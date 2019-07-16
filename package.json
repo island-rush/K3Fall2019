@@ -4,9 +4,9 @@
   "description": "Island Rush V3.1 is a Military Strategy Teaching Tool/Game.",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node index.js",
     "buildClient": "cd client && npm install && npm run build && cd ..",
-    "devStart": "nodemon server.js"
+    "devStart": "nodemon index.js"
   },
   "repository": {
     "type": "git",

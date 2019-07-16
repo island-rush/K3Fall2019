@@ -9,7 +9,8 @@ const DatabaseHostname = process.env.DB_HOSTNAME || "localhost";
 const DatabaseUsername = process.env.DB_USERNAME || "root";
 const DatabasePassword = process.env.DB_PASSWORD || "";
 const DatabaseName = process.env.DB_NAME || "k3";
-const app = require('express')();
+const express = require('express');
+const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const session = require('express-session')({
@@ -33,8 +34,10 @@ const csvparse = require('csv-array');
 let distanceMatrix = [];
 csvparse.parseCSV('distanceMatrix.csv', (data) => { distanceMatrix = data; }, false);
 
+app.use(express.static(__dirname + '/client/build'));
+
 // ----------------------------------------------------------------------------------------
-// Internal Routing
+// Internal Routing (unrestricted access)
 // ----------------------------------------------------------------------------------------
 
 app.get('/', (req, res) => {
@@ -60,10 +63,12 @@ app.get('/credits.html', (req, res) => {
 
 
 // ----------------------------------------------------------------------------------------
-// Game Routing
+// Game Routing (into the react app)
 // ----------------------------------------------------------------------------------------
 
-
+app.get('/game.html', (req, res) => {
+    res.sendFile(__dirname + '/client/build/index.html');
+});
 
 // ----------------------------------------------------------------------------------------
 // Socket Requests (client + server gameplay services)
