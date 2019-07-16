@@ -39,6 +39,14 @@ app.get('/index.html', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/troubleshooting.html', (req, res) => {
+    res.sendFile(__dirname + '/troubleshooting.html');
+});
+
+app.get('/credits.html', (req, res) => {
+    res.sendFile(__dirname + '/credits.html');
+});
+
 // ----------------------------------------------------------------------------------------
 // Admin Services / Routing
 // ----------------------------------------------------------------------------------------
