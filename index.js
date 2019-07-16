@@ -67,7 +67,7 @@ app.get('/credits.html', (req, res) => {
 // ----------------------------------------------------------------------------------------
 
 app.get('/game.html', (req, res) => {
-    res.sendFile(__dirname + '/client/build/index.html');
+    res.sendFile(__dirname + '/client/build/game.html');
 });
 
 // ----------------------------------------------------------------------------------------
