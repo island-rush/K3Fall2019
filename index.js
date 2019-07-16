@@ -3,6 +3,12 @@
 // ----------------------------------------------------------------------------------------
 
 const port = process.env.PORT || 80;
+const CourseDirectorLastName = process.env.CD_LASTNAME || "Smith";
+const CourseDirectorPassword = process.env.CD_PASSWORD || "5f4dcc3b5aa765d61d8327deb882cf99";  //"password"
+const DatabaseHostname = process.env.DB_HOSTNAME || "localhost";
+const DatabaseUsername = process.env.DB_USERNAME || "root";
+const DatabasePassword = process.env.DB_PASSWORD || "";
+const DatabaseName = process.env.DB_NAME || "k3";
 const app = require('express')();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
@@ -17,10 +23,10 @@ io.use(sharedsession(session));
 const md5 = require('md5');
 const mysql = require('mysql');
 // const config = {
-//     host: process.env.DB_HOSTNAME || "localhost",
-//     user: process.env.DB_USERNAME || "root",
-//     password: process.env.DB_PASSWORD || "",
-//     database: process.env.DB_NAME || "k3"
+//     host: DatabaseHostname,
+//     user: DatabaseUsername,
+//     password: DatabasePassword,
+//     database: DatabaseName
 // }
 
 const csvparse = require('csv-array');
@@ -39,8 +45,8 @@ app.get('/index.html', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
-app.get('/troubleshooting.html', (req, res) => {
-    res.sendFile(__dirname + '/troubleshooting.html');
+app.get('/troubleshoot.html', (req, res) => {
+    res.sendFile(__dirname + '/troubleshoot.html');
 });
 
 app.get('/credits.html', (req, res) => {
@@ -48,7 +54,7 @@ app.get('/credits.html', (req, res) => {
 });
 
 // ----------------------------------------------------------------------------------------
-// Admin Services / Routing
+// Teacher and Course Director Services / Routing
 // ----------------------------------------------------------------------------------------
 
 
