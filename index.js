@@ -74,7 +74,15 @@ app.get('/game.html', (req, res) => {
 // Socket Requests (client + server gameplay services)
 // ----------------------------------------------------------------------------------------
 
-
+io.sockets.on('connection', (socket) => {
+    console.log("connected from a client");
+    socket.on('disconnect', () => {
+        console.log("disconnected from a client");
+    });
+    socket.on('callToServer', (callback) => {
+        callback("only the server knows this info");
+    });
+});
 
 // ----------------------------------------------------------------------------------------
 // Start taking in requests to the server
