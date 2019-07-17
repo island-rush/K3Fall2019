@@ -9,6 +9,7 @@ const DatabaseHostname = process.env.DB_HOSTNAME || "localhost";
 const DatabaseUsername = process.env.DB_USERNAME || "root";
 const DatabasePassword = process.env.DB_PASSWORD || "";
 const DatabaseName = process.env.DB_NAME || "k3";
+const backendServices = require('./backendServices.js');
 const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
@@ -20,6 +21,7 @@ const session = require('express-session')({
 });
 const sharedsession = require('express-socket.io-session');
 app.use(session);
+app.use(express.urlencoded());
 io.use(sharedsession(session));
 const md5 = require('md5');
 const mysql = require('mysql');
@@ -60,7 +62,46 @@ app.get('/credits.html', (req, res) => {
 // Teacher and Course Director Services / Routing
 // ----------------------------------------------------------------------------------------
 
+app.get('/teacher.html', (req, res) => {
+    res.sendFile(__dirname + '/teacher.html');
+});
 
+app.get('/courseDirector.html', (req, res) => {
+    res.sendFile(__dirname + '/courseDirector.html');
+});
+
+app.post('/gameAdd', (req, res) => {
+    const result = backendServices.gameAdd(req.body.adminSection, req.body.adminInstructor, req.body.adminPassword);
+    if (result) {
+        res.redirect('/courseDirector.html?success=1');
+    } else {
+        res.redirect('/courseDirector.html?error=1');
+    }
+});
+
+app.post('/gameDelete', (req, res) => {
+    const result = backendServices.gameDelete(req.body.gameId);
+    if (result) {
+        res.redirect('/courseDirector.html?success=2');
+    } else {
+        res.redirect('/courseDirector.html?error=2');
+    }
+});
+
+app.post('/generateDatabase', (req, res) => {
+    const result = backendServices.generateDatabase();
+    if (result) {
+        res.redirect('/courseDirector.html?success=3');
+    } else {
+        res.redirect('/courseDirector.html?error=3');
+    }
+});
+
+app.get('/getGames', (req, res) => {
+    console.log('got games');
+    const result = backendServices.getGames();
+    res.send(result);
+});
 
 // ----------------------------------------------------------------------------------------
 // Game Routing (into the react app)
@@ -75,9 +116,8 @@ app.get('/game.html', (req, res) => {
 // ----------------------------------------------------------------------------------------
 
 io.sockets.on('connection', (socket) => {
-    console.log("connected from a client");
     socket.on('disconnect', () => {
-        console.log("disconnected from a client");
+        //Disconnect Things
     });
     socket.on('callToServer', (callback) => {
         callback("only the server knows this info");
