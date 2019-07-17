@@ -41,6 +41,18 @@ exports.getGames = () => {
     return JSON.stringify(games);
 }
 
+exports.getGame = () => {
+    //validate the sender (session = teacher)
+
+    //get the gameId from the session
+
+    //make sure the game exists?
+
+    //get all the data needed about the game to display to the teacher
+
+    //return the JSON
+}
+
 
 
 
