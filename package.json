@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "devStart": "nodemon index.js",
-    "devBuildClient": "cd client && npm install && npm run build && cd build && ren index.html game.html && cd .. && cd .."
+    "devServer": "nodemon index.js",
+    "devClient": "cd client && npm run build && cd build && ren index.html game.html && cd .. && cd .."
   },
   "repository": {
     "type": "git",

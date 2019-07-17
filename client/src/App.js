@@ -13,7 +13,8 @@ class App extends Component {
   // socket = socketIOClient('');
 
   componentDidMount() {
-    const socket = socketIOClient(window.location.href);
+    const socket = socketIOClient(window.location.hostname);
+    alert(window.location.hostname);
     socket.emit('callToServer', (serverResponse) => {
       alert(serverResponse);
     });
