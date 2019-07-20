@@ -53,5 +53,46 @@
             <a href="https://gitreports.com/issue/island-rush/K3.1" target="_blank" style="float: right">Report an Issue</a>
             <a href="https://github.com/island-rush/K3.1/wiki" target="_blank" style="float: right">Wiki</a>
         </nav>
+        <h2>Teacher Tools</h2>
+        <span class="important" id="section"></span>
+        <span class="important" id="instructor"></span>
+        <br>
+        <hr>
+        <h3>Activate / Deactivate Game</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        <script>
+            function getUrlVars() {
+                var vars = {};
+                var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+                    vars[key] = value;
+                });
+                return vars;
+            }
+
+            function getUrlParam(parameter, defaultvalue){
+                var urlparameter = defaultvalue;
+                if(window.location.href.indexOf(parameter) > -1){
+                    urlparameter = getUrlVars()[parameter];
+                    }
+                return urlparameter;
+            }
+
+            document.getElementById("section").innerHTML = "Section: <b>" + getUrlParam('section') + "</b>";
+            document.getElementById("instructor").innerHTML = "Instructor: <b>" + getUrlParam('instructor') + "</b>";
+        </script>
     </body>
 </html>

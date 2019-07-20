@@ -23,7 +23,7 @@ const sharedsession = require('express-socket.io-session');
 app.use(session);
 app.use(express.urlencoded());
 io.use(sharedsession(session));
-const md5 = require('md5');
+
 
 // Dataase Connection Pool
 const mysql = require('mysql');
@@ -78,6 +78,13 @@ app.get('/teacher.html', (req, res) => {
 
 app.get('/courseDirector.html', (req, res) => {
     res.sendFile(__dirname + '/server/routes/courseDirector.html');
+});
+
+//For both teacher / courseDirector
+app.post('/adminLoginVerify', (req, res) => {
+    backendServices.adminLoginVerify(mysqlPool, req, (result) => {
+        res.redirect(result);
+    });
 });
 
 app.post('/gameAdd', (req, res) => {

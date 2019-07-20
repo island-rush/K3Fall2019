@@ -51,6 +51,13 @@
       Green {
         color: green
       }
+      Blue {
+        color: blue
+      }
+      /* * {
+        padding: px;
+        margin: 0px;
+      } */
     </style>
   </head>
   <body>
@@ -62,7 +69,93 @@
       <a href="https://gitreports.com/issue/island-rush/K3.1" target="_blank" style="float: right">Report an Issue</a>
       <a href="https://github.com/island-rush/K3.1/wiki" target="_blank" style="float: right">Wiki</a>
     </nav>
-    <h2 id="DatabaseConnectionTag">Database Connection Status: Loading...</h2>
+    
+
+    <table style="width: 100%">
+      <tr>
+          <td>
+              <H3>Player Login</H3>
+              <form name="gameLogin" method="post" id="gameLogin" action="/gameLoginVerify">
+                  <table>
+                      <tr>
+                        <td colspan="2">
+                            <div id="formFeedback" class="formError" style="color: red;">
+                            </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Section</td>
+                        <td>
+                            <input name="gameSection" type="text" id="gameSection" placeholder="ex: m1a1" autofocus="autofocus" required>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Teacher Last Name</td>
+                        <td>
+                            <input name="gameInstructor" type="text" id="gameInstructor" placeholder="ex: Smith" required>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Team</td>
+                        <td>
+                            <input type="radio" name="gameTeam" value="Blue"> <blue>Vestrland Commander</blue><br>
+                            <!-- <input type="radio" name="gameTeam" value="Red"> <red>Zuun Commander</red><br> -->
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Type</td>
+                        <td>
+                            <input type="radio" name="gameType" value="Main">Main Commander<br>
+                            <!-- <input type="radio" name="gameType" value="Air">Air Commander<br>
+                            <input type="radio" name="gameType" value="Land">Air Commander<br>
+                            <input type="radio" name="gameType" value="Sea">Air Commander<br>
+                            <input type="radio" name="gameType" value="Marine">Air Commander<br> -->
+                        </td>
+                    </tr>
+                      <tr>
+                          <td colspan="2"><br/><input type="submit" name="Submit" value="Game Login"></td>
+                      </tr>
+                  </table>
+              </form>
+          </td>
+          <td style="vertical-align: top">
+            <h3 id="DatabaseConnectionTag" style="position: relative; float: left">Database Connection Status: Loading...</h3>
+          </td>
+          <td style="position: relative; float: right">
+              <H3>Teacher Login</H3>
+              <form name="adminLogin" method="post" id="adminLogin" action="/adminLoginVerify">
+                  <table>
+                      <tr>
+                          <td>Section</td>
+                          <td>
+                              <input name="adminSection" type="text" id="adminSection" placeholder="ex: m1a1" autofocus="autofocus" required>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td>Teacher Last Name</td>
+                          <td>
+                              <input name="adminInstructor" type="text" id="adminInstructor" placeholder="ex: Smith" required>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td>Password</td>
+                          <td>
+                              <input name="adminPassword" type="password" id="adminPassword" required>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td colspan="2"><br/><input type="submit" name="Submit" value="Admin Login"></td>
+                      </tr>
+                  </table>
+              </form>
+          </td>
+      </tr>
+  </table>
+
+
+
+
+
   </body>
   <script>
     let getDatabaseStatus = new XMLHttpRequest();
@@ -78,5 +171,30 @@
     };
     getDatabaseStatus.open("GET", "/databaseStatus", true);
     getDatabaseStatus.send();
+
+    function getUrlVars() {
+        var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+            vars[key] = value;
+        });
+        return vars;
+    }
+
+    function getUrlParam(parameter, defaultvalue){
+        var urlparameter = defaultvalue;
+        if(window.location.href.indexOf(parameter) > -1){
+            urlparameter = getUrlVars()[parameter];
+            }
+        return urlparameter;
+    }
+
+    switch (getUrlParam('error')) {
+        case "login":
+            document.getElementById('formFeedback').innerHTML = "Login Credentials Failed";
+            break;
+        case "session":
+            document.getElementById('formFeedback').innerHTML = "Session Error";
+            break;
+    }
   </script>
 </html>
