@@ -84,7 +84,6 @@
 
         <h2 id="DatabaseConnectionTag">Database Status: Loading...</h2>
 
-
         <h1>Add a Game</h1>
         <form name="gameAdd" method="post" id="gameAddForm" action="/gameAdd">
             <table border="0" cellpadding="3" cellspacing="1">
@@ -144,7 +143,7 @@
 
         <br><br>
 
-        <form name="generateDatabase" method="post" id="generateDatabaseForm" onsubmit="return generateDatabase()" action="/generateDatabase">
+        <form name="insertDatabaseTablesForm" method="post" id="insertDatabaseTablesForm" onsubmit="return insertDatabaseTables()" action="/insertDatabaseTables">
             <input type="submit" class="btn btn-danger" name="Submit" id="databaseResetButton" value="GENERATE DATABASE">
         </form>
 
@@ -204,7 +203,7 @@
                     document.getElementById('SuccessTag').innerHTML = "Successfully Created Game";
                     break;
                 case "failed":
-                    document.getElementById('ErrorTag').innerHTML = "Failed to Create Game";
+                    document.getElementById('ErrorTag').innerHTML = "Failed to Create Game: Check Database Initialization";
                     break;
             }
 
@@ -217,7 +216,16 @@
                     break;
             }
 
-            function databaseReset() {
+            switch (getUrlParam('initializeDatabase')) {
+                case "success":
+                    document.getElementById('SuccessTag').innerHTML = "Successfully Initialized Database";
+                    break;
+                case "failed":
+                    document.getElementById('ErrorTag').innerHTML = "Failed to Initialize Database";
+                    break;
+            }
+
+            function insertDatabaseTables() {
                 return confirm("This button should only need to be pressed once, as a convenience of creating the database tables. It is assumed that the database itself already exists. This action will not effect current tables if they already exist.");
             }
             function confirmDelete() {

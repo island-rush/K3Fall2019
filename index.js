@@ -3,8 +3,6 @@
 // ----------------------------------------------------------------------------------------
 
 const port = process.env.PORT || 80;
-const CourseDirectorLastName = process.env.CD_LASTNAME || "Smith";
-const CourseDirectorPassword = process.env.CD_PASSWORD || "5f4dcc3b5aa765d61d8327deb882cf99";  //"password"
 const DatabaseHostname = process.env.DB_HOSTNAME || "localhost";
 const DatabaseUsername = process.env.DB_USERNAME || "root";
 const DatabasePassword = process.env.DB_PASSWORD || "";
@@ -24,8 +22,6 @@ app.use(session);
 app.use(express.urlencoded());
 io.use(sharedsession(session));
 
-
-// Dataase Connection Pool
 const mysql = require('mysql');
 const databaseConfig = {
     connectionLimit: 10,
@@ -47,14 +43,12 @@ app.use(express.static(__dirname + '/client/build'));
 // ----------------------------------------------------------------------------------------
 
 app.get('/', (req, res) => {
-    res.redirect('/index.html');
+    delete req.session.ir3;
+    res.sendFile(__dirname + '/server/routes/index.html');
 });
 
 app.get('/index.html', (req, res) => {
-    //clean the session
-    delete req.session.gameId;
-    delete req.session.teacher;
-    delete req.session.courseDirector;
+    delete req.session.ir3;
     res.sendFile(__dirname + '/server/routes/index.html');
 });
 
@@ -77,7 +71,7 @@ app.get('/databaseStatus', (req, res) => {
 // ----------------------------------------------------------------------------------------
 
 app.get('/teacher.html', (req, res) => {
-    if (req.session.teacher) {
+    if (req.session.ir3.teacher) {
         res.sendFile(__dirname + '/server/routes/teacher.html');
     } else {
         res.redirect('/index.html?error=login');
@@ -85,7 +79,7 @@ app.get('/teacher.html', (req, res) => {
 });
 
 app.get('/courseDirector.html', (req, res) => {
-    if (req.session.courseDirector) {
+    if (req.session.ir3.courseDirector) {
         res.sendFile(__dirname + '/server/routes/courseDirector.html');
     } else {
         res.redirect('/index.html?error=login');
@@ -99,7 +93,7 @@ app.post('/adminLoginVerify', (req, res) => {
 });
 
 app.post('/gameAdd', (req, res) => {
-    if (req.session.courseDirector) {
+    if (req.session.ir3.courseDirector) {
         backendServices.gameAdd(mysqlPool, req, (result) => {
             res.redirect(`/courseDirector.html?gameAdd=${result ? "success" : "failed"}`);
         });
@@ -109,7 +103,7 @@ app.post('/gameAdd', (req, res) => {
 });
 
 app.post('/gameDelete', (req, res) => {
-    if (req.session.courseDirector) {
+    if (req.session.ir3.courseDirector) {
         backendServices.gameDelete(mysqlPool, req, (result) => {
             res.redirect(`/courseDirector.html?gameDelete=${result ? "success" : "failed"}`);
         });
@@ -118,17 +112,18 @@ app.post('/gameDelete', (req, res) => {
     }
 });
 
-app.post('/generateDatabase', (req, res) => {
-    // const result = backendServices.generateDatabase();
-    // if (result) {
-    //     res.redirect('/courseDirector.html?success=3');
-    // } else {
-    //     res.redirect('/courseDirector.html?error=3');
-    // }
+app.post('/insertDatabaseTables', (req, res) => {
+    if (req.session.ir3.courseDirector) {
+        backendServices.insertDatabaseTables(mysqlPool, req, (result) => {
+            res.redirect(`/courseDirector.html?initializeDatabase=${result}`);
+        });
+    } else {
+        res.redirect('/index.html?error=access');
+    }
 });
 
 app.get('/getGames', (req, res) => {
-    if (req.session.teacher || req.session.courseDirector) {
+    if (req.session.ir3.teacher || req.session.ir3.courseDirector) {
         backendServices.getGames(mysqlPool, req, (result) => {
             res.send(result);
         });
@@ -138,7 +133,7 @@ app.get('/getGames', (req, res) => {
 });
 
 app.get('/getGameActive', (req, res) => {
-    if (req.session.teacher && req.session.gameId) {
+    if (req.session.ir3.teacher && req.session.ir3.gameId) {
         backendServices.getGameActive(mysqlPool, req, (result) => {
             res.send(JSON.stringify(result));
         });
@@ -148,7 +143,7 @@ app.get('/getGameActive', (req, res) => {
 });
 
 app.post('/toggleGameActive', (req, res) => {
-    if (req.session.teacher && req.session.gameId) {
+    if (req.session.ir3.teacher && req.session.ir3.gameId) {
         backendServices.toggleGameActive(mysqlPool, req, (result) => {});
     } else {
         res.redirect('/index.html?error=access');
@@ -160,7 +155,7 @@ app.post('/toggleGameActive', (req, res) => {
 // ----------------------------------------------------------------------------------------
 
 app.get('/game.html', (req, res) => {
-    if (req.session.gameId) {
+    if (req.session.ir3.gameId) {
         res.sendFile(__dirname + '/client/build/game.html');
     } else {
         res.redirect('/index.html?error=unkownGameAccess');

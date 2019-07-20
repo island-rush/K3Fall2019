@@ -116,18 +116,7 @@
         <hr>
         <h3>News Alerts for this game:</h3>
 
-
-
-
-
-
-
-
-
-
-
-
-
+        <p>Todo: Implement News Alerts</p>
 
         <script>
             let getGameActive = new XMLHttpRequest();
@@ -146,7 +135,7 @@
                 toggleGameActive.open("POST", "/toggleGameActive", true);
                 toggleGameActive.send();
             }
-            
+
             function getUrlVars() {
                 var vars = {};
                 var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
