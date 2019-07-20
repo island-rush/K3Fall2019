@@ -71,7 +71,7 @@ app.get('/databaseStatus', (req, res) => {
 // ----------------------------------------------------------------------------------------
 
 app.get('/teacher.html', (req, res) => {
-    if (req.session.ir3.teacher) {
+    if (req.session.ir3 && req.session.ir3.teacher) {
         res.sendFile(__dirname + '/server/routes/teacher.html');
     } else {
         res.redirect('/index.html?error=login');
@@ -79,7 +79,7 @@ app.get('/teacher.html', (req, res) => {
 });
 
 app.get('/courseDirector.html', (req, res) => {
-    if (req.session.ir3.courseDirector) {
+    if (req.session.ir3 && req.session.ir3.courseDirector) {
         res.sendFile(__dirname + '/server/routes/courseDirector.html');
     } else {
         res.redirect('/index.html?error=login');
@@ -93,7 +93,7 @@ app.post('/adminLoginVerify', (req, res) => {
 });
 
 app.post('/gameAdd', (req, res) => {
-    if (req.session.ir3.courseDirector) {
+    if (req.session.ir3 && req.session.ir3.courseDirector) {
         backendServices.gameAdd(mysqlPool, req, (result) => {
             res.redirect(`/courseDirector.html?gameAdd=${result ? "success" : "failed"}`);
         });
@@ -103,7 +103,7 @@ app.post('/gameAdd', (req, res) => {
 });
 
 app.post('/gameDelete', (req, res) => {
-    if (req.session.ir3.courseDirector) {
+    if (req.session.ir3 && req.session.ir3.courseDirector) {
         backendServices.gameDelete(mysqlPool, req, (result) => {
             res.redirect(`/courseDirector.html?gameDelete=${result ? "success" : "failed"}`);
         });
@@ -113,7 +113,7 @@ app.post('/gameDelete', (req, res) => {
 });
 
 app.post('/insertDatabaseTables', (req, res) => {
-    if (req.session.ir3.courseDirector) {
+    if (req.session.ir3 && req.session.ir3.courseDirector) {
         backendServices.insertDatabaseTables(mysqlPool, req, (result) => {
             res.redirect(`/courseDirector.html?initializeDatabase=${result}`);
         });
@@ -123,7 +123,7 @@ app.post('/insertDatabaseTables', (req, res) => {
 });
 
 app.get('/getGames', (req, res) => {
-    if (req.session.ir3.teacher || req.session.ir3.courseDirector) {
+    if (req.session.ir3 && (req.session.ir3.teacher || req.session.ir3.courseDirector)) {
         backendServices.getGames(mysqlPool, req, (result) => {
             res.send(result);
         });
@@ -133,7 +133,7 @@ app.get('/getGames', (req, res) => {
 });
 
 app.get('/getGameActive', (req, res) => {
-    if (req.session.ir3.teacher && req.session.ir3.gameId) {
+    if (req.session.ir3 && req.session.ir3.teacher && req.session.ir3.gameId) {
         backendServices.getGameActive(mysqlPool, req, (result) => {
             res.send(JSON.stringify(result));
         });
@@ -143,7 +143,7 @@ app.get('/getGameActive', (req, res) => {
 });
 
 app.post('/toggleGameActive', (req, res) => {
-    if (req.session.ir3.teacher && req.session.ir3.gameId) {
+    if (req.session.ir3 && req.session.ir3.teacher && req.session.ir3.gameId) {
         backendServices.toggleGameActive(mysqlPool, req, (result) => {});
     } else {
         res.redirect('/index.html?error=access');
@@ -155,7 +155,7 @@ app.post('/toggleGameActive', (req, res) => {
 // ----------------------------------------------------------------------------------------
 
 app.get('/game.html', (req, res) => {
-    if (req.session.ir3.gameId) {
+    if (req.session.ir3 && req.session.ir3.gameId) {
         res.sendFile(__dirname + '/client/build/game.html');
     } else {
         res.redirect('/index.html?error=unkownGameAccess');
