@@ -1,42 +1,38 @@
 const md5 = require('md5');
 
-
-
 exports.gameAdd = (mysqlPool, req, callback) => {
-    //validate the session
-    //req.session
-
-    //validate the inputs
     const {adminSection, adminInstructor, adminPassword} = req.body;
+    if (!adminSection || !adminInstructor || !adminPassword) {
+        callback(false);
+        return;
+    }
+
     const adminPasswordHashed = md5(adminPassword);
-    
-    //attempt to insert
     mysqlPool.query('INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?)', [adminSection, adminInstructor, adminPasswordHashed], (error, results, fields) => {
         if (error) {
-            //handle error
-            console.log(error.code);
             callback(false);
+            return;
         } else {
             callback(true);
+            return;
         }
     });
 }
 
 exports.gameDelete = (mysqlPool, req, callback) => {
-    //validate the session
-    //req.session
-
-    //validate inputs
     const {gameId} = req.body;
+    if (!gameId) {
+        callback(false);
+        return;
+    }
 
-    //attempt to delete
     mysqlPool.query('DELETE FROM games WHERE gameId = ?', [gameId], (error, results, fields) => {
         if (error) {
-            //handle error
-            console.log(error.code);
             callback(false);
+            return;
         } else {
             callback(true);
+            return;
         }
     });
 }
@@ -53,7 +49,10 @@ exports.databaseStatus = (mysqlPool, req, callback) => {
 }
 
 exports.getGames = (mysqlPool, req, callback) => {
-    //verify session is cd
+    if (!req.session.courseDirector) {
+        callback(null);
+        return;
+    }
 
     mysqlPool.query('SELECT * FROM games', (error, results, fields) => {
         let games = [];
@@ -69,31 +68,18 @@ exports.getGames = (mysqlPool, req, callback) => {
     });
 }
 
-
-
-
-
-
-
-
-
-
-
-
 exports.adminLoginVerify = (mysqlPool, req, callback) => {
-    //validate empty session (must have empty session variables to log into a different admin?)
-    //req.session
-
     const CourseDirectorLastName = process.env.CD_LASTNAME || "Smith";
     const CourseDirectorPassword = process.env.CD_PASSWORD || "5f4dcc3b5aa765d61d8327deb882cf99";  //"password"
-
-    //get the login info / validate the login info?
     const {adminSection, adminInstructor, adminPassword} = req.body;
-    const adminPasswordHashed = md5(adminPassword);
+    if (!adminSection || !adminInstructor || !adminPassword) {
+        callback("/index.html?error=badRequest");
+        return;
+    }
 
-    //see if its the course director
+    const adminPasswordHashed = md5(adminPassword);
     if (adminSection == "CourseDirector" && adminInstructor == CourseDirectorLastName && adminPasswordHashed == CourseDirectorPassword) {
-        //set the session
+        req.session.courseDirector = true;
         callback("/courseDirector.html");
         return;
     }
@@ -103,42 +89,32 @@ exports.adminLoginVerify = (mysqlPool, req, callback) => {
             callback('/index.html?error=login');
             return;
         }
+
         const {gameId, gameAdminPassword} = results[0];
         if (gameAdminPassword != adminPasswordHashed) {
             callback('/index.html?error=login');
             return;
         }
         
-        //authenticate the session
-        //req.session
+        req.session.gameId = gameId;
+        req.session.teacher = true;
         callback(`/teacher.html?section=${adminSection}&instructor=${adminInstructor}`);
         return;
     });
-
-
-
-
 }
 
 
 
+exports.getGameActive = (mysqlPool, req, callback) => {
+    const {gameId} = req.session;
+    if (!gameId) {
+        callback(null);
+        return;
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    mysqlPool.query('SELECT gameActive FROM games WHERE gameId = ?', [gameId], (error, results, fields) => {
+        callback(results[0].gameActive);
+        return;
+    });
+}
 

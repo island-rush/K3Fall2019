@@ -190,11 +190,18 @@
 
     switch (getUrlParam('error')) {
         case "login":
-            document.getElementById('formFeedback').innerHTML = "Login Credentials Failed";
-            break;
-        case "session":
-            document.getElementById('formFeedback').innerHTML = "Session Error";
-            break;
+          document.getElementById('formFeedback').innerHTML = "Login Credentials Failed";
+          break;
+        case "access":
+          document.getElementById('formFeedback').innerHTML = "Unauthenticated/Unauthorized Access";
+          break;
+        case "unkownGameAccess":
+          document.getElementById('formFeedback').innerHTML = "Unauthenticated Game Access";
+          break;
+        case "badRequest":
+          document.getElementById('formFeedback').innerHTML = "Bad Request was Given";
+          break;
+
     }
   </script>
 </html>

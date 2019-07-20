@@ -51,6 +51,10 @@ app.get('/', (req, res) => {
 });
 
 app.get('/index.html', (req, res) => {
+    //clean the session
+    delete req.session.gameId;
+    delete req.session.teacher;
+    delete req.session.courseDirector;
     res.sendFile(__dirname + '/server/routes/index.html');
 });
 
@@ -73,14 +77,21 @@ app.get('/databaseStatus', (req, res) => {
 // ----------------------------------------------------------------------------------------
 
 app.get('/teacher.html', (req, res) => {
-    res.sendFile(__dirname + '/server/routes/teacher.html');
+    if (req.session.teacher) {
+        res.sendFile(__dirname + '/server/routes/teacher.html');
+    } else {
+        res.redirect('/index.html?error=login');
+    }
 });
 
 app.get('/courseDirector.html', (req, res) => {
-    res.sendFile(__dirname + '/server/routes/courseDirector.html');
+    if (req.session.courseDirector) {
+        res.sendFile(__dirname + '/server/routes/courseDirector.html');
+    } else {
+        res.redirect('/index.html?error=login');
+    }
 });
 
-//For both teacher / courseDirector
 app.post('/adminLoginVerify', (req, res) => {
     backendServices.adminLoginVerify(mysqlPool, req, (result) => {
         res.redirect(result);
@@ -88,16 +99,23 @@ app.post('/adminLoginVerify', (req, res) => {
 });
 
 app.post('/gameAdd', (req, res) => {
-    //TODO: Redirect to home page if not an authenticated course director / admin
-    backendServices.gameAdd(mysqlPool, req, (result) => {
-        res.redirect(`/courseDirector.html?gameAdd=${result ? "success" : "failed"}`);
-    });
+    if (req.session.courseDirector) {
+        backendServices.gameAdd(mysqlPool, req, (result) => {
+            res.redirect(`/courseDirector.html?gameAdd=${result ? "success" : "failed"}`);
+        });
+    } else {
+        res.redirect('/index.html?error=access');
+    }
 });
 
 app.post('/gameDelete', (req, res) => {
-    backendServices.gameDelete(mysqlPool, req, (result) => {
-        res.redirect(`/courseDirector.html?gameDelete=${result ? "success" : "failed"}`);
-    });
+    if (req.session.courseDirector) {
+        backendServices.gameDelete(mysqlPool, req, (result) => {
+            res.redirect(`/courseDirector.html?gameDelete=${result ? "success" : "failed"}`);
+        });
+    } else {
+        res.redirect('/index.html?error=access');
+    }
 });
 
 app.post('/generateDatabase', (req, res) => {
@@ -110,9 +128,23 @@ app.post('/generateDatabase', (req, res) => {
 });
 
 app.get('/getGames', (req, res) => {
-    backendServices.getGames(mysqlPool, req, (result) => {
-        res.send(result);
-    });
+    if (req.session.teacher || req.session.courseDirector) {
+        backendServices.getGames(mysqlPool, req, (result) => {
+            res.send(result);
+        });
+    } else {
+        res.redirect('/index.html?error=access');
+    }
+});
+
+app.get('/getGameActive', (req, res) => {
+    if (req.session.teacher) {
+        backendServices.getGameActive(mysqlPool, req, (result) => {
+            res.send(result);
+        });
+    } else {
+        res.redirect('/index.html?error=access');
+    }
 });
 
 // ----------------------------------------------------------------------------------------
@@ -120,7 +152,11 @@ app.get('/getGames', (req, res) => {
 // ----------------------------------------------------------------------------------------
 
 app.get('/game.html', (req, res) => {
-    res.sendFile(__dirname + '/client/build/game.html');
+    if (req.session.gameId) {
+        res.sendFile(__dirname + '/client/build/game.html');
+    } else {
+        res.redirect('/index.html?error=unkownGameAccess');
+    }
 });
 
 // ----------------------------------------------------------------------------------------
