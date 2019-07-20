@@ -36,7 +36,7 @@ const csvparse = require('csv-array');
 let distanceMatrix = [];
 csvparse.parseCSV('./server/distanceMatrix.csv', (data) => { distanceMatrix = data; }, false);
 
-app.use(express.static(__dirname + '/client/build'));
+
 
 // ----------------------------------------------------------------------------------------
 // Internal Routing (unrestricted access)
@@ -154,13 +154,21 @@ app.post('/toggleGameActive', (req, res) => {
 // Game Routing (into the react app)
 // ----------------------------------------------------------------------------------------
 
+app.post('/gameLoginVerify', (req, res) => {
+    backendServices.gameLoginVerify(mysqlPool, req, (result) => {
+        res.redirect(result);
+    });
+});
+
 app.get('/game.html', (req, res) => {
     if (req.session.ir3 && req.session.ir3.gameId) {
-        res.sendFile(__dirname + '/client/build/game.html');
+        res.sendFile(__dirname + '/client/build/index.html');
     } else {
-        res.redirect('/index.html?error=unkownGameAccess');
+        res.redirect('/index.html?error=login');
     }
 });
+
+app.use(express.static(__dirname + '/client/build'));
 
 // ----------------------------------------------------------------------------------------
 // Socket Requests (client + server gameplay services)

@@ -1,4 +1,5 @@
 const md5 = require('md5');
+const fs = require('fs');
 
 exports.gameAdd = (mysqlPool, req, callback) => {
     const {adminSection, adminInstructor, adminPassword} = req.body;
@@ -122,7 +123,8 @@ exports.toggleGameActive = (mysqlPool, req, callback) => {
 }
 
 exports.insertDatabaseTables = (mysqlPool, req, callback) => {
-    mysqlPool.query('CREATE TABLE IF NOT EXISTS games(gameId INT(2) NOT NULL UNIQUE AUTO_INCREMENT, gameSection VARCHAR(4) NOT NULL, gameInstructor VARCHAR(32) NOT NULL, gameAdminPassword VARCHAR(32) NOT NULL, gameActive INT(1) NOT NULL DEFAULT 0, PRIMARY KEY(gameId)) AUTO_INCREMENT=1', (error, results, fields) => {
+    const sql = fs.readFileSync('./server/sql/k3_tableInsert.sql').toString();
+    mysqlPool.query(sql, (error, results, fields) => {
         if (error) {
             console.log(error);
             callback("failed");
@@ -131,5 +133,43 @@ exports.insertDatabaseTables = (mysqlPool, req, callback) => {
             callback("success");
             return;
         }
+    });
+}
+
+
+
+
+
+
+exports.gameLoginVerify = (mysqlPool, req, callback) => {
+    const {gameSection, gameInstructor, gameTeam, gameTeamPassword, gameController} = req.body;
+    if (!gameSection || !gameInstructor || !gameTeam || !gameTeamPassword || !gameController) {
+        callback("/index.html?error=badRequest");
+        return;
+    }
+
+    const gameTeamPasswordHashed = md5(gameTeamPassword);
+    mysqlPool.query('SELECT gameId, game0Password, game1Password FROM games WHERE gameSection = ? AND gameInstructor = ? ORDER BY gameId', [gameSection, gameInstructor], (error, results, fields) => {
+        if (results.length != 1) {
+            callback('/index.html?error=login');
+            return;
+        }
+
+        const {gameId, game0Password, game1Password} = results[0];
+        let gamePassword = game0Password;
+        if (gameTeam == 1) {
+            gamePassword = game1Password;
+        }
+
+        if (gameTeamPasswordHashed != gamePassword) {
+            callback("/index.html?error=login");
+            return;
+        }
+
+        req.session.ir3 = {
+            gameId: gameId
+        }
+        callback("/game.html");
+        return;
     });
 }
