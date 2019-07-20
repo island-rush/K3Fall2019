@@ -83,13 +83,13 @@ app.get('/courseDirector.html', (req, res) => {
 app.post('/gameAdd', (req, res) => {
     //TODO: Redirect to home page if not an authenticated course director / admin
     backendServices.gameAdd(mysqlPool, req, (result) => {
-        res.redirect(`/server/routes/courseDirector.html?gameAdd=${result ? "success" : "failed"}`);
+        res.redirect(`/courseDirector.html?gameAdd=${result ? "success" : "failed"}`);
     });
 });
 
 app.post('/gameDelete', (req, res) => {
     backendServices.gameDelete(mysqlPool, req, (result) => {
-        res.redirect(`/server/routes/courseDirector.html?gameDelete=${result ? "success" : "failed"}`);
+        res.redirect(`/courseDirector.html?gameDelete=${result ? "success" : "failed"}`);
     });
 });
 
