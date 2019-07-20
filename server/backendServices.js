@@ -103,18 +103,27 @@ exports.adminLoginVerify = (mysqlPool, req, callback) => {
     });
 }
 
-
-
 exports.getGameActive = (mysqlPool, req, callback) => {
     const {gameId} = req.session;
-    if (!gameId) {
-        callback(null);
-        return;
-    }
-
     mysqlPool.query('SELECT gameActive FROM games WHERE gameId = ?', [gameId], (error, results, fields) => {
         callback(results[0].gameActive);
         return;
     });
 }
+
+exports.toggleGameActive = (mysqlPool, req, callback) => {
+    const {gameId} = req.session;
+    mysqlPool.query('UPDATE games SET gameActive = (gameActive + 1) % 2 WHERE gameId = ?', [gameId], (error, result, fields) => {
+        callback();
+        return;
+    });
+}
+
+
+
+
+
+
+
+
 

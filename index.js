@@ -138,10 +138,18 @@ app.get('/getGames', (req, res) => {
 });
 
 app.get('/getGameActive', (req, res) => {
-    if (req.session.teacher) {
+    if (req.session.teacher && req.session.gameId) {
         backendServices.getGameActive(mysqlPool, req, (result) => {
-            res.send(result);
+            res.send(JSON.stringify(result));
         });
+    } else {
+        res.redirect('/index.html?error=access');
+    }
+});
+
+app.post('/toggleGameActive', (req, res) => {
+    if (req.session.teacher && req.session.gameId) {
+        backendServices.toggleGameActive(mysqlPool, req, (result) => {});
     } else {
         res.redirect('/index.html?error=access');
     }
