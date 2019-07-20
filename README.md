@@ -1,4 +1,5 @@
 # K3.1
+[![Build status](https://dev.azure.com/spenceradolph/IslandRushK3/_apis/build/status/IslandRushK3-CI)](https://dev.azure.com/spenceradolph/IslandRushK3/_build/latest?definitionId=7)
 
 Island Rush is a military strategy teaching tool/game for use by DFMI at The United States Air Force Academy.
 
