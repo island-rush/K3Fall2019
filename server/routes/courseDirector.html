@@ -79,6 +79,11 @@
             <a href="https://github.com/island-rush/K3.1/wiki" target="_blank" style="float: right">Wiki</a>
         </nav>
 
+        <div id="SuccessTag" style="color: green"></div>
+        <div id="ErrorTag" style="color: red"></div>
+
+        <h2 id="DatabaseConnectionTag">Database Status: Loading...</h2>
+
 
         <h1>Add a Game</h1>
         <form name="gameAdd" method="post" id="gameAddForm" action="/gameAdd">
@@ -165,6 +170,52 @@
             getGamesXMLHttp.open("GET", "/getGames", true);
             getGamesXMLHttp.send();
 
+            let getDatabaseStatusXMLHttp = new XMLHttpRequest();
+            getDatabaseStatusXMLHttp.onreadystatechange = function () {
+                if (this.readyState === 4 && this.status === 200) {
+                    if (this.response == "Success") {
+                        document.getElementById("DatabaseConnectionTag").innerHTML = "Database Status: <Green>Success</Green>";
+                    } else {
+                        document.getElementById("DatabaseConnectionTag").innerHTML = "Database Status: <Red>Failed</Red>";
+                    }
+                }
+            };
+            getDatabaseStatusXMLHttp.open("GET", "/databaseStatus", true);
+            getDatabaseStatusXMLHttp.send();
+
+            function getUrlVars() {
+                var vars = {};
+                var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+                    vars[key] = value;
+                });
+                return vars;
+            }
+
+            function getUrlParam(parameter, defaultvalue){
+                var urlparameter = defaultvalue;
+                if(window.location.href.indexOf(parameter) > -1){
+                    urlparameter = getUrlVars()[parameter];
+                    }
+                return urlparameter;
+            }
+
+            switch (getUrlParam('gameAdd')) {
+                case "success":
+                    document.getElementById('SuccessTag').innerHTML = "Successfully Created Game";
+                    break;
+                case "failed":
+                    document.getElementById('ErrorTag').innerHTML = "Failed to Create Game";
+                    break;
+            }
+
+            switch (getUrlParam('gameDelete')) {
+                case "success":
+                    document.getElementById('SuccessTag').innerHTML = "Successfully Deleted Game";
+                    break;
+                case "failed":
+                    document.getElementById('ErrorTag').innerHTML = "Failed to Delete Game";
+                    break;
+            }
 
             function databaseReset() {
                 return confirm("This button should only need to be pressed once, as a convenience of creating the database tables. It is assumed that the database itself already exists. This action will not effect current tables if they already exist.");
@@ -182,7 +233,7 @@
                 }
             }
             password.onchange = validatePassword;
-            confirm_password.onkeyup = validatePassword;	
+            confirm_password.onkeyup = validatePassword;
         </script>
     </body>
 </html>

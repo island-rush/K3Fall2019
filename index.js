@@ -9,7 +9,7 @@ const DatabaseHostname = process.env.DB_HOSTNAME || "localhost";
 const DatabaseUsername = process.env.DB_USERNAME || "root";
 const DatabasePassword = process.env.DB_PASSWORD || "";
 const DatabaseName = process.env.DB_NAME || "k3";
-const backendServices = require('./backendServices.js');
+const backendServices = require('./server/backendServices.js');
 const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
@@ -24,17 +24,21 @@ app.use(session);
 app.use(express.urlencoded());
 io.use(sharedsession(session));
 const md5 = require('md5');
+
+// Dataase Connection Pool
 const mysql = require('mysql');
-// const config = {
-//     host: DatabaseHostname,
-//     user: DatabaseUsername,
-//     password: DatabasePassword,
-//     database: DatabaseName
-// }
+const databaseConfig = {
+    connectionLimit: 10,
+    host: DatabaseHostname,
+    user: DatabaseUsername,
+    password: DatabasePassword,
+    database: DatabaseName
+}
+let mysqlPool = mysql.createPool(databaseConfig);
 
 const csvparse = require('csv-array');
 let distanceMatrix = [];
-csvparse.parseCSV('distanceMatrix.csv', (data) => { distanceMatrix = data; }, false);
+csvparse.parseCSV('./server/distanceMatrix.csv', (data) => { distanceMatrix = data; }, false);
 
 app.use(express.static(__dirname + '/client/build'));
 
@@ -47,15 +51,21 @@ app.get('/', (req, res) => {
 });
 
 app.get('/index.html', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/server/routes/index.html');
 });
 
 app.get('/troubleshoot.html', (req, res) => {
-    res.sendFile(__dirname + '/troubleshoot.html');
+    res.sendFile(__dirname + '/server/routes/troubleshoot.html');
 });
 
 app.get('/credits.html', (req, res) => {
-    res.sendFile(__dirname + '/credits.html');
+    res.sendFile(__dirname + '/server/routes/credits.html');
+});
+
+app.get('/databaseStatus', (req, res) => {
+    backendServices.databaseStatus(mysqlPool, req, (result) => {
+        res.send(result ? "Success" : "Failed");
+    });
 });
 
 // ----------------------------------------------------------------------------------------
@@ -63,44 +73,39 @@ app.get('/credits.html', (req, res) => {
 // ----------------------------------------------------------------------------------------
 
 app.get('/teacher.html', (req, res) => {
-    res.sendFile(__dirname + '/teacher.html');
+    res.sendFile(__dirname + '/server/routes/teacher.html');
 });
 
 app.get('/courseDirector.html', (req, res) => {
-    res.sendFile(__dirname + '/courseDirector.html');
+    res.sendFile(__dirname + '/server/routes/courseDirector.html');
 });
 
 app.post('/gameAdd', (req, res) => {
-    const result = backendServices.gameAdd(req.body.adminSection, req.body.adminInstructor, req.body.adminPassword);
-    if (result) {
-        res.redirect('/courseDirector.html?success=1');
-    } else {
-        res.redirect('/courseDirector.html?error=1');
-    }
+    //TODO: Redirect to home page if not an authenticated course director / admin
+    backendServices.gameAdd(mysqlPool, req, (result) => {
+        res.redirect(`/server/routes/courseDirector.html?gameAdd=${result ? "success" : "failed"}`);
+    });
 });
 
 app.post('/gameDelete', (req, res) => {
-    const result = backendServices.gameDelete(req.body.gameId);
-    if (result) {
-        res.redirect('/courseDirector.html?success=2');
-    } else {
-        res.redirect('/courseDirector.html?error=2');
-    }
+    backendServices.gameDelete(mysqlPool, req, (result) => {
+        res.redirect(`/server/routes/courseDirector.html?gameDelete=${result ? "success" : "failed"}`);
+    });
 });
 
 app.post('/generateDatabase', (req, res) => {
-    const result = backendServices.generateDatabase();
-    if (result) {
-        res.redirect('/courseDirector.html?success=3');
-    } else {
-        res.redirect('/courseDirector.html?error=3');
-    }
+    // const result = backendServices.generateDatabase();
+    // if (result) {
+    //     res.redirect('/courseDirector.html?success=3');
+    // } else {
+    //     res.redirect('/courseDirector.html?error=3');
+    // }
 });
 
 app.get('/getGames', (req, res) => {
-    console.log('got games');
-    const result = backendServices.getGames();
-    res.send(result);
+    backendServices.getGames(mysqlPool, req, (result) => {
+        res.send(result);
+    });
 });
 
 // ----------------------------------------------------------------------------------------

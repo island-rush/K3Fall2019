@@ -45,6 +45,12 @@
         background-color:#285fb7;
         color:white;
       }
+      Red {
+        color: red
+      }
+      Green {
+        color: green
+      }
     </style>
   </head>
   <body>
@@ -56,5 +62,21 @@
       <a href="https://gitreports.com/issue/island-rush/K3.1" target="_blank" style="float: right">Report an Issue</a>
       <a href="https://github.com/island-rush/K3.1/wiki" target="_blank" style="float: right">Wiki</a>
     </nav>
+    <h2 id="DatabaseConnectionTag">Database Connection Status: Loading...</h2>
   </body>
+  <script>
+    let getDatabaseStatus = new XMLHttpRequest();
+    getDatabaseStatus.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            if (this.response == "Success") {
+              document.getElementById('DatabaseConnectionTag').innerHTML = "Database Connection Status: <Green>Success</Green>";
+            } else {
+              document.getElementById('DatabaseConnectionTag').innerHTML = "Database Connection Status: <Red>Failed</Red>";
+            }
+            
+        }
+    };
+    getDatabaseStatus.open("GET", "/databaseStatus", true);
+    getDatabaseStatus.send();
+  </script>
 </html>
