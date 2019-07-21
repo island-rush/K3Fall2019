@@ -86,36 +86,35 @@
                       <tr>
                         <td>Section</td>
                         <td>
-                            <input name="gameSection" type="text" id="gameSection" placeholder="ex: m1a1" autofocus="autofocus" required>
+                            <input name="gameSection" type="text" id="gameSection" placeholder="ex: m1a1" value="m1a1" autofocus="autofocus" required>
                         </td>
                       </tr>
                       <tr>
                         <td>Teacher Last Name</td>
                         <td>
-                            <input name="gameInstructor" type="text" id="gameInstructor" placeholder="ex: Smith" required>
+                            <input name="gameInstructor" type="text" id="gameInstructor" placeholder="ex: Smith" value="adolph" required>
                         </td>
                       </tr>
                       <tr>
                         <td>Team</td>
                         <td>
-                            <input type="radio" name="gameTeam" value="Blue"> <blue>Vestrland Commander</blue><br>
-                            <!-- <input type="radio" name="gameTeam" value="Red"> <red>Zuun Commander</red><br> -->
+                            <input type="radio" name="gameTeam" value="0" checked> <blue>Vestrland Commander</blue><br>
+                            <input type="radio" name="gameTeam" value="1"> <red>Zuun Commander</red><br>
                         </td>
                       </tr>
                       <tr>
                         <td>Controller Type</td>
                         <td>
-                            <input type="radio" name="gameController" value="0">Main Commander<br>
-                            <!-- <input type="radio" name="gameType" value="Air">Air Commander<br>
-                            <input type="radio" name="gameType" value="Land">Air Commander<br>
-                            <input type="radio" name="gameType" value="Sea">Air Commander<br>
-                            <input type="radio" name="gameType" value="Marine">Air Commander<br> -->
+                            <input type="radio" name="gameController" checked value="0">Main Commander<br>
+                            <input type="radio" name="gameController" value="1">Air Commander<br>
+                            <input type="radio" name="gameController" value="2">Land Commander<br>
+                            <input type="radio" name="gameController" value="3">Sea Commander<br>
                         </td>
                     </tr>
                     <tr>
                       <td>Team Password</td>
                       <td>
-                          <input name="gameTeamPassword" type="text" id="gameTeamPassword" required>
+                          <input name="gameTeamPassword" type="text" value="password" id="gameTeamPassword" required>
                       </td>
                     </tr>
                     <tr>
@@ -207,7 +206,12 @@
         case "badRequest":
           document.getElementById('formFeedback').innerHTML = "Bad Request was Given";
           break;
-
+        case "gameNotActive":
+          document.getElementById('formFeedback').innerHTML = "Teacher has Disabled the Game";
+          break;
+        case "alreadyLoggedIn":
+          document.getElementById('formFeedback').innerHTML = "That controller is already logged in.";
+          break;
     }
   </script>
 </html>

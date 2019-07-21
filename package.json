@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "devServer": "nodemon index.js",
+    "devServer": "nodemon index.js -ignore './client/'",
     "devClient": "cd client && npm run build && cd build && ren index.html game.html && cd .. && cd ..",
     "clientInstall": "cd client && npm install && cd ..",
     "clientBuild": "cd client && npm run build && cd .."

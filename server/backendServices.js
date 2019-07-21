@@ -116,7 +116,8 @@ exports.getGameActive = (mysqlPool, req, callback) => {
 
 exports.toggleGameActive = (mysqlPool, req, callback) => {
     const {gameId} = req.session.ir3;
-    mysqlPool.query('UPDATE games SET gameActive = (gameActive + 1) % 2 WHERE gameId = ?', [gameId], (error, result, fields) => {
+    mysqlPool.query('UPDATE games SET gameActive = (gameActive + 1) % 2, game0Controller0 = 0, game0Controller1 = 0, game0Controller2 = 0, game0Controller3 = 0, game1Controller0 = 0, game1Controller1 = 0, game1Controller2 = 0, game1Controller3 = 0 WHERE gameId = ?', [gameId], (error, result, fields) => {
+        //handle error
         callback();
         return;
     });
@@ -136,11 +137,6 @@ exports.insertDatabaseTables = (mysqlPool, req, callback) => {
     });
 }
 
-
-
-
-
-
 exports.gameLoginVerify = (mysqlPool, req, callback) => {
     const {gameSection, gameInstructor, gameTeam, gameTeamPassword, gameController} = req.body;
     if (!gameSection || !gameInstructor || !gameTeam || !gameTeamPassword || !gameController) {
@@ -149,25 +145,39 @@ exports.gameLoginVerify = (mysqlPool, req, callback) => {
     }
 
     const gameTeamPasswordHashed = md5(gameTeamPassword);
-    mysqlPool.query('SELECT gameId, game0Password, game1Password FROM games WHERE gameSection = ? AND gameInstructor = ? ORDER BY gameId', [gameSection, gameInstructor], (error, results, fields) => {
+    const commanderLoginField = 'game' + gameTeam + 'Controller' + gameController;  //ex: 'game0Controller0'
+    mysqlPool.query('SELECT gameId, game0Password, game1Password, gameActive, ?? as commanderLogin FROM games WHERE gameSection = ? AND gameInstructor = ? ORDER BY gameId', [commanderLoginField, gameSection, gameInstructor], (error, results, fields) => {
         if (results.length != 1) {
             callback('/index.html?error=login');
             return;
         }
 
-        const {gameId, game0Password, game1Password} = results[0];
+        const {gameId, game0Password, game1Password, gameActive, commanderLogin} = results[0];
+        if (gameActive != 1) {
+            callback('/index.html?error=gameNotActive');
+            return;
+        }
+        if (commanderLogin != 0) {
+            callback('/index.html?error=alreadyLoggedIn');
+            return;
+        }
         let gamePassword = game0Password;
         if (gameTeam == 1) {
             gamePassword = game1Password;
         }
-
         if (gameTeamPasswordHashed != gamePassword) {
             callback("/index.html?error=login");
             return;
         }
 
+        mysqlPool.query('UPDATE games SET ?? = 1 WHERE gameId = ?', [commanderLoginField, gameId], (error, results, fields) => {
+            //handle error
+        });
+
         req.session.ir3 = {
-            gameId: gameId
+            gameId: gameId,
+            gameTeam: gameTeam,
+            gameController: gameController
         }
         callback("/game.html");
         return;

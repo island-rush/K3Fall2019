@@ -161,8 +161,9 @@ app.post('/gameLoginVerify', (req, res) => {
 });
 
 app.get('/game.html', (req, res) => {
-    if (req.session.ir3 && req.session.ir3.gameId) {
-        res.sendFile(__dirname + '/client/build/index.html');
+    if (req.session.ir3 && req.session.ir3.gameId && req.session.ir3.gameTeam && req.session.ir3.gameController) {
+        // res.sendFile(__dirname + '/client/build/index.html');
+        res.redirect('http://localhost:3000');
     } else {
         res.redirect('/index.html?error=login');
     }
@@ -175,8 +176,27 @@ app.use(express.static(__dirname + '/client/build'));
 // ----------------------------------------------------------------------------------------
 
 io.sockets.on('connection', (socket) => {
+    //add the socket to a game 'room' to speak to it later
+    socket.join('game' + socket.handshake.session.ir3.gameId + 'team' + socket.handshake.session.ir3.teamId);
+    console.log("socket connected");
+    //give the client game state info
+
+    //get game state info
+    mysqlPool.query("SELECT * FROM games WHERE gameId = ?", [socket.handshake.session.ir3.gameId], (error, results, fields) => {
+        //handle error
+        socket.emit('gameState', {
+            gameSection: results[0].gameSection,
+            gameInstructor: results[0].gameInstructor
+        });
+    });
+
     socket.on('disconnect', () => {
-        //Disconnect Things
+        const controllerLoginField = 'game' + socket.handshake.session.ir3.gameTeam + 'Controller' + socket.handshake.session.ir3.gameController;
+        const gameId = socket.handshake.session.ir3.gameId;
+        mysqlPool.query('UPDATE games SET ?? = 0 WHERE gameId = ?', [controllerLoginField, gameId], (error, results, fields) => {
+            //handle error 
+        });
+        console.log("socket disconnected");
     });
     socket.on('callToServer', (callback) => {
         callback("only the server knows this info");
