@@ -71,7 +71,7 @@ exports.getGames = (mysqlPool, req, callback) => {
 
 exports.adminLoginVerify = (mysqlPool, req, callback) => {
     const CourseDirectorLastName = process.env.CD_LASTNAME || "Smith";
-    const CourseDirectorPassword = process.env.CD_PASSWORD || "5f4dcc3b5aa765d61d8327deb882cf99";  //"password"
+    const CourseDirectorPassword = process.env.CD_PASSWORD || "912ec803b2ce49e4a541068d495ab570";  //"asdf"
     const {adminSection, adminInstructor, adminPassword} = req.body;
     if (!adminSection || !adminInstructor || !adminPassword) {
         callback("/index.html?error=badRequest");
