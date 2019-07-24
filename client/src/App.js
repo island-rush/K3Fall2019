@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-// import socketIOClient from 'socket.io-client';
+import socketIOClient from 'socket.io-client';
 import './App.css';
 
 class App extends Component {
 
   componentDidMount() {
-    // const socket = socketIOClient(window.location.hostname);
+    const socket = socketIOClient(window.location.hostname);
     // socket.emit('callToServer', (serverResponse) => {
     //   // alert(serverResponse);
     // });

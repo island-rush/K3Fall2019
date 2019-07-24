@@ -181,14 +181,14 @@ io.sockets.on('connection', (socket) => {
     console.log("socket connected");
     //give the client game state info
 
-    //get game state info
-    mysqlPool.query("SELECT * FROM games WHERE gameId = ?", [socket.handshake.session.ir3.gameId], (error, results, fields) => {
-        //handle error
-        socket.emit('gameState', {
-            gameSection: results[0].gameSection,
-            gameInstructor: results[0].gameInstructor
-        });
-    });
+    // //get game state info
+    // mysqlPool.query("SELECT * FROM games WHERE gameId = ?", [socket.handshake.session.ir3.gameId], (error, results, fields) => {
+    //     //handle error
+    //     socket.emit('gameState', {
+    //         gameSection: results[0].gameSection,
+    //         gameInstructor: results[0].gameInstructor
+    //     });
+    // });
 
     socket.on('disconnect', () => {
         const controllerLoginField = 'game' + socket.handshake.session.ir3.gameTeam + 'Controller' + socket.handshake.session.ir3.gameController;
