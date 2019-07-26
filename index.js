@@ -218,6 +218,7 @@ io.sockets.on("connection", socket => {
 
 	socket.on("clientSendingData", clientData => {
 		//need to externalize these into backend services probably
+		//switch statement for backend services?
 	});
 
 	socket.on("disconnect", () => {

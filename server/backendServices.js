@@ -1,3 +1,5 @@
+import { INITIAL_GAMESTATE } from "../client/src/redux/actions/types";
+
 const md5 = require("md5");
 const fs = require("fs");
 
@@ -253,8 +255,6 @@ exports.gameLoginVerify = (mysqlPool, req, callback) => {
 };
 
 exports.socketInitialGameState = (mysqlPool, gameId, gameTeam, socket) => {
-	console.log("sending the initial state");
-
 	mysqlPool.query(
 		"SELECT gameSection FROM games WHERE gameId = ?",
 		[gameId],
@@ -265,11 +265,14 @@ exports.socketInitialGameState = (mysqlPool, gameId, gameTeam, socket) => {
 			}
 
 			const serverData = {
-				type: "MANUAL_POINTS",
-				payload: 1480
+				type: INITIAL_GAMESTATE,
+				payload: {
+					points: 9001,
+					userFeedback: "Inital Game State Feedback"
+				}
 			};
 
-			socket.emit("serverSendingData", serverData);
+			socket.emit("serverSendingAction", serverData);
 		}
 	);
 };
