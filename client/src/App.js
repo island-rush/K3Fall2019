@@ -1,26 +1,36 @@
-import React, {Component} from 'react';
-import socketIOClient from 'socket.io-client';
-import './App.css';
+import React, { Component } from "react";
+import "./App.css";
+import { connect } from "react-redux";
+import { clientSendingDataAction } from "./redux/actions/clientSendingDataAction";
 
 class App extends Component {
+	userClicked() {
+		this.props.clientSendData("clientData");
+	}
 
-  componentDidMount() {
-    const socket = socketIOClient(window.location.hostname);
-    // socket.emit('callToServer', (serverResponse) => {
-    //   // alert(serverResponse);
-    // });
-    // socket.on('gameState', (gameState) => {
-    //   this.setState(gameState);
-    // });
-  }
-
-  render() {
-    return (
-      <div className="App">
-        <p>This is the App. (under construction...)</p>
-      </div>
-    );
-  }
+	render() {
+		return (
+			<div className="App">
+				<p>This is the App.</p>
+				<p>Points: {this.props.points}</p>
+				<p onClick={() => this.userClicked()}>
+					UserFeedback: {this.props.userFeedback}
+				</p>
+			</div>
+		);
+	}
 }
 
-export default App;
+const mapStateToProps = ({ points, userFeedback }) => ({
+	points: points,
+	userFeedback: userFeedback
+});
+
+const mapActionsToProps = {
+	clientSendData: clientSendingDataAction
+};
+
+export default connect(
+	mapStateToProps,
+	mapActionsToProps
+)(App);
