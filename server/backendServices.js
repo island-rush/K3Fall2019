@@ -1,5 +1,3 @@
-import { INITIAL_GAMESTATE } from "../client/src/redux/actions/types";
-
 const md5 = require("md5");
 const fs = require("fs");
 
@@ -265,7 +263,7 @@ exports.socketInitialGameState = (mysqlPool, gameId, gameTeam, socket) => {
 			}
 
 			const serverData = {
-				type: INITIAL_GAMESTATE,
+				type: "INITIAL_GAMESTATE",
 				payload: {
 					points: 9001,
 					userFeedback: "Inital Game State Feedback"
