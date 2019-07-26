@@ -10,6 +10,12 @@ export const init = store => {
 			payload: payload
 		});
 	});
+
+	socket.on("serverRedirect", serverError => {
+		window.location.replace(
+			`//${window.location.hostname}/index.html?error=${serverError}`
+		);
+	});
 };
 
 export const emit = (type, payload) => socket.emit(type, payload);

@@ -102,6 +102,11 @@ exports.adminLoginVerify = (mysqlPool, req, callback) => {
 		"SELECT gameId, gameAdminPassword FROM games WHERE gameSection = ? AND gameInstructor = ? ORDER BY gameId",
 		[adminSection, adminInstructor],
 		(error, results, fields) => {
+			if (error) {
+				callback("/index.html?error=database");
+				return;
+			}
+
 			if (results.length != 1) {
 				callback("/index.html?error=login");
 				return;
@@ -131,6 +136,10 @@ exports.getGameActive = (mysqlPool, req, callback) => {
 		"SELECT gameActive FROM games WHERE gameId = ?",
 		[gameId],
 		(error, results, fields) => {
+			if (error) {
+				callback(0);
+				return;
+			}
 			callback(results[0].gameActive);
 			return;
 		}
@@ -142,8 +151,8 @@ exports.toggleGameActive = (mysqlPool, req, callback) => {
 	mysqlPool.query(
 		"UPDATE games SET gameActive = (gameActive + 1) % 2, game0Controller0 = 0, game0Controller1 = 0, game0Controller2 = 0, game0Controller3 = 0, game1Controller0 = 0, game1Controller1 = 0, game1Controller2 = 0, game1Controller3 = 0 WHERE gameId = ?",
 		[gameId],
-		(error, result, fields) => {
-			//handle error
+		(error, results, fields) => {
+			//handle error (callback does not depend on success TODO: notify of failure?)
 			callback();
 			return;
 		}
@@ -189,6 +198,11 @@ exports.gameLoginVerify = (mysqlPool, req, callback) => {
 		"SELECT gameId, game0Password, game1Password, gameActive, ?? as commanderLogin FROM games WHERE gameSection = ? AND gameInstructor = ? ORDER BY gameId",
 		[commanderLoginField, gameSection, gameInstructor],
 		(error, results, fields) => {
+			if (error) {
+				callback("/index.html?error=database");
+				return;
+			}
+
 			if (results.length != 1) {
 				callback("/index.html?error=login");
 				return;
@@ -223,6 +237,7 @@ exports.gameLoginVerify = (mysqlPool, req, callback) => {
 				[commanderLoginField, gameId],
 				(error, results, fields) => {
 					//handle error
+					//shouldn't have error if succeeded above
 				}
 			);
 
@@ -233,6 +248,28 @@ exports.gameLoginVerify = (mysqlPool, req, callback) => {
 			};
 			callback("/game.html");
 			return;
+		}
+	);
+};
+
+exports.socketInitialGameState = (mysqlPool, gameId, gameTeam, socket) => {
+	console.log("sending the initial state");
+
+	mysqlPool.query(
+		"SELECT gameSection FROM games WHERE gameId = ?",
+		[gameId],
+		(error, results, fields) => {
+			if (error) {
+				socket.emit("serverRedirect", "database");
+				return;
+			}
+
+			const serverData = {
+				type: "MANUAL_POINTS",
+				payload: 1480
+			};
+
+			socket.emit("serverSendingData", serverData);
 		}
 	);
 };

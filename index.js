@@ -178,8 +178,8 @@ app.get("/game.html", (req, res) => {
 		req.session.ir3.gameTeam &&
 		req.session.ir3.gameController
 	) {
-		res.sendFile(__dirname + "/client/build/index.html");
-		// res.redirect("http://localhost:3000");
+		// res.sendFile(__dirname + "/client/build/index.html");
+		res.redirect("http://localhost:3000");
 	} else {
 		res.redirect("/index.html?error=login");
 	}
@@ -192,45 +192,38 @@ app.use(express.static(__dirname + "/client/build"));
 // ----------------------------------------------------------------------------------------
 
 io.sockets.on("connection", socket => {
-	//add the socket to a game 'room' to speak to it later
-	// socket.join(
-	// 	"game" +
-	// 		socket.handshake.session.ir3.gameId +
-	// 		"team" +
-	// 		socket.handshake.session.ir3.teamId
-	// );
-	console.log("socket connected");
-	//give the client game state info
+	if (
+		!socket.handshake.session.ir3 ||
+		!socket.handshake.session.ir3.gameId ||
+		!socket.handshake.session.ir3.gameTeam ||
+		!socket.handshake.session.ir3.gameController
+	) {
+		console.log("Got to game.html without authenticated session...");
+		socket.emit("serverRedirect", "access");
+		return;
+	}
 
-	socket.emit("serverSendingAction", {
-		type: "MANUAL_POINTS",
-		payload: 123
-	});
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+
+	//Room for the Team
+	socket.join("game" + gameId + "team" + gameTeam);
+
+	//Room for the Indiviual Controller
+	socket.join(
+		"game" + gameId + "team" + gameTeam + "controller" + gameController
+	);
+
+	//Send the initial game state (TODO: Server Side Rendering)
+	backendServices.socketInitialGameState(mysqlPool, gameId, gameTeam, socket);
 
 	socket.on("clientSendingData", clientData => {
-		const serverAction = {
-			type: "MANUAL_POINTS",
-			payload: 234
-		};
-		socket.emit("serverSendingAction", serverAction);
+		//need to externalize these into backend services probably
 	});
 
-	//get game state info
-	// mysqlPool.query("SELECT * FROM games WHERE gameId = ?", [socket.handshake.session.ir3.gameId], (error, results, fields) => {
-	//     //handle error
-	//     socket.emit('serverSendingData', {
-	//         gameSection: results[0].gameSection,
-	//         gameInstructor: results[0].gameInstructor
-	//     });
-	// });
-
 	socket.on("disconnect", () => {
+		console.log("socket disconnected");
 		const controllerLoginField =
-			"game" +
-			socket.handshake.session.ir3.gameTeam +
-			"Controller" +
-			socket.handshake.session.ir3.gameController;
-		const gameId = socket.handshake.session.ir3.gameId;
+			"game" + gameTeam + "Controller" + gameController;
 		mysqlPool.query(
 			"UPDATE games SET ?? = 0 WHERE gameId = ?",
 			[controllerLoginField, gameId],
@@ -238,7 +231,6 @@ io.sockets.on("connection", socket => {
 				//handle error
 			}
 		);
-		console.log("socket disconnected");
 	});
 });
 
