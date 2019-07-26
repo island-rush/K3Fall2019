@@ -151,7 +151,7 @@ exports.toggleGameActive = (mysqlPool, req, callback) => {
 };
 
 exports.insertDatabaseTables = (mysqlPool, req, callback) => {
-	const sql = fs.readFileSync("./server/sql/k3_tableInsert.sql").toString();
+	const sql = fs.readFileSync("./server/sql/tableInsert.sql").toString();
 	mysqlPool.query(sql, (error, results, fields) => {
 		if (error) {
 			console.log(error);
