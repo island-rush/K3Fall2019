@@ -7,16 +7,19 @@ const DatabaseHostname = process.env.DB_HOSTNAME || "localhost";
 const DatabaseUsername = process.env.DB_USERNAME || "root";
 const DatabasePassword = process.env.DB_PASSWORD || "";
 const DatabaseName = process.env.DB_NAME || "k3";
+const sessionSecret = process.env.SESSION_SECRET || "@d$f4%ggGG4_*7FGkdkjlk";
+
 const backendServices = require("./server/backendServices.js");
 const express = require("express");
 const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
-const session = require("express-session")({
-	secret: process.env.SESSION_SECRET || "sdlkjslfjk",
+const esConfig = {
+	secret: sessionSecret,
 	resave: true,
 	saveUninitialized: true
-});
+};
+const session = require("express-session")(esConfig);
 const sharedsession = require("express-socket.io-session");
 app.use(session);
 app.use(express.urlencoded());
@@ -179,7 +182,7 @@ app.get("/game.html", (req, res) => {
 		req.session.ir3.gameController
 	) {
 		res.sendFile(__dirname + "/client/build/index.html");
-		// res.redirect("http://localhost:3000");
+		// res.redirect("http://localhost:3000");  // Use this redirect while working on react frontend
 	} else {
 		res.redirect("/index.html?error=login");
 	}
@@ -198,7 +201,6 @@ io.sockets.on("connection", socket => {
 		!socket.handshake.session.ir3.gameTeam ||
 		!socket.handshake.session.ir3.gameController
 	) {
-		console.log("Got to game.html without authenticated session...");
 		socket.emit("serverRedirect", "access");
 		return;
 	}
