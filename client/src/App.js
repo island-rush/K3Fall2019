@@ -1,21 +1,29 @@
 import React, { Component } from "react";
-import "./App.css";
 import { connect } from "react-redux";
 import { clientSendingDataAction } from "./redux/actions/clientSendingDataAction";
+
+import "./App.css";
+
+import Sidebar from "./components/Sidebar";
+import Bottombar from "./components/Bottombar";
 
 class App extends Component {
 	userClicked() {
 		this.props.clientSendData("clientData");
 	}
 
+	appStyle = {
+		backgroundColor: "black",
+		width: "100vw",
+		height: "100vh"
+		// minHeight: "100vh"
+	};
+
 	render() {
 		return (
-			<div className="App">
-				<p>This is the App.</p>
-				<p>Points: {this.props.points}</p>
-				<p onClick={() => this.userClicked()}>
-					UserFeedback: {this.props.userFeedback}
-				</p>
+			<div className="App" style={this.appStyle}>
+				<Sidebar />
+				<Bottombar />
 			</div>
 		);
 	}
