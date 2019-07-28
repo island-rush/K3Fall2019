@@ -181,8 +181,8 @@ app.get("/game.html", (req, res) => {
 		req.session.ir3.gameTeam &&
 		req.session.ir3.gameController
 	) {
-		res.sendFile(__dirname + "/client/build/index.html");
-		// res.redirect("http://localhost:3000"); // Use this redirect while working on react frontend
+		// res.sendFile(__dirname + "/client/build/index.html");
+		res.redirect("http://localhost:3000"); // Use this redirect while working on react frontend
 	} else {
 		res.redirect("/index.html?error=login");
 	}

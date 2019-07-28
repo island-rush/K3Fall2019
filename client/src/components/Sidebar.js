@@ -1,6 +1,7 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 
-export default class Sidebar extends Component {
+class Sidebar extends Component {
 	sidebarStyle = {
 		backgroundColor: "Red",
 		position: "absolute",
@@ -13,9 +14,9 @@ export default class Sidebar extends Component {
 	render() {
 		return (
 			<div style={this.sidebarStyle}>
-				<button>Menu1</button>
-				<button>Menu2</button>
-				<button>Menu3</button>
+				<button>Shop</button>
+				<button>Inventory</button>
+				<button>{this.props.gameInfo.gameSection}</button>
 				{/* component for shop */}
 				{/* component for inventory */}
 				{/* component for game info (points, stats, section / instructor?, game version...debug stuff?) */}
@@ -23,3 +24,9 @@ export default class Sidebar extends Component {
 		);
 	}
 }
+
+const mapStateToProps = ({ gameInfo }) => ({
+	gameInfo: gameInfo
+});
+
+export default connect(mapStateToProps)(Sidebar);

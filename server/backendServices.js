@@ -265,8 +265,13 @@ exports.socketInitialGameState = (mysqlPool, gameId, gameTeam, socket) => {
 			const serverData = {
 				type: "INITIAL_GAMESTATE",
 				payload: {
-					points: 9001,
-					userFeedback: "Inital Game State Feedback"
+					points: -1,
+					userFeedback: "Welcome to Island Rush!",
+					gameInfo: {
+						gameSection: "T1A1",
+						gameInstructor: "Kaz",
+						gameController: "test"
+					}
 				}
 			};
 

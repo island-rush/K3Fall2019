@@ -17,9 +17,6 @@ class Bottombar extends Component {
 	render() {
 		return (
 			<div style={this.bottombarStyle}>
-				{/* leftcontrols for game stuff */}
-				{/* userFeedback */}
-				{/* main control button */}
 				<LeftControls />
 				<UserFeedback />
 				<MainControl />

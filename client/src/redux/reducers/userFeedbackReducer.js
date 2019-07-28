@@ -1,6 +1,11 @@
 import { INITIAL_GAMESTATE } from "../actions/types";
 
-export default function userFeedbackReducer(state = "", { type, payload }) {
+const initialUserFeedback = "Welcome to Island Rush!";
+
+export default function userFeedbackReducer(
+	state = initialUserFeedback,
+	{ type, payload }
+) {
 	switch (type) {
 		case INITIAL_GAMESTATE:
 			return payload.userFeedback;
