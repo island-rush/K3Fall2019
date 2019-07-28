@@ -253,7 +253,8 @@ exports.gameLoginVerify = (mysqlPool, req, callback) => {
 	);
 };
 
-exports.socketInitialGameState = (mysqlPool, gameId, gameTeam, socket) => {
+exports.socketInitialGameState = (mysqlPool, socket) => {
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 	//SELECT based on TeamId (socket.handshake.session.ir3.gameTeam)
 	//also consider gameController info in ir3
 	mysqlPool.query(
@@ -272,7 +273,7 @@ exports.socketInitialGameState = (mysqlPool, gameId, gameTeam, socket) => {
 				type: INITIAL_GAMESTATE,
 				payload: {
 					points: -1,
-					userFeedback: "Welcome to Island Rush!",
+					userFeedback: "Welcome to Island Rush!!",
 					gameInfo: {
 						gameSection: gameSection,
 						gameInstructor: gameInstructor,
@@ -284,4 +285,16 @@ exports.socketInitialGameState = (mysqlPool, gameId, gameTeam, socket) => {
 			socket.emit("serverSendingAction", serverData);
 		}
 	);
+};
+
+exports.clientSendingData = (mysqlPool, socket, clientData) => {
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+
+	//send back stuff?
+	const serverAction = {
+		type: "SET_USERFEEDBACK",
+		payload: `Server Got Data: ${clientData}`
+	};
+
+	socket.emit("serverSendingAction", serverAction);
 };

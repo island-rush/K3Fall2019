@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { clientSendingDataAction } from "./redux/actions/userActions";
 import Sidebar from "./components/sidebarComponents/Sidebar";
 import Bottombar from "./components/bottombarComponents/Bottombar";
 import "./App.css";
@@ -13,7 +12,7 @@ class App extends Component {
 	appStyle = {
 		backgroundColor: "black",
 		width: "100vw",
-		height: "100vh"
+		height: "47.1vw"
 	};
 
 	render() {
@@ -31,11 +30,4 @@ const mapStateToProps = ({ points, userFeedback }) => ({
 	userFeedback: userFeedback
 });
 
-const mapActionsToProps = {
-	clientSendData: clientSendingDataAction
-};
-
-export default connect(
-	mapStateToProps,
-	mapActionsToProps
-)(App);
+export default connect(mapStateToProps)(App);
