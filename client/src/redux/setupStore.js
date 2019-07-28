@@ -3,7 +3,7 @@ import thunk from "redux-thunk";
 import rootReducer from "./reducers";
 import { init, emit } from "./websocket";
 
-export default () => {
+const setupStore = () => {
 	const initialState = {};
 
 	const middleware = [thunk.withExtraArgument(emit)];
@@ -22,3 +22,5 @@ export default () => {
 
 	return store;
 };
+
+export default setupStore;

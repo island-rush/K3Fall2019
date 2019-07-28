@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-export default class Maincontrol extends Component {
+class Maincontrol extends Component {
 	maincontrolStyle = {
 		backgroundColor: "grey",
 		height: "80%",
@@ -13,3 +13,5 @@ export default class Maincontrol extends Component {
 		return <div style={this.maincontrolStyle}>Main Control Button</div>;
 	}
 }
+
+export default Maincontrol;

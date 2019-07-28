@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-
 import LeftControls from "./Leftcontrols";
 import UserFeedback from "./Userfeedback";
 import MainControl from "./Maincontrol";

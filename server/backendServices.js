@@ -1,5 +1,6 @@
 const md5 = require("md5");
 const fs = require("fs");
+const INITIAL_GAMESTATE = "INITIAL_GAMESTATE";
 
 exports.gameAdd = (mysqlPool, req, callback) => {
 	const { adminSection, adminInstructor, adminPassword } = req.body;
@@ -263,7 +264,7 @@ exports.socketInitialGameState = (mysqlPool, gameId, gameTeam, socket) => {
 			}
 
 			const serverData = {
-				type: "INITIAL_GAMESTATE",
+				type: INITIAL_GAMESTATE,
 				payload: {
 					points: -1,
 					userFeedback: "Welcome to Island Rush!",

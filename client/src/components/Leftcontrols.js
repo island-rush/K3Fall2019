@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-export default class Leftcontrols extends Component {
+class Leftcontrols extends Component {
 	leftcontrolsStyle = {
 		background: "grey",
 		height: "80%",
@@ -14,3 +14,5 @@ export default class Leftcontrols extends Component {
 		return <div style={this.leftcontrolsStyle}>left controls</div>;
 	}
 }
+
+export default Leftcontrols;

@@ -6,10 +6,7 @@ const initialGameInfoState = {
 	gameController: "Loading..."
 };
 
-export default function gameInfoReducer(
-	state = initialGameInfoState,
-	{ type, payload }
-) {
+function gameInfoReducer(state = initialGameInfoState, { type, payload }) {
 	switch (type) {
 		case INITIAL_GAMESTATE:
 			return payload.gameInfo;
@@ -17,3 +14,5 @@ export default function gameInfoReducer(
 			return state;
 	}
 }
+
+export default gameInfoReducer;
