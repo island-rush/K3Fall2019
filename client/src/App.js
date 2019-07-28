@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { clientSendingDataAction } from "./redux/actions/clientSendingDataAction";
-import Sidebar from "./components/Sidebar";
-import Bottombar from "./components/Bottombar";
+import { clientSendingDataAction } from "./redux/actions/userActions";
+import Sidebar from "./components/sidebarComponents/Sidebar";
+import Bottombar from "./components/bottombarComponents/Bottombar";
 import "./App.css";
 
 class App extends Component {

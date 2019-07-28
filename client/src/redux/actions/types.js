@@ -1,2 +1,3 @@
 export const INITIAL_GAMESTATE = "INITIAL_GAMESTATE";
 export const MANUAL_POINTS = "MANUAL_POINTS";
+export const MENU_SELECT = "MENU_SELECT";

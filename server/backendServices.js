@@ -254,8 +254,10 @@ exports.gameLoginVerify = (mysqlPool, req, callback) => {
 };
 
 exports.socketInitialGameState = (mysqlPool, gameId, gameTeam, socket) => {
+	//SELECT based on TeamId (socket.handshake.session.ir3.gameTeam)
+	//also consider gameController info in ir3
 	mysqlPool.query(
-		"SELECT gameSection FROM games WHERE gameId = ?",
+		"SELECT gameSection, gameInstructor FROM games WHERE gameId = ?",
 		[gameId],
 		(error, results, fields) => {
 			if (error) {
@@ -263,15 +265,18 @@ exports.socketInitialGameState = (mysqlPool, gameId, gameTeam, socket) => {
 				return;
 			}
 
+			const { gameSection, gameInstructor } = results[0];
+			const gameController = socket.handshake.session.ir3.gameController;
+
 			const serverData = {
 				type: INITIAL_GAMESTATE,
 				payload: {
 					points: -1,
 					userFeedback: "Welcome to Island Rush!",
 					gameInfo: {
-						gameSection: "T1A1",
-						gameInstructor: "Kaz",
-						gameController: "test"
+						gameSection: gameSection,
+						gameInstructor: gameInstructor,
+						gameController: gameController
 					}
 				}
 			};
