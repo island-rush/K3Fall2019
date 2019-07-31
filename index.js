@@ -8,6 +8,7 @@ const DatabaseUsername = process.env.DB_USERNAME || "root";
 const DatabasePassword = process.env.DB_PASSWORD || "";
 const DatabaseName = process.env.DB_NAME || "k3";
 const sessionSecret = process.env.SESSION_SECRET || "@d$f4%ggGG4_*7FGkdkjlk";
+const productionEnv = process.env.PRODUCTION_ENV || false;
 
 const backendServices = require("./server/backendServices.js");
 const express = require("express");
@@ -182,8 +183,11 @@ app.get("/game.html", (req, res) => {
 		req.session.ir3.gameTeam &&
 		req.session.ir3.gameController
 	) {
-		res.sendFile(__dirname + "/client/build/index.html");
-		// res.redirect("http://localhost:3000"); // Use this redirect while working on react frontend
+		if (productionEnv) {
+			res.sendFile(__dirname + "/client/build/index.html");
+		} else {
+			res.redirect("http://localhost:3000"); // Use this redirect while working on react frontend
+		}
 	} else {
 		res.redirect("/index.html?error=login");
 	}
