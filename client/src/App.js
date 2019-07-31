@@ -11,9 +11,10 @@ class App extends Component {
 	}
 
 	appStyle = {
+		position: "relative",
 		backgroundColor: "black",
-		width: "100vw",
-		height: "47.1vw"
+		height: "100%",
+		width: "100%"
 	};
 
 	render() {

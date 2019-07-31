@@ -3,8 +3,11 @@ import React, { Component } from "react";
 class Inventory extends Component {
 	inventoryStyle = {
 		backgroundColor: "Yellow",
-		height: "100%",
-		width: "70%"
+		position: "absolute",
+		height: "120%",
+		width: "1800%",
+		marginLeft: "150%",
+		marginTop: "20%"
 	};
 
 	invisibleStyle = {

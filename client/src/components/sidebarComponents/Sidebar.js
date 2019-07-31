@@ -18,15 +18,15 @@ class Sidebar extends Component {
 	render() {
 		return (
 			<div style={this.sidebarStyle}>
-				<button onClick={() => this.props.menuSelect(1)}>Shop</button>
-				<button onClick={() => this.props.menuSelect(2)}>Inventory</button>
-				<button onClick={() => this.props.menuSelect(3)}>Gameinfo</button>
 				<Shop selected={this.props.menuSelected === 1} />
 				<Inventory selected={this.props.menuSelected === 2} />
 				<Gameinfo
 					gameInfo={this.props.gameInfo}
 					selected={this.props.menuSelected === 3}
 				/>
+				<button onClick={() => this.props.menuSelect(1)}>Shop</button>
+				<button onClick={() => this.props.menuSelect(2)}>Inventory</button>
+				<button onClick={() => this.props.menuSelect(3)}>Gameinfo</button>
 			</div>
 		);
 	}

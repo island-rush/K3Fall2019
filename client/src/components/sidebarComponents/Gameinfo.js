@@ -2,8 +2,11 @@ import React from "react";
 
 const gameinfoStyle = {
 	backgroundColor: "Yellow",
-	height: "100%",
-	width: "300%"
+	position: "absolute",
+	height: "50%",
+	width: "500%",
+	marginLeft: "200%",
+	marginTop: "20%"
 };
 
 const invisibleStyle = {

@@ -186,7 +186,7 @@ app.get("/game.html", (req, res) => {
 		if (productionEnv) {
 			res.sendFile(__dirname + "/client/build/index.html");
 		} else {
-			res.redirect("http://localhost:3000"); // Use this redirect while working on react frontend
+			res.redirect("http://localhost:3001"); // Use this redirect while working on react frontend
 		}
 	} else {
 		res.redirect("/index.html?error=login");

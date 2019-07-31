@@ -2,3 +2,18 @@
 	margin: 0;
 	padding: 0;
 }
+
+html,
+body {
+	height: 45vw;
+	width: 100vw;
+	overflow-x: hidden; /* This disables scroll, forces aspect ratio */
+	overflow-y: hidden;
+	background-color: rgb(56, 56, 56);
+}
+
+#root {
+	background-color: maroon;
+	height: 100%;
+	width: 100%;
+}
