@@ -31,7 +31,8 @@ const databaseConfig = {
 	host: DatabaseHostname,
 	user: DatabaseUsername,
 	password: DatabasePassword,
-	database: DatabaseName
+	database: DatabaseName,
+	multipleStatements: true //it allows for SQL injection attacks if values are not properly escaped
 };
 let mysqlPool = mysql.createPool(databaseConfig);
 
@@ -165,7 +166,7 @@ app.post("/toggleGameActive", (req, res) => {
 });
 
 // ----------------------------------------------------------------------------------------
-// Game Routing (into the react app)
+// Game Routing (Into React App)
 // ----------------------------------------------------------------------------------------
 
 app.post("/gameLoginVerify", (req, res) => {
@@ -191,7 +192,7 @@ app.get("/game.html", (req, res) => {
 app.use(express.static(__dirname + "/client/build"));
 
 // ----------------------------------------------------------------------------------------
-// Socket Requests (client + server gameplay services)
+// Socket Requests (Gameplay Client <-|-> Server)
 // ----------------------------------------------------------------------------------------
 
 io.sockets.on("connection", socket => {
@@ -236,7 +237,7 @@ io.sockets.on("connection", socket => {
 });
 
 // ----------------------------------------------------------------------------------------
-// Start taking in requests to the server
+// Start Server
 // ----------------------------------------------------------------------------------------
 
 server.listen(port, () => {

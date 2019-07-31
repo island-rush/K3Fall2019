@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import Sidebar from "./components/sidebarComponents/Sidebar";
 import Bottombar from "./components/bottombarComponents/Bottombar";
+import Gameboard from "./components/gameboardComponents/Gameboard";
 import "./App.css";
 
 class App extends Component {
@@ -20,6 +21,7 @@ class App extends Component {
 			<div className="App" style={this.appStyle}>
 				<Sidebar />
 				<Bottombar />
+				<Gameboard />
 			</div>
 		);
 	}
