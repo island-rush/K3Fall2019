@@ -5,8 +5,8 @@ class InvItem extends Component {
 	invItemStyle = {
 		position: "relative",
 		backgroundColor: "blue",
-		width: "5%",
-		paddingTop: "5%",
+		width: "20%",
+		paddingTop: "20%",
 		margin: "1%",
 		float: "left",
 		backgroundSize: "100% 100%",
