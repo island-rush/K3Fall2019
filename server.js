@@ -53,20 +53,20 @@ csvparse.parseCSV(
 
 app.get("/", (req, res) => {
 	delete req.session.ir3;
-	res.sendFile(__dirname + "/server/routes/index.html");
+	res.sendFile(__dirname + "/serverItems/routes/index.html");
 });
 
 app.get("/index.html", (req, res) => {
 	delete req.session.ir3;
-	res.sendFile(__dirname + "/server/routes/index.html");
+	res.sendFile(__dirname + "/serverItems/routes/index.html");
 });
 
 app.get("/troubleshoot.html", (req, res) => {
-	res.sendFile(__dirname + "/server/routes/troubleshoot.html");
+	res.sendFile(__dirname + "/serverItems/routes/troubleshoot.html");
 });
 
 app.get("/credits.html", (req, res) => {
-	res.sendFile(__dirname + "/server/routes/credits.html");
+	res.sendFile(__dirname + "/serverItems/routes/credits.html");
 });
 
 app.get("/databaseStatus", (req, res) => {
@@ -81,7 +81,7 @@ app.get("/databaseStatus", (req, res) => {
 
 app.get("/teacher.html", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.teacher) {
-		res.sendFile(__dirname + "/server/routes/teacher.html");
+		res.sendFile(__dirname + "/serverItems/routes/teacher.html");
 	} else {
 		res.redirect("/index.html?error=login");
 	}
@@ -89,7 +89,7 @@ app.get("/teacher.html", (req, res) => {
 
 app.get("/courseDirector.html", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.courseDirector) {
-		res.sendFile(__dirname + "/server/routes/courseDirector.html");
+		res.sendFile(__dirname + "/serverItems/routes/courseDirector.html");
 	} else {
 		res.redirect("/index.html?error=login");
 	}

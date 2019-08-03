@@ -171,7 +171,7 @@ exports.toggleGameActive = (mysqlPool, req, callback) => {
 };
 
 exports.insertDatabaseTables = (mysqlPool, req, callback) => {
-	const sql = fs.readFileSync("./server/sql/tableInsert.sql").toString();
+	const sql = fs.readFileSync("./serverItems/sql/tableInsert.sql").toString();
 	mysqlPool.query(sql, (error, results, fields) => {
 		if (error) {
 			callback("failed");
