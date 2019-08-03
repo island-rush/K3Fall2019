@@ -2,6 +2,7 @@ import {
 	SHOP_PURCHASE,
 	SHOP_REFUND,
 	SHOP_CLEAR,
+	SHOP_TRANSFER,
 	INITIAL_GAMESTATE
 } from "../actions/types";
 
@@ -19,6 +20,8 @@ function shopReducer(state = initialShopState, { type, payload }) {
 			return state.filter(function(shopItem, index, arr) {
 				return shopItem.shopItemId !== payload.shopItem.shopItemId;
 			});
+		case SHOP_TRANSFER:
+			return [];
 		default:
 			return state;
 	}

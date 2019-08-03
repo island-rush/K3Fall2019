@@ -4,12 +4,14 @@ const INITIAL_GAMESTATE = "INITIAL_GAMESTATE";
 const SHOP_PURCHASE = "SHOP_PURCHASE";
 const SHOP_REFUND = "SHOP_REFUND";
 const SET_USERFEEDBACK = "SET_USERFEEDBACK";
+const SHOP_TRANSFER = "SHOP_TRANSFER";
 
 const shopItemTypeCosts = {
 	//shopItemTypeId: pointsCost
-	0: 10, //ship
+	0: 10, //radar
 	1: 10, //plane
-	2: 10 //warfare
+	2: 10, //sub
+	3: 10 //tank
 };
 
 exports.gameAdd = (mysqlPool, req, callback) => {
@@ -308,7 +310,8 @@ exports.getInitialGameState = (mysqlPool, socket) => {
 										gameInfo: {
 											gameSection: gameSection,
 											gameInstructor: gameInstructor,
-											gameController: gameController
+											gameController: gameController,
+											gamePoints: teamPoints
 										},
 										shopItems: shopItems,
 										invItems: invItems,
@@ -362,10 +365,13 @@ exports.shopPurchaseRequest = (mysqlPool, socket, shopItemTypeId) => {
 										shopItemTypeId: shopItemTypeId
 									};
 
+									const pointsRemaining = teamPoints - shopItemCost;
+
 									const serverAction = {
 										type: SHOP_PURCHASE,
 										payload: {
-											shopItem: shopItem
+											shopItem: shopItem,
+											points: pointsRemaining
 										}
 									};
 									socket.emit("serverSendingAction", serverAction);
@@ -414,10 +420,47 @@ exports.shopRefundRequest = (mysqlPool, socket, shopItem) => {
 						const serverAction = {
 							type: SHOP_REFUND,
 							payload: {
-								shopItem: shopItem
+								shopItem: shopItem,
+								pointsAdded: itemCost
 							}
 						};
 						socket.emit("serverSendingAction", serverAction);
+					}
+				);
+			}
+		);
+	});
+};
+
+exports.shopConfirmPurchase = (mysqlPool, socket) => {
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+
+	//verify if it is allowed, game active, phase, controller...
+
+	mysqlPool.getConnection((error, connection) => {
+		connection.query(
+			"INSERT INTO invItems (invItemId, invItemGameId, invItemTeamId, invItemTypeId) SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?",
+			[gameId, gameTeam],
+			(error, results, fields) => {
+				connection.query(
+					"DELETE FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?",
+					[gameId, gameTeam],
+					(error, results, fields) => {
+						connection.query(
+							"SELECT * FROM invItems WHERE invItemGameId = ? AND invItemTeamId = ?",
+							[gameId, gameTeam],
+							(error, results, fields) => {
+								connection.release();
+								const serverAction = {
+									type: SHOP_TRANSFER,
+									payload: {
+										invItems: results
+									}
+								};
+								socket.emit("serverSendingAction", serverAction);
+								return;
+							}
+						);
 					}
 				);
 			}

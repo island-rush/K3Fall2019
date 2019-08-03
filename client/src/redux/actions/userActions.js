@@ -12,6 +12,12 @@ export const shopRefundRequest = shopItemId => {
 	};
 };
 
+export const shopConfirmPurchase = () => {
+	return (dispath, getState, emit) => {
+		emit("shopConfirmPurchase");
+	};
+};
+
 export const selectPosition = selectedPositionId => {
 	return {
 		type: POSITION_SELECT,

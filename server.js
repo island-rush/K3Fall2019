@@ -231,6 +231,10 @@ io.sockets.on("connection", socket => {
 		backendServices.shopRefundRequest(mysqlPool, socket, shopItem);
 	});
 
+	socket.on("shopConfirmPurchase", () => {
+		backendServices.shopConfirmPurchase(mysqlPool, socket);
+	});
+
 	socket.on("disconnect", () => {
 		const controllerLoginField =
 			"game" + gameTeam + "Controller" + gameController;

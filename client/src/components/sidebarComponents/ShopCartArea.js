@@ -8,7 +8,8 @@ class ShopCartArea extends Component {
 		position: "absolute",
 		width: "20%",
 		height: "80%",
-		right: "1%"
+		right: "1%",
+		top: "1%"
 	};
 
 	render() {

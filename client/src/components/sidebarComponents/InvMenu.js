@@ -7,10 +7,11 @@ class InvMenu extends Component {
 	inventoryStyle = {
 		backgroundColor: "Yellow",
 		position: "absolute",
-		height: "120%",
+		height: "250%",
 		width: "1800%",
 		marginLeft: "150%",
-		marginTop: "20%"
+		marginTop: "20%",
+		padding: "1%"
 	};
 
 	invisibleStyle = {
