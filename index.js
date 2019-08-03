@@ -10,7 +10,7 @@ const DatabaseName = process.env.DB_NAME || "k3";
 const sessionSecret = process.env.SESSION_SECRET || "@d$f4%ggGG4_*7FGkdkjlk";
 const productionEnv = process.env.PRODUCTION_ENV || false;
 
-const backendServices = require("./server/backendServices.js");
+const backendServices = require("./serverItems/backendServices.js");
 const express = require("express");
 const app = express();
 const server = require("http").createServer(app);
@@ -40,7 +40,7 @@ let mysqlPool = mysql.createPool(databaseConfig);
 const csvparse = require("csv-array");
 let distanceMatrix = [];
 csvparse.parseCSV(
-	"./server/distanceMatrix.csv",
+	"./serverItems/distanceMatrix.csv",
 	data => {
 		distanceMatrix = data;
 	},
