@@ -24,7 +24,7 @@ class ShopMenu extends Component {
 	render() {
 		return (
 			<div style={this.props.selected ? this.shopStyle : this.invisibleStyle}>
-				<div onClick={() => this.props.purchase(0)}>Pieces Div</div>
+				<div onClick={() => this.props.purchase(0)}>Purchase Item</div>
 				<ShopCartArea
 					refund={this.props.refund}
 					shopItems={this.props.shopItems}

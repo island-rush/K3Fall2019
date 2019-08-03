@@ -35,7 +35,7 @@ class Sidebar extends Component {
 	};
 
 	infoButtonStyle = {
-		backgroundImage: 'url("./infoIcon.png")',
+		backgroundImage: 'url("./images/graphics/infoIcon.png")',
 		top: "70%"
 	};
 

@@ -7,7 +7,7 @@ class ShopCartArea extends Component {
 		backgroundColor: "red",
 		position: "absolute",
 		width: "20%",
-		height: "90%",
+		height: "80%",
 		right: "1%"
 	};
 
