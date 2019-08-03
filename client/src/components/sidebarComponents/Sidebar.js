@@ -46,18 +46,18 @@ class Sidebar extends Component {
 	render() {
 		return (
 			<div style={this.sidebarStyle}>
-				<ShopMenu selected={this.props.menuSelected === 1} />
-				<InvMenu selected={this.props.menuSelected === 2} />
+				<ShopMenu selected={this.props.selectedMenu === 1} />
+				<InvMenu selected={this.props.selectedMenu === 2} />
 				<Gameinfo
 					gameInfo={this.props.gameInfo}
-					selected={this.props.menuSelected === 3}
+					selected={this.props.selectedMenu === 3}
 				/>
 				<div
 					onClick={() => this.props.menuSelect(1)}
 					style={{
 						...this.buttonStyle,
 						...this.shopButtonStyle,
-						...(this.props.menuSelected === 1 ? this.selectedButtonStyle : "")
+						...(this.props.selectedMenu === 1 ? this.selectedButtonStyle : "")
 					}}
 				/>
 				<div
@@ -65,7 +65,7 @@ class Sidebar extends Component {
 					style={{
 						...this.buttonStyle,
 						...this.invButtonStyle,
-						...(this.props.menuSelected === 2 ? this.selectedButtonStyle : "")
+						...(this.props.selectedMenu === 2 ? this.selectedButtonStyle : "")
 					}}
 				/>
 				<div
@@ -73,7 +73,7 @@ class Sidebar extends Component {
 					style={{
 						...this.buttonStyle,
 						...this.infoButtonStyle,
-						...(this.props.menuSelected === 3 ? this.selectedButtonStyle : "")
+						...(this.props.selectedMenu === 3 ? this.selectedButtonStyle : "")
 					}}
 				/>
 			</div>
@@ -83,13 +83,13 @@ class Sidebar extends Component {
 
 Sidebar.propTypes = {
 	gameInfo: PropTypes.object.isRequired,
-	menuSelected: PropTypes.number.isRequired,
+	selectedMenu: PropTypes.number.isRequired,
 	menuSelect: PropTypes.func.isRequired
 };
 
-const mapStateToProps = ({ gameInfo, menuSelected }) => ({
+const mapStateToProps = ({ gameInfo, selectedMenu }) => ({
 	gameInfo: gameInfo,
-	menuSelected: menuSelected
+	selectedMenu: selectedMenu
 });
 
 const mapActionsToProps = {

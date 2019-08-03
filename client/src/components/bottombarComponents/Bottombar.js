@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import LeftControls from "./Leftcontrols";
 import UserFeedback from "./Userfeedback";
 import MainControl from "./Maincontrol";
+import { connect } from "react-redux";
 
 class Bottombar extends Component {
 	bottombarStyle = {
@@ -17,11 +18,15 @@ class Bottombar extends Component {
 		return (
 			<div style={this.bottombarStyle}>
 				<LeftControls />
-				<UserFeedback />
+				<UserFeedback userFeedback={this.props.userFeedback} />
 				<MainControl />
 			</div>
 		);
 	}
 }
 
-export default Bottombar;
+const mapStateToProps = ({ userFeedback }) => ({
+	userFeedback: userFeedback
+});
+
+export default connect(mapStateToProps)(Bottombar);

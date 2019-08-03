@@ -6,7 +6,7 @@ const SHOP_REFUND = "SHOP_REFUND";
 const SET_USERFEEDBACK = "SET_USERFEEDBACK";
 
 const shopItemTypeCosts = {
-	//id: cost
+	//shopItemTypeId: pointsCost
 	0: 10, //ship
 	1: 10, //plane
 	2: 10 //warfare
@@ -174,7 +174,6 @@ exports.insertDatabaseTables = (mysqlPool, req, callback) => {
 	const sql = fs.readFileSync("./server/sql/tableInsert.sql").toString();
 	mysqlPool.query(sql, (error, results, fields) => {
 		if (error) {
-			console.log(error);
 			callback("failed");
 			return;
 		} else {
@@ -205,121 +204,130 @@ exports.gameLoginVerify = (mysqlPool, req, callback) => {
 
 	const gameTeamPasswordHashed = md5(gameTeamPassword);
 	const commanderLoginField = "game" + gameTeam + "Controller" + gameController; //ex: 'game0Controller0'
-	mysqlPool.query(
-		"SELECT gameId, game0Password, game1Password, gameActive, ?? as commanderLogin FROM games WHERE gameSection = ? AND gameInstructor = ? ORDER BY gameId",
-		[commanderLoginField, gameSection, gameInstructor],
-		(error, results, fields) => {
-			if (error) {
-				callback("/index.html?error=database");
-				return;
-			}
-
-			if (results.length != 1) {
-				callback("/index.html?error=login");
-				return;
-			}
-
-			const {
-				gameId,
-				game0Password,
-				game1Password,
-				gameActive,
-				commanderLogin
-			} = results[0];
-			if (gameActive != 1) {
-				callback("/index.html?error=gameNotActive");
-				return;
-			}
-			if (commanderLogin != 0) {
-				callback("/index.html?error=alreadyLoggedIn");
-				return;
-			}
-			let gamePassword = game0Password;
-			if (gameTeam == 1) {
-				gamePassword = game1Password;
-			}
-			if (gameTeamPasswordHashed != gamePassword) {
-				callback("/index.html?error=login");
-				return;
-			}
-
-			mysqlPool.query(
-				"UPDATE games SET ?? = 1 WHERE gameId = ?",
-				[commanderLoginField, gameId],
-				(error, results, fields) => {
-					//handle error
-					//shouldn't have error if succeeded above
+	mysqlPool.getConnection((error, connection) => {
+		connection.query(
+			"SELECT gameId, game0Password, game1Password, gameActive, ?? as commanderLogin FROM games WHERE gameSection = ? AND gameInstructor = ? ORDER BY gameId",
+			[commanderLoginField, gameSection, gameInstructor],
+			(error, results, fields) => {
+				if (error) {
+					callback("/index.html?error=database");
+					return;
 				}
-			);
 
-			req.session.ir3 = {
-				gameId: gameId,
-				gameTeam: gameTeam,
-				gameController: gameController
-			};
+				if (results.length != 1) {
+					callback("/index.html?error=login");
+					return;
+				}
 
-			callback("/game.html");
-			return;
-		}
-	);
+				const {
+					gameId,
+					game0Password,
+					game1Password,
+					gameActive,
+					commanderLogin
+				} = results[0];
+				if (gameActive != 1) {
+					callback("/index.html?error=gameNotActive");
+					return;
+				}
+				if (commanderLogin != 0) {
+					callback("/index.html?error=alreadyLoggedIn");
+					return;
+				}
+				let gamePassword = game0Password;
+				if (gameTeam == 1) {
+					gamePassword = game1Password;
+				}
+				if (gameTeamPasswordHashed != gamePassword) {
+					callback("/index.html?error=login");
+					return;
+				}
+
+				connection.query(
+					"UPDATE games SET ?? = 1 WHERE gameId = ?",
+					[commanderLoginField, gameId],
+					(error, results, fields) => {
+						//handle error
+						//shouldn't have error if succeeded above
+						connection.release();
+					}
+				);
+
+				req.session.ir3 = {
+					gameId: gameId,
+					gameTeam: gameTeam,
+					gameController: gameController
+				};
+
+				callback("/game.html");
+				return;
+			}
+		);
+	});
 };
 
-exports.socketInitialGameState = (mysqlPool, socket) => {
+exports.getInitialGameState = (mysqlPool, socket) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 	//SELECT based on TeamId (socket.handshake.session.ir3.gameTeam)
 	//also consider gameController info in ir3
 
 	const pointsField = `game${gameTeam}Points`;
-	mysqlPool.query(
-		"SELECT gameSection, gameInstructor, ?? as teamPoints FROM games WHERE gameId = ?",
-		[pointsField, gameId],
-		(error, results, fields) => {
-			if (error) {
-				socket.emit("serverRedirect", "database");
-				return;
-			}
-			const { gameSection, gameInstructor } = results[0];
-			const teamPoints = results[0].teamPoints;
 
-			mysqlPool.query(
-				"SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?",
-				[gameId, gameTeam],
-				(error, results, fields) => {
-					const shopItems = results;
+	mysqlPool.getConnection((error, connection) => {
+		if (error) throw error; //deal with error
 
-					mysqlPool.query(
-						"SELECT * FROM invItems WHERE invItemGameId = ? AND invItemTeamId = ?",
-						[gameId, gameTeam],
-						(error, results, fields) => {
-							const invItems = results;
-
-							const serverData = {
-								type: INITIAL_GAMESTATE,
-								payload: {
-									points: teamPoints,
-									userFeedback: "Welcome to Island Rush!!",
-									gameInfo: {
-										gameSection: gameSection,
-										gameInstructor: gameInstructor,
-										gameController: gameController
-									},
-									shopItems: shopItems,
-									invItems: invItems,
-									gameboard: [], //need to have all the positions in here...
-									gameboardMeta: {
-										selectedPosition: -1
-									}
-								}
-							};
-
-							socket.emit("serverSendingAction", serverData);
-							return;
-						}
-					);
+		connection.query(
+			"SELECT gameSection, gameInstructor, ?? as teamPoints FROM games WHERE gameId = ?",
+			[pointsField, gameId],
+			(error, results, fields) => {
+				if (error) {
+					socket.emit("serverRedirect", "database");
+					return;
 				}
-			);
-		}
-	);
+				const { gameSection, gameInstructor } = results[0];
+				const teamPoints = results[0].teamPoints;
+
+				connection.query(
+					"SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?",
+					[gameId, gameTeam],
+					(error, results, fields) => {
+						const shopItems = results;
+
+						connection.query(
+							"SELECT * FROM invItems WHERE invItemGameId = ? AND invItemTeamId = ?",
+							[gameId, gameTeam],
+							(error, results, fields) => {
+								connection.release();
+								const invItems = results;
+
+								const serverData = {
+									type: INITIAL_GAMESTATE,
+									payload: {
+										points: teamPoints,
+										userFeedback: "Welcome to Island Rush!!",
+										gameInfo: {
+											gameSection: gameSection,
+											gameInstructor: gameInstructor,
+											gameController: gameController
+										},
+										shopItems: shopItems,
+										invItems: invItems,
+										gameboard: [], //need to have all the positions in here...
+										gameboardMeta: {
+											selectedPosition: -1
+										}
+									}
+								};
+
+								socket.emit("serverSendingAction", serverData);
+								return;
+							}
+						);
+					}
+				);
+			}
+		);
+	});
 };
 
 exports.shopPurchaseRequest = (mysqlPool, socket, shopItemTypeId) => {
@@ -329,53 +337,56 @@ exports.shopPurchaseRequest = (mysqlPool, socket, shopItemTypeId) => {
 
 	const pointsField = `game${gameTeam}Points`;
 
-	mysqlPool.query(
-		"SELECT ?? as points FROM games WHERE gameId = ?",
-		[pointsField, gameId],
-		(error, results, fields) => {
-			const teamPoints = results[0].points;
-			const shopItemCost = shopItemTypeCosts[shopItemTypeId];
+	mysqlPool.getConnection((error, connection) => {
+		connection.query(
+			"SELECT ?? as points FROM games WHERE gameId = ?",
+			[pointsField, gameId],
+			(error, results, fields) => {
+				const teamPoints = results[0].points;
+				const shopItemCost = shopItemTypeCosts[shopItemTypeId];
 
-			if (teamPoints >= shopItemCost) {
-				mysqlPool.query(
-					"UPDATE games SET ?? = ?? - ? WHERE gameId = ?",
-					[pointsField, pointsField, shopItemCost, gameId],
-					(error, results, fields) => {
-						mysqlPool.query(
-							"INSERT INTO shopItems (shopItemGameId, shopItemTeamId, shopItemTypeId) values (?, ?, ?)",
-							[gameId, gameTeam, shopItemTypeId],
-							(error, results, fields) => {
-								const shopItem = {
-									shopItemId: results.insertId,
-									shopItemGameId: gameId,
-									shopItemTeamId: gameTeam,
-									shopItemTypeId: shopItemTypeId
-								};
+				if (teamPoints >= shopItemCost) {
+					connection.query(
+						"UPDATE games SET ?? = ?? - ? WHERE gameId = ?",
+						[pointsField, pointsField, shopItemCost, gameId],
+						(error, results, fields) => {
+							connection.query(
+								"INSERT INTO shopItems (shopItemGameId, shopItemTeamId, shopItemTypeId) values (?, ?, ?)",
+								[gameId, gameTeam, shopItemTypeId],
+								(error, results, fields) => {
+									connection.release();
+									const shopItem = {
+										shopItemId: results.insertId,
+										shopItemGameId: gameId,
+										shopItemTeamId: gameTeam,
+										shopItemTypeId: shopItemTypeId
+									};
 
-								const serverAction = {
-									type: SHOP_PURCHASE,
-									payload: {
-										shopItem: shopItem
-									}
-								};
-								socket.emit("serverSendingAction", serverAction);
-								return;
-							}
-						);
-					}
-				);
-			} else {
-				const serverAction = {
-					type: SET_USERFEEDBACK,
-					payload: {
-						userFeedback: "Not enough points to purchase"
-					}
-				};
-				socket.emit("serverSendingAction", serverAction);
-				return;
+									const serverAction = {
+										type: SHOP_PURCHASE,
+										payload: {
+											shopItem: shopItem
+										}
+									};
+									socket.emit("serverSendingAction", serverAction);
+									return;
+								}
+							);
+						}
+					);
+				} else {
+					const serverAction = {
+						type: SET_USERFEEDBACK,
+						payload: {
+							userFeedback: "Not enough points to purchase"
+						}
+					};
+					socket.emit("serverSendingAction", serverAction);
+					return;
+				}
 			}
-		}
-	);
+		);
+	});
 };
 
 exports.shopRefundRequest = (mysqlPool, socket, shopItem) => {
@@ -387,26 +398,29 @@ exports.shopRefundRequest = (mysqlPool, socket, shopItem) => {
 	const pointsField = `game${gameTeam}Points`;
 	const itemCost = shopItemTypeCosts[shopItem.shopItemTypeId];
 
-	mysqlPool.query(
-		"UPDATE games SET ?? = ?? + ? WHERE gameId = ?",
-		[pointsField, pointsField, itemCost, gameId],
-		(error, results, fields) => {
-			//get rid of the item
-			mysqlPool.query(
-				"DELETE FROM shopItems WHERE shopItemId = ?",
-				[shopItem.shopItemId],
-				(error, results, fields) => {
-					//probably check success of deletion?
+	mysqlPool.getConnection((error, connection) => {
+		connection.query(
+			"UPDATE games SET ?? = ?? + ? WHERE gameId = ?",
+			[pointsField, pointsField, itemCost, gameId],
+			(error, results, fields) => {
+				//get rid of the item
+				connection.query(
+					"DELETE FROM shopItems WHERE shopItemId = ?",
+					[shopItem.shopItemId],
+					(error, results, fields) => {
+						//probably check success of deletion?
+						connection.release();
 
-					const serverAction = {
-						type: SHOP_REFUND,
-						payload: {
-							shopItem: shopItem
-						}
-					};
-					socket.emit("serverSendingAction", serverAction);
-				}
-			);
-		}
-	);
+						const serverAction = {
+							type: SHOP_REFUND,
+							payload: {
+								shopItem: shopItem
+							}
+						};
+						socket.emit("serverSendingAction", serverAction);
+					}
+				);
+			}
+		);
+	});
 };

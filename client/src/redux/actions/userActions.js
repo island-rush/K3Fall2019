@@ -1,20 +1,31 @@
-import { MENU_SELECT } from "./types";
+import { MENU_SELECT, POSITION_SELECT } from "./types";
 
-export function shopPurchaseRequest(shopItemTypeId) {
+export const shopPurchaseRequest = shopItemTypeId => {
 	return (dispatch, getState, emit) => {
 		emit("shopPurchaseRequest", shopItemTypeId);
 	};
-}
+};
 
-export function shopRefundRequest(shopItemId) {
+export const shopRefundRequest = shopItemId => {
 	return (dispatch, getState, emit) => {
 		emit("shopRefundRequest", shopItemId);
 	};
-}
+};
 
-export function menuSelect(menuNumber) {
+export const selectPosition = selectedPositionId => {
+	return {
+		type: POSITION_SELECT,
+		payload: {
+			positionId: selectedPositionId
+		}
+	};
+};
+
+export const menuSelect = selectedMenuId => {
 	return {
 		type: MENU_SELECT,
-		payload: menuNumber
+		payload: {
+			selectedMenuId: selectedMenuId
+		}
 	};
-}
+};

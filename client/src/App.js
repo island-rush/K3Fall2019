@@ -1,15 +1,9 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import Sidebar from "./components/sidebarComponents/Sidebar";
 import Bottombar from "./components/bottombarComponents/Bottombar";
 import Gameboard from "./components/gameboardComponents/Gameboard";
-import "./App.css";
 
 class App extends Component {
-	userClicked() {
-		this.props.clientSendData("clientData");
-	}
-
 	appStyle = {
 		position: "relative",
 		backgroundColor: "black",
@@ -19,7 +13,7 @@ class App extends Component {
 
 	render() {
 		return (
-			<div className="App" style={this.appStyle}>
+			<div style={this.appStyle}>
 				<Sidebar />
 				<Bottombar />
 				<Gameboard />
@@ -28,8 +22,4 @@ class App extends Component {
 	}
 }
 
-const mapStateToProps = ({ points, userFeedback }) => ({
-	userFeedback: userFeedback
-});
-
-export default connect(mapStateToProps)(App);
+export default App;

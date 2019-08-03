@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
 class Userfeedback extends Component {
@@ -21,8 +20,4 @@ Userfeedback.propTypes = {
 	userFeedback: PropTypes.string.isRequired
 };
 
-const mapStateToProps = ({ userFeedback }) => ({
-	userFeedback: userFeedback
-});
-
-export default connect(mapStateToProps)(Userfeedback);
+export default Userfeedback;

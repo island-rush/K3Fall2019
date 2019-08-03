@@ -220,8 +220,8 @@ io.sockets.on("connection", socket => {
 		"game" + gameId + "team" + gameTeam + "controller" + gameController
 	);
 
-	//Send the initial game state (TODO: Server Side Rendering)
-	backendServices.socketInitialGameState(mysqlPool, socket);
+	//Send the initial game state (TODO: Server Side Rendering with react?)
+	backendServices.getInitialGameState(mysqlPool, socket);
 
 	socket.on("shopPurchaseRequest", shopItemTypeId => {
 		backendServices.shopPurchaseRequest(mysqlPool, socket, shopItemTypeId);
@@ -238,7 +238,7 @@ io.sockets.on("connection", socket => {
 			"UPDATE games SET ?? = 0 WHERE gameId = ?",
 			[controllerLoginField, gameId],
 			(error, results, fields) => {
-				//handle error
+				//handle error, check success?
 			}
 		);
 	});

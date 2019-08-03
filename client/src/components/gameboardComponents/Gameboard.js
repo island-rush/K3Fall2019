@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import { selectPosition } from "../../redux/actions/userActions";
 
 class Gameboard extends Component {
 	render() {
@@ -18,4 +19,11 @@ const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 	selectedPosition: gameboardMeta.selectedPosition
 });
 
-export default connect(mapStateToProps)(Gameboard);
+const mapActionsToProps = {
+	selectPosition: selectPosition
+};
+
+export default connect(
+	mapStateToProps,
+	mapActionsToProps
+)(Gameboard);
