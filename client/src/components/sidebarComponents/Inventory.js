@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 class Inventory extends Component {
 	inventoryStyle = {
@@ -24,5 +25,9 @@ class Inventory extends Component {
 		);
 	}
 }
+
+Inventory.propTypes = {
+	selected: PropTypes.bool.isRequired
+};
 
 export default Inventory;

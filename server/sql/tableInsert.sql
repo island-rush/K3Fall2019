@@ -14,7 +14,25 @@ CREATE TABLE IF NOT EXISTS games (
     game1Controller1 INT(1) NOT NULL DEFAULT 0,
     game1Controller2 INT(1) NOT NULL DEFAULT 0,
     game1Controller3 INT(1) NOT NULL DEFAULT 0,
+    game0Points INT(5) NOT NULL DEFAULT 0,
+    game1Points INT(5) NOT NULL DEFAULT 0,
     PRIMARY KEY(gameId)
+) AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS shopItems (
+    shopItemId INT(8) NOT NULL AUTO_INCREMENT,
+    shopItemGameId INT(3) NOT NULL,
+    shopItemTeamId INT(1) NOT NULL,
+    shopItemTypeId INT(2) NOT NULL,
+    PRIMARY KEY(shopItemId)
+) AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS invItems (
+    invItemId INT(8) NOT NULL AUTO_INCREMENT,
+    invItemGameId INT(3) NOT NULL,
+    invItemTeamId INT(1) NOT NULL,
+    invItemTypeId INT(2) NOT NULL,
+    PRIMARY KEY(invItemId)
 ) AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS pieces (
@@ -29,3 +47,4 @@ CREATE TABLE IF NOT EXISTS pieces (
     pieceFuel INT(2) NOT NULL,
     PRIMARY KEY(pieceId)
 ) AUTO_INCREMENT=1;
+

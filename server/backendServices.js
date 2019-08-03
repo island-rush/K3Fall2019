@@ -1,6 +1,16 @@
 const md5 = require("md5");
 const fs = require("fs");
 const INITIAL_GAMESTATE = "INITIAL_GAMESTATE";
+const SHOP_PURCHASE = "SHOP_PURCHASE";
+const SHOP_REFUND = "SHOP_REFUND";
+const SET_USERFEEDBACK = "SET_USERFEEDBACK";
+
+const shopItemTypeCosts = {
+	//id: cost
+	0: 10, //ship
+	1: 10, //plane
+	2: 10 //warfare
+};
 
 exports.gameAdd = (mysqlPool, req, callback) => {
 	const { adminSection, adminInstructor, adminPassword } = req.body;
@@ -247,6 +257,7 @@ exports.gameLoginVerify = (mysqlPool, req, callback) => {
 				gameTeam: gameTeam,
 				gameController: gameController
 			};
+
 			callback("/game.html");
 			return;
 		}
@@ -257,44 +268,139 @@ exports.socketInitialGameState = (mysqlPool, socket) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 	//SELECT based on TeamId (socket.handshake.session.ir3.gameTeam)
 	//also consider gameController info in ir3
+
+	const pointsField = `game${gameTeam}Points`;
 	mysqlPool.query(
-		"SELECT gameSection, gameInstructor FROM games WHERE gameId = ?",
-		[gameId],
+		"SELECT gameSection, gameInstructor, ?? as teamPoints FROM games WHERE gameId = ?",
+		[pointsField, gameId],
 		(error, results, fields) => {
 			if (error) {
 				socket.emit("serverRedirect", "database");
 				return;
 			}
 
-			const { gameSection, gameInstructor } = results[0];
-			const gameController = socket.handshake.session.ir3.gameController;
+			const teamPoints = results[0].teamPoints;
 
-			const serverData = {
-				type: INITIAL_GAMESTATE,
-				payload: {
-					points: -1,
-					userFeedback: "Welcome to Island Rush!!",
-					gameInfo: {
-						gameSection: gameSection,
-						gameInstructor: gameInstructor,
-						gameController: gameController
-					}
+			mysqlPool.query(
+				"SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?",
+				[gameId, gameTeam],
+				(error, results, fields) => {
+					const shopItems = results;
+
+					const { gameSection, gameInstructor } = results[0];
+					const gameController = socket.handshake.session.ir3.gameController;
+
+					const serverData = {
+						type: INITIAL_GAMESTATE,
+						payload: {
+							points: teamPoints,
+							userFeedback: "Welcome to Island Rush!!",
+							gameInfo: {
+								gameSection: gameSection,
+								gameInstructor: gameInstructor,
+								gameController: gameController
+							},
+							shopItems: shopItems,
+							gameboard: [], //need to have all the positions in here...
+							gameboardMeta: {
+								selectedPosition: -1
+							}
+						}
+					};
+
+					socket.emit("serverSendingAction", serverData);
+					return;
 				}
-			};
-
-			socket.emit("serverSendingAction", serverData);
+			);
 		}
 	);
 };
 
-exports.clientSendingData = (mysqlPool, socket, clientData) => {
+exports.shopPurchaseRequest = (mysqlPool, socket, shopItemTypeId) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	//send back stuff?
-	const serverAction = {
-		type: "SET_USERFEEDBACK",
-		payload: `Server Got Data: ${clientData}`
-	};
+	//TODO: figure out if the purchase is allowed (game phase...controller Id....game active....)
 
-	socket.emit("serverSendingAction", serverAction);
+	const pointsField = `game${gameTeam}Points`;
+
+	mysqlPool.query(
+		"SELECT ?? as points FROM games WHERE gameId = ?",
+		[pointsField, gameId],
+		(error, results, fields) => {
+			const teamPoints = results[0].points;
+			const shopItemCost = shopItemTypeCosts[shopItemTypeId];
+
+			if (teamPoints >= shopItemCost) {
+				mysqlPool.query(
+					"UPDATE games SET ?? = ?? - ? WHERE gameId = ?",
+					[pointsField, pointsField, shopItemCost, gameId],
+					(error, results, fields) => {
+						mysqlPool.query(
+							"INSERT INTO shopItems (shopItemGameId, shopItemTeamId, shopItemTypeId) values (?, ?, ?)",
+							[gameId, gameTeam, shopItemTypeId],
+							(error, results, fields) => {
+								const shopItem = {
+									shopItemId: results.insertId,
+									shopItemGameId: gameId,
+									shopItemTeamId: gameTeam,
+									shopItemTypeId: shopItemTypeId
+								};
+
+								const serverAction = {
+									type: SHOP_PURCHASE,
+									payload: {
+										shopItem: shopItem
+									}
+								};
+								socket.emit("serverSendingAction", serverAction);
+								return;
+							}
+						);
+					}
+				);
+			} else {
+				const serverAction = {
+					type: SET_USERFEEDBACK,
+					payload: {
+						userFeedback: "Not enough points to purchase"
+					}
+				};
+				socket.emit("serverSendingAction", serverAction);
+				return;
+			}
+		}
+	);
+};
+
+exports.shopRefundRequest = (mysqlPool, socket, shopItem) => {
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+
+	//verify that the refund is available (correct controller, game active....)
+	//verify that the piece exists and the object given matches database values (overkill)
+
+	const pointsField = `game${gameTeam}Points`;
+	const itemCost = shopItemTypeCosts[shopItem.shopItemTypeId];
+
+	mysqlPool.query(
+		"UPDATE games SET ?? = ?? + ? WHERE gameId = ?",
+		[pointsField, pointsField, itemCost, gameId],
+		(error, results, fields) => {
+			//get rid of the item
+			mysqlPool.query(
+				"DELETE FROM shopItems WHERE shopItemId = ?",
+				[shopItem.shopItemId],
+				(error, results, fields) => {
+					//probably check success of deletion?
+
+					const serverAction = {
+						type: SHOP_REFUND,
+						payload: {
+							shopItem: shopItem
+						}
+					};
+					socket.emit("serverSendingAction", serverAction);
+				}
+			);
+		}
+	);
 };

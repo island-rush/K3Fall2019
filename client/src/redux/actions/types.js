@@ -1,4 +1,6 @@
 export const INITIAL_GAMESTATE = "INITIAL_GAMESTATE";
-export const MANUAL_POINTS = "MANUAL_POINTS";
 export const MENU_SELECT = "MENU_SELECT";
 export const SET_USERFEEDBACK = "SET_USERFEEDBACK";
+export const SHOP_PURCHASE = "SHOP_PURCHASE";
+export const SHOP_REFUND = "SHOP_REFUND";
+export const SHOP_CLEAR = "SHOP_CLEAR";

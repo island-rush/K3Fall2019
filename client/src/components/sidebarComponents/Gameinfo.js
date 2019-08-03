@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const gameinfoStyle = {
 	backgroundColor: "Yellow",
@@ -13,15 +14,20 @@ const invisibleStyle = {
 	display: "none"
 };
 
-function Gameinfo(props) {
+const Gameinfo = ({ selected, gameInfo }) => {
 	return (
-		<div style={props.selected ? gameinfoStyle : invisibleStyle}>
+		<div style={selected ? gameinfoStyle : invisibleStyle}>
 			Gameinfo
-			<div>GameSection: {props.gameInfo.gameSection}</div>
-			<div>GameInstructor: {props.gameInfo.gameInstructor}</div>
-			<div>GameController: {props.gameInfo.gameController}</div>
+			<div>GameSection: {gameInfo.gameSection}</div>
+			<div>GameInstructor: {gameInfo.gameInstructor}</div>
+			<div>GameController: {gameInfo.gameController}</div>
 		</div>
 	);
-}
+};
+
+Gameinfo.propTypes = {
+	selected: PropTypes.bool.isRequired,
+	gameInfo: PropTypes.object.isRequired
+};
 
 export default Gameinfo;

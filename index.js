@@ -186,7 +186,7 @@ app.get("/game.html", (req, res) => {
 		if (productionEnv) {
 			res.sendFile(__dirname + "/client/build/index.html");
 		} else {
-			res.redirect("http://localhost:3001"); // Use this redirect while working on react frontend
+			res.redirect("http://localhost:3000"); // Use this redirect while working on react frontend
 		}
 	} else {
 		res.redirect("/index.html?error=login");
@@ -223,8 +223,12 @@ io.sockets.on("connection", socket => {
 	//Send the initial game state (TODO: Server Side Rendering)
 	backendServices.socketInitialGameState(mysqlPool, socket);
 
-	socket.on("clientSendingData", clientData => {
-		backendServices.clientSendingData(mysqlPool, socket, clientData);
+	socket.on("shopPurchaseRequest", shopItemTypeId => {
+		backendServices.shopPurchaseRequest(mysqlPool, socket, shopItemTypeId);
+	});
+
+	socket.on("shopRefundRequest", shopItem => {
+		backendServices.shopRefundRequest(mysqlPool, socket, shopItem);
 	});
 
 	socket.on("disconnect", () => {

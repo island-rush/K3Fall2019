@@ -1,8 +1,14 @@
 import { MENU_SELECT } from "./types";
 
-export function clientSendingDataAction(clientData) {
+export function shopPurchaseRequest(shopItemTypeId) {
 	return (dispatch, getState, emit) => {
-		emit("clientSendingData", clientData);
+		emit("shopPurchaseRequest", shopItemTypeId);
+	};
+}
+
+export function shopRefundRequest(shopItemId) {
+	return (dispatch, getState, emit) => {
+		emit("shopRefundRequest", shopItemId);
 	};
 }
 

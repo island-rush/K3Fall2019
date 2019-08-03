@@ -29,7 +29,6 @@ class App extends Component {
 }
 
 const mapStateToProps = ({ points, userFeedback }) => ({
-	points: points,
 	userFeedback: userFeedback
 });
 
