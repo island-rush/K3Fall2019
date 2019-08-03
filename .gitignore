@@ -1,1 +1,3 @@
 node_modules
+serverItems/sql/dbReset.sql
+serverItems/sql/scratchSQL.sql
