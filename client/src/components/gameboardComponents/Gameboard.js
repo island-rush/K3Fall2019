@@ -9,11 +9,13 @@ class Gameboard extends Component {
 }
 
 Gameboard.propTypes = {
+	gameboard: PropTypes.array.isRequired,
 	selectedPosition: PropTypes.number.isRequired
 };
 
-const mapStateToProps = ({ selectedPosition }) => ({
-	selectedPosition: selectedPosition
+const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
+	gameboard: gameboard,
+	selectedPosition: gameboardMeta.selectedPosition
 });
 
 export default connect(mapStateToProps)(Gameboard);

@@ -1,4 +1,3 @@
-//import the type from ../actions/types or something
 import {
 	SHOP_PURCHASE,
 	SHOP_REFUND,

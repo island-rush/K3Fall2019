@@ -12,6 +12,7 @@ class ShopItem extends Component {
 }
 
 ShopItem.propTypes = {
+	key: PropTypes.number,
 	refund: PropTypes.func.isRequired,
 	shopItem: PropTypes.object.isRequired
 };

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import ShopMenu from "./ShopMenu";
-import Inventory from "./Inventory";
+import InvMenu from "./InvMenu";
 import Gameinfo from "./Gameinfo";
 import { menuSelect } from "../../redux/actions/userActions";
 import PropTypes from "prop-types";
@@ -47,7 +47,7 @@ class Sidebar extends Component {
 		return (
 			<div style={this.sidebarStyle}>
 				<ShopMenu selected={this.props.menuSelected === 1} />
-				<Inventory selected={this.props.menuSelected === 2} />
+				<InvMenu selected={this.props.menuSelected === 2} />
 				<Gameinfo
 					gameInfo={this.props.gameInfo}
 					selected={this.props.menuSelected === 3}

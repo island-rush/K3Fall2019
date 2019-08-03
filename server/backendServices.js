@@ -278,7 +278,7 @@ exports.socketInitialGameState = (mysqlPool, socket) => {
 				socket.emit("serverRedirect", "database");
 				return;
 			}
-
+			const { gameSection, gameInstructor } = results[0];
 			const teamPoints = results[0].teamPoints;
 
 			mysqlPool.query(
@@ -287,29 +287,35 @@ exports.socketInitialGameState = (mysqlPool, socket) => {
 				(error, results, fields) => {
 					const shopItems = results;
 
-					const { gameSection, gameInstructor } = results[0];
-					const gameController = socket.handshake.session.ir3.gameController;
+					mysqlPool.query(
+						"SELECT * FROM invItems WHERE invItemGameId = ? AND invItemTeamId = ?",
+						[gameId, gameTeam],
+						(error, results, fields) => {
+							const invItems = results;
 
-					const serverData = {
-						type: INITIAL_GAMESTATE,
-						payload: {
-							points: teamPoints,
-							userFeedback: "Welcome to Island Rush!!",
-							gameInfo: {
-								gameSection: gameSection,
-								gameInstructor: gameInstructor,
-								gameController: gameController
-							},
-							shopItems: shopItems,
-							gameboard: [], //need to have all the positions in here...
-							gameboardMeta: {
-								selectedPosition: -1
-							}
+							const serverData = {
+								type: INITIAL_GAMESTATE,
+								payload: {
+									points: teamPoints,
+									userFeedback: "Welcome to Island Rush!!",
+									gameInfo: {
+										gameSection: gameSection,
+										gameInstructor: gameInstructor,
+										gameController: gameController
+									},
+									shopItems: shopItems,
+									invItems: invItems,
+									gameboard: [], //need to have all the positions in here...
+									gameboardMeta: {
+										selectedPosition: -1
+									}
+								}
+							};
+
+							socket.emit("serverSendingAction", serverData);
+							return;
 						}
-					};
-
-					socket.emit("serverSendingAction", serverData);
-					return;
+					);
 				}
 			);
 		}
