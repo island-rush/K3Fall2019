@@ -14,9 +14,9 @@ class App extends Component {
 	render() {
 		return (
 			<div style={this.appStyle}>
-				<Sidebar />
 				<Bottombar />
 				<Gameboard />
+				<Sidebar />
 			</div>
 		);
 	}
