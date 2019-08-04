@@ -19,6 +19,7 @@ export const shopConfirmPurchase = () => {
 };
 
 export const selectPosition = selectedPositionId => {
+	console.log("selecting position");
 	return {
 		type: POSITION_SELECT,
 		payload: {

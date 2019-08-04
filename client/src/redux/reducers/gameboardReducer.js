@@ -1,8 +1,8 @@
 import { INITIAL_GAMESTATE } from "../actions/types";
 
-const initialGameboard = [];
+const initialGameboardEmpty = {};
 
-function gameboardReducer(state = initialGameboard, { type, payload }) {
+function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
 	switch (type) {
 		case INITIAL_GAMESTATE:
 			return payload.gameboard;
@@ -12,3 +12,14 @@ function gameboardReducer(state = initialGameboard, { type, payload }) {
 }
 
 export default gameboardReducer;
+
+// let gameboard = {
+// 	0: {
+// 		type: "land",
+// 		pieces: []
+// 	},
+// 	1: {
+// 		type: "land",
+// 		pieces: []
+// 	}
+// }

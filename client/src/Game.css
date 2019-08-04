@@ -22,3 +22,25 @@ body {
 	height: 100%;
 	width: 100%;
 }
+
+/* Hexagon CSS */
+svg g {
+	fill-opacity: 1;
+}
+svg :hover {
+	fill-opacity: 0.8;
+}
+svg g polygon {
+	stroke: rgb(0, 0, 0);
+	stroke-width: 0.15;
+}
+.selectedPos polygon {
+	z-index: 10;
+	stroke: rgb(255, 255, 255);
+	stroke-width: 0.3;
+}
+.plannedPos polygon {
+	z-index: 10;
+	stroke: rgb(196, 3, 3);
+	stroke-width: 0.3;
+}

@@ -1,19 +1,14 @@
 const md5 = require("md5");
 const fs = require("fs");
-const INITIAL_GAMESTATE = "INITIAL_GAMESTATE";
-const SHOP_PURCHASE = "SHOP_PURCHASE";
-const SHOP_REFUND = "SHOP_REFUND";
-const SET_USERFEEDBACK = "SET_USERFEEDBACK";
-const SHOP_TRANSFER = "SHOP_TRANSFER";
 
-//TODO: duplicate constants in the client directories!*!*!*!
-const shopItemTypeCosts = {
-	//TypeId: Cost
-	0: 10, //radar
-	1: 10, //plane
-	2: 10, //sub
-	3: 10 //tank
-};
+const constants = require("./constants");
+const INITIAL_GAMESTATE = constants.INITIAL_GAMESTATE;
+const SHOP_PURCHASE = constants.SHOP_PURCHASE;
+const SHOP_REFUND = constants.SHOP_REFUND;
+const SET_USERFEEDBACK = constants.SET_USERFEEDBACK;
+const SHOP_TRANSFER = constants.SHOP_TRANSFER;
+const shopItemTypeCosts = constants.shopItemTypeCosts;
+const blankGameboard = constants.blankGameboard;
 
 exports.gameAdd = (mysqlPool, req, callback) => {
 	const { adminSection, adminInstructor, adminPassword } = req.body;
@@ -315,7 +310,7 @@ exports.getInitialGameState = (mysqlPool, socket) => {
 										},
 										shopItems: shopItems,
 										invItems: invItems,
-										gameboard: [], //need to have all the positions in here...
+										gameboard: blankGameboard, //need to insert the pieces from the db
 										gameboardMeta: {
 											selectedPosition: -1
 										}
