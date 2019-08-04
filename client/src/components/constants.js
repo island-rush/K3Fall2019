@@ -21,3 +21,13 @@ export const typeMoves = {
 	2: 5, //sub
 	3: 5 //tank
 };
+
+export const zoomboxBackgrounds = {
+	land: { backgroundColor: "green" },
+	water: { backgroundColor: "yellow" }
+};
+
+export const typeTeamBorders = {
+	0: { boxShadow: "0px 0px 0px 2px rgba(0, 111, 255, 0.67) inset" },
+	1: { boxShadow: "0px 0px 0px 2px rgba(255, 0, 0, 0.55) inset" }
+};

@@ -15,7 +15,35 @@ exports.shopItemTypeCosts = {
 exports.blankGameboard = {
 	0: { type: "land", pieces: [] },
 	1: { type: "land", pieces: [] },
-	2: { type: "land", pieces: [] },
+	2: {
+		type: "land",
+		pieces: [
+			{
+				pieceId: 1,
+				pieceGameId: 1,
+				pieceTeamId: 0,
+				pieceTypeId: 1,
+				pieceMoves: 5,
+				pieceFuel: 5
+			},
+			{
+				pieceId: 2,
+				pieceGameId: 1,
+				pieceTeamId: 0,
+				pieceTypeId: 2,
+				pieceMoves: 5,
+				pieceFuel: 5
+			},
+			{
+				pieceId: 3,
+				pieceGameId: 1,
+				pieceTeamId: 1,
+				pieceTypeId: 3,
+				pieceMoves: 5,
+				pieceFuel: 5
+			}
+		]
+	},
 	3: { type: "land", pieces: [] },
 	4: { type: "land", pieces: [] },
 	5: { type: "land", pieces: [] },

@@ -6,46 +6,46 @@ import Gameinfo from "./Gameinfo";
 import { menuSelect } from "../../redux/actions/userActions";
 import PropTypes from "prop-types";
 
+const sidebarStyle = {
+	backgroundColor: "Red",
+	position: "absolute",
+	top: "0%",
+	left: "0%",
+	height: "30%",
+	width: "5%"
+};
+
+const buttonStyle = {
+	position: "absolute",
+	backgroundSize: "100% 100%",
+	backgroundRepeat: "no-repeat",
+	backgroundColor: "maroon",
+	left: "15%",
+	width: "70%",
+	paddingTop: "70%"
+};
+
+const shopButtonStyle = {
+	top: "5%"
+};
+
+const invButtonStyle = {
+	top: "37.5%"
+};
+
+const infoButtonStyle = {
+	backgroundImage: 'url("./images/graphics/infoIcon.png")',
+	top: "70%"
+};
+
+const selectedButtonStyle = {
+	backgroundColor: "white"
+};
+
 class Sidebar extends Component {
-	sidebarStyle = {
-		backgroundColor: "Red",
-		position: "absolute",
-		top: "0%",
-		left: "0%",
-		height: "30%",
-		width: "5%"
-	};
-
-	buttonStyle = {
-		position: "absolute",
-		backgroundSize: "100% 100%",
-		backgroundRepeat: "no-repeat",
-		backgroundColor: "maroon",
-		left: "15%",
-		width: "70%",
-		paddingTop: "70%"
-	};
-
-	shopButtonStyle = {
-		top: "5%"
-	};
-
-	invButtonStyle = {
-		top: "37.5%"
-	};
-
-	infoButtonStyle = {
-		backgroundImage: 'url("./images/graphics/infoIcon.png")',
-		top: "70%"
-	};
-
-	selectedButtonStyle = {
-		backgroundColor: "white"
-	};
-
 	render() {
 		return (
-			<div style={this.sidebarStyle}>
+			<div style={sidebarStyle}>
 				<ShopMenu selected={this.props.selectedMenu === 1} />
 				<InvMenu selected={this.props.selectedMenu === 2} />
 				<Gameinfo
@@ -55,25 +55,25 @@ class Sidebar extends Component {
 				<div
 					onClick={() => this.props.menuSelect(1)}
 					style={{
-						...this.buttonStyle,
-						...this.shopButtonStyle,
-						...(this.props.selectedMenu === 1 ? this.selectedButtonStyle : "")
+						...buttonStyle,
+						...shopButtonStyle,
+						...(this.props.selectedMenu === 1 ? selectedButtonStyle : "")
 					}}
 				/>
 				<div
 					onClick={() => this.props.menuSelect(2)}
 					style={{
-						...this.buttonStyle,
-						...this.invButtonStyle,
-						...(this.props.selectedMenu === 2 ? this.selectedButtonStyle : "")
+						...buttonStyle,
+						...invButtonStyle,
+						...(this.props.selectedMenu === 2 ? selectedButtonStyle : "")
 					}}
 				/>
 				<div
 					onClick={() => this.props.menuSelect(3)}
 					style={{
-						...this.buttonStyle,
-						...this.infoButtonStyle,
-						...(this.props.selectedMenu === 3 ? this.selectedButtonStyle : "")
+						...buttonStyle,
+						...infoButtonStyle,
+						...(this.props.selectedMenu === 3 ? selectedButtonStyle : "")
 					}}
 				/>
 			</div>

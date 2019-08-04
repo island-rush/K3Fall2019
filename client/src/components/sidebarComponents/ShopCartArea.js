@@ -2,16 +2,16 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import ShopItem from "./ShopItem";
 
-class ShopCartArea extends Component {
-	shopCartAreaStyle = {
-		backgroundColor: "red",
-		position: "absolute",
-		width: "20%",
-		height: "80%",
-		right: "1%",
-		top: "1%"
-	};
+const shopCartAreaStyle = {
+	backgroundColor: "red",
+	position: "absolute",
+	width: "20%",
+	height: "80%",
+	right: "1%",
+	top: "1%"
+};
 
+class ShopCartArea extends Component {
 	render() {
 		const shopItemComponents = this.props.shopItems.map((shopItem, index) => (
 			<ShopItem
@@ -21,7 +21,7 @@ class ShopCartArea extends Component {
 			/>
 		));
 
-		return <div style={this.shopCartAreaStyle}>{shopItemComponents}</div>;
+		return <div style={shopCartAreaStyle}>{shopItemComponents}</div>;
 	}
 }
 

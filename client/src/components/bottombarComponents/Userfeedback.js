@@ -1,18 +1,18 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-class Userfeedback extends Component {
-	userfeedbackStyle = {
-		background: "grey",
-		height: "80%",
-		width: "40%",
-		position: "relative",
-		float: "left",
-		margin: ".5%"
-	};
+const userfeedbackStyle = {
+	background: "grey",
+	height: "80%",
+	width: "40%",
+	position: "relative",
+	float: "left",
+	margin: ".5%"
+};
 
+class Userfeedback extends Component {
 	render() {
-		return <div style={this.userfeedbackStyle}>{this.props.userFeedback}</div>;
+		return <div style={userfeedbackStyle}>{this.props.userFeedback}</div>;
 	}
 }
 

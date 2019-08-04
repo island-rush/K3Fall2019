@@ -9,32 +9,32 @@ import ShopCartArea from "./ShopCartArea";
 import PropTypes from "prop-types";
 import PurchaseableItemsContainer from "./PurchaseableItemsContainer";
 
+const shopStyle = {
+	backgroundColor: "Yellow",
+	position: "absolute",
+	height: "250%",
+	width: "1800%",
+	marginLeft: "150%",
+	marginTop: "20%"
+};
+
+const invisibleStyle = {
+	display: "none"
+};
+
+const purchaseButtonStyle = {
+	position: "absolute",
+	bottom: "1%",
+	right: "1%",
+	height: "5%",
+	width: "10%",
+	backgroundColor: "pink"
+};
+
 class ShopMenu extends Component {
-	shopStyle = {
-		backgroundColor: "Yellow",
-		position: "absolute",
-		height: "250%",
-		width: "1800%",
-		marginLeft: "150%",
-		marginTop: "20%"
-	};
-
-	invisibleStyle = {
-		display: "none"
-	};
-
-	purchaseButtonStyle = {
-		position: "absolute",
-		bottom: "1%",
-		right: "1%",
-		height: "5%",
-		width: "10%",
-		backgroundColor: "pink"
-	};
-
 	render() {
 		return (
-			<div style={this.props.selected ? this.shopStyle : this.invisibleStyle}>
+			<div style={this.props.selected ? shopStyle : invisibleStyle}>
 				<ShopCartArea
 					refund={this.props.refund}
 					shopItems={this.props.shopItems}
@@ -44,7 +44,7 @@ class ShopMenu extends Component {
 					purchase={this.props.purchase}
 				/>
 				<div
-					style={this.purchaseButtonStyle}
+					style={purchaseButtonStyle}
 					onClick={() => this.props.confirmPurchase()}
 				>
 					Confirm Purchase

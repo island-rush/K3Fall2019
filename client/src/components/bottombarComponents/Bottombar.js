@@ -4,19 +4,19 @@ import UserFeedback from "./Userfeedback";
 import MainControl from "./Maincontrol";
 import { connect } from "react-redux";
 
-class Bottombar extends Component {
-	bottombarStyle = {
-		backgroundColor: "Green",
-		position: "absolute",
-		height: "10%",
-		width: "80%",
-		bottom: "0%",
-		right: "0%"
-	};
+const bottombarStyle = {
+	backgroundColor: "Green",
+	position: "absolute",
+	height: "10%",
+	width: "73%",
+	bottom: "0%",
+	right: "0%"
+};
 
+class Bottombar extends Component {
 	render() {
 		return (
-			<div style={this.bottombarStyle}>
+			<div style={bottombarStyle}>
 				<LeftControls />
 				<UserFeedback userFeedback={this.props.userFeedback} />
 				<MainControl />

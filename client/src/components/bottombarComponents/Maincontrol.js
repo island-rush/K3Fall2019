@@ -1,16 +1,16 @@
 import React, { Component } from "react";
 
-class Maincontrol extends Component {
-	maincontrolStyle = {
-		backgroundColor: "grey",
-		height: "80%",
-		width: "20%",
-		margin: ".5%",
-		float: "left"
-	};
+const maincontrolStyle = {
+	backgroundColor: "grey",
+	height: "80%",
+	width: "20%",
+	margin: ".5%",
+	float: "left"
+};
 
+class Maincontrol extends Component {
 	render() {
-		return <div style={this.maincontrolStyle}>Main Control Button</div>;
+		return <div style={maincontrolStyle}>Main Control Button</div>;
 	}
 }
 

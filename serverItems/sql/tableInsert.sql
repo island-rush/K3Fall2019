@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS pieces (
 	pieceId INT(8) NOT NULL AUTO_INCREMENT,
     pieceGameId INT(3) NOT NULL,
     pieceTeamId INT(1) NOT NULL,
-    pieceUnitId INT(2) NOT NULL,
+    pieceTypeId INT(2) NOT NULL,
     piecePositionId INT(4) NOT NULL,
     pieceContainerId INT(8) NOT NULL,
     pieceVisible INT(1) NOT NULL,

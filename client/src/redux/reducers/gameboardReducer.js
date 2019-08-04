@@ -1,6 +1,6 @@
 import { INITIAL_GAMESTATE } from "../actions/types";
 
-const initialGameboardEmpty = {};
+const initialGameboardEmpty = {}; //TODO: better initial = not an empty position board...default pos from constants on server file
 
 function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
 	switch (type) {

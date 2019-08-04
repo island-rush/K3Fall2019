@@ -3,39 +3,39 @@ import PropTypes from "prop-types";
 import InvItem from "./InvItem";
 import { connect } from "react-redux";
 
+const inventoryStyle = {
+	backgroundColor: "Yellow",
+	position: "absolute",
+	height: "250%",
+	width: "1800%",
+	marginLeft: "150%",
+	marginTop: "20%",
+	padding: "1%"
+};
+
+const invisibleStyle = {
+	display: "none"
+};
+
+const warfareItemsContainerStyle = {
+	backgroundColor: "pink",
+	position: "absolute",
+	width: "20%",
+	height: "80%",
+	left: "1%",
+	top: "1%"
+};
+
+const pieceItemsContainerStyle = {
+	backgroundColor: "pink",
+	position: "absolute",
+	width: "20%",
+	height: "80%",
+	right: "1%",
+	top: "1%"
+};
+
 class InvMenu extends Component {
-	inventoryStyle = {
-		backgroundColor: "Yellow",
-		position: "absolute",
-		height: "250%",
-		width: "1800%",
-		marginLeft: "150%",
-		marginTop: "20%",
-		padding: "1%"
-	};
-
-	invisibleStyle = {
-		display: "none"
-	};
-
-	warfareItemsContainerStyle = {
-		backgroundColor: "pink",
-		position: "absolute",
-		width: "20%",
-		height: "80%",
-		left: "1%",
-		top: "1%"
-	};
-
-	pieceItemsContainerStyle = {
-		backgroundColor: "pink",
-		position: "absolute",
-		width: "20%",
-		height: "80%",
-		right: "1%",
-		top: "1%"
-	};
-
 	render() {
 		const warfareInvItems = this.props.invItems.filter(item => {
 			return item.invItemTypeId === 0;
@@ -54,14 +54,12 @@ class InvMenu extends Component {
 		));
 
 		return (
-			<div
-				style={this.props.selected ? this.inventoryStyle : this.invisibleStyle}
-			>
-				<div style={this.warfareItemsContainerStyle}>
+			<div style={this.props.selected ? inventoryStyle : invisibleStyle}>
+				<div style={warfareItemsContainerStyle}>
 					<div>Warefare</div>
 					{warefareInvItemComponents}
 				</div>
-				<div style={this.pieceItemsContainerStyle}>
+				<div style={pieceItemsContainerStyle}>
 					<div>Pieces</div>
 					{pieceInvItemComponents}
 				</div>
