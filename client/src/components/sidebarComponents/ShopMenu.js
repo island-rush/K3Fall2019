@@ -7,6 +7,7 @@ import {
 } from "../../redux/actions/userActions";
 import ShopCartArea from "./ShopCartArea";
 import PropTypes from "prop-types";
+import PurchaseableItemsContainer from "./PurchaseableItemsContainer";
 
 class ShopMenu extends Component {
 	shopStyle = {
@@ -22,6 +23,15 @@ class ShopMenu extends Component {
 		display: "none"
 	};
 
+	purchaseButtonStyle = {
+		position: "absolute",
+		bottom: "1%",
+		right: "1%",
+		height: "5%",
+		width: "10%",
+		backgroundColor: "pink"
+	};
+
 	render() {
 		return (
 			<div style={this.props.selected ? this.shopStyle : this.invisibleStyle}>
@@ -29,12 +39,16 @@ class ShopMenu extends Component {
 					refund={this.props.refund}
 					shopItems={this.props.shopItems}
 				/>
-				<div>Points: {this.props.points}</div>
-				<div onClick={() => this.props.purchase(0)}>Purchase 0</div>
-				<div onClick={() => this.props.purchase(1)}>Purchase 1</div>
-				<div onClick={() => this.props.purchase(2)}>Purchase 2</div>
-				<div onClick={() => this.props.purchase(3)}>Purchase 3</div>
-				<div onClick={() => this.props.confirmPurchase()}>Confirm Purchase</div>
+				<PurchaseableItemsContainer
+					points={this.props.points}
+					purchase={this.props.purchase}
+				/>
+				<div
+					style={this.purchaseButtonStyle}
+					onClick={() => this.props.confirmPurchase()}
+				>
+					Confirm Purchase
+				</div>
 			</div>
 		);
 	}

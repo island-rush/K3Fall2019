@@ -6,8 +6,9 @@ const SHOP_REFUND = "SHOP_REFUND";
 const SET_USERFEEDBACK = "SET_USERFEEDBACK";
 const SHOP_TRANSFER = "SHOP_TRANSFER";
 
+//TODO: duplicate constants in the client directories!*!*!*!
 const shopItemTypeCosts = {
-	//shopItemTypeId: pointsCost
+	//TypeId: Cost
 	0: 10, //radar
 	1: 10, //plane
 	2: 10, //sub
@@ -302,11 +303,10 @@ exports.getInitialGameState = (mysqlPool, socket) => {
 								connection.release();
 								const invItems = results;
 
-								const serverData = {
+								const serverAction = {
 									type: INITIAL_GAMESTATE,
 									payload: {
 										points: teamPoints,
-										userFeedback: "Welcome to Island Rush!!",
 										gameInfo: {
 											gameSection: gameSection,
 											gameInstructor: gameInstructor,
@@ -322,7 +322,7 @@ exports.getInitialGameState = (mysqlPool, socket) => {
 									}
 								};
 
-								socket.emit("serverSendingAction", serverData);
+								socket.emit("serverSendingAction", serverAction);
 								return;
 							}
 						);

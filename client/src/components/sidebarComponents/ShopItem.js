@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { typeImages } from "../constants";
 
 class ShopItem extends Component {
 	shopItemStyle = {
@@ -13,19 +14,12 @@ class ShopItem extends Component {
 		backgroundRepeat: "no-repeat"
 	};
 
-	shopItemTypeImages = [
-		{ backgroundImage: 'url("./images/radar.png")' },
-		{ backgroundImage: 'url("./images/stealthBomber.png")' },
-		{ backgroundImage: 'url("./images/submarine.png")' },
-		{ backgroundImage: 'url("./images/tank.png")' }
-	];
-
 	render() {
 		return (
 			<div
 				style={{
 					...this.shopItemStyle,
-					...this.shopItemTypeImages[this.props.shopItem.shopItemTypeId]
+					...typeImages[this.props.shopItem.shopItemTypeId]
 				}}
 				onClick={() => this.props.refund(this.props.shopItem)}
 			/>

@@ -37,10 +37,6 @@ class InvMenu extends Component {
 	};
 
 	render() {
-		const inventoryItemComponents = this.props.invItems.map(
-			(invItem, index) => <InvItem key={index} invItem={invItem} />
-		);
-
 		const warfareInvItems = this.props.invItems.filter(item => {
 			return item.invItemTypeId === 0;
 		});
