@@ -5,7 +5,7 @@ import Zoombox from "./components/zoomboxZomponents/Zoombox";
 import Sidebar from "./components/sidebarComponents/Sidebar";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { selectPosition } from "./redux/actions/userActions";
+import { selectPosition, menuSelect } from "./redux/actions/userActions";
 
 const appStyle = {
 	position: "relative",
@@ -22,6 +22,7 @@ class App extends Component {
 				onClick={event => {
 					event.preventDefault();
 					this.props.selectPosition(-1);
+					this.props.menuSelect(0);
 					event.stopPropagation();
 				}}
 			>
@@ -35,13 +36,15 @@ class App extends Component {
 }
 
 App.propTypes = {
-	selectPosition: PropTypes.func.isRequired
+	selectPosition: PropTypes.func.isRequired,
+	menuSelect: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({});
 
 const mapActionsToProps = {
-	selectPosition: selectPosition
+	selectPosition: selectPosition,
+	menuSelect: menuSelect
 };
 
 export default connect(

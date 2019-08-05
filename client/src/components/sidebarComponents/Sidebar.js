@@ -53,7 +53,11 @@ class Sidebar extends Component {
 					selected={this.props.selectedMenu === 3}
 				/>
 				<div
-					onClick={() => this.props.menuSelect(1)}
+					onClick={event => {
+						event.preventDefault();
+						this.props.menuSelect(1);
+						event.stopPropagation();
+					}}
 					style={{
 						...buttonStyle,
 						...shopButtonStyle,
@@ -61,7 +65,11 @@ class Sidebar extends Component {
 					}}
 				/>
 				<div
-					onClick={() => this.props.menuSelect(2)}
+					onClick={event => {
+						event.preventDefault();
+						this.props.menuSelect(2);
+						event.stopPropagation();
+					}}
 					style={{
 						...buttonStyle,
 						...invButtonStyle,
@@ -69,7 +77,11 @@ class Sidebar extends Component {
 					}}
 				/>
 				<div
-					onClick={() => this.props.menuSelect(3)}
+					onClick={event => {
+						event.preventDefault();
+						this.props.menuSelect(3);
+						event.stopPropagation();
+					}}
 					style={{
 						...buttonStyle,
 						...infoButtonStyle,
