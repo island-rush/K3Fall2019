@@ -273,7 +273,6 @@ exports.getInitialGameState = (mysqlPool, socket) => {
 
 	mysqlPool.getConnection((error, connection) => {
 		if (error) throw error; //deal with error
-
 		connection.query(
 			"SELECT gameSection, gameInstructor, ?? as teamPoints FROM games WHERE gameId = ?",
 			[pointsField, gameId],
@@ -284,7 +283,6 @@ exports.getInitialGameState = (mysqlPool, socket) => {
 				}
 				const { gameSection, gameInstructor } = results[0];
 				const teamPoints = results[0].teamPoints;
-
 				connection.query(
 					"SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?",
 					[gameId, gameTeam],
@@ -295,30 +293,55 @@ exports.getInitialGameState = (mysqlPool, socket) => {
 							"SELECT * FROM invItems WHERE invItemGameId = ? AND invItemTeamId = ?",
 							[gameId, gameTeam],
 							(error, results, fields) => {
-								connection.release();
 								const invItems = results;
-
-								const serverAction = {
-									type: INITIAL_GAMESTATE,
-									payload: {
-										points: teamPoints,
-										gameInfo: {
-											gameSection: gameSection,
-											gameInstructor: gameInstructor,
-											gameController: gameController,
-											gamePoints: teamPoints
-										},
-										shopItems: shopItems,
-										invItems: invItems,
-										gameboard: blankGameboard, //need to insert the pieces from the db
-										gameboardMeta: {
-											selectedPosition: -1
+								connection.query(
+									"SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = ? OR pieceVisible = 1) ORDER BY pieceContainerId ASC",
+									[gameId, gameTeam],
+									(error, results, fields) => {
+										let gameboard = blankGameboard;
+										for (let x = 0; x < results.length; x++) {
+											let currentPiece = results[x];
+											let { piecePositionId, pieceContainerId } = currentPiece;
+											currentPiece.contents = [];
+											if (pieceContainerId == -1) {
+												gameboard[piecePositionId].pieces.push(currentPiece);
+											} else {
+												const indexOfParentPiece = gameboard[
+													piecePositionId
+												].pieces.findIndex(piece => {
+													return (piece.pieceId = pieceContainerId);
+												});
+												gameboard[piecePositionId].pieces[
+													indexOfParentPiece
+												].contents.push(currentPiece);
+											}
 										}
-									}
-								};
 
-								socket.emit("serverSendingAction", serverAction);
-								return;
+										connection.release();
+
+										const serverAction = {
+											type: INITIAL_GAMESTATE,
+											payload: {
+												points: teamPoints,
+												gameInfo: {
+													gameSection: gameSection,
+													gameInstructor: gameInstructor,
+													gameController: gameController,
+													gamePoints: teamPoints
+												},
+												shopItems: shopItems,
+												invItems: invItems,
+												gameboard: gameboard, //need to insert the pieces from the db
+												gameboardMeta: {
+													selectedPosition: -1
+												}
+											}
+										};
+
+										socket.emit("serverSendingAction", serverAction);
+										return;
+									}
+								);
 							}
 						);
 					}
