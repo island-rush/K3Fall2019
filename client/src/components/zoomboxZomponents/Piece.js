@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { typeImages, typeTeamBorders } from "../constants";
+import { typeImages, typeTeamBorders, typeNames } from "../constants";
 
 const pieceStyle = {
 	backgroundColor: "grey",
@@ -13,16 +13,18 @@ const pieceStyle = {
 };
 
 class Piece extends Component {
+	title = `${typeNames[this.props.piece.pieceTypeId]}\nMoves: ${
+		this.props.piece.pieceMoves
+	}\nFuel: ${this.props.piece.pieceFuel}`;
+
+	style = {
+		...pieceStyle,
+		...typeImages[this.props.piece.pieceTypeId],
+		...typeTeamBorders[this.props.piece.pieceTeamId]
+	};
+
 	render() {
-		return (
-			<div
-				style={{
-					...pieceStyle,
-					...typeImages[this.props.piece.pieceTypeId],
-					...typeTeamBorders[this.props.piece.pieceTeamId]
-				}}
-			/>
-		);
+		return <div style={this.style} title={this.title} />;
 	}
 }
 

@@ -22,12 +22,24 @@ export const typeMoves = {
 	3: 5 //tank
 };
 
+export const typeNames = {
+	0: "Radar",
+	1: "Plane",
+	2: "Sub",
+	3: "Tank"
+};
+
 export const zoomboxBackgrounds = {
 	land: { backgroundColor: "green" },
-	water: { backgroundColor: "yellow" }
+	water: { backgroundColor: "cyan" },
+	airfield: { backgroundColor: "green" },
+	flag: { backgroundColor: "green" },
+	missile: { backgroundColor: "green" },
+	red: { backgroundColor: "green" },
+	blue: { backgroundColor: "green" }
 };
 
 export const typeTeamBorders = {
-	0: { boxShadow: "0px 0px 0px 2px rgba(0, 111, 255, 0.67) inset" },
-	1: { boxShadow: "0px 0px 0px 2px rgba(255, 0, 0, 0.55) inset" }
+	0: { boxShadow: "0px 0px 0px 2px rgba(0, 111, 255, 0.67) inset" }, //blue
+	1: { boxShadow: "0px 0px 0px 2px rgba(255, 0, 0, 0.55) inset" } //red
 };

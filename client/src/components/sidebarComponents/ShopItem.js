@@ -21,7 +21,11 @@ class ShopItem extends Component {
 					...shopItemStyle,
 					...typeImages[this.props.shopItem.shopItemTypeId]
 				}}
-				onClick={() => this.props.refund(this.props.shopItem)}
+				onClick={event => {
+					event.preventDefault();
+					this.props.refund(this.props.shopItem);
+					event.stopPropagation();
+				}}
 			/>
 		);
 	}

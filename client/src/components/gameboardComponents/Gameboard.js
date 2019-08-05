@@ -6,7 +6,7 @@ import { HexGrid, Layout, Hexagon, Pattern } from "react-hexgrid";
 
 const gameboardStyle = {
 	backgroundColor: "blue",
-	width: "86%",
+	width: "94%",
 	height: "88%",
 	top: "0%",
 	right: "0%",
@@ -103,7 +103,13 @@ class Gameboard extends Component {
 				fill={patternSolver(this.props.gameboard[positionIndex])}
 				onClick={event => {
 					event.preventDefault();
-					this.props.selectPosition(positionIndex);
+					if (
+						parseInt(positionIndex) === parseInt(this.props.selectedPosition)
+					) {
+						this.props.selectPosition(-1);
+					} else {
+						this.props.selectPosition(positionIndex);
+					}
 					event.stopPropagation();
 				}}
 				className={
@@ -120,8 +126,8 @@ class Gameboard extends Component {
 					<Layout
 						size={hexagonSize}
 						flat={true}
-						spacing={1.02}
-						origin={{ x: -103, y: -46 }}
+						spacing={1.03}
+						origin={{ x: -98, y: -46 }}
 					>
 						{positions}
 					</Layout>

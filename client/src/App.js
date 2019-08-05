@@ -21,8 +21,11 @@ class App extends Component {
 				style={appStyle}
 				onClick={event => {
 					event.preventDefault();
-					this.props.selectPosition(-1);
-					this.props.menuSelect(0);
+					if (this.props.selectedMenu === 0) {
+						this.props.selectPosition(-1);
+					} else {
+						this.props.menuSelect(0);
+					}
 					event.stopPropagation();
 				}}
 			>
@@ -40,7 +43,7 @@ App.propTypes = {
 	menuSelect: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => ({});
+const mapStateToProps = ({ selectedMenu }) => ({ selectedMenu: selectedMenu });
 
 const mapActionsToProps = {
 	selectPosition: selectPosition,

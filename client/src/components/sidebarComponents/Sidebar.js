@@ -45,7 +45,12 @@ const selectedButtonStyle = {
 class Sidebar extends Component {
 	render() {
 		return (
-			<div style={sidebarStyle}>
+			<div
+				style={sidebarStyle}
+				onClick={event => {
+					event.stopPropagation();
+				}}
+			>
 				<ShopMenu selected={this.props.selectedMenu === 1} />
 				<InvMenu selected={this.props.selectedMenu === 2} />
 				<Gameinfo

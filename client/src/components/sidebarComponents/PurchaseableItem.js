@@ -17,7 +17,11 @@ const PurchaseableItem = ({ typeId, purchase }) => {
 	return (
 		<div
 			style={{ ...purchaseableItemStyle, ...typeImages[typeId] }}
-			onClick={() => purchase(typeId)}
+			onClick={event => {
+				event.preventDefault();
+				purchase(typeId);
+				event.stopPropagation();
+			}}
 			title={`Cost: ${typeCosts[typeId]}`}
 		/>
 	);

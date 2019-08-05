@@ -45,7 +45,11 @@ class ShopMenu extends Component {
 				/>
 				<div
 					style={purchaseButtonStyle}
-					onClick={() => this.props.confirmPurchase()}
+					onClick={event => {
+						event.preventDefault();
+						this.props.confirmPurchase();
+						event.stopPropagation();
+					}}
 				>
 					Confirm Purchase
 				</div>

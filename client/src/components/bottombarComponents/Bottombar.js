@@ -16,7 +16,12 @@ const bottombarStyle = {
 class Bottombar extends Component {
 	render() {
 		return (
-			<div style={bottombarStyle}>
+			<div
+				style={bottombarStyle}
+				onClick={event => {
+					event.stopPropagation();
+				}}
+			>
 				<LeftControls />
 				<UserFeedback userFeedback={this.props.userFeedback} />
 				<MainControl />

@@ -9,7 +9,8 @@ const zoomboxStyle = {
 	left: "0%",
 	bottom: "0%",
 	height: "29%",
-	width: "26%"
+	width: "24%",
+	boxShadow: "0px 0px 0px 2px rgba(0, 0, 0, 1) inset"
 };
 
 const invisibleStyle = {
