@@ -29,6 +29,19 @@ export const typeNames = {
 	3: "Tank"
 };
 
+//Could Use for reverse lookup / other constant ease of setup
+export const typeNameIds = {
+	Radar: 0,
+	Plane: 1,
+	Sub: 2,
+	Tank: 3
+};
+
+export const typeHighLow = {
+	highPieces: [0, 1],
+	lowPieces: [2, 3]
+};
+
 export const zoomboxBackgrounds = {
 	land: { backgroundColor: "green" },
 	water: { backgroundColor: "cyan" },

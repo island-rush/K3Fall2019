@@ -12,6 +12,21 @@ exports.shopItemTypeCosts = {
 	3: 10 //tank
 };
 
+exports.typeMoves = {
+	//TypdId: Moves (-1 = warfare)
+	0: -1, //radar
+	1: 5, //plane
+	2: 5, //sub
+	3: 5 //tank
+};
+
+exports.typeNames = {
+	0: "Radar",
+	1: "Plane",
+	2: "Sub",
+	3: "Tank"
+};
+
 exports.blankGameboard = {
     '0': {
       type: 'land',

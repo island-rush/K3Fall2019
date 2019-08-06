@@ -298,7 +298,7 @@ exports.getInitialGameState = (mysqlPool, socket) => {
 									"SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = ? OR pieceVisible = 1) ORDER BY pieceContainerId ASC",
 									[gameId, gameTeam],
 									(error, results, fields) => {
-										let gameboard = blankGameboard;
+										let gameboard = JSON.parse(JSON.stringify(blankGameboard));
 										for (let x = 0; x < results.length; x++) {
 											let currentPiece = results[x];
 											let { piecePositionId, pieceContainerId } = currentPiece;
