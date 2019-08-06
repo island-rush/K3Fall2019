@@ -298,11 +298,13 @@ exports.getInitialGameState = (mysqlPool, socket) => {
 									"SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = ? OR pieceVisible = 1) ORDER BY pieceContainerId ASC",
 									[gameId, gameTeam],
 									(error, results, fields) => {
-										let gameboard = JSON.parse(JSON.stringify(blankGameboard));
+										connection.release();
+
+										let gameboard = JSON.parse(JSON.stringify(blankGameboard)); //Deep Copy of Object
 										for (let x = 0; x < results.length; x++) {
 											let currentPiece = results[x];
 											let { piecePositionId, pieceContainerId } = currentPiece;
-											currentPiece.contents = [];
+											currentPiece.pieceContents = { pieces: [] };
 											if (pieceContainerId == -1) {
 												gameboard[piecePositionId].pieces.push(currentPiece);
 											} else {
@@ -313,11 +315,9 @@ exports.getInitialGameState = (mysqlPool, socket) => {
 												});
 												gameboard[piecePositionId].pieces[
 													indexOfParentPiece
-												].contents.push(currentPiece);
+												].pieceContents.pieces.push(currentPiece);
 											}
 										}
-
-										connection.release();
 
 										const serverAction = {
 											type: INITIAL_GAMESTATE,

@@ -15,8 +15,6 @@ const gameboardStyle = {
 	position: "absolute"
 };
 
-const hexagonSize = { x: 3.15, y: 3.15 };
-
 const qIndexSolver = index => {
 	if (index < 81) {
 		//above zoombox
@@ -124,7 +122,7 @@ class Gameboard extends Component {
 			<div style={gameboardStyle}>
 				<HexGrid width={"100%"} height={"100%"} viewBox="-50 -50 100 100">
 					<Layout
-						size={hexagonSize}
+						size={{ x: 3.15, y: 3.15 }}
 						flat={true}
 						spacing={1.03}
 						origin={{ x: -98, y: -46 }}

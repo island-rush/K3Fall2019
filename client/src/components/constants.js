@@ -1,9 +1,12 @@
+const relativePath = "./images/unitImages/";
+
 export const typeImages = {
 	//TypeId: ImageUrlCSS
-	0: { backgroundImage: 'url("./images/radar.png")' },
-	1: { backgroundImage: 'url("./images/stealthBomber.png")' },
-	2: { backgroundImage: 'url("./images/submarine.png")' },
-	3: { backgroundImage: 'url("./images/tank.png")' }
+	0: { backgroundImage: `url("${relativePath}radar.png")` },
+	1: { backgroundImage: `url("${relativePath}stealthBomber.png")` },
+	2: { backgroundImage: `url("${relativePath}submarine.png")` },
+	3: { backgroundImage: `url("${relativePath}tank.png")` },
+	4: { backgroundImage: `url("${relativePath}transport.png")` }
 };
 
 export const typeCosts = {
@@ -11,22 +14,25 @@ export const typeCosts = {
 	0: 10, //radar
 	1: 10, //plane
 	2: 10, //sub
-	3: 10 //tank
+	3: 10, //tank
+	4: 10 //container
 };
 
 export const typeMoves = {
-	//TypdId: Moves (-1 = warfare)
+	//TypdId: Moves (-1 = warfare/non-piece)
 	0: -1, //radar
 	1: 5, //plane
 	2: 5, //sub
-	3: 5 //tank
+	3: 5, //tank
+	4: 5 //container
 };
 
 export const typeNames = {
 	0: "Radar",
 	1: "Plane",
 	2: "Sub",
-	3: "Tank"
+	3: "Tank",
+	4: "Container"
 };
 
 //Could Use for reverse lookup / other constant ease of setup
@@ -34,12 +40,13 @@ export const typeNameIds = {
 	Radar: 0,
 	Plane: 1,
 	Sub: 2,
-	Tank: 3
+	Tank: 3,
+	Container: 4
 };
 
 export const typeHighLow = {
 	highPieces: [0, 1],
-	lowPieces: [2, 3]
+	lowPieces: [2, 3, 4]
 };
 
 export const zoomboxBackgrounds = {
