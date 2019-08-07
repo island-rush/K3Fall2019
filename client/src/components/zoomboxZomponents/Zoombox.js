@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { zoomboxBackgrounds } from "../constants";
 import Piece from "./Piece";
+import { selectPiece } from "../../redux/actions/userActions";
 
 const zoomboxStyle = {
 	position: "absolute",
@@ -24,7 +25,15 @@ class Zoombox extends Component {
 		const pieces = !isVisible
 			? null
 			: this.props.gameboard[this.props.selectedPos].pieces.map(
-					(piece, index) => <Piece key={index} piece={piece} />
+					(piece, index) => (
+						<Piece
+							pieceClick={this.props.selectPiece}
+							isOpen={this.props.selectedPiece === piece.pieceId}
+							topLevel={true}
+							key={index}
+							piece={piece}
+						/>
+					)
 			  );
 
 		return (
@@ -41,6 +50,9 @@ class Zoombox extends Component {
 				}
 				onClick={event => {
 					event.preventDefault();
+					//close current selected piece?
+					//close any open pieces
+					this.props.selectPiece(-1);
 					event.stopPropagation();
 				}}
 			>
@@ -57,10 +69,13 @@ Zoombox.propTypes = {
 
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 	selectedPos: gameboardMeta.selectedPosition,
+	selectedPiece: gameboardMeta.selectedPiece,
 	gameboard: gameboard
 });
 
-const mapActionsToProps = {};
+const mapActionsToProps = {
+	selectPiece: selectPiece
+};
 
 export default connect(
 	mapStateToProps,

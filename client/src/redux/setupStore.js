@@ -8,8 +8,6 @@ const setupStore = () => {
 
 	const middleware = [thunk.withExtraArgument(emit)];
 
-	//TODO: fix redux dev tools
-
 	const store = createStore(
 		rootReducer,
 		initialState,

@@ -6,3 +6,4 @@ export const SHOP_REFUND = "SHOP_REFUND";
 export const SHOP_CLEAR = "SHOP_CLEAR";
 export const POSITION_SELECT = "POSITION_SELECT";
 export const SHOP_TRANSFER = "SHOP_TRANSFER";
+export const PIECE_CLICK = "PIECE_CLICK";

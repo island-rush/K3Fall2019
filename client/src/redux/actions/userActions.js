@@ -1,4 +1,4 @@
-import { MENU_SELECT, POSITION_SELECT } from "./types";
+import { MENU_SELECT, POSITION_SELECT, PIECE_CLICK } from "./types";
 
 export const shopPurchaseRequest = shopItemTypeId => {
 	return (dispatch, getState, emit) => {
@@ -23,6 +23,15 @@ export const selectPosition = selectedPositionId => {
 		type: POSITION_SELECT,
 		payload: {
 			positionId: selectedPositionId
+		}
+	};
+};
+
+export const selectPiece = selectedPieceId => {
+	return {
+		type: PIECE_CLICK,
+		payload: {
+			selectedPieceId: selectedPieceId
 		}
 	};
 };

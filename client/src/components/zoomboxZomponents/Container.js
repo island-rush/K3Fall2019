@@ -15,7 +15,13 @@ const invisibleStyle = {
 class Container extends Component {
 	render() {
 		const pieces = this.props.pieces.map((piece, index) => (
-			<Piece key={index} piece={piece} />
+			<Piece
+				pieceClick={this.props.pieceClick}
+				topLevel={false}
+				key={index}
+				piece={piece}
+				isOpen={false} //pieces inside containers are never open
+			/>
 		));
 
 		return (
@@ -31,7 +37,8 @@ class Container extends Component {
 
 Container.propTypes = {
 	pieces: PropTypes.array.isRequired,
-	isOpen: PropTypes.bool.isRequired
+	isOpen: PropTypes.bool.isRequired,
+	pieceClick: PropTypes.func.isRequired
 };
 
 export default Container;
