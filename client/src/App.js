@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 import {
 	selectPosition,
 	menuSelect,
-	selectPiece
+	clearPieceSelection
 } from "./redux/actions/userActions";
 
 const appStyle = {
@@ -30,7 +30,7 @@ class App extends Component {
 					} else {
 						this.props.menuSelect(0);
 					}
-					this.props.selectPiece(-1);
+					this.props.clearPieceSelection();
 					event.stopPropagation();
 				}}
 			>
@@ -53,7 +53,7 @@ const mapStateToProps = ({ selectedMenu }) => ({ selectedMenu: selectedMenu });
 const mapActionsToProps = {
 	selectPosition: selectPosition,
 	menuSelect: menuSelect,
-	selectPiece: selectPiece
+	clearPieceSelection: clearPieceSelection
 };
 
 export default connect(

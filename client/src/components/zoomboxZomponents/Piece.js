@@ -8,7 +8,8 @@ const pieceStyle = {
 	margin: "1%",
 	float: "left",
 	backgroundSize: "100% 100%",
-	backgroundRepeat: "no-repeat"
+	backgroundRepeat: "no-repeat",
+	position: "relative"
 };
 
 const topLevelStyle = {
@@ -21,18 +22,9 @@ const bottomLevelStyle = {
 	height: "48%"
 };
 
+const zIndexLevels = [{ zIndex: 5 }, { zIndex: 10 }];
+
 class Piece extends Component {
-	title = `${typeNames[this.props.piece.pieceTypeId]}\nMoves: ${
-		this.props.piece.pieceMoves
-	}\nFuel: ${this.props.piece.pieceFuel}`;
-
-	style = {
-		...pieceStyle,
-		...(this.props.topLevel ? topLevelStyle : bottomLevelStyle),
-		...typeImages[this.props.piece.pieceTypeId],
-		...typeTeamBorders[this.props.piece.pieceTeamId]
-	};
-
 	render() {
 		const contents =
 			this.props.piece.pieceContents.pieces.length === 0 ? null : (
@@ -43,13 +35,25 @@ class Piece extends Component {
 				/>
 			);
 
+		const pieceCombinedStyle = {
+			...pieceStyle,
+			...(this.props.topLevel ? topLevelStyle : bottomLevelStyle),
+			...zIndexLevels[this.props.isOpen ? 1 : 0],
+			...typeImages[this.props.piece.pieceTypeId],
+			...typeTeamBorders[this.props.piece.pieceTeamId]
+		};
+
+		const title = `${typeNames[this.props.piece.pieceTypeId]}\nMoves: ${
+			this.props.piece.pieceMoves
+		}\nFuel: ${this.props.piece.pieceFuel}`;
+
 		return (
 			<div
-				style={this.style}
-				title={this.title}
+				style={{ ...pieceCombinedStyle }}
+				title={title}
 				onClick={e => {
 					e.preventDefault();
-					this.props.pieceClick(this.props.piece.pieceId);
+					this.props.pieceClick(this.props.piece);
 					e.stopPropagation();
 				}}
 			>

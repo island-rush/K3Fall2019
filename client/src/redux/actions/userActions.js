@@ -1,4 +1,9 @@
-import { MENU_SELECT, POSITION_SELECT, PIECE_CLICK } from "./types";
+import {
+	MENU_SELECT,
+	POSITION_SELECT,
+	PIECE_CLICK,
+	PIECE_CLEAR_SELECTION
+} from "./types";
 
 export const shopPurchaseRequest = shopItemTypeId => {
 	return (dispatch, getState, emit) => {
@@ -27,11 +32,20 @@ export const selectPosition = selectedPositionId => {
 	};
 };
 
-export const selectPiece = selectedPieceId => {
+export const selectPiece = selectedPiece => {
 	return {
 		type: PIECE_CLICK,
 		payload: {
-			selectedPieceId: selectedPieceId
+			selectedPieceId: selectedPiece.pieceId
+		}
+	};
+};
+
+export const clearPieceSelection = () => {
+	return {
+		type: PIECE_CLEAR_SELECTION,
+		payload: {
+			selectedPieceId: -1
 		}
 	};
 };

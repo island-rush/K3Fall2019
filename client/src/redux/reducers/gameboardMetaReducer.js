@@ -1,7 +1,8 @@
 import {
 	INITIAL_GAMESTATE,
 	POSITION_SELECT,
-	PIECE_CLICK
+	PIECE_CLICK,
+	PIECE_CLEAR_SELECTION
 } from "../actions/types";
 
 const initialGameboardMeta = {
@@ -15,10 +16,13 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 		case INITIAL_GAMESTATE:
 			return payload.gameboardMeta;
 		case POSITION_SELECT:
-			stateDeepCopy.selectedPosition = payload.positionId;
+			stateDeepCopy.selectedPosition = parseInt(payload.positionId);
 			return stateDeepCopy;
 		case PIECE_CLICK:
-			stateDeepCopy.selectedPiece = payload.selectedPieceId;
+			stateDeepCopy.selectedPiece = parseInt(payload.selectedPieceId);
+			return stateDeepCopy;
+		case PIECE_CLEAR_SELECTION:
+			stateDeepCopy.selectedPiece = -1;
 			return stateDeepCopy;
 		default:
 			return state;

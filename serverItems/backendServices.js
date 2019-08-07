@@ -295,7 +295,7 @@ exports.getInitialGameState = (mysqlPool, socket) => {
 							(error, results, fields) => {
 								const invItems = results;
 								connection.query(
-									"SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = ? OR pieceVisible = 1) ORDER BY pieceContainerId ASC",
+									"SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = ? OR pieceVisible = 1) ORDER BY pieceContainerId, pieceTeamId ASC",
 									[gameId, gameTeam],
 									(error, results, fields) => {
 										connection.release();
