@@ -21,7 +21,12 @@ class ShopCartArea extends Component {
 			/>
 		));
 
-		return <div style={shopCartAreaStyle}>{shopItemComponents}</div>;
+		return (
+			<div style={shopCartAreaStyle}>
+				<div>Cart</div>
+				{shopItemComponents}
+			</div>
+		);
 	}
 }
 

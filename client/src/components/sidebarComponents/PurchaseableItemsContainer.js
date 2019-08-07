@@ -14,7 +14,7 @@ const purchaseableItemsContainerStyle = {
 const PurchaseableItemsContainer = ({ purchase, points }) => {
 	return (
 		<div style={purchaseableItemsContainerStyle}>
-			<div>Points: {points}</div>
+			<div>Store -> Points: {points}</div>
 			<PurchaseableItem purchase={purchase} typeId={0} />
 			<PurchaseableItem purchase={purchase} typeId={1} />
 			<PurchaseableItem purchase={purchase} typeId={2} />

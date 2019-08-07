@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 const inventoryStyle = {
 	backgroundColor: "Yellow",
 	position: "absolute",
-	height: "250%",
+	height: "225%",
 	width: "1800%",
 	marginLeft: "150%",
 	marginTop: "20%",
@@ -56,7 +56,7 @@ class InvMenu extends Component {
 		return (
 			<div style={this.props.selected ? inventoryStyle : invisibleStyle}>
 				<div style={warfareItemsContainerStyle}>
-					<div>Warefare</div>
+					<div>Warefare Items</div>
 					{warefareInvItemComponents}
 				</div>
 				<div style={pieceItemsContainerStyle}>

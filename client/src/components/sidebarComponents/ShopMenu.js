@@ -12,7 +12,7 @@ import PurchaseableItemsContainer from "./PurchaseableItemsContainer";
 const shopStyle = {
 	backgroundColor: "Yellow",
 	position: "absolute",
-	height: "250%",
+	height: "225%",
 	width: "1800%",
 	marginLeft: "150%",
 	marginTop: "20%"
