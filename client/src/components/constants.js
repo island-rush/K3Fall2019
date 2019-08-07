@@ -15,7 +15,7 @@ export const typeCosts = {
 	1: 10, //plane
 	2: 10, //sub
 	3: 10, //tank
-	4: 10 //container
+	4: 10 //transport
 };
 
 export const typeMoves = {
@@ -24,7 +24,7 @@ export const typeMoves = {
 	1: 5, //plane
 	2: 5, //sub
 	3: 5, //tank
-	4: 5 //container
+	4: 5 //transport
 };
 
 export const typeNames = {
@@ -32,7 +32,7 @@ export const typeNames = {
 	1: "Plane",
 	2: "Sub",
 	3: "Tank",
-	4: "Container"
+	4: "Transport"
 };
 
 //Could Use for reverse lookup / other constant ease of setup
@@ -41,7 +41,7 @@ export const typeNameIds = {
 	Plane: 1,
 	Sub: 2,
 	Tank: 3,
-	Container: 4
+	Transport: 4
 };
 
 export const typeHighLow = {

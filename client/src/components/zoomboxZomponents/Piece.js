@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { typeImages, typeTeamBorders, typeNames } from "../constants";
+import Container from "./Container";
 
 const pieceStyle = {
 	backgroundColor: "grey",
-	width: "10%",
-	paddingTop: "10%",
+	width: "15%",
+	height: "24%",
 	margin: "1%",
 	float: "left",
 	backgroundSize: "100% 100%",
@@ -24,7 +25,26 @@ class Piece extends Component {
 	};
 
 	render() {
-		return <div style={this.style} title={this.title} />;
+		const contents =
+			this.props.piece.pieceContents.pieces.length === 0 ? null : (
+				<Container
+					isOpen={false}
+					pieces={this.props.piece.pieceContents.pieces}
+				/>
+			);
+
+		return (
+			<div
+				style={this.style}
+				title={this.title}
+				onClick={() => {
+					alert("clicked piece");
+				}}
+			>
+				{contents}
+				{/* <div style={containerStyle} /> */}
+			</div>
+		);
 	}
 }
 

@@ -61,25 +61,25 @@ const patternSolver = position => {
 		for (let x = 0; x < pieces.length; x++) {
 			let thisPiece = pieces[x];
 			if (
-				thisPiece.pieceTeamId === 0 &&
+				thisPiece.pieceTeamId === 1 &&
 				highPieces.includes(thisPiece.pieceTypeId)
 			) {
 				redHigh = 1;
 			}
 			if (
-				thisPiece.pieceTeamId === 0 &&
+				thisPiece.pieceTeamId === 1 &&
 				lowPieces.includes(thisPiece.pieceTypeId)
 			) {
 				redLow = 1;
 			}
 			if (
-				thisPiece.pieceTeamId === 1 &&
+				thisPiece.pieceTeamId === 0 &&
 				highPieces.includes(thisPiece.pieceTypeId)
 			) {
 				blueHigh = 1;
 			}
 			if (
-				thisPiece.pieceTeamId === 1 &&
+				thisPiece.pieceTeamId === 0 &&
 				lowPieces.includes(thisPiece.pieceTypeId)
 			) {
 				blueLow = 1;
