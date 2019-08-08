@@ -97,9 +97,9 @@ Please note that after building the client, only the ./client/build directory is
 
 ## Built With
 
-- [node](http://www.dropwizard.io/1.0.2/docs/) - Backend Server
-- [mysql](https://maven.apache.org/) - Database
-- [react](https://rometools.github.io/rome/) - Frontend Framework
+- [node](https://nodejs.org/en/docs/) - Backend Server
+- [mysql](https://dev.mysql.com/doc/) - Database
+- [react](https://reactjs.org/docs/getting-started.html) - Frontend Framework
 
 ## License
 
