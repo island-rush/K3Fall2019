@@ -1,159 +1,230 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Island Rush Teacher</title>
-        <style>
-            body {
-                background-color:#f4f4f4;
-                color:#555555;
-                font: normal 18px Arial, Helvetica, sans-serif;
-                line-height: 1.6em;
-                margin:0;
-            }
-            h1 {
-                color: #555;
-                margin: 5%;
-                padding:0;
-                font-size: 40px;
-            }
-            nav {
-                z-index: 1000;
-                background-color: #333;
-                overflow: auto;
-                margin: 0;
-                padding:0;
-                position: sticky;
-                top: 0;
-            }
-            nav a {
-                float: left;
-                color: #f2f2f2;
-                text-align: center;
-                padding: 10px 30px;
-                text-decoration: none;
-                font-size: 20px;
-            }
-            nav a:hover {
-                background-color: #ccc;
-                color: black;
-            }
-            nav a.active {
-                background-color:#285fb7;
-                color:white;
-            }
-            .switch {
-                position: relative;
-                display: inline-block;
-                width: 60px;
-                height: 34px;
-            }
-            .switch input {
-                display:block;
-            }
-            .slider {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: #ccc;
-                -webkit-transition: .4s;
-                transition: .4s;
-            }
-            .slider:before {
-                position: absolute;
-                content: "";
-                height: 26px;
-                width: 26px;
-                left: 4px;
-                bottom: 4px;
-                background-color: white;
-                -webkit-transition: .4s;
-                transition: .4s;
-            }
-            input:checked + .slider {
-                background-color: #2196F3;
-            }
-            input:focus + .slider {
-                box-shadow: 0 0 1px #2196F3;
-            }
-            input:checked + .slider:before {
-                -webkit-transform: translateX(26px);
-                -ms-transform: translateX(26px);
-                transform: translateX(26px);
-            }
-            .slider.round {
-                border-radius: 34px;
-            }
-            .slider.round:before {
-                border-radius: 50%;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Island Rush Teacher</h1>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="troubleshoot.html">Troubleshoot</a>
-            <a href="credits.html">Credits</a>
-            <a href="https://gitreports.com/issue/island-rush/K3.1" target="_blank" style="float: right">Report an Issue</a>
-            <a href="https://github.com/island-rush/K3.1/wiki" target="_blank" style="float: right">Wiki</a>
-        </nav>
-        <h2>Teacher Tools</h2>
-        <span class="important" id="section"></span>
-        <span class="important" id="instructor"></span>
-        <br>
-        <hr>
-        <h3>Activate / Deactivate Game</h3>
-        <span>Inactive</span>
-        <label class="switch">
-            <input id="activeToggle" type="checkbox" onclick="toggleActive()">
-            <span id="slider1" class="slider round"></span>
-        </label>
-        <span>Active</span>
-        <hr>
-        <h3>News Alerts for this game:</h3>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Island Rush Teacher</title>
+		<style>
+			body {
+				background-color: #f4f4f4;
+				color: #555555;
+				font: normal 18px Arial, Helvetica, sans-serif;
+				line-height: 1.6em;
+				margin: 0;
+			}
+			h1 {
+				color: #555;
+				margin: 5%;
+				padding: 0;
+				font-size: 40px;
+			}
+			nav {
+				z-index: 1000;
+				background-color: #333;
+				overflow: auto;
+				margin: 0;
+				padding: 0;
+				position: sticky;
+				top: 0;
+			}
+			nav a {
+				float: left;
+				color: #f2f2f2;
+				text-align: center;
+				padding: 10px 30px;
+				text-decoration: none;
+				font-size: 20px;
+			}
+			nav a:hover {
+				background-color: #ccc;
+				color: black;
+			}
+			nav a.active {
+				background-color: #285fb7;
+				color: white;
+			}
+			.switch {
+				position: relative;
+				display: inline-block;
+				width: 60px;
+				height: 34px;
+			}
+			.switch input {
+				display: block;
+			}
+			.slider {
+				position: absolute;
+				cursor: pointer;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: #ccc;
+				-webkit-transition: 0.4s;
+				transition: 0.4s;
+			}
+			.slider:before {
+				position: absolute;
+				content: "";
+				height: 26px;
+				width: 26px;
+				left: 4px;
+				bottom: 4px;
+				background-color: white;
+				-webkit-transition: 0.4s;
+				transition: 0.4s;
+			}
+			input:checked + .slider {
+				background-color: #2196f3;
+			}
+			input:focus + .slider {
+				box-shadow: 0 0 1px #2196f3;
+			}
+			input:checked + .slider:before {
+				-webkit-transform: translateX(26px);
+				-ms-transform: translateX(26px);
+				transform: translateX(26px);
+			}
+			.slider.round {
+				border-radius: 34px;
+			}
+			.slider.round:before {
+				border-radius: 50%;
+			}
+			.btn-danger {
+				color: #fbdedd;
+				background: #ff4b37;
+			}
+			.btn {
+				display: block;
+				margin-bottom: 0;
+				text-align: center;
+				text-transform: uppercase;
+				cursor: pointer;
+				background-image: none;
+				padding: 6px 12px;
+				font-size: 1.4rem;
+				border-radius: 3px;
+				border: 1px solid transparent;
+				text-decoration: none;
+				user-select: none;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Island Rush Teacher</h1>
+		<nav>
+			<a href="index.html">Home</a>
+			<a href="troubleshoot.html">Troubleshoot</a>
+			<a href="credits.html">Credits</a>
+			<a
+				href="https://gitreports.com/issue/island-rush/K3.1"
+				target="_blank"
+				style="float: right"
+				>Report an Issue</a
+			>
+			<a
+				href="https://github.com/island-rush/K3.1/wiki"
+				target="_blank"
+				style="float: right"
+				>Wiki</a
+			>
+		</nav>
+		<h2>Teacher Tools</h2>
+		<div id="SuccessTag" style="color: green"></div>
+		<div id="ErrorTag" style="color: red"></div>
+		<span class="important" id="section">Section: TODO</span>
+		<span class="important" id="instructor">Instructor: TODO</span>
+		<br />
+		<hr />
+		<h3>Activate / Deactivate Game</h3>
+		<span>Inactive</span>
+		<label class="switch">
+			<input id="activeToggle" type="checkbox" onclick="toggleActive()" />
+			<span id="slider1" class="slider round"></span>
+		</label>
+		<span>Active</span>
+		<hr />
 
-        <p>Todo: Implement News Alerts</p>
+		<h3>Game Reset</h3>
 
-        <script>
-            let getGameActive = new XMLHttpRequest();
-            getGameActive.onreadystatechange = function () {
-                if (this.readyState === 4 && this.status === 200) {
-                    if (this.response == 1) {
-                        document.getElementById("activeToggle").checked = true;
-                    }
-                }
-            };
-            getGameActive.open("GET", "/getGameActive", true);
-            getGameActive.send();
+		<form
+			name="gameResetForm"
+			method="post"
+			id="gameResetForm"
+			onsubmit="return gameReset()"
+			action="/gameReset"
+		>
+			<input
+				type="submit"
+				class="btn btn-danger"
+				name="Submit"
+				id="gameResetButton"
+				value="GAME RESET"
+			/>
+		</form>
 
-            function toggleActive() {
-                let toggleGameActive = new XMLHttpRequest();
-                toggleGameActive.open("POST", "/toggleGameActive", true);
-                toggleGameActive.send();
-            }
+		<hr />
 
-            function getUrlVars() {
-                var vars = {};
-                var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-                    vars[key] = value;
-                });
-                return vars;
-            }
+		<h3>News Alerts for this game:</h3>
 
-            function getUrlParam(parameter, defaultvalue){
-                var urlparameter = defaultvalue;
-                if(window.location.href.indexOf(parameter) > -1){
-                    urlparameter = getUrlVars()[parameter];
-                    }
-                return urlparameter;
-            }
+		<p>Todo: Implement News Alerts</p>
 
-            document.getElementById("section").innerHTML = "Section: <b>" + getUrlParam('section') + "</b>";
-            document.getElementById("instructor").innerHTML = "Instructor: <b>" + getUrlParam('instructor') + "</b>";
-        </script>
-    </body>
+		<script>
+			function gameReset() {
+				if (confirm("ARE YOU SURE YOU WANT TO RESET THIS GAME?")) {
+					return confirm(
+						"ARE YOU EXTRA SURE? THIS WILL DELETE ALL DATA FOR THIS GAME..."
+					);
+				}
+				return false;
+			}
+
+			let getGameActive = new XMLHttpRequest();
+			getGameActive.onreadystatechange = function() {
+				if (this.readyState === 4 && this.status === 200) {
+					if (this.response == 1) {
+						document.getElementById("activeToggle").checked = true;
+					}
+				}
+			};
+			getGameActive.open("GET", "/getGameActive", true);
+			getGameActive.send();
+
+			function toggleActive() {
+				let toggleGameActive = new XMLHttpRequest();
+				toggleGameActive.open("POST", "/toggleGameActive", true);
+				toggleGameActive.send();
+			}
+
+			function getUrlVars() {
+				var vars = {};
+				var parts = window.location.href.replace(
+					/[?&]+([^=&]+)=([^&]*)/gi,
+					function(m, key, value) {
+						vars[key] = value;
+					}
+				);
+				return vars;
+			}
+
+			function getUrlParam(parameter, defaultvalue) {
+				var urlparameter = defaultvalue;
+				if (window.location.href.indexOf(parameter) > -1) {
+					urlparameter = getUrlVars()[parameter];
+				}
+				return urlparameter;
+			}
+
+			switch (getUrlParam("gameReset")) {
+				case "success":
+					document.getElementById("SuccessTag").innerHTML =
+						"Successfully Reset Game";
+					break;
+				case "failed":
+					document.getElementById("ErrorTag").innerHTML =
+						"Failed to Reset Game";
+					break;
+			}
+		</script>
+	</body>
 </html>

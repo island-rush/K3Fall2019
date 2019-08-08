@@ -45,8 +45,8 @@ export const typeNameIds = {
 };
 
 export const typeHighLow = {
-	highPieces: [0, 1],
-	lowPieces: [2, 3, 4]
+	highPieces: [1],
+	lowPieces: [0, 2, 3, 4]
 };
 
 export const zoomboxBackgrounds = {

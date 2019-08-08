@@ -81,7 +81,12 @@ app.get("/databaseStatus", (req, res) => {
 
 app.get("/teacher.html", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.teacher) {
-		res.sendFile(__dirname + "/serverItems/routes/teacher.html");
+		res
+			.set({
+				section: req.session.adminSection,
+				instructor: req.session.adminInstructor
+			})
+			.sendFile(__dirname + "/serverItems/routes/teacher.html");
 	} else {
 		res.redirect("/index.html?error=login");
 	}
@@ -97,6 +102,7 @@ app.get("/courseDirector.html", (req, res) => {
 
 app.post("/adminLoginVerify", (req, res) => {
 	backendServices.adminLoginVerify(mysqlPool, req, result => {
+		//TODO: standardize callbacks to client (set url within / without backendServices)
 		res.redirect(result);
 	});
 });
@@ -161,6 +167,16 @@ app.get("/getGameActive", (req, res) => {
 app.post("/toggleGameActive", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.teacher && req.session.ir3.gameId) {
 		backendServices.toggleGameActive(mysqlPool, req, result => {});
+	} else {
+		res.redirect("/index.html?error=access");
+	}
+});
+
+app.post("/gameReset", (req, res) => {
+	if (req.session.ir3 && req.session.ir3.teacher && req.session.ir3.gameId) {
+		backendServices.gameReset(mysqlPool, req, result => {
+			res.redirect(`/teacher.html?gameReset=${result ? "success" : "failed"}`);
+		});
 	} else {
 		res.redirect("/index.html?error=access");
 	}

@@ -20,11 +20,27 @@ exports.typeMoves = {
 	3: 5 //tank
 };
 
+exports.typeFuel = {
+	//TypdId: Moves (-1 = warfare)
+	0: -1, //radar
+	1: 5, //plane
+	2: -1, //sub
+	3: -1 //tank
+};
+
 exports.typeNames = {
 	0: "Radar",
 	1: "Plane",
 	2: "Sub",
 	3: "Tank"
+};
+
+exports.typeNameIds = {
+	"Radar": 0,
+	"Plane": 1,
+	"Sub": 2,
+	"Tank": 3,
+	"Transport": 4
 };
 
 exports.blankGameboard = {

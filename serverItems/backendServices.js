@@ -129,11 +129,11 @@ exports.adminLoginVerify = (mysqlPool, req, callback) => {
 
 			req.session.ir3 = {
 				gameId: gameId,
-				teacher: true
+				teacher: true,
+				adminSection, //same name = don't need :
+				adminInstructor
 			};
-			callback(
-				`/teacher.html?section=${adminSection}&instructor=${adminInstructor}`
-			);
+			callback(`/teacher.html`);
 			return;
 		}
 	);
@@ -485,3 +485,5 @@ exports.shopConfirmPurchase = (mysqlPool, socket) => {
 		);
 	});
 };
+
+exports.gameReset = require("./gameReset").gameReset;
