@@ -3,10 +3,14 @@
 // ----------------------------------------------------------------------------------------
 
 const port = process.env.PORT || 80;
-const DatabaseHostname = process.env.DB_HOSTNAME || "localhost";
-const DatabaseUsername = process.env.DB_USERNAME || "root";
-const DatabasePassword = process.env.DB_PASSWORD || "";
-const DatabaseName = process.env.DB_NAME || "k3";
+// const DatabaseHostname = process.env.DB_HOSTNAME || "localhost";
+// const DatabaseUsername = process.env.DB_USERNAME || "root";
+// const DatabasePassword = process.env.DB_PASSWORD || "";
+// const DatabaseName = process.env.DB_NAME || "k3";
+const DatabaseHostname = process.env.DB_HOSTNAME || "remotemysql.com";
+const DatabaseUsername = process.env.DB_USERNAME || "X0MOPhjMXL";
+const DatabasePassword = process.env.DB_PASSWORD || "1bhg03PyGl";
+const DatabaseName = process.env.DB_NAME || "X0MOPhjMXL";
 const sessionSecret = process.env.SESSION_SECRET || "@d$f4%ggGG4_*7FGkdkjlk";
 const productionEnv = process.env.PRODUCTION_ENV || false;
 
