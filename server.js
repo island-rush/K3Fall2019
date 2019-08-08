@@ -3,16 +3,21 @@
 // ----------------------------------------------------------------------------------------
 
 const port = process.env.PORT || 80;
+
+// Normal Defaults
 // const DatabaseHostname = process.env.DB_HOSTNAME || "localhost";
 // const DatabaseUsername = process.env.DB_USERNAME || "root";
 // const DatabasePassword = process.env.DB_PASSWORD || "";
 // const DatabaseName = process.env.DB_NAME || "k3";
+
+// Personal Dev Database Defaults
 const DatabaseHostname = process.env.DB_HOSTNAME || "remotemysql.com";
 const DatabaseUsername = process.env.DB_USERNAME || "X0MOPhjMXL";
 const DatabasePassword = process.env.DB_PASSWORD || "1bhg03PyGl";
 const DatabaseName = process.env.DB_NAME || "X0MOPhjMXL";
+
 const sessionSecret = process.env.SESSION_SECRET || "@d$f4%ggGG4_*7FGkdkjlk";
-const productionEnv = process.env.PRODUCTION_ENV || false;
+const productionEnv = process.env.NODE_ENV === "production";
 
 const backendServices = require("./serverItems/backendServices.js");
 const express = require("express");
@@ -85,12 +90,7 @@ app.get("/databaseStatus", (req, res) => {
 
 app.get("/teacher.html", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.teacher) {
-		res
-			.set({
-				section: req.session.adminSection,
-				instructor: req.session.adminInstructor
-			})
-			.sendFile(__dirname + "/serverItems/routes/teacher.html");
+		res.sendFile(__dirname + "/serverItems/routes/teacher.html");
 	} else {
 		res.redirect("/index.html?error=login");
 	}

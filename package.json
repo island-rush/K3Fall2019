@@ -5,8 +5,11 @@
 	"main": "index.js",
 	"scripts": {
 		"start": "node server.js",
-		"dev": "nodemon server.js -ignore './client/'",
-		"fullInstall": "npm install && cd client && npm install && npm run build && cd .."
+		"fullInstall": "npm install && cd client && npm install && cd ..",
+		"devBackend": "nodemon server.js -ignore './client/'",
+		"devFrontend": "cd client && npm start",
+		"dev": "concurrently \"npm:devBackend\" \"npm:devFrontend\"",
+		"buildClient": "cd client && npm run build && cd .."
 	},
 	"repository": {
 		"type": "git",
@@ -28,6 +31,7 @@
 		"socket.io": "^2.2.0"
 	},
 	"devDependencies": {
+		"concurrently": "^4.1.1",
 		"nodemon": "^1.18.10"
 	}
 }
