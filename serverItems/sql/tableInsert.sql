@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS games (
     game1Controller1 INT(1) NOT NULL DEFAULT 0,
     game1Controller2 INT(1) NOT NULL DEFAULT 0,
     game1Controller3 INT(1) NOT NULL DEFAULT 0,
-    game0Points INT(5) NOT NULL DEFAULT 0,
-    game1Points INT(5) NOT NULL DEFAULT 0,
+    game0Points INT(5) NOT NULL DEFAULT 50,
+    game1Points INT(5) NOT NULL DEFAULT 50,
     PRIMARY KEY(gameId)
 ) AUTO_INCREMENT=1;
 
