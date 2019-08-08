@@ -11,7 +11,12 @@ const leftcontrolsStyle = {
 
 class Leftcontrols extends Component {
 	render() {
-		return <div style={leftcontrolsStyle}>left controls</div>;
+		return (
+			<div style={leftcontrolsStyle}>
+				<div>Nothing Here</div>
+				<div>Planning Controls</div>
+			</div>
+		);
 	}
 }
 
