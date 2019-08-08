@@ -103,4 +103,4 @@ Please note that after building the client, only the ./client/build directory is
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
