@@ -56,20 +56,40 @@ exports.gameReset = (mysqlPool, req, callback) => {
 			"UPDATE games SET gameActive = DEFAULT, game0Controller0 = DEFAULT, game0Controller1 = DEFAULT, game0Controller2 = DEFAULT, game0Controller3 = DEFAULT, game1Controller0 = DEFAULT, game1Controller1 = DEFAULT, game1Controller2 = DEFAULT, game1Controller3 = DEFAULT, game0Points = DEFAULT, game1Points = DEFAULT WHERE gameId = ?",
 			[gameId],
 			(error, results, fields) => {
+				if (error) {
+					connection.release();
+					callback(false);
+					return;
+				}
 				//delete all entries in other tables relating to this game
 				//need to deal with errors as they occur (or just hope they don't happen....ever)
 				connection.query(
 					"DELETE FROM shopItems WHERE shopItemGameId = ?",
 					[gameId],
 					(error, results, fields) => {
+						if (error) {
+							connection.release();
+							callback(false);
+							return;
+						}
 						connection.query(
 							"DELETE FROM invItems WHERE invItemGameId = ?",
 							[gameId],
 							(error, results, fields) => {
+								if (error) {
+									connection.release();
+									callback(false);
+									return;
+								}
 								connection.query(
 									"DELETE FROM pieces WHERE pieceGameId = ?",
 									[gameId],
 									(error, results, fields) => {
+										if (error) {
+											connection.release();
+											callback(false);
+											return;
+										}
 										//start to do the inserts
 										//check for more errors probably
 										defaultPieceValues = generateDefaultPieceValues(gameId);
@@ -77,6 +97,11 @@ exports.gameReset = (mysqlPool, req, callback) => {
 											"INSERT INTO pieces (pieceGameId, pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId, pieceVisible, pieceMoves, pieceFuel) VALUES ?",
 											[defaultPieceValues],
 											(error, results, fields) => {
+												if (error) {
+													connection.release();
+													callback(false);
+													return;
+												}
 												//need to insert container pieces and get inserted id from results for next piece (must do with callbacks or async***)
 												//only needed if initial game has containers with pieces on the inside...
 												connection.release();
