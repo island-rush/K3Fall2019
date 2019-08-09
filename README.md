@@ -1,4 +1,4 @@
-# Island Rush V3.1
+# Island Rush V3
 
 [![Build status](https://dev.azure.com/spenceradolph/IslandRushK3/_apis/build/status/IslandRushK3-CI)](https://dev.azure.com/spenceradolph/IslandRushK3/_build/latest?definitionId=7)
 
