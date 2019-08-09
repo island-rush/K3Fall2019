@@ -93,7 +93,7 @@ npm run buildClient
 node server
 ```
 
-Please note that after building the client, only the ./client/build directory is needed for the frontend.
+Please note that the web.config is currently being used to configure the environment to run on the Azure Cloud.
 
 ## Built With
 
