@@ -41,7 +41,7 @@ const generateDefaultPieceValues = gameId => {
 	];
 };
 
-exports.gameReset = (mysqlPool, req, callback) => {
+exports.gameReset = (req, callback, mysqlPool) => {
 	//reset the game via database methods
 
 	//callback with true or false for success

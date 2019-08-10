@@ -4,22 +4,9 @@
 
 const port = process.env.PORT || 80;
 
-// Normal Defaults
-// const DatabaseHostname = process.env.DB_HOSTNAME || "localhost";
-// const DatabaseUsername = process.env.DB_USERNAME || "root";
-// const DatabasePassword = process.env.DB_PASSWORD || "";
-// const DatabaseName = process.env.DB_NAME || "k3";
-
-// Personal Dev Database Defaults
-const DatabaseHostname = process.env.DB_HOSTNAME || "remotemysql.com";
-const DatabaseUsername = process.env.DB_USERNAME || "X0MOPhjMXL";
-const DatabasePassword = process.env.DB_PASSWORD || "1bhg03PyGl";
-const DatabaseName = process.env.DB_NAME || "X0MOPhjMXL";
-
 const sessionSecret = process.env.SESSION_SECRET || "@d$f4%ggGG4_*7FGkdkjlk";
 const productionEnv = process.env.NODE_ENV === "production";
 
-const backendServices = require("./serverItems/backendServices.js");
 const express = require("express");
 const app = express();
 const server = require("http").createServer(app);
@@ -35,17 +22,6 @@ app.use(session);
 app.use(express.urlencoded());
 io.use(sharedsession(session));
 
-const mysql = require("mysql");
-const databaseConfig = {
-	connectionLimit: 10,
-	host: DatabaseHostname,
-	user: DatabaseUsername,
-	password: DatabasePassword,
-	database: DatabaseName,
-	multipleStatements: true //it allows for SQL injection attacks if values are not properly escaped
-};
-let mysqlPool = mysql.createPool(databaseConfig);
-
 const csvparse = require("csv-array");
 let distanceMatrix = [];
 csvparse.parseCSV(
@@ -56,9 +32,16 @@ csvparse.parseCSV(
 	false
 );
 
+//Used to externalize server functions
+const backendServices = require("./serverItems/backendServices.js");
+
 // ----------------------------------------------------------------------------------------
 // Internal Routing (unrestricted access)
 // ----------------------------------------------------------------------------------------
+
+//TODO: Use middleware or reverse proxy to server static files instead of res.sendFile (so that node isn't bogged down on each request)
+
+//TODO: Put these routes in an external file? (keep the server.js file small)
 
 app.get("/", (req, res) => {
 	delete req.session.ir3;
@@ -79,7 +62,7 @@ app.get("/credits.html", (req, res) => {
 });
 
 app.get("/databaseStatus", (req, res) => {
-	backendServices.databaseStatus(mysqlPool, req, result => {
+	backendServices.databaseStatus(req, result => {
 		res.send(result ? "Success" : "Failed");
 	});
 });
@@ -105,7 +88,7 @@ app.get("/courseDirector.html", (req, res) => {
 });
 
 app.post("/adminLoginVerify", (req, res) => {
-	backendServices.adminLoginVerify(mysqlPool, req, result => {
+	backendServices.adminLoginVerify(req, result => {
 		//TODO: standardize callbacks to client (set url within / without backendServices)
 		res.redirect(result);
 	});
@@ -113,7 +96,7 @@ app.post("/adminLoginVerify", (req, res) => {
 
 app.post("/gameAdd", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.courseDirector) {
-		backendServices.gameAdd(mysqlPool, req, result => {
+		backendServices.gameAdd(req, result => {
 			res.redirect(
 				`/courseDirector.html?gameAdd=${result ? "success" : "failed"}`
 			);
@@ -125,7 +108,7 @@ app.post("/gameAdd", (req, res) => {
 
 app.post("/gameDelete", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.courseDirector) {
-		backendServices.gameDelete(mysqlPool, req, result => {
+		backendServices.gameDelete(req, result => {
 			res.redirect(
 				`/courseDirector.html?gameDelete=${result ? "success" : "failed"}`
 			);
@@ -137,7 +120,7 @@ app.post("/gameDelete", (req, res) => {
 
 app.post("/insertDatabaseTables", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.courseDirector) {
-		backendServices.insertDatabaseTables(mysqlPool, req, result => {
+		backendServices.insertDatabaseTables(req, result => {
 			res.redirect(`/courseDirector.html?initializeDatabase=${result}`);
 		});
 	} else {
@@ -150,7 +133,7 @@ app.get("/getGames", (req, res) => {
 		req.session.ir3 &&
 		(req.session.ir3.teacher || req.session.ir3.courseDirector)
 	) {
-		backendServices.getGames(mysqlPool, req, result => {
+		backendServices.getGames(req, result => {
 			res.send(result);
 		});
 	} else {
@@ -160,7 +143,7 @@ app.get("/getGames", (req, res) => {
 
 app.get("/getGameActive", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.teacher && req.session.ir3.gameId) {
-		backendServices.getGameActive(mysqlPool, req, result => {
+		backendServices.getGameActive(req, result => {
 			res.send(JSON.stringify(result));
 		});
 	} else {
@@ -170,7 +153,7 @@ app.get("/getGameActive", (req, res) => {
 
 app.post("/toggleGameActive", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.teacher && req.session.ir3.gameId) {
-		backendServices.toggleGameActive(mysqlPool, req, result => {});
+		backendServices.toggleGameActive(req, result => {});
 	} else {
 		res.redirect("/index.html?error=access");
 	}
@@ -178,7 +161,7 @@ app.post("/toggleGameActive", (req, res) => {
 
 app.post("/gameReset", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.teacher && req.session.ir3.gameId) {
-		backendServices.gameReset(mysqlPool, req, result => {
+		backendServices.gameReset(req, result => {
 			res.redirect(`/teacher.html?gameReset=${result ? "success" : "failed"}`);
 		});
 	} else {
@@ -191,7 +174,7 @@ app.post("/gameReset", (req, res) => {
 // ----------------------------------------------------------------------------------------
 
 app.post("/gameLoginVerify", (req, res) => {
-	backendServices.gameLoginVerify(mysqlPool, req, result => {
+	backendServices.gameLoginVerify(req, result => {
 		res.redirect(result);
 	});
 });
@@ -241,18 +224,18 @@ io.sockets.on("connection", socket => {
 	);
 
 	//Send the initial game state (TODO: Server Side Rendering with react?)
-	backendServices.getInitialGameState(mysqlPool, socket);
+	backendServices.getInitialGameState(socket);
 
 	socket.on("shopPurchaseRequest", shopItemTypeId => {
-		backendServices.shopPurchaseRequest(mysqlPool, socket, shopItemTypeId);
+		backendServices.shopPurchaseRequest(socket, shopItemTypeId);
 	});
 
 	socket.on("shopRefundRequest", shopItem => {
-		backendServices.shopRefundRequest(mysqlPool, socket, shopItem);
+		backendServices.shopRefundRequest(socket, shopItem);
 	});
 
 	socket.on("shopConfirmPurchase", () => {
-		backendServices.shopConfirmPurchase(mysqlPool, socket);
+		backendServices.shopConfirmPurchase(socket);
 	});
 
 	socket.on("disconnect", () => {

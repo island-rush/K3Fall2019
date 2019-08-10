@@ -10,7 +10,9 @@ const SHOP_TRANSFER = constants.SHOP_TRANSFER;
 const shopItemTypeCosts = constants.shopItemTypeCosts;
 const blankGameboard = constants.blankGameboard;
 
-exports.gameAdd = (mysqlPool, req, callback) => {
+const pool = require("./database").default;
+
+exports.gameAdd = (req, callback) => {
 	const { adminSection, adminInstructor, adminPassword } = req.body;
 	if (!adminSection || !adminInstructor || !adminPassword) {
 		callback(false);
@@ -18,7 +20,7 @@ exports.gameAdd = (mysqlPool, req, callback) => {
 	}
 
 	const adminPasswordHashed = md5(adminPassword);
-	mysqlPool.query(
+	pool.query(
 		"INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?)",
 		[adminSection, adminInstructor, adminPasswordHashed],
 		(error, results, fields) => {
@@ -33,14 +35,14 @@ exports.gameAdd = (mysqlPool, req, callback) => {
 	);
 };
 
-exports.gameDelete = (mysqlPool, req, callback) => {
+exports.gameDelete = (req, callback) => {
 	const { gameId } = req.body;
 	if (!gameId) {
 		callback(false);
 		return;
 	}
 
-	mysqlPool.query(
+	pool.query(
 		"DELETE FROM games WHERE gameId = ?",
 		[gameId],
 		(error, results, fields) => {
@@ -55,8 +57,8 @@ exports.gameDelete = (mysqlPool, req, callback) => {
 	);
 };
 
-exports.databaseStatus = (mysqlPool, req, callback) => {
-	mysqlPool.getConnection((err, connection) => {
+exports.databaseStatus = (req, callback) => {
+	pool.getConnection((err, connection) => {
 		if (err) {
 			callback(false);
 		} else {
@@ -66,8 +68,8 @@ exports.databaseStatus = (mysqlPool, req, callback) => {
 	});
 };
 
-exports.getGames = (mysqlPool, req, callback) => {
-	mysqlPool.query("SELECT * FROM games", (error, results, fields) => {
+exports.getGames = (req, callback) => {
+	pool.query("SELECT * FROM games", (error, results, fields) => {
 		if (error) {
 			callback(JSON.stringify([]));
 			return;
@@ -86,7 +88,7 @@ exports.getGames = (mysqlPool, req, callback) => {
 	});
 };
 
-exports.adminLoginVerify = (mysqlPool, req, callback) => {
+exports.adminLoginVerify = (req, callback) => {
 	const CourseDirectorLastName = process.env.CD_LASTNAME || "Smith";
 	const CourseDirectorPassword =
 		process.env.CD_PASSWORD || "912ec803b2ce49e4a541068d495ab570"; //"asdf"
@@ -107,7 +109,7 @@ exports.adminLoginVerify = (mysqlPool, req, callback) => {
 		return;
 	}
 
-	mysqlPool.query(
+	pool.query(
 		"SELECT gameId, gameAdminPassword FROM games WHERE gameSection = ? AND gameInstructor = ? ORDER BY gameId",
 		[adminSection, adminInstructor],
 		(error, results, fields) => {
@@ -139,9 +141,9 @@ exports.adminLoginVerify = (mysqlPool, req, callback) => {
 	);
 };
 
-exports.getGameActive = (mysqlPool, req, callback) => {
+exports.getGameActive = (req, callback) => {
 	const { gameId } = req.session.ir3;
-	mysqlPool.query(
+	pool.query(
 		"SELECT gameActive FROM games WHERE gameId = ?",
 		[gameId],
 		(error, results, fields) => {
@@ -155,9 +157,9 @@ exports.getGameActive = (mysqlPool, req, callback) => {
 	);
 };
 
-exports.toggleGameActive = (mysqlPool, req, callback) => {
+exports.toggleGameActive = (req, callback) => {
 	const { gameId } = req.session.ir3;
-	mysqlPool.query(
+	pool.query(
 		"UPDATE games SET gameActive = (gameActive + 1) % 2, game0Controller0 = 0, game0Controller1 = 0, game0Controller2 = 0, game0Controller3 = 0, game1Controller0 = 0, game1Controller1 = 0, game1Controller2 = 0, game1Controller3 = 0 WHERE gameId = ?",
 		[gameId],
 		(error, results, fields) => {
@@ -168,9 +170,9 @@ exports.toggleGameActive = (mysqlPool, req, callback) => {
 	);
 };
 
-exports.insertDatabaseTables = (mysqlPool, req, callback) => {
+exports.insertDatabaseTables = (req, callback) => {
 	const sql = fs.readFileSync("./serverItems/sql/tableInsert.sql").toString();
-	mysqlPool.query(sql, (error, results, fields) => {
+	pool.query(sql, (error, results, fields) => {
 		if (error) {
 			callback("failed");
 			return;
@@ -181,7 +183,7 @@ exports.insertDatabaseTables = (mysqlPool, req, callback) => {
 	});
 };
 
-exports.gameLoginVerify = (mysqlPool, req, callback) => {
+exports.gameLoginVerify = (req, callback) => {
 	const {
 		gameSection,
 		gameInstructor,
@@ -202,7 +204,7 @@ exports.gameLoginVerify = (mysqlPool, req, callback) => {
 
 	const gameTeamPasswordHashed = md5(gameTeamPassword);
 	const commanderLoginField = "game" + gameTeam + "Controller" + gameController; //ex: 'game0Controller0'
-	mysqlPool.getConnection((error, connection) => {
+	pool.getConnection((error, connection) => {
 		connection.query(
 			"SELECT gameId, game0Password, game1Password, gameActive, ?? as commanderLogin FROM games WHERE gameSection = ? AND gameInstructor = ? ORDER BY gameId",
 			[commanderLoginField, gameSection, gameInstructor],
@@ -264,14 +266,14 @@ exports.gameLoginVerify = (mysqlPool, req, callback) => {
 	});
 };
 
-exports.getInitialGameState = (mysqlPool, socket) => {
+exports.getInitialGameState = socket => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 	//SELECT based on TeamId (socket.handshake.session.ir3.gameTeam)
 	//also consider gameController info in ir3
 
 	const pointsField = `game${gameTeam}Points`;
 
-	mysqlPool.getConnection((error, connection) => {
+	pool.getConnection((error, connection) => {
 		if (error) throw error; //deal with error
 		connection.query(
 			"SELECT gameSection, gameInstructor, ?? as teamPoints FROM games WHERE gameId = ?",
@@ -351,14 +353,14 @@ exports.getInitialGameState = (mysqlPool, socket) => {
 	});
 };
 
-exports.shopPurchaseRequest = (mysqlPool, socket, shopItemTypeId) => {
+exports.shopPurchaseRequest = (socket, shopItemTypeId) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	//TODO: figure out if the purchase is allowed (game phase...controller Id....game active....)
 
 	const pointsField = `game${gameTeam}Points`;
 
-	mysqlPool.getConnection((error, connection) => {
+	pool.getConnection((error, connection) => {
 		connection.query(
 			"SELECT ?? as points FROM games WHERE gameId = ?",
 			[pointsField, gameId],
@@ -413,7 +415,7 @@ exports.shopPurchaseRequest = (mysqlPool, socket, shopItemTypeId) => {
 	});
 };
 
-exports.shopRefundRequest = (mysqlPool, socket, shopItem) => {
+exports.shopRefundRequest = (socket, shopItem) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	//verify that the refund is available (correct controller, game active....)
@@ -422,7 +424,7 @@ exports.shopRefundRequest = (mysqlPool, socket, shopItem) => {
 	const pointsField = `game${gameTeam}Points`;
 	const itemCost = shopItemTypeCosts[shopItem.shopItemTypeId];
 
-	mysqlPool.getConnection((error, connection) => {
+	pool.getConnection((error, connection) => {
 		connection.query(
 			"UPDATE games SET ?? = ?? + ? WHERE gameId = ?",
 			[pointsField, pointsField, itemCost, gameId],
@@ -450,12 +452,12 @@ exports.shopRefundRequest = (mysqlPool, socket, shopItem) => {
 	});
 };
 
-exports.shopConfirmPurchase = (mysqlPool, socket) => {
+exports.shopConfirmPurchase = socket => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	//verify if it is allowed, game active, phase, controller...
 
-	mysqlPool.getConnection((error, connection) => {
+	pool.getConnection((error, connection) => {
 		connection.query(
 			"INSERT INTO invItems (invItemId, invItemGameId, invItemTeamId, invItemTypeId) SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?",
 			[gameId, gameTeam],
@@ -486,4 +488,5 @@ exports.shopConfirmPurchase = (mysqlPool, socket) => {
 	});
 };
 
-exports.gameReset = require("./gameReset").gameReset;
+exports.gameReset = (req, callback) =>
+	require("./gameReset").gameReset(req, callback, pool);
