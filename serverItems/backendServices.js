@@ -1,6 +1,16 @@
 const md5 = require("md5");
 const fs = require("fs");
 
+// const csvparse = require("csv-array");
+// let distanceMatrix = [];
+// csvparse.parseCSV(
+// 	"./distanceMatrix",
+// 	data => {
+// 		distanceMatrix = data;
+// 	},
+// 	false
+// );
+
 const {
 	INITIAL_GAMESTATE,
 	SHOP_PURCHASE,

@@ -9,8 +9,6 @@ const backendServices = require("./backendServices");
 // Internal Routing (unrestricted access)
 // ----------------------------------------------------------------------------------------
 
-//TODO: Use middleware or reverse proxy to server static files instead of res.sendFile (so that node isn't bogged down on each request)
-
 router.get("/", (req, res) => {
 	delete req.session.ir3;
 	res.sendFile(__dirname + "/routes/index.html");

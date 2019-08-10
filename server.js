@@ -1,51 +1,34 @@
-// ----------------------------------------------------------------------------------------
-// Server Setup and Configuration
-// ----------------------------------------------------------------------------------------
-
-const port = process.env.PORT || 80;
-
-const sessionSecret = process.env.SESSION_SECRET || "@d$f4%ggGG4_*7FGkdkjlk";
-
+//Create the server
 const express = require("express");
 const app = express();
 const server = require("http").createServer(app);
-const io = require("socket.io")(server);
-const esConfig = {
+
+//Session Setup
+const sessionSecret = process.env.SESSION_SECRET || "@d$f4%ggGG4_*7FGkdkjlk";
+const sessionConfig = {
 	secret: sessionSecret,
 	resave: true,
 	saveUninitialized: true
 };
-const session = require("express-session")(esConfig);
-const sharedsession = require("express-socket.io-session");
-app.use(session);
-app.use(express.urlencoded());
-io.use(sharedsession(session));
+const session = require("express-session")(sessionConfig);
 
-const csvparse = require("csv-array");
-let distanceMatrix = [];
-csvparse.parseCSV(
-	"./serverItems/distanceMatrix.csv",
-	data => {
-		distanceMatrix = data;
-	},
-	false
-);
+app.use(session); //App has access to sessions
+app.use(express.urlencoded()); //parses data and puts into req.body
 
-const backendServices = require("./serverItems/backendServices");
-
-const router = require("./serverItems/router");
-app.use("/", router);
-
+//Server Routing
+//TODO: Use middleware or reverse proxy to serve static files
+app.use("/", require("./serverItems/router"));
 app.use(express.static(__dirname + "/client/build"));
 
+//Socket Setup
+const io = require("socket.io")(server);
+io.use(require("express-socket.io-session")(session)); //Socket has access to sessions
 io.sockets.on("connection", socket => {
-	backendServices.socketSetup(socket);
+	require("./serverItems/backendServices").socketSetup(socket);
 });
 
-// ----------------------------------------------------------------------------------------
-// Start Server
-// ----------------------------------------------------------------------------------------
-
+//Start the server
+const port = process.env.PORT || 80;
 server.listen(port, () => {
 	console.log(`Listening on port ${port}...`);
 });
