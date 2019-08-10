@@ -104,3 +104,7 @@ Please note that the web.config is currently being used to configure the environ
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Version
+
+Version 3.1.0
