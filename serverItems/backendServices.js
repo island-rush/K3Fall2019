@@ -1,16 +1,17 @@
 const md5 = require("md5");
 const fs = require("fs");
 
-const constants = require("./constants");
-const INITIAL_GAMESTATE = constants.INITIAL_GAMESTATE;
-const SHOP_PURCHASE = constants.SHOP_PURCHASE;
-const SHOP_REFUND = constants.SHOP_REFUND;
-const SET_USERFEEDBACK = constants.SET_USERFEEDBACK;
-const SHOP_TRANSFER = constants.SHOP_TRANSFER;
-const shopItemTypeCosts = constants.shopItemTypeCosts;
-const blankGameboard = constants.blankGameboard;
+const {
+	INITIAL_GAMESTATE,
+	SHOP_PURCHASE,
+	SHOP_REFUND,
+	SET_USERFEEDBACK,
+	SHOP_TRANSFER,
+	shopItemTypeCosts,
+	blankGameboard
+} = require("./constants");
 
-const pool = require("./database").default;
+const pool = require("./database");
 
 exports.gameAdd = (req, callback) => {
 	const { adminSection, adminInstructor, adminPassword } = req.body;
@@ -266,7 +267,7 @@ exports.gameLoginVerify = (req, callback) => {
 	});
 };
 
-exports.getInitialGameState = socket => {
+const getInitialGameState = socket => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 	//SELECT based on TeamId (socket.handshake.session.ir3.gameTeam)
 	//also consider gameController info in ir3
@@ -353,7 +354,7 @@ exports.getInitialGameState = socket => {
 	});
 };
 
-exports.shopPurchaseRequest = (socket, shopItemTypeId) => {
+const shopPurchaseRequest = (socket, shopItemTypeId) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	//TODO: figure out if the purchase is allowed (game phase...controller Id....game active....)
@@ -415,7 +416,7 @@ exports.shopPurchaseRequest = (socket, shopItemTypeId) => {
 	});
 };
 
-exports.shopRefundRequest = (socket, shopItem) => {
+const shopRefundRequest = (socket, shopItem) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	//verify that the refund is available (correct controller, game active....)
@@ -452,7 +453,7 @@ exports.shopRefundRequest = (socket, shopItem) => {
 	});
 };
 
-exports.shopConfirmPurchase = socket => {
+const shopConfirmPurchase = socket => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	//verify if it is allowed, game active, phase, controller...
@@ -485,6 +486,64 @@ exports.shopConfirmPurchase = socket => {
 				);
 			}
 		);
+	});
+};
+
+const logout = socket => {
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+
+	const controllerLoginField =
+		"game" + gameTeam + "Controller" + gameController;
+
+	pool.query(
+		"UPDATE games SET ?? = 0 WHERE gameId = ?",
+		[controllerLoginField, gameId],
+		(error, results, fields) => {}
+	);
+};
+
+// ----------------------------------------------------------------------------------------
+// Socket Requests (Gameplay Client <-|-> Server)
+// ----------------------------------------------------------------------------------------
+
+exports.socketSetup = socket => {
+	if (
+		!socket.handshake.session.ir3 ||
+		!socket.handshake.session.ir3.gameId ||
+		!socket.handshake.session.ir3.gameTeam ||
+		!socket.handshake.session.ir3.gameController
+	) {
+		socket.emit("serverRedirect", "access");
+		return;
+	}
+
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+
+	//Room for the Team
+	socket.join("game" + gameId + "team" + gameTeam);
+
+	//Room for the Indiviual Controller
+	socket.join(
+		"game" + gameId + "team" + gameTeam + "controller" + gameController
+	);
+
+	//Send the initial game state (TODO: Server Side Rendering with react?)
+	getInitialGameState(socket);
+
+	socket.on("shopPurchaseRequest", shopItemTypeId => {
+		shopPurchaseRequest(socket, shopItemTypeId);
+	});
+
+	socket.on("shopRefundRequest", shopItem => {
+		shopRefundRequest(socket, shopItem);
+	});
+
+	socket.on("shopConfirmPurchase", () => {
+		shopConfirmPurchase(socket);
+	});
+
+	socket.on("disconnect", () => {
+		logout(socket);
 	});
 };
 
