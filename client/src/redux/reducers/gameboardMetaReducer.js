@@ -1,5 +1,4 @@
 import {
-	INITIAL_GAMESTATE,
 	POSITION_SELECT,
 	PIECE_CLICK,
 	PIECE_CLEAR_SELECTION
@@ -13,8 +12,6 @@ const initialGameboardMeta = {
 function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 	let stateDeepCopy = JSON.parse(JSON.stringify(state));
 	switch (type) {
-		case INITIAL_GAMESTATE:
-			return payload.gameboardMeta;
 		case POSITION_SELECT:
 			stateDeepCopy.selectedPosition = parseInt(payload.positionId);
 			return stateDeepCopy;

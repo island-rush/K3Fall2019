@@ -41,7 +41,7 @@ const generateDefaultPieceValues = gameId => {
 	];
 };
 
-exports.gameReset = (req, callback, mysqlPool) => {
+exports.gameReset = async (req, callback, promisePool) => {
 	//reset the game via database methods
 
 	//callback with true or false for success
@@ -49,6 +49,17 @@ exports.gameReset = (req, callback, mysqlPool) => {
 	//need to verify who is asking to
 
 	const { gameId } = req.session.ir3;
+
+	const conn = await promisePool.getConnection();
+
+	let queryString =
+		"UPDATE games SET gameActive = DEFAULT, game0Controller0 = DEFAULT, game0Controller1 = DEFAULT, game0Controller2 = DEFAULT, game0Controller3 = DEFAULT, game1Controller0 = DEFAULT, game1Controller1 = DEFAULT, game1Controller2 = DEFAULT, game1Controller3 = DEFAULT, game0Points = DEFAULT, game1Points = DEFAULT WHERE gameId = ?";
+	let inserts = [gameId];
+	await conn.query(queryString, inserts);
+
+	queryString = "DELETE FROM shopItems WHERE shopItemGameId = ?";
+	inserts = [];
+	await conn.query(queryString, inserts);
 
 	mysqlPool.getConnection((error, connection) => {
 		//reset game to default values (known by database table)

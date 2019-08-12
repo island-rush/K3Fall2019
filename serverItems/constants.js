@@ -40,9 +40,9 @@ exports.typeNames = {
 };
 
 exports.typeNameIds = {
-	Radar: 0,
-	Plane: 1,
-	Sub: 2,
-	Tank: 3,
-	Transport: 4
+	"Radar": 0,
+	"Plane": 1,
+	"Sub": 2,
+	"Tank": 3,
+	"Transport": 4
 };
