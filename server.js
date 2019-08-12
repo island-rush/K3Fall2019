@@ -24,7 +24,7 @@ app.use(express.static(__dirname + "/client/build"));
 const io = require("socket.io")(server);
 io.use(require("express-socket.io-session")(session)); //Socket has access to sessions
 io.sockets.on("connection", socket => {
-	require("./serverItems/backendServices2").socketSetup(socket);
+	require("./serverItems/backendServices").socketSetup(socket);
 });
 
 //Start the server

@@ -17,6 +17,7 @@ function shopReducer(state = initialShopState, { type, payload }) {
 		case SHOP_CLEAR:
 			return [];
 		case SHOP_REFUND:
+			//TODO: sending back the entire item when refunding, could send only the id
 			return state.filter(function(shopItem, index, arr) {
 				return shopItem.shopItemId !== payload.shopItem.shopItemId;
 			});

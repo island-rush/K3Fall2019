@@ -1,7 +1,6 @@
 const productionEnv = process.env.NODE_ENV === "production";
 
 const backendServices = require("./backendServices");
-const backendServices2 = require("./backendServices2");
 
 const router = require("express").Router();
 
@@ -59,27 +58,27 @@ router.get("/game.html", (req, res) => {
 // --------------------------------------------------------
 
 router.get("/databaseStatus", (req, res) => {
-	backendServices2.databaseStatus(req, result => {
+	backendServices.databaseStatus(req, result => {
 		res.send(result ? "Success" : "Failed");
 	});
 });
 
 router.post("/adminLoginVerify", async (req, res) => {
-	backendServices2.adminLoginVerify(req, result => {
+	backendServices.adminLoginVerify(req, result => {
 		//TODO: standardize callbacks to client (set url within / without backendServices)
 		res.redirect(result);
 	});
 });
 
 router.post("/gameLoginVerify", (req, res) => {
-	backendServices2.gameLoginVerify(req, result => {
+	backendServices.gameLoginVerify(req, result => {
 		res.redirect(result);
 	});
 });
 
 router.post("/gameAdd", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.courseDirector) {
-		backendServices2.gameAdd(req, result => {
+		backendServices.gameAdd(req, result => {
 			res.redirect(
 				`/courseDirector.html?gameAdd=${result ? "success" : "failed"}`
 			);
@@ -91,7 +90,7 @@ router.post("/gameAdd", (req, res) => {
 
 router.post("/gameDelete", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.courseDirector) {
-		backendServices2.gameDelete(req, result => {
+		backendServices.gameDelete(req, result => {
 			res.redirect(
 				`/courseDirector.html?gameDelete=${result ? "success" : "failed"}`
 			);
@@ -103,7 +102,7 @@ router.post("/gameDelete", (req, res) => {
 
 router.post("/insertDatabaseTables", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.courseDirector) {
-		backendServices2.insertDatabaseTables(req, result => {
+		backendServices.insertDatabaseTables(req, result => {
 			res.redirect(`/courseDirector.html?initializeDatabase=${result}`);
 		});
 	} else {
@@ -116,7 +115,7 @@ router.get("/getGames", (req, res) => {
 		req.session.ir3 &&
 		(req.session.ir3.teacher || req.session.ir3.courseDirector)
 	) {
-		backendServices2.getGames(req, result => {
+		backendServices.getGames(req, result => {
 			res.send(result);
 		});
 	} else {
@@ -126,7 +125,7 @@ router.get("/getGames", (req, res) => {
 
 router.get("/getGameActive", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.teacher && req.session.ir3.gameId) {
-		backendServices2.getGameActive(req, result => {
+		backendServices.getGameActive(req, result => {
 			res.send(JSON.stringify(result));
 		});
 	} else {
@@ -136,7 +135,7 @@ router.get("/getGameActive", (req, res) => {
 
 router.post("/toggleGameActive", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.teacher && req.session.ir3.gameId) {
-		backendServices2.toggleGameActive(req, result => {});
+		backendServices.toggleGameActive(req, result => {});
 	} else {
 		res.redirect("/index.html?error=access");
 	}
@@ -144,7 +143,7 @@ router.post("/toggleGameActive", (req, res) => {
 
 router.post("/gameReset", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.teacher && req.session.ir3.gameId) {
-		backendServices2.gameReset2(req, result => {
+		backendServices.gameReset(req, result => {
 			res.redirect(`/teacher.html?gameReset=${result ? "success" : "failed"}`);
 		});
 	} else {
