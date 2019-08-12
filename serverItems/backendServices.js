@@ -17,8 +17,7 @@ const {
 	SHOP_REFUND,
 	SET_USERFEEDBACK,
 	SHOP_TRANSFER,
-	shopItemTypeCosts,
-	blankGameboard
+	shopItemTypeCosts
 } = require("./constants");
 
 const pool = require("./database");
@@ -52,6 +51,8 @@ exports.gameDelete = (req, callback) => {
 		callback(false);
 		return;
 	}
+
+	//TODO: delete all the other tables...
 
 	pool.query(
 		"DELETE FROM games WHERE gameId = ?",
@@ -182,7 +183,8 @@ exports.toggleGameActive = (req, callback) => {
 };
 
 exports.insertDatabaseTables = (req, callback) => {
-	const sql = fs.readFileSync("./serverItems/sql/tableInsert.sql").toString();
+	// const sqlthing = require('./sqlScripts/t')
+	const sql = fs.readFileSync("./sqlScripts/tableInsert.sql").toString();
 	pool.query(sql, (error, results, fields) => {
 		if (error) {
 			callback("failed");
@@ -261,17 +263,17 @@ exports.gameLoginVerify = (req, callback) => {
 						//handle error
 						//shouldn't have error if succeeded above
 						connection.release();
+
+						req.session.ir3 = {
+							gameId: gameId,
+							gameTeam: gameTeam,
+							gameController: gameController
+						};
+
+						callback("/game.html");
+						return;
 					}
 				);
-
-				req.session.ir3 = {
-					gameId: gameId,
-					gameTeam: gameTeam,
-					gameController: gameController
-				};
-
-				callback("/game.html");
-				return;
 			}
 		);
 	});
@@ -313,22 +315,29 @@ const getInitialGameState = socket => {
 									(error, results, fields) => {
 										connection.release();
 
-										let gameboard = JSON.parse(JSON.stringify(blankGameboard)); //Deep Copy of Object
+										let allPieces = {};
+
 										for (let x = 0; x < results.length; x++) {
 											let currentPiece = results[x];
-											let { piecePositionId, pieceContainerId } = currentPiece;
 											currentPiece.pieceContents = { pieces: [] };
-											if (pieceContainerId == -1) {
-												gameboard[piecePositionId].pieces.push(currentPiece);
+											if (!allPieces[currentPiece.piecePositionId]) {
+												allPieces[currentPiece.piecePositionId] = [];
+											}
+											if (currentPiece.pieceContainerId === -1) {
+												allPieces[currentPiece.piecePositionId].push(
+													currentPiece
+												);
 											} else {
-												const indexOfParentPiece = gameboard[
-													piecePositionId
-												].pieces.findIndex(piece => {
-													return (piece.pieceId = pieceContainerId);
+												let indexOfParent = allPieces[
+													currentPiece.piecePositionId
+												].findIndex(piece => {
+													return (
+														piece.pieceId === currentPiece.pieceContainerId
+													);
 												});
-												gameboard[piecePositionId].pieces[
-													indexOfParentPiece
-												].pieceContents.pieces.push(currentPiece);
+												allPieces[currentPiece.piecePositionId][
+													indexOfParent
+												].pieceContents.push(currentPiece);
 											}
 										}
 
@@ -344,7 +353,7 @@ const getInitialGameState = socket => {
 												},
 												shopItems: shopItems,
 												invItems: invItems,
-												gameboard: gameboard, //need to insert the pieces from the db
+												gameboardPieces: allPieces, //need to insert the pieces from the db
 												gameboardMeta: {
 													selectedPosition: -1
 												}

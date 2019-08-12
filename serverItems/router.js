@@ -1,13 +1,8 @@
-const express = require("express");
-const router = express.Router();
-
 const productionEnv = process.env.NODE_ENV === "production";
 
 const backendServices = require("./backendServices");
 
-// ----------------------------------------------------------------------------------------
-// Internal Routing (unrestricted access)
-// ----------------------------------------------------------------------------------------
+const router = require("express").Router();
 
 router.get("/", (req, res) => {
 	delete req.session.ir3;
@@ -27,16 +22,6 @@ router.get("/credits.html", (req, res) => {
 	res.sendFile(__dirname + "/routes/credits.html");
 });
 
-router.get("/databaseStatus", (req, res) => {
-	backendServices.databaseStatus(req, result => {
-		res.send(result ? "Success" : "Failed");
-	});
-});
-
-// ----------------------------------------------------------------------------------------
-// Teacher and Course Director Services / Routing
-// ----------------------------------------------------------------------------------------
-
 router.get("/teacher.html", (req, res) => {
 	if (req.session.ir3 && req.session.ir3.teacher) {
 		res.sendFile(__dirname + "/routes/teacher.html");
@@ -51,6 +36,29 @@ router.get("/courseDirector.html", (req, res) => {
 	} else {
 		res.redirect("/index.html?error=login");
 	}
+});
+
+router.get("/game.html", (req, res) => {
+	if (
+		req.session.ir3 &&
+		req.session.ir3.gameId &&
+		req.session.ir3.gameTeam &&
+		req.session.ir3.gameController
+	) {
+		if (productionEnv) {
+			res.sendFile(__dirname + "../client/build/index.html");
+		} else {
+			res.redirect("http://localhost:3000"); // Use this redirect while working on react frontend
+		}
+	} else {
+		res.redirect("/index.html?error=login");
+	}
+});
+
+router.get("/databaseStatus", (req, res) => {
+	backendServices.databaseStatus(req, result => {
+		res.send(result ? "Success" : "Failed");
+	});
 });
 
 router.post("/adminLoginVerify", (req, res) => {
@@ -135,31 +143,10 @@ router.post("/gameReset", (req, res) => {
 	}
 });
 
-// ----------------------------------------------------------------------------------------
-// Game Routing (Into React app)
-// ----------------------------------------------------------------------------------------
-
 router.post("/gameLoginVerify", (req, res) => {
 	backendServices.gameLoginVerify(req, result => {
 		res.redirect(result);
 	});
-});
-
-router.get("/game.html", (req, res) => {
-	if (
-		req.session.ir3 &&
-		req.session.ir3.gameId &&
-		req.session.ir3.gameTeam &&
-		req.session.ir3.gameController
-	) {
-		if (productionEnv) {
-			res.sendFile(__dirname + "../client/build/index.html");
-		} else {
-			res.redirect("http://localhost:3000"); // Use this redirect while working on react frontend
-		}
-	} else {
-		res.redirect("/index.html?error=login");
-	}
 });
 
 module.exports = router;
