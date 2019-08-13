@@ -1,3 +1,4 @@
+const path = require("path");
 const backendServices = require("./backendServices");
 
 const router = require("express").Router();
@@ -52,7 +53,7 @@ router.get("/game.html", (req, res) => {
 	}
 
 	if (process.env.NODE_ENV === "production") {
-		res.sendFile(__dirname + "../client/build/index.html");
+		res.sendFile(path.join(__dirname, "/../client/build/index.html"));
 	} else {
 		res.redirect("http://localhost:3000"); // Use this redirect while working on react frontend
 	}
