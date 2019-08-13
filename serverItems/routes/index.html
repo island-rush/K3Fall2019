@@ -1,216 +1,308 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>Island Rush</title>
-    <script>
-      console.log("Home Page Javascript");
-    </script>
-    <style>
-      body {
-        background-color:#f4f4f4;
-        color:#555555;
-        font: normal 18px Arial, Helvetica, sans-serif;
-        line-height: 1.6em;
-        margin: 0;
-      }
-      h1 {
-        color: #555;
-        margin: 5%;
-        padding: 0;
-        font-size: 40px;
-      }
-      nav {
-        z-index: 1000;
-        background-color: #333;
-        overflow: auto;
-        margin: 0;
-        padding: 0;
-        position: sticky;
-        top: 0;
-      }
-      nav a {
-        float: left;
-        color: #f2f2f2;
-        text-align: center;
-        padding: 10px 30px;
-        text-decoration: none;
-        font-size: 20px;
-      }
-      nav a:hover {
-          background-color: #ccc;
-          color: black;
-      }
-      nav a.active {
-        background-color:#285fb7;
-        color:white;
-      }
-      Red {
-        color: red
-      }
-      Green {
-        color: green
-      }
-      Blue {
-        color: blue
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Island Rush V3.1</h1>
-    <nav>
-      <a class="active" href="index.html">Home</a>
-      <a href="troubleshoot.html">Troubleshoot</a>
-      <a href="credits.html">Credits</a>
-      <a href="https://gitreports.com/issue/island-rush/K3.1" target="_blank" style="float: right">Report an Issue</a>
-      <a href="https://github.com/island-rush/K3.1/wiki" target="_blank" style="float: right">Wiki</a>
-    </nav>
-    
+	<head>
+		<meta charset="UTF-8" />
+		<title>Island Rush</title>
+		<script>
+			console.log("Home Page Javascript");
+		</script>
+		<style>
+			body {
+				background-color: #f4f4f4;
+				color: #555555;
+				font: normal 18px Arial, Helvetica, sans-serif;
+				line-height: 1.6em;
+				margin: 0;
+			}
+			h1 {
+				color: #555;
+				margin: 5%;
+				padding: 0;
+				font-size: 40px;
+			}
+			nav {
+				z-index: 1000;
+				background-color: #333;
+				overflow: auto;
+				margin: 0;
+				padding: 0;
+				position: sticky;
+				top: 0;
+			}
+			nav a {
+				float: left;
+				color: #f2f2f2;
+				text-align: center;
+				padding: 10px 30px;
+				text-decoration: none;
+				font-size: 20px;
+			}
+			nav a:hover {
+				background-color: #ccc;
+				color: black;
+			}
+			nav a.active {
+				background-color: #285fb7;
+				color: white;
+			}
+			Red {
+				color: red;
+			}
+			Green {
+				color: green;
+			}
+			Blue {
+				color: blue;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Island Rush V3.1</h1>
+		<nav>
+			<a class="active" href="index.html">Home</a>
+			<a href="troubleshoot.html">Troubleshoot</a>
+			<a href="credits.html">Credits</a>
+			<a
+				href="https://gitreports.com/issue/island-rush/K3.1"
+				target="_blank"
+				style="float: right"
+				>Report an Issue</a
+			>
+			<a
+				href="https://github.com/island-rush/K3.1/wiki"
+				target="_blank"
+				style="float: right"
+				>Wiki</a
+			>
+		</nav>
 
-    <table style="width: 100%">
-      <tr>
-          <td>
-              <H3>Player Login</H3>
-              <form name="gameLogin" method="post" id="gameLogin" action="/gameLoginVerify">
-                  <table>
-                      <tr>
-                        <td colspan="2">
-                            <div id="formFeedback" class="formError" style="color: red;">
-                            </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Section</td>
-                        <td>
-                            <input name="gameSection" type="text" id="gameSection" placeholder="ex: m1a1" value="m1a1" autofocus="autofocus" required>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Teacher Last Name</td>
-                        <td>
-                            <input name="gameInstructor" type="text" id="gameInstructor" placeholder="ex: Smith" value="adolph" required>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Team</td>
-                        <td>
-                            <input type="radio" name="gameTeam" value="0" checked> <blue>Vestrland Commander</blue><br>
-                            <input type="radio" name="gameTeam" value="1"> <red>Zuun Commander</red><br>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Controller Type</td>
-                        <td>
-                            <input type="radio" name="gameController" checked value="0">Main Commander<br>
-                            <input type="radio" name="gameController" value="1">Air Commander<br>
-                            <input type="radio" name="gameController" value="2">Land Commander<br>
-                            <input type="radio" name="gameController" value="3">Sea Commander<br>
-                        </td>
-                    </tr>
-                    <tr>
-                      <td>Team Password</td>
-                      <td>
-                          <input name="gameTeamPassword" type="text" value="password" id="gameTeamPassword" required>
-                      </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2"><br/><input type="submit" name="Submit" value="Game Login"></td>
-                    </tr>
-                  </table>
-              </form>
-          </td>
-          <td style="vertical-align: top">
-            <h3 id="DatabaseConnectionTag" style="position: relative; float: left">Database Connection Status: Loading...</h3>
-          </td>
-          <td style="position: relative; float: right">
-              <H3>Teacher Login</H3>
-              <form name="adminLogin" method="post" id="adminLogin" action="/adminLoginVerify">
-                  <table>
-                      <tr>
-                          <td>Section</td>
-                          <td>
-                              <input name="adminSection" type="text" id="adminSection" placeholder="ex: m1a1" autofocus="autofocus" required>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td>Teacher Last Name</td>
-                          <td>
-                              <input name="adminInstructor" type="text" id="adminInstructor" placeholder="ex: Smith" required>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td>Password</td>
-                          <td>
-                              <input name="adminPassword" type="password" id="adminPassword" required>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td colspan="2"><br/><input type="submit" name="Submit" value="Admin Login"></td>
-                      </tr>
-                  </table>
-              </form>
-          </td>
-      </tr>
-  </table>
+		<table style="width: 100%">
+			<tr>
+				<td>
+					<H3>Player Login</H3>
+					<form
+						name="gameLogin"
+						method="post"
+						id="gameLogin"
+						action="/gameLoginVerify"
+					>
+						<table>
+							<tr>
+								<td colspan="2">
+									<div
+										id="formFeedback"
+										class="formError"
+										style="color: red;"
+									></div>
+								</td>
+							</tr>
+							<tr>
+								<td>Section</td>
+								<td>
+									<input
+										name="gameSection"
+										type="text"
+										id="gameSection"
+										placeholder="ex: m1a1"
+										value="m1a1"
+										autofocus="autofocus"
+										required
+									/>
+								</td>
+							</tr>
+							<tr>
+								<td>Teacher Last Name</td>
+								<td>
+									<input
+										name="gameInstructor"
+										type="text"
+										id="gameInstructor"
+										placeholder="ex: Smith"
+										value="adolph"
+										required
+									/>
+								</td>
+							</tr>
+							<tr>
+								<td>Team</td>
+								<td>
+									<input type="radio" name="gameTeam" value="0" checked />
+									<blue>Vestrland Commander</blue><br />
+									<input type="radio" name="gameTeam" value="1" />
+									<red>Zuun Commander</red><br />
+								</td>
+							</tr>
+							<tr>
+								<td>Controller Type</td>
+								<td>
+									<input
+										type="radio"
+										name="gameController"
+										checked
+										value="0"
+									/>Main Commander<br />
+									<input type="radio" name="gameController" value="1" />Air
+									Commander<br />
+									<input type="radio" name="gameController" value="2" />Land
+									Commander<br />
+									<input type="radio" name="gameController" value="3" />Sea
+									Commander<br />
+								</td>
+							</tr>
+							<tr>
+								<td>Team Password</td>
+								<td>
+									<input
+										name="gameTeamPassword"
+										type="text"
+										value="password"
+										id="gameTeamPassword"
+										required
+									/>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<br /><input type="submit" name="Submit" value="Game Login" />
+								</td>
+							</tr>
+						</table>
+					</form>
+				</td>
+				<td style="vertical-align: top">
+					<h3
+						id="DatabaseConnectionTag"
+						style="position: relative; float: left"
+					>
+						Database Connection Status: Loading...
+					</h3>
+				</td>
+				<td style="position: relative; float: right">
+					<H3>Teacher Login</H3>
+					<form
+						name="adminLogin"
+						method="post"
+						id="adminLogin"
+						action="/adminLoginVerify"
+					>
+						<table>
+							<tr>
+								<td>Section</td>
+								<td>
+									<input
+										name="adminSection"
+										type="text"
+										id="adminSection"
+										placeholder="ex: m1a1"
+										autofocus="autofocus"
+										required
+									/>
+								</td>
+							</tr>
+							<tr>
+								<td>Teacher Last Name</td>
+								<td>
+									<input
+										name="adminInstructor"
+										type="text"
+										id="adminInstructor"
+										placeholder="ex: Smith"
+										required
+									/>
+								</td>
+							</tr>
+							<tr>
+								<td>Password</td>
+								<td>
+									<input
+										name="adminPassword"
+										type="password"
+										id="adminPassword"
+										required
+									/>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<br /><input
+										type="submit"
+										name="Submit"
+										value="Admin Login"
+									/>
+								</td>
+							</tr>
+						</table>
+					</form>
+				</td>
+			</tr>
+		</table>
+	</body>
+	<script>
+		let getDatabaseStatus = new XMLHttpRequest();
+		getDatabaseStatus.onreadystatechange = function() {
+			if (this.readyState === 4 && this.status === 200) {
+				document.getElementById("DatabaseConnectionTag").innerHTML =
+					"Database: " + this.response;
 
+				//TODO: fade this out slowly
+				setTimeout(() => {
+					if (this.response === "Connected") {
+						document.getElementById("DatabaseConnectionTag").innerHTML = "";
+					}
+				}, 1500);
+			}
+		};
+		getDatabaseStatus.open("GET", "/databaseStatus", true);
+		getDatabaseStatus.send();
 
+		function getUrlVars() {
+			var vars = {};
+			var parts = window.location.href.replace(
+				/[?&]+([^=&]+)=([^&]*)/gi,
+				function(m, key, value) {
+					vars[key] = value;
+				}
+			);
+			return vars;
+		}
 
+		function getUrlParam(parameter, defaultvalue) {
+			var urlparameter = defaultvalue;
+			if (window.location.href.indexOf(parameter) > -1) {
+				urlparameter = getUrlVars()[parameter];
+			}
+			return urlparameter;
+		}
 
-
-  </body>
-  <script>
-    let getDatabaseStatus = new XMLHttpRequest();
-    getDatabaseStatus.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            if (this.response == "Success") {
-              document.getElementById('DatabaseConnectionTag').innerHTML = "Database Connection Status: <Green>Success</Green>";
-            } else {
-              document.getElementById('DatabaseConnectionTag').innerHTML = "Database Connection Status: <Red>Failed</Red>";
-            }
-            
-        }
-    };
-    getDatabaseStatus.open("GET", "/databaseStatus", true);
-    getDatabaseStatus.send();
-
-    function getUrlVars() {
-        var vars = {};
-        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-            vars[key] = value;
-        });
-        return vars;
-    }
-
-    function getUrlParam(parameter, defaultvalue){
-        var urlparameter = defaultvalue;
-        if(window.location.href.indexOf(parameter) > -1){
-            urlparameter = getUrlVars()[parameter];
-            }
-        return urlparameter;
-    }
-
-    switch (getUrlParam('error')) {
-        case "login":
-          document.getElementById('formFeedback').innerHTML = "Login Credentials Failed";
-          break;
-        case "access":
-          document.getElementById('formFeedback').innerHTML = "Unauthenticated/Unauthorized Access";
-          break;
-        case "unkownGameAccess":
-          document.getElementById('formFeedback').innerHTML = "Unauthenticated Game Access";
-          break;
-        case "badRequest":
-          document.getElementById('formFeedback').innerHTML = "Bad Request was Given";
-          break;
-        case "gameNotActive":
-          document.getElementById('formFeedback').innerHTML = "Teacher has Disabled the Game";
-          break;
-        case "alreadyLoggedIn":
-          document.getElementById('formFeedback').innerHTML = "That controller is already logged in.";
-          break;
-        case "database":
-          document.getElementById('formFeedback').innerHTML = "Database had a failure.";
-          break;
-    }
-  </script>
+		switch (getUrlParam("error")) {
+			case "login":
+				document.getElementById("formFeedback").innerHTML =
+					"Login Credentials Failed";
+				break;
+			case "access":
+				document.getElementById("formFeedback").innerHTML =
+					"Unauthenticated/Unauthorized Access";
+				break;
+			case "unkownGameAccess":
+				document.getElementById("formFeedback").innerHTML =
+					"Unauthenticated Game Access";
+				break;
+			case "badRequest":
+				document.getElementById("formFeedback").innerHTML =
+					"Bad Request was Given";
+				break;
+			case "gameNotActive":
+				document.getElementById("formFeedback").innerHTML =
+					"Teacher has Disabled the Game";
+				break;
+			case "alreadyLoggedIn":
+				document.getElementById("formFeedback").innerHTML =
+					"That controller is already logged in.";
+				break;
+			case "database":
+				document.getElementById("formFeedback").innerHTML =
+					"Database had a failure.";
+				break;
+		}
+	</script>
 </html>

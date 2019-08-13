@@ -21,7 +21,7 @@ const {
 } = require("./constants");
 
 //Database Pool
-const promisePool = require("./database").promise();
+const promisePool = require("./database");
 
 //Internal Functions
 const getGameActiveReal = async (conn, gameId) => {
@@ -117,11 +117,13 @@ const getTeamShopItems = async (conn, gameId, gameTeam) => {
 };
 
 const logout = async socket => {
-	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3; //Assume we have this, if this method is ever called (from sockets)
 	const loginField = "game" + gameTeam + "Controller" + gameController;
 	const queryString = "UPDATE games SET ?? = 0 WHERE gameId = ?";
 	const inserts = [loginField, gameId];
-	await promisePool.query(queryString, inserts);
+	try {
+		await promisePool.query(queryString, inserts);
+	} catch (error) {}
 };
 
 const giveInitialGameState = async socket => {
@@ -316,6 +318,7 @@ const piece = (
 };
 
 const generateDefaultPieceValues = gameId => {
+	//TODO: externalize this, make additional pieces for containers (need to know parent id after insert....)
 	return [
 		piece(gameId, "Blue", "Tank", 0),
 		piece(gameId, "Blue", "Plane", 0),
@@ -331,9 +334,15 @@ const generateDefaultPieceValues = gameId => {
 };
 
 //Exposed / Exported Functions
-exports.gameReset = async (req, callback) => {
+exports.gameReset = async (req, res) => {
+	if (!req.session.ir3 || !req.session.ir3.teacher || !req.session.ir3.gameId) {
+		res.status(403).redirect("/index.html?error=access");
+		return;
+	}
+
+	const { gameId } = req.session.ir3;
+
 	try {
-		const { gameId } = req.session.ir3;
 		const conn = await promisePool.getConnection();
 		const gameInfo = await getGameInfo(conn, gameId);
 		const { gameSection, gameInstructor, gameAdminPassword } = gameInfo;
@@ -351,20 +360,19 @@ exports.gameReset = async (req, callback) => {
 		inserts = [defaultPieceValues];
 		await conn.query(queryString, inserts);
 
-		await conn.release();
+		conn.release();
 
-		callback(true);
+		res.redirect("/teacher.html?gameReset=success");
 	} catch (error) {
-		console.log(error);
-		callback(false);
+		res.status(500).redirect("/teacher.html?gameReset=failed");
 	}
 };
 
-exports.adminLoginVerify = async (req, callback) => {
+exports.adminLoginVerify = async (req, res) => {
 	const { adminSection, adminInstructor, adminPassword } = req.body;
 
 	if (!adminSection || !adminInstructor || !adminPassword) {
-		callback("/index.html?error=badRequest");
+		res.redirect("/index.html?error=badRequest");
 		return;
 	}
 
@@ -375,7 +383,7 @@ exports.adminLoginVerify = async (req, callback) => {
 		inputPasswordHash == CourseDirectorPasswordHash
 	) {
 		req.session.ir3 = { courseDirector: true };
-		callback("/courseDirector.html");
+		res.redirect("/courseDirector.html");
 		return;
 	}
 
@@ -385,7 +393,7 @@ exports.adminLoginVerify = async (req, callback) => {
 	conn.release();
 
 	if (gameInfo["gameAdminPassword"] != inputPasswordHash) {
-		callback("/index.html?error=login");
+		res.redirect("/index.html?error=login");
 		return;
 	}
 
@@ -395,11 +403,11 @@ exports.adminLoginVerify = async (req, callback) => {
 		adminSection, //same name = don't need : inside the object...
 		adminInstructor
 	};
-	callback(`/teacher.html`);
+	res.redirect(`/teacher.html`);
 	return;
 };
 
-exports.gameLoginVerify = async (req, callback) => {
+exports.gameLoginVerify = async (req, res, callback) => {
 	const {
 		gameSection,
 		gameInstructor,
@@ -415,7 +423,7 @@ exports.gameLoginVerify = async (req, callback) => {
 		!gameTeamPassword ||
 		!gameController
 	) {
-		callback("/index.html?error=badRequest");
+		res.redirect("/index.html?error=badRequest");
 		return;
 	}
 
@@ -428,11 +436,11 @@ exports.gameLoginVerify = async (req, callback) => {
 	const gameInfo = await getGameInfo(conn, gameId);
 
 	if (gameInfo["gameActive"] != 1) {
-		callback("/index.html?error=gameNotActive");
+		res.redirect("/index.html?error=gameNotActive");
 	} else if (gameInfo[commanderLoginField] != 0) {
-		callback("/index.html?error=alreadyLoggedIn");
+		res.redirect("/index.html?error=alreadyLoggedIn");
 	} else if (inputPasswordHash != gameInfo[passwordHashToCheck]) {
-		callback("/index.html?error=login");
+		res.redirect("/index.html?error=login");
 	} else {
 		await markLoggedIn(conn, gameId, commanderLoginField);
 
@@ -442,94 +450,146 @@ exports.gameLoginVerify = async (req, callback) => {
 			gameController: gameController
 		};
 
-		callback("/game.html");
+		res.redirect("/game.html");
 	}
 
 	conn.release();
 };
 
-exports.getGames = async (req, callback) => {
+exports.getGames = async (req, res) => {
+	if (!req.session.ir3 || !req.session.ir3.courseDirector) {
+		res.redirect("/index.html?error=access");
+		return;
+	}
+
 	try {
 		const queryString =
 			"SELECT gameId, gameSection, gameInstructor, gameActive FROM games";
 		const [results, fields] = await promisePool.query(queryString);
-		callback(results);
+		res.send(results);
 	} catch (error) {
-		callback([]);
+		res.send([
+			{
+				gameId: 69,
+				gameSection: "DATABASE",
+				gameInstructor: "FAILED",
+				gameActive: 0
+			}
+		]);
 	}
 };
 
-exports.getGameActive = async (req, callback) => {
-	const { gameId } = req.session.ir3;
-	const conn = await promisePool.getConnection();
-	const gameActive = await getGameActiveReal(conn, gameId);
-	await conn.release();
-	callback(gameActive);
-};
+exports.getGameActive = async (req, res) => {
+	if (!req.session.ir3 || !req.session.ir3.teacher || !req.session.ir3.gameId) {
+		res.sendStatus(403);
+		return;
+	}
 
-exports.databaseStatus = async (req, callback) => {
+	const { gameId } = req.session.ir3;
+
 	try {
 		const conn = await promisePool.getConnection();
-		if (conn) {
-			callback(true);
-			await conn.release();
-		} else {
-			callback(false);
-		}
+		const gameActive = await getGameActiveReal(conn, gameId);
+		conn.release();
+		res.send(JSON.stringify(gameActive));
 	} catch (error) {
-		callback(false);
+		res.sendStatus(500);
 	}
 };
 
-exports.toggleGameActive = async (req, callback) => {
-	const { gameId } = req.session.ir3;
-	const queryString =
-		"UPDATE games SET gameActive = (gameActive + 1) % 2, game0Controller0 = 0, game0Controller1 = 0, game0Controller2 = 0, game0Controller3 = 0, game1Controller0 = 0, game1Controller1 = 0, game1Controller2 = 0, game1Controller3 = 0 WHERE gameId = ?";
-	const inserts = [gameId];
-	await promisePool.query(queryString, inserts);
-	callback();
+exports.databaseStatus = async (req, res) => {
+	try {
+		const conn = await promisePool.getConnection();
+		res.send("Connected");
+		conn.release();
+	} catch (error) {
+		res.send(error.code);
+	}
 };
 
-exports.insertDatabaseTables = async (req, callback) => {
+exports.toggleGameActive = async (req, res) => {
+	if (!req.session.ir3 || !req.session.ir3.teacher || !req.session.ir3.gameId) {
+		res.sendStatus(403);
+		return;
+	}
+
+	const { gameId } = req.session.ir3;
+
+	try {
+		const queryString =
+			"UPDATE games SET gameActive = (gameActive + 1) % 2, game0Controller0 = 0, game0Controller1 = 0, game0Controller2 = 0, game0Controller3 = 0, game1Controller0 = 0, game1Controller1 = 0, game1Controller2 = 0, game1Controller3 = 0 WHERE gameId = ?";
+		const inserts = [gameId];
+		await promisePool.query(queryString, inserts);
+		res.sendStatus(200);
+	} catch (error) {
+		res.sendStatus(500);
+	}
+};
+
+exports.insertDatabaseTables = async (req, res) => {
+	if (!req.session.ir3 || !req.session.ir3.courseDirector) {
+		res.redirect("/index.html?error=access");
+		return;
+	}
+
 	try {
 		const queryString = fs
 			.readFileSync("./serverItems/sqlScripts/tableInsert.sql")
 			.toString();
 		await promisePool.query(queryString);
-		callback("success");
+		res.redirect("/courseDirector.html?initializeDatabase=success");
 	} catch (error) {
-		callback("failed");
+		res.redirect("/courseDirector.html?initializeDatabase=failed");
 	}
 };
 
-exports.gameAdd = async (req, callback) => {
+exports.gameAdd = async (req, res) => {
+	if (!req.session.ir3 || !req.session.ir3.courseDirector) {
+		res.redirect(403, "/index.html?error=access");
+		return;
+	}
+
 	const { adminSection, adminInstructor, adminPassword } = req.body;
 	if (!adminSection || !adminInstructor || !adminPassword) {
-		callback(false);
+		//TODO: better errors on CD (could have same as index) (status?)
+		res.redirect("/index.html?error=badRequest");
 		return;
 	}
-	const adminPasswordHashed = md5(adminPassword);
-	const queryString =
-		"INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?)";
-	const inserts = [adminSection, adminInstructor, adminPasswordHashed];
-	await promisePool.query(queryString, inserts);
-	callback(true);
+
+	try {
+		const adminPasswordHashed = md5(adminPassword);
+		const queryString =
+			"INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?)";
+		const inserts = [adminSection, adminInstructor, adminPasswordHashed];
+		await promisePool.query(queryString, inserts);
+		res.redirect("/courseDirector.html?gameAdd=success");
+	} catch (error) {
+		//TODO: better error logging probably (more specific errors on CD) (on other functions too)
+		res.redirect(500, "/courseDirector.html?gameAdd=failed");
+	}
 };
 
-exports.gameDelete = async (req, callback) => {
-	const { gameId } = req.body;
-	if (!gameId) {
-		callback(false);
+exports.gameDelete = async (req, res) => {
+	if (!req.session.ir3 || !req.session.ir3.courseDirector) {
+		res.status(403).redirect("/index.html?error=access");
 		return;
 	}
 
-	const conn = await promisePool.getConnection();
+	const { gameId } = req.body;
+	if (!gameId) {
+		res.status(400).redirect("/courseDirector.html?gameDelete=failed");
+		return;
+	}
 
-	await gameDeleteReal(conn, gameId);
-
-	await conn.release();
-
-	callback(true);
+	try {
+		const conn = await promisePool.getConnection();
+		await gameDeleteReal(conn, gameId);
+		conn.release();
+		res.redirect("/courseDirector.html?gameDelete=success");
+	} catch (error) {
+		//TODO: error logging
+		res.status(500).redirect("/courseDirector.html?gameDelete=failed");
+	}
 };
 
 exports.socketSetup = socket => {
@@ -546,14 +606,14 @@ exports.socketSetup = socket => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	//Room for the Team
-	// socket.join("game" + gameId + "team" + gameTeam);
+	socket.join("game" + gameId + "team" + gameTeam);
 
 	//Room for the Indiviual Controller
-	// socket.join(
-	// 	"game" + gameId + "team" + gameTeam + "controller" + gameController
-	// );
+	socket.join(
+		"game" + gameId + "team" + gameTeam + "controller" + gameController
+	);
 
-	//Send the initial game state (TODO: Server Side Rendering with react?)
+	//TODO: Server Side Rendering with react?
 	giveInitialGameState(socket);
 
 	socket.on("shopPurchaseRequest", shopItemTypeId => {
@@ -568,13 +628,7 @@ exports.socketSetup = socket => {
 		shopConfirmPurchase(socket);
 	});
 
-	socket.on("disconnect", async () => {
-		//TODO: error handle if session isn't there?
-		try {
-			await logout(socket);
-		} catch (error) {
-			console.log(error);
-			console.log("logout error");
-		}
+	socket.on("disconnect", () => {
+		logout(socket);
 	});
 };
