@@ -108,3 +108,25 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Version
 
 Version 3.1.0
+
+## TODO
+
+- K3 Wiki
+  - Gamerules / Images / Controls (ask MSS team)
+- Frontend
+  - Bottom Bar Controls
+  - Popups (refuel, container, battles)
+  - Phases
+  - Distance Matrix Imported
+- Backend
+  - PM2 or other to monitor / auto-restart (Azure may have this)
+  - Middleware / reverse proxy to serve static files
+  - Containerize / Dockerize for easier deployment?
+  - External Session Store (see Express/Azure docs)
+  - Better error handling (try/catch) and logging (to external file?)
+  - OOP on the backend, abstract/easy to read code > potential performance?
+  - bcrypt instead of md5
+- Testing
+  - Set up testing early and use test-driven development
+
+Please [report](https://gitreports.com/issue/island-rush/K3.1) any issues.
