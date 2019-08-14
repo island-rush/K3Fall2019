@@ -18,11 +18,18 @@ const appStyle = {
 	width: "100%"
 };
 
+const isPlanningStyle = {
+	backgroundColor: "yellow"
+};
+
 class App extends Component {
 	render() {
 		return (
 			<div
-				style={appStyle}
+				style={{
+					...appStyle,
+					...(this.props.gameboardMeta.planning.active ? isPlanningStyle : "")
+				}}
 				onClick={event => {
 					event.preventDefault();
 					if (this.props.selectedMenu === 0) {
@@ -45,10 +52,14 @@ class App extends Component {
 
 App.propTypes = {
 	selectPosition: PropTypes.func.isRequired,
-	menuSelect: PropTypes.func.isRequired
+	menuSelect: PropTypes.func.isRequired,
+	gameboardMeta: PropTypes.object.isRequired
 };
 
-const mapStateToProps = ({ selectedMenu }) => ({ selectedMenu: selectedMenu });
+const mapStateToProps = ({ selectedMenu, gameboardMeta }) => ({
+	selectedMenu,
+	gameboardMeta
+});
 
 const mapActionsToProps = {
 	selectPosition: selectPosition,

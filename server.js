@@ -16,7 +16,7 @@ app.use(session); //App has access to sessions
 app.use(express.urlencoded()); //parses data and puts into req.body
 
 //Server Routing
-//TODO: Use middleware or reverse proxy to serve static files
+//TODO: Use middleware or reverse proxy to serve static files -> aka, anything with res.sendFile()
 app.use("/", require("./serverItems/router"));
 app.use(express.static(__dirname + "/client/build"));
 

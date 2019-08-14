@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 const leftcontrolsStyle = {
 	background: "grey",
@@ -45,6 +46,7 @@ class Leftcontrols extends Component {
 				<div
 					title={buttonTitles.start}
 					style={{ ...buttonStyle, ...buttonImages.start }}
+					onClick={() => this.props.startPlanning()}
 				/>
 				<div
 					title={buttonTitles.cancel}
@@ -66,5 +68,9 @@ class Leftcontrols extends Component {
 		);
 	}
 }
+
+Leftcontrols.propTypes = {
+	startPlanning: PropTypes.func.isRequired
+};
 
 export default Leftcontrols;

@@ -3,7 +3,8 @@ import {
 	SET_USERFEEDBACK,
 	SHOP_REFUND,
 	SHOP_PURCHASE,
-	SHOP_TRANSFER
+	SHOP_TRANSFER,
+	START_PLANNING
 } from "../actions/types";
 
 const initialUserFeedback = "Loading...";
@@ -20,6 +21,8 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "Purchased the item!";
 		case SHOP_TRANSFER:
 			return "Confirmed the purchases...check the inventory!";
+		case START_PLANNING:
+			return "Now Planning: Select positions to create the plan...";
 		default:
 			return state;
 	}

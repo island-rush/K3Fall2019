@@ -2,7 +2,9 @@ import {
 	MENU_SELECT,
 	POSITION_SELECT,
 	PIECE_CLICK,
-	PIECE_CLEAR_SELECTION
+	PIECE_CLEAR_SELECTION,
+	START_PLANNING,
+	SET_USERFEEDBACK
 } from "./types";
 
 export const shopPurchaseRequest = shopItemTypeId => {
@@ -18,7 +20,7 @@ export const shopRefundRequest = shopItemId => {
 };
 
 export const shopConfirmPurchase = () => {
-	return (dispath, getState, emit) => {
+	return (dispatch, getState, emit) => {
 		emit("shopConfirmPurchase");
 	};
 };
@@ -37,6 +39,22 @@ export const selectPiece = selectedPiece => {
 		type: PIECE_CLICK,
 		payload: {
 			selectedPieceId: selectedPiece.pieceId
+		}
+	};
+};
+
+export const startPlanning = () => {
+	return (dispatch, getState, emit) => {
+		const { gameboardMeta } = getState();
+
+		//TODO: other checks for if planning is okay, "disable" the button if no piece selected as well
+		if (gameboardMeta.selectedPiece !== -1) {
+			dispatch({ type: START_PLANNING });
+		} else {
+			dispatch({
+				type: SET_USERFEEDBACK,
+				payload: { userFeedback: "Must select a piece to begin planning" }
+			});
 		}
 	};
 };

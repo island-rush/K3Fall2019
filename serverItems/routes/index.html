@@ -240,7 +240,7 @@
 	<script>
 		let getDatabaseStatus = new XMLHttpRequest();
 		getDatabaseStatus.onreadystatechange = function() {
-			if (this.readyState === 4 && this.status === 200) {
+			if (this.readyState === 4) {
 				document.getElementById("DatabaseConnectionTag").innerHTML =
 					"Database: " + this.response;
 

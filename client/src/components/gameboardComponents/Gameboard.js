@@ -5,6 +5,8 @@ import { selectPosition } from "../../redux/actions/userActions";
 import { HexGrid, Layout, Hexagon } from "react-hexgrid";
 import { typeHighLow } from "../constants";
 import Patterns from "./Patterns";
+import BattlePopup from "./BattlePopup";
+import NewsAlertPopup from "./NewsAlertPopup";
 
 const gameboardStyle = {
 	backgroundColor: "blue",
@@ -131,6 +133,8 @@ class Gameboard extends Component {
 					</Layout>
 					<Patterns />
 				</HexGrid>
+				<NewsAlertPopup newsAlert={this.props.newsAlert} />
+				<BattlePopup />
 			</div>
 		);
 	}
@@ -139,12 +143,14 @@ class Gameboard extends Component {
 Gameboard.propTypes = {
 	gameboard: PropTypes.object.isRequired,
 	selectedPosition: PropTypes.number.isRequired,
-	selectPosition: PropTypes.func.isRequired
+	selectPosition: PropTypes.func.isRequired,
+	newsAlert: PropTypes.object.isRequired
 };
 
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
-	gameboard: gameboard,
-	selectedPosition: gameboardMeta.selectedPosition
+	gameboard,
+	selectedPosition: gameboardMeta.selectedPosition,
+	newsAlert: gameboardMeta.newsAlert
 });
 
 const mapActionsToProps = {
