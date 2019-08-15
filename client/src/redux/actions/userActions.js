@@ -35,13 +35,15 @@ export const selectPosition = selectedPositionId => {
 
 		//figure out if planning (constrain what to select)
 		if (gameboardMeta.planning.active) {
-			//TODO: need to be adjacent
-			dispatch({
-				type: POSITION_SELECT,
-				payload: {
-					selectedPositionId
-				}
-			});
+			//TODO: need to be adjacent, can't be -1?
+			if (selectedPositionId !== -1) {
+				dispatch({
+					type: POSITION_SELECT,
+					payload: {
+						selectedPositionId
+					}
+				});
+			}
 		} else {
 			//select anything
 			dispatch({

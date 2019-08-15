@@ -20,6 +20,8 @@ const {
 	typeFuel
 } = require("./constants");
 
+const distanceMatrix = require("./distanceMatrix").distanceMatrix;
+
 const initialTopPiecesGenerator = require("./initialTopPieces")
 	.generateDefaultPieces; //TODO: This is wordy / weird, fix later
 
@@ -153,7 +155,8 @@ const giveInitialGameState = async socket => {
 			},
 			shopItems,
 			invItems,
-			gameboardPieces
+			gameboardPieces,
+			distanceMatrix: JSON.stringify(distanceMatrix)
 		}
 	};
 
