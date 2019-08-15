@@ -2,7 +2,9 @@ import {
 	POSITION_SELECT,
 	PIECE_CLICK,
 	PIECE_CLEAR_SELECTION,
-	START_PLANNING
+	START_PLANNING,
+	CANCEL_PLANNING,
+	UNDO_PLANNING
 } from "../actions/types";
 
 const initialGameboardMeta = {
@@ -26,7 +28,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 	let stateDeepCopy = JSON.parse(JSON.stringify(state));
 	switch (type) {
 		case POSITION_SELECT:
-			stateDeepCopy.selectedPosition = parseInt(payload.positionId);
+			stateDeepCopy.selectedPosition = parseInt(payload.selectedPositionId);
 			return stateDeepCopy;
 		case PIECE_CLICK:
 			stateDeepCopy.selectedPiece = parseInt(payload.selectedPieceId);
@@ -36,6 +38,14 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			return stateDeepCopy;
 		case START_PLANNING:
 			stateDeepCopy.planning.active = true;
+			return stateDeepCopy;
+		case CANCEL_PLANNING:
+			stateDeepCopy.planning.active = false;
+			stateDeepCopy.planning.moves = [];
+			stateDeepCopy.selectedPiece = -1;
+			return stateDeepCopy;
+		case UNDO_PLANNING:
+			stateDeepCopy.planning.moves.pop();
 			return stateDeepCopy;
 		default:
 			return state;

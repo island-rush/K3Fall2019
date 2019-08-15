@@ -22,6 +22,10 @@ const bottomLevelStyle = {
 	height: "48%"
 };
 
+const selectedStyle = {
+	boxShadow: "0px 0px 0px 2px rgba(255, 255, 255, 0.8) inset"
+};
+
 const zIndexLevels = [{ zIndex: 5 }, { zIndex: 10 }];
 
 class Piece extends Component {
@@ -29,7 +33,7 @@ class Piece extends Component {
 		const contents =
 			this.props.piece.pieceContents.pieces.length === 0 ? null : (
 				<Container
-					isOpen={this.props.isOpen}
+					selected={this.props.selected}
 					pieces={this.props.piece.pieceContents.pieces}
 					pieceClick={this.props.pieceClick}
 				/>
@@ -38,9 +42,10 @@ class Piece extends Component {
 		const pieceCombinedStyle = {
 			...pieceStyle,
 			...(this.props.topLevel ? topLevelStyle : bottomLevelStyle),
-			...zIndexLevels[this.props.isOpen ? 1 : 0],
+			...zIndexLevels[this.props.selected ? 1 : 0],
 			...typeImages[this.props.piece.pieceTypeId],
-			...typeTeamBorders[this.props.piece.pieceTeamId]
+			...typeTeamBorders[this.props.piece.pieceTeamId],
+			...(this.props.selected ? selectedStyle : "")
 		};
 
 		const title = `${typeNames[this.props.piece.pieceTypeId]}\nMoves: ${
@@ -66,7 +71,7 @@ class Piece extends Component {
 Piece.propTypes = {
 	piece: PropTypes.object.isRequired,
 	topLevel: PropTypes.bool.isRequired,
-	isOpen: PropTypes.bool.isRequired,
+	selected: PropTypes.bool.isRequired,
 	pieceClick: PropTypes.func.isRequired
 };
 

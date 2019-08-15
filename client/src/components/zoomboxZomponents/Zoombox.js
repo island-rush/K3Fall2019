@@ -31,7 +31,7 @@ class Zoombox extends Component {
 					(piece, index) => (
 						<Piece
 							pieceClick={this.props.selectPiece}
-							isOpen={this.props.selectedPiece === piece.pieceId}
+							selected={this.props.selectedPiece === piece.pieceId}
 							topLevel={true}
 							key={index}
 							piece={piece}

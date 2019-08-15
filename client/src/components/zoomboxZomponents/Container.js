@@ -20,13 +20,13 @@ class Container extends Component {
 				topLevel={false}
 				key={index}
 				piece={piece}
-				isOpen={false} //pieces inside containers are never open
+				selected={false} //pieces inside containers are never open (TODO: change values to distinguish between selected and isOpen (selecting multiple pieces, other actions...))
 			/>
 		));
 
 		return (
 			<div
-				style={this.props.isOpen ? containerStyle : invisibleStyle}
+				style={this.props.selected ? containerStyle : invisibleStyle}
 				title={""}
 			>
 				{pieces}
@@ -37,7 +37,7 @@ class Container extends Component {
 
 Container.propTypes = {
 	pieces: PropTypes.array.isRequired,
-	isOpen: PropTypes.bool.isRequired,
+	selected: PropTypes.bool.isRequired,
 	pieceClick: PropTypes.func.isRequired
 };
 

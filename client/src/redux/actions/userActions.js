@@ -4,7 +4,11 @@ import {
 	PIECE_CLICK,
 	PIECE_CLEAR_SELECTION,
 	START_PLANNING,
-	SET_USERFEEDBACK
+	SET_USERFEEDBACK,
+	CANCEL_PLANNING,
+	UNDO_PLANNING,
+	OPEN_CONTAINER_PLANNING,
+	CONFIRM_PLANNING
 } from "./types";
 
 export const shopPurchaseRequest = shopItemTypeId => {
@@ -26,19 +30,50 @@ export const shopConfirmPurchase = () => {
 };
 
 export const selectPosition = selectedPositionId => {
-	return {
-		type: POSITION_SELECT,
-		payload: {
-			positionId: selectedPositionId
+	return (dispatch, getState, emit) => {
+		const { gameboardMeta } = getState();
+
+		//figure out if planning (constrain what to select)
+		if (gameboardMeta.planning.active) {
+			//TODO: need to be adjacent
+			dispatch({
+				type: POSITION_SELECT,
+				payload: {
+					selectedPositionId
+				}
+			});
+		} else {
+			//select anything
+			dispatch({
+				type: POSITION_SELECT,
+				payload: {
+					selectedPositionId
+				}
+			});
 		}
 	};
 };
 
 export const selectPiece = selectedPiece => {
+	return (dispatch, getState, emit) => {
+		const { gameboardMeta } = getState();
+
+		if (!gameboardMeta.planning.active) {
+			dispatch({
+				type: PIECE_CLICK,
+				payload: {
+					selectedPieceId: selectedPiece.pieceId
+				}
+			});
+		}
+	};
+};
+
+const setUserFeedback = userFeedback => {
 	return {
-		type: PIECE_CLICK,
+		type: SET_USERFEEDBACK,
 		payload: {
-			selectedPieceId: selectedPiece.pieceId
+			userFeedback
 		}
 	};
 };
@@ -49,30 +84,68 @@ export const startPlanning = () => {
 
 		//TODO: other checks for if planning is okay, "disable" the button if no piece selected as well
 		if (gameboardMeta.selectedPiece !== -1) {
-			dispatch({ type: START_PLANNING });
+			if (gameboardMeta.planning.active) {
+				dispatch(setUserFeedback("Already planning a move..."));
+			} else {
+				dispatch({ type: START_PLANNING });
+			}
 		} else {
+			dispatch(setUserFeedback("Must select a piece to plan a move..."));
+		}
+	};
+};
+
+export const cancelPlanning = () => {
+	return (dispatch, getState, emit) => {
+		const { gameboardMeta } = getState();
+
+		if (gameboardMeta.planning.active) {
+			dispatch({ type: CANCEL_PLANNING });
+		}
+	};
+};
+
+export const confirmPlanning = () => {
+	return (dispatch, getState, emit) => {
+		//get the plans from the state and emit them to the server probably
+	};
+};
+
+export const undoPlanning = () => {
+	return {
+		type: UNDO_PLANNING
+	};
+};
+
+export const openContainerPlanning = () => {
+	return (dispatch, getState, emit) => {
+		//whatever this function eventually becomes...
+	};
+};
+
+export const clearPieceSelection = () => {
+	return (dispatch, getState, emit) => {
+		const { gameboardMeta } = getState();
+
+		if (!gameboardMeta.planning.active) {
 			dispatch({
-				type: SET_USERFEEDBACK,
-				payload: { userFeedback: "Must select a piece to begin planning" }
+				type: PIECE_CLEAR_SELECTION
 			});
 		}
 	};
 };
 
-export const clearPieceSelection = () => {
-	return {
-		type: PIECE_CLEAR_SELECTION,
-		payload: {
-			selectedPieceId: -1
-		}
-	};
-};
-
 export const menuSelect = selectedMenuId => {
-	return {
-		type: MENU_SELECT,
-		payload: {
-			selectedMenuId: selectedMenuId
+	return (dispatch, getState, emit) => {
+		const { gameboardMeta } = getState();
+
+		if (!gameboardMeta.planning.active) {
+			dispatch({
+				type: MENU_SELECT,
+				payload: {
+					selectedMenuId
+				}
+			});
 		}
 	};
 };

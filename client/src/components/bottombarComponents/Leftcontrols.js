@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { startPlanning, cancelPlanning } from "../../redux/actions/userActions";
 
 const leftcontrolsStyle = {
 	background: "grey",
@@ -51,6 +53,7 @@ class Leftcontrols extends Component {
 				<div
 					title={buttonTitles.cancel}
 					style={{ ...buttonStyle, ...buttonImages.cancel }}
+					onClick={() => this.props.cancelPlanning()}
 				/>
 				<div
 					title={buttonTitles.undo}
@@ -70,7 +73,21 @@ class Leftcontrols extends Component {
 }
 
 Leftcontrols.propTypes = {
-	startPlanning: PropTypes.func.isRequired
+	startPlanning: PropTypes.func.isRequired,
+	cancelPlanning: PropTypes.func.isRequired,
+	planning: PropTypes.object.isRequired
 };
 
-export default Leftcontrols;
+const mapStateToProps = ({ gameboardMeta }) => ({
+	planning: gameboardMeta.planning
+});
+
+const mapActionsToProps = {
+	startPlanning,
+	cancelPlanning
+};
+
+export default connect(
+	mapStateToProps,
+	mapActionsToProps
+)(Leftcontrols);

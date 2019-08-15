@@ -3,7 +3,6 @@ import LeftControls from "./Leftcontrols";
 import UserFeedback from "./Userfeedback";
 import MainControl from "./Maincontrol";
 import { connect } from "react-redux";
-import { startPlanning } from "../../redux/actions/userActions";
 
 const bottombarStyle = {
 	backgroundColor: "Green",
@@ -23,7 +22,7 @@ class Bottombar extends Component {
 					event.stopPropagation();
 				}}
 			>
-				<LeftControls startPlanning={this.props.startPlanning} />
+				<LeftControls />
 				<UserFeedback userFeedback={this.props.userFeedback} />
 				<MainControl />
 			</div>
@@ -35,11 +34,4 @@ const mapStateToProps = ({ userFeedback }) => ({
 	userFeedback: userFeedback
 });
 
-const mapActionsToProps = {
-	startPlanning
-};
-
-export default connect(
-	mapStateToProps,
-	mapActionsToProps
-)(Bottombar);
+export default connect(mapStateToProps)(Bottombar);
