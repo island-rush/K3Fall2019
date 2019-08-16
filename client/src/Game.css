@@ -41,6 +41,11 @@ svg g polygon {
 }
 .plannedPos polygon {
 	z-index: 10;
-	stroke: rgb(196, 3, 3);
+	stroke: rgb(255, 0, 212);
+	stroke-width: 0.3;
+}
+.containerPos polygon {
+	z-index: 10;
+	stroke: rgb(238, 255, 0);
 	stroke-width: 0.3;
 }

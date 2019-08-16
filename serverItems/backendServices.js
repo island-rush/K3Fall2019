@@ -17,10 +17,12 @@ const {
 	shopItemTypeCosts,
 	typeNameIds,
 	typeMoves,
-	typeFuel
+	typeFuel,
+	PLAN_WAS_CONFIRMED,
+	DELETE_PLAN
 } = require("./constants");
 
-const distanceMatrix = require("./distanceMatrix").distanceMatrix;
+const { distanceMatrix } = require("./distanceMatrix");
 
 const initialTopPiecesGenerator = require("./initialTopPieces")
 	.generateDefaultPieces; //TODO: This is wordy / weird, fix later
@@ -67,6 +69,19 @@ const getGameInfo = async (conn, gameId) => {
 	const inserts = [gameId];
 	const [results, fields] = await conn.query(queryString, inserts);
 	return results[0];
+};
+
+const getPieceInfo = async (conn, pieceId) => {
+	const queryString = "SELECT * FROM pieces WHERE pieceId = ?";
+	const inserts = [pieceId];
+	const [results, fields] = await conn.query(queryString, inserts);
+	return results[0];
+};
+
+const insertPlan = async (conn, move) => {
+	const queryString = "";
+	const inserts = [];
+	const [results, fields] = await conn.query(queryString, inserts);
 };
 
 const markLoggedIn = async (conn, gameId, commanderField) => {
@@ -243,6 +258,7 @@ const deleteShopItem = async (conn, shopItemId) => {
 };
 
 const shopRefundRequest = async (socket, shopItem) => {
+	//TODO: check that these session objects exist before using them
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 	const itemCost = shopItemTypeCosts[shopItem.shopItemTypeId];
 
@@ -296,6 +312,109 @@ const shopConfirmPurchase = async socket => {
 			invItems: results
 		}
 	};
+	socket.emit("serverSendingAction", serverAction);
+};
+
+const sendUserFeedback = async (socket, userFeedback) => {
+	const serverAction = {
+		type: SET_USERFEEDBACK,
+		payload: {
+			userFeedback
+		}
+	};
+	socket.emit("serverSendingAction", serverAction);
+};
+
+const confirmPlan = async (socket, pieceId, plan) => {
+	//plan = moves array, where each move has type and positionId
+	//confirm the plan and report back to the client with a server action
+	//TODO: verify that this user is authorized to make a plan
+	//verify that the piece exists?
+	//verify that this piece belongs to this team? (all those other auths)
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+
+	const conn = await promisePool.getConnection();
+	const gameInfo = await getGameInfo(conn, gameId);
+	const pieceInfo = await getPieceInfo(conn, pieceId);
+
+	const { gameActive } = gameInfo;
+
+	const {
+		pieceGameId,
+		pieceTeamId,
+		piecePositionId,
+		pieceContainerId,
+		pieceTypeId
+	} = pieceInfo;
+
+	//did the piece exists, same team as this one / same game...
+	//make sure plan isnt empty...
+
+	let previousPosition = piecePositionId;
+
+	for (let x = 0; x < plan.length; x++) {
+		//make sure adjacency between positions in the plan...
+		//other checks...piece type and number of moves?
+
+		const { type, positionId } = plan[x];
+
+		//make sure positions are equal for container type
+
+		if (distanceMatrix[previousPosition][positionId] !== 1) {
+			sendUserFeedback(
+				socket,
+				"sent a bad plan, positions were not adjacent..."
+			);
+			return;
+		}
+
+		previousPosition = positionId;
+	}
+
+	//all of the plans checked out and were authorized
+	//send the plan back to the client with confirm action
+
+	//insert all of the plans into the database***
+
+	await conn.release();
+
+	const serverAction = {
+		type: PLAN_WAS_CONFIRMED,
+		payload: {
+			pieceId,
+			plan
+		}
+	};
+
+	socket.emit("serverSendingAction", serverAction);
+};
+
+const deletePlan = async (socket, pieceId) => {
+	//verify that the person is authorized to delete the plan (correct team, game, gameactive)
+	//need lots of other checks in here for full security, assuming that they have a socket for whatever reason
+	//could cut back the security checks for better performance...but not ideal
+
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+
+	const conn = await promisePool.getConnection();
+	const gameInfo = await getGameInfo(conn, gameId);
+	const pieceInfo = await getPieceInfo(conn, pieceId);
+
+	//can still run the query if the plan doesn't exist? (it won't fail...)
+
+	const queryString = "DELETE FROM plans WHERE planPieceId = ?";
+	const inserts = [pieceId];
+	await conn.query(queryString, inserts);
+
+	await conn.release();
+
+	const serverAction = {
+		type: DELETE_PLAN,
+		payload: {
+			pieceId
+		}
+	};
+
 	socket.emit("serverSendingAction", serverAction);
 };
 
@@ -599,6 +718,7 @@ exports.socketSetup = socket => {
 	//TODO: Server Side Rendering with react?
 	giveInitialGameState(socket);
 
+	//TODO: reflect that the argument is a payload, change these to be objects that the server is receiving for continuity
 	socket.on("shopPurchaseRequest", shopItemTypeId => {
 		shopPurchaseRequest(socket, shopItemTypeId);
 	});
@@ -609,6 +729,16 @@ exports.socketSetup = socket => {
 
 	socket.on("shopConfirmPurchase", () => {
 		shopConfirmPurchase(socket);
+	});
+
+	socket.on("confirmPlan", payload => {
+		const { pieceId, plan } = payload;
+		confirmPlan(socket, pieceId, plan);
+	});
+
+	socket.on("deletePlan", payload => {
+		const { pieceId } = payload;
+		deletePlan(socket, pieceId);
 	});
 
 	socket.on("disconnect", () => {

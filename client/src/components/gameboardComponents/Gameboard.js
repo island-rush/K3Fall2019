@@ -93,6 +93,41 @@ const patternSolver = position => {
 
 class Gameboard extends Component {
 	render() {
+		let planningPositions = []; //all of the positions part of a plan
+		let containerPositions = []; //specific positions part of a plan of type container
+
+		for (let x = 0; x < this.props.planning.moves.length; x++) {
+			const { type, positionId } = this.props.planning.moves[x];
+
+			if (!planningPositions.includes(positionId)) {
+				planningPositions.push(positionId);
+			}
+
+			if (type === "container" && !containerPositions.includes(positionId)) {
+				containerPositions.push(positionId);
+			}
+		}
+
+		if (this.props.selectedPiece !== -1) {
+			if (this.props.selectedPiece in this.props.confirmedPlans) {
+				for (
+					let z = 0;
+					z < this.props.confirmedPlans[this.props.selectedPiece].length;
+					z++
+				) {
+					const { type, positionId } = this.props.confirmedPlans[
+						this.props.selectedPiece
+					][z];
+					if (type === "move") {
+						planningPositions.push(positionId);
+					}
+					if (type === "container") {
+						containerPositions.push(positionId);
+					}
+				}
+			}
+		}
+
 		const positions = Object.keys(this.props.gameboard).map(positionIndex => (
 			<Hexagon
 				key={positionIndex}
@@ -115,6 +150,10 @@ class Gameboard extends Component {
 				className={
 					this.props.selectedPosition === parseInt(positionIndex)
 						? "selectedPos"
+						: containerPositions.includes(positionIndex)
+						? "containerPos"
+						: planningPositions.includes(positionIndex)
+						? "plannedPos"
 						: ""
 				}
 			/>
@@ -144,13 +183,19 @@ Gameboard.propTypes = {
 	gameboard: PropTypes.object.isRequired,
 	selectedPosition: PropTypes.number.isRequired,
 	selectPosition: PropTypes.func.isRequired,
-	newsAlert: PropTypes.object.isRequired
+	newsAlert: PropTypes.object.isRequired,
+	planning: PropTypes.object.isRequired,
+	selectedPiece: PropTypes.number.isRequired,
+	confirmedPlans: PropTypes.object.isRequired
 };
 
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 	gameboard,
 	selectedPosition: gameboardMeta.selectedPosition,
-	newsAlert: gameboardMeta.newsAlert
+	newsAlert: gameboardMeta.newsAlert,
+	planning: gameboardMeta.planning,
+	selectedPiece: gameboardMeta.selectedPiece,
+	confirmedPlans: gameboardMeta.confirmedPlans
 });
 
 const mapActionsToProps = {

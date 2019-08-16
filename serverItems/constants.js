@@ -3,6 +3,8 @@ exports.SHOP_PURCHASE = "SHOP_PURCHASE";
 exports.SHOP_REFUND = "SHOP_REFUND";
 exports.SET_USERFEEDBACK = "SET_USERFEEDBACK";
 exports.SHOP_TRANSFER = "SHOP_TRANSFER";
+exports.PLAN_WAS_CONFIRMED = "PLAN_WAS_CONFIRMED";
+exports.DELETE_PLAN = "DELETE_PLAN";
 
 exports.shopItemTypeCosts = {
 	//TypeId: Cost

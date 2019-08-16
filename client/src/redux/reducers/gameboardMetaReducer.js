@@ -4,10 +4,14 @@ import {
 	PIECE_CLEAR_SELECTION,
 	START_PLANNING,
 	CANCEL_PLANNING,
-	UNDO_PLANNING
+	UNDO_PLANNING,
+	PLANNING_SELECT,
+	PLAN_WAS_CONFIRMED,
+	DELETE_PLAN
 } from "../actions/types";
 
 const initialGameboardMeta = {
+	//TODO: change to selectedPositionId and selectedPieceId to better represent the values
 	selectedPosition: -1,
 	selectedPiece: -1,
 	newsAlert: {
@@ -21,7 +25,8 @@ const initialGameboardMeta = {
 	planning: {
 		active: false,
 		moves: []
-	}
+	},
+	confirmedPlans: {}
 };
 
 function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
@@ -47,6 +52,24 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 		case UNDO_PLANNING:
 			stateDeepCopy.planning.moves.pop();
 			return stateDeepCopy;
+		case PLANNING_SELECT:
+			//TODO: move this to userActions to have more checks there within the thunk
+			stateDeepCopy.planning.moves.push({
+				type: "move",
+				positionId: payload.selectedPositionId
+			});
+			return stateDeepCopy;
+		case PLAN_WAS_CONFIRMED:
+			const { pieceId, plan } = payload;
+			stateDeepCopy.confirmedPlans[pieceId] = plan;
+			stateDeepCopy.planning.active = false;
+			stateDeepCopy.planning.moves = [];
+			stateDeepCopy.selectedPiece = -1;
+			return stateDeepCopy;
+		case DELETE_PLAN:
+			delete stateDeepCopy.confirmedPlans[payload.pieceId];
+			stateDeepCopy.selectedPiece = -1;
+			return stateDeepCopy;
 		default:
 			return state;
 	}
@@ -67,12 +90,25 @@ export default gameboardMetaReducer;
 // 			positionId: 2
 // 		},
 // 		{
-// 			type: "container",  //not sure yet if this is eventual implementation
+// 			type: "container", //not sure yet if this is eventual implementation
 // 			positionId: 2
 // 		},
 // 		{
 // 			type: "move",
 // 			positionId: 3
+// 		}
+// 	]
+// };
+
+// const confirmedPlans = {
+// 	0: [
+// 		{
+// 			type: "move",
+// 			positionId: 1
+// 		},
+// 		{
+// 			type: "move",
+// 			positionId: 2
 // 		}
 // 	]
 // }

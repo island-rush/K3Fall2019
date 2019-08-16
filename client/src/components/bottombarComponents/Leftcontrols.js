@@ -1,7 +1,11 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { startPlanning, cancelPlanning } from "../../redux/actions/userActions";
+import {
+	startPlan,
+	cancelPlan,
+	confirmPlan
+} from "../../redux/actions/userActions";
 
 const leftcontrolsStyle = {
 	background: "grey",
@@ -66,6 +70,7 @@ class Leftcontrols extends Component {
 				<div
 					title={buttonTitles.confirm}
 					style={{ ...buttonStyle, ...buttonImages.confirm }}
+					onClick={() => this.props.confirmPlan()}
 				/>
 			</div>
 		);
@@ -73,9 +78,10 @@ class Leftcontrols extends Component {
 }
 
 Leftcontrols.propTypes = {
-	startPlanning: PropTypes.func.isRequired,
-	cancelPlanning: PropTypes.func.isRequired,
-	planning: PropTypes.object.isRequired
+	startPlan: PropTypes.func.isRequired,
+	cancelPlan: PropTypes.func.isRequired,
+	planning: PropTypes.object.isRequired,
+	confirmPlan: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ gameboardMeta }) => ({
@@ -83,8 +89,9 @@ const mapStateToProps = ({ gameboardMeta }) => ({
 });
 
 const mapActionsToProps = {
-	startPlanning,
-	cancelPlanning
+	startPlan,
+	cancelPlan,
+	confirmPlan
 };
 
 export default connect(

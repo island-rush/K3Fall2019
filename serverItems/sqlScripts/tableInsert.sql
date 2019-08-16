@@ -48,3 +48,14 @@ CREATE TABLE IF NOT EXISTS pieces (
     PRIMARY KEY(pieceId)
 ) AUTO_INCREMENT=1;
 
+CREATE TABLE IF NOT EXISTS plans(
+	planId INT(8) NOT NULL AUTO_INCREMENT,
+    planGameId INT(2) NOT NULL,
+    planTeamId INT(1) NOT NULL,
+    planPieceId INT(8) NOT NULL,
+    planMovementOrder INT(2) NOT NULL,
+    planPositionId INT(4) NOT NULL,
+    planSpecialFlag INT(1) NOT NULL DEFAULT 0,
+    PRIMARY KEY(planId)
+) AUTO_INCREMENT=1;
+

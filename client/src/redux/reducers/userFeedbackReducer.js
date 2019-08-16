@@ -6,7 +6,8 @@ import {
 	SHOP_TRANSFER,
 	START_PLANNING,
 	UNDO_PLANNING,
-	CANCEL_PLANNING
+	CANCEL_PLANNING,
+	DELETE_PLAN
 } from "../actions/types";
 
 const initialUserFeedback = "Loading...";
@@ -29,6 +30,8 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "Removed the action from the plan...";
 		case CANCEL_PLANNING:
 			return "Cancelled the plan...";
+		case DELETE_PLAN:
+			return "Deleted the confirmed plan...";
 		default:
 			return state;
 	}
