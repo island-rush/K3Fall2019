@@ -19,7 +19,8 @@ const {
 	typeMoves,
 	typeFuel,
 	PLAN_WAS_CONFIRMED,
-	DELETE_PLAN
+	DELETE_PLAN,
+	containerTypes
 } = require("./constants");
 
 const { distanceMatrix } = require("./distanceMatrix");
@@ -51,6 +52,10 @@ const gameDeleteReal = async (conn, gameId) => {
 	inserts = [gameId];
 	await conn.query(queryString, inserts);
 
+	queryString = "DELETE FROM plans WHERE planGameId = ?";
+	inserts = [gameId];
+	await conn.query(queryString, inserts);
+
 	queryString = "DELETE FROM games WHERE gameId = ?";
 	inserts = [gameId];
 	await conn.query(queryString, inserts);
@@ -76,12 +81,6 @@ const getPieceInfo = async (conn, pieceId) => {
 	const inserts = [pieceId];
 	const [results, fields] = await conn.query(queryString, inserts);
 	return results[0];
-};
-
-const insertPlan = async (conn, move) => {
-	const queryString = "";
-	const inserts = [];
-	const [results, fields] = await conn.query(queryString, inserts);
 };
 
 const markLoggedIn = async (conn, gameId, commanderField) => {
@@ -136,6 +135,31 @@ const getTeamShopItems = async (conn, gameId, gameTeam) => {
 	return results;
 };
 
+const getTeamPlans = async (conn, gameId, gameTeam) => {
+	const queryString =
+		"SELECT * FROM plans WHERE planGameId = ? AND planTeamId = ? ORDER BY planPieceId, planMovementOrder ASC";
+	const inserts = [gameId, gameTeam];
+	const [results, fields] = await conn.query(queryString, inserts);
+
+	let confirmedPlans = {};
+
+	for (let x = 0; x < results.length; x++) {
+		let { planPieceId, planPositionId, planSpecialFlag } = results[x];
+		let type = planSpecialFlag === 0 ? "move" : "container"; //TODO: unknown future special flags could interfere
+
+		if (!(planPieceId in confirmedPlans)) {
+			confirmedPlans[planPieceId] = [];
+		}
+
+		confirmedPlans[planPieceId].push({
+			type,
+			positionId: planPositionId
+		});
+	}
+
+	return confirmedPlans;
+};
+
 const logout = async socket => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3; //Assume we have this, if this method is ever called (from sockets)
 	const loginField = "game" + gameTeam + "Controller" + gameController;
@@ -143,7 +167,10 @@ const logout = async socket => {
 	const inserts = [loginField, gameId];
 	try {
 		await promisePool.query(queryString, inserts);
-	} catch (error) {}
+	} catch (error) {
+		console.log(error);
+		//nothing to send to client, they disconnected from the socket already...
+	}
 };
 
 const giveInitialGameState = async socket => {
@@ -154,6 +181,7 @@ const giveInitialGameState = async socket => {
 	const invItems = await getTeamInvItems(conn, gameId, gameTeam);
 	const shopItems = await getTeamShopItems(conn, gameId, gameTeam);
 	const gameboardPieces = await getVisiblePieces(conn, gameId, gameTeam);
+	const confirmedPlans = await getTeamPlans(conn, gameId, gameTeam);
 	await conn.release();
 
 	const { gameSection, gameInstructor } = gameInfo;
@@ -171,7 +199,7 @@ const giveInitialGameState = async socket => {
 			shopItems,
 			invItems,
 			gameboardPieces,
-			distanceMatrix: JSON.stringify(distanceMatrix)
+			confirmedPlans
 		}
 	};
 
@@ -325,12 +353,26 @@ const sendUserFeedback = async (socket, userFeedback) => {
 	socket.emit("serverSendingAction", serverAction);
 };
 
+const insertPlan = async (conn, pieceInfo, plan) => {
+	const { pieceGameId, pieceTeamId, pieceId } = pieceInfo;
+	for (let x = 0; x < plan.length; x++) {
+		//movement order is x?
+		let { positionId, type } = plan[x];
+		let specialFlag = type === "move" ? 0 : 1; // 1 = container, use other numbers for future special flags...
+		await conn.query(
+			"INSERT INTO plans (planGameId, planTeamId, planPieceId, planMovementOrder, planPositionId, planSpecialFlag) VALUES (?, ?, ?, ?, ?, ?)",
+			[pieceGameId, pieceTeamId, pieceId, x, positionId, specialFlag]
+		);
+	}
+};
+
 const confirmPlan = async (socket, pieceId, plan) => {
 	//plan = moves array, where each move has type and positionId
 	//confirm the plan and report back to the client with a server action
 	//TODO: verify that this user is authorized to make a plan
 	//verify that the piece exists?
 	//verify that this piece belongs to this team? (all those other auths)
+	//need to know if this piece is a container or not, to check if container move was inserted
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	const conn = await promisePool.getConnection();
@@ -347,8 +389,12 @@ const confirmPlan = async (socket, pieceId, plan) => {
 		pieceTypeId
 	} = pieceInfo;
 
+	const isContainer = containerTypes.includes(pieceTypeId);
+
 	//did the piece exists, same team as this one / same game...
 	//make sure plan isnt empty...
+
+	//can you do container to start the plan?
 
 	let previousPosition = piecePositionId;
 
@@ -359,13 +405,32 @@ const confirmPlan = async (socket, pieceId, plan) => {
 		const { type, positionId } = plan[x];
 
 		//make sure positions are equal for container type
+		if (type == "container") {
+			if (!isContainer) {
+				sendUserFeedback(
+					socket,
+					"sent a bad plan, container move for non-container piece..."
+				);
+				return;
+			}
+
+			if (previousPosition != positionId) {
+				sendUserFeedback(
+					socket,
+					"sent a bad plan, container move was not in previous position..."
+				);
+				return;
+			}
+		}
 
 		if (distanceMatrix[previousPosition][positionId] !== 1) {
-			sendUserFeedback(
-				socket,
-				"sent a bad plan, positions were not adjacent..."
-			);
-			return;
+			if (type !== "container") {
+				sendUserFeedback(
+					socket,
+					"sent a bad plan, positions were not adjacent..."
+				);
+				return;
+			}
 		}
 
 		previousPosition = positionId;
@@ -375,6 +440,7 @@ const confirmPlan = async (socket, pieceId, plan) => {
 	//send the plan back to the client with confirm action
 
 	//insert all of the plans into the database***
+	await insertPlan(conn, pieceInfo, plan);
 
 	await conn.release();
 
@@ -720,28 +786,86 @@ exports.socketSetup = socket => {
 
 	//TODO: reflect that the argument is a payload, change these to be objects that the server is receiving for continuity
 	socket.on("shopPurchaseRequest", shopItemTypeId => {
-		shopPurchaseRequest(socket, shopItemTypeId);
+		try {
+			shopPurchaseRequest(socket, shopItemTypeId);
+		} catch (error) {
+			console.log(error);
+			const serverAction = {
+				type: SET_USERFEEDBACK,
+				payload: {
+					userFeedback: "INTERNAL SERVER ERROR: CHECK DATABASE"
+				}
+			};
+			socket.emit("serverSendingAction", serverAction);
+		}
 	});
 
 	socket.on("shopRefundRequest", shopItem => {
-		shopRefundRequest(socket, shopItem);
+		try {
+			shopRefundRequest(socket, shopItem);
+		} catch (error) {
+			console.log(error);
+			const serverAction = {
+				type: SET_USERFEEDBACK,
+				payload: {
+					userFeedback: "INTERNAL SERVER ERROR: CHECK DATABASE"
+				}
+			};
+			socket.emit("serverSendingAction", serverAction);
+		}
 	});
 
 	socket.on("shopConfirmPurchase", () => {
-		shopConfirmPurchase(socket);
+		try {
+			shopConfirmPurchase(socket);
+		} catch (error) {
+			console.log(error);
+			const serverAction = {
+				type: SET_USERFEEDBACK,
+				payload: {
+					userFeedback: "INTERNAL SERVER ERROR: CHECK DATABASE"
+				}
+			};
+			socket.emit("serverSendingAction", serverAction);
+		}
 	});
 
 	socket.on("confirmPlan", payload => {
 		const { pieceId, plan } = payload;
-		confirmPlan(socket, pieceId, plan);
+
+		try {
+			confirmPlan(socket, pieceId, plan);
+		} catch (error) {
+			console.log(error);
+			const serverAction = {
+				type: SET_USERFEEDBACK,
+				payload: {
+					userFeedback: "INTERNAL SERVER ERROR: CHECK DATABASE"
+				}
+			};
+			socket.emit("serverSendingAction", serverAction);
+		}
 	});
 
 	socket.on("deletePlan", payload => {
 		const { pieceId } = payload;
-		deletePlan(socket, pieceId);
+
+		try {
+			deletePlan(socket, pieceId);
+		} catch (error) {
+			console.log(error);
+			const serverAction = {
+				type: SET_USERFEEDBACK,
+				payload: {
+					userFeedback: "INTERNAL SERVER ERROR: CHECK DATABASE"
+				}
+			};
+			socket.emit("serverSendingAction", serverAction);
+		}
 	});
 
 	socket.on("disconnect", () => {
+		//TODO: do try catch at this level instead of within the specific function
 		logout(socket);
 	});
 };

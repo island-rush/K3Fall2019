@@ -7,7 +7,8 @@ import {
 	SET_USERFEEDBACK,
 	CANCEL_PLAN,
 	PLANNING_SELECT,
-	UNDO_MOVE
+	UNDO_MOVE,
+	CONTAINER_MOVE
 } from "./types";
 
 import { distanceMatrix } from "./distanceMatrix";
@@ -100,13 +101,16 @@ export const confirmPlan = () => {
 	return (dispatch, getState, emit) => {
 		const { gameboardMeta } = getState();
 
-		//check to see if moves array is empty?
-		const payload = {
-			pieceId: gameboardMeta.selectedPiece,
-			plan: gameboardMeta.planning.moves
-		};
+		if (gameboardMeta.planning.moves.length === 0) {
+			dispatch(setUserFeedback("Can't submit an empty plan..."));
+		} else {
+			const payload = {
+				pieceId: gameboardMeta.selectedPiece,
+				plan: gameboardMeta.planning.moves
+			};
 
-		emit("confirmPlan", payload);
+			emit("confirmPlan", payload);
+		}
 	};
 };
 
@@ -165,6 +169,38 @@ export const undoMove = () => {
 			});
 		} else {
 			dispatch(setUserFeedback("Can only undo while actively planning"));
+		}
+	};
+};
+
+export const containerMove = () => {
+	return (dispatch, getState, emit) => {
+		const { gameboardMeta } = getState();
+
+		if (gameboardMeta.planning.active) {
+			// get either last position from the planning moves, or selectedPosition from overall if no moves yet made
+
+			// need other checks, such as doing it multiple times in a row prevention...other game rule checks for containers
+
+			const lastSelectedPosition =
+				gameboardMeta.planning.moves.length > 0
+					? gameboardMeta.planning.moves[
+							gameboardMeta.planning.moves.length - 1
+					  ].positionId
+					: gameboardMeta.selectedPosition;
+
+			dispatch({
+				type: CONTAINER_MOVE,
+				payload: {
+					selectedPositionId: lastSelectedPosition
+				}
+			});
+		} else {
+			dispatch(
+				setUserFeedback(
+					"Can only do container moves while actively planning..."
+				)
+			);
 		}
 	};
 };

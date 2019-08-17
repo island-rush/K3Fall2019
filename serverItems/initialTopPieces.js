@@ -26,15 +26,15 @@ const piece = (
 
 exports.generateDefaultPieces = gameId => {
 	return [
-		piece(gameId, "Blue", "Tank", 0),
-		piece(gameId, "Blue", "Plane", 0),
-		piece(gameId, "Red", "Tank", 0),
-		piece(gameId, "Red", "Plane", 0),
-		piece(gameId, "Blue", "Tank", 1),
-		piece(gameId, "Red", "Radar", 2),
-		piece(gameId, "Red", "Sub", 2),
-		piece(gameId, "Red", "Plane", 2),
-		piece(gameId, "Red", "Transport", 2),
-		piece(gameId, "Blue", "Tank", 3)
+		piece(gameId, "Blue", "Tank", 0)
+		// piece(gameId, "Blue", "Plane", 0),
+		// piece(gameId, "Red", "Tank", 0),
+		// piece(gameId, "Red", "Plane", 0),
+		// piece(gameId, "Blue", "Tank", 1),
+		// piece(gameId, "Red", "Radar", 2),
+		// piece(gameId, "Red", "Sub", 2),
+		// piece(gameId, "Red", "Plane", 2),
+		// piece(gameId, "Red", "Transport", 2),
+		// piece(gameId, "Blue", "Tank", 3)
 	];
 };

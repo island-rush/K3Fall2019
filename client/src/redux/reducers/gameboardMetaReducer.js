@@ -7,7 +7,9 @@ import {
 	PLANNING_SELECT,
 	PLAN_WAS_CONFIRMED,
 	DELETE_PLAN,
-	UNDO_MOVE
+	UNDO_MOVE,
+	CONTAINER_MOVE,
+	INITIAL_GAMESTATE
 } from "../actions/types";
 
 const initialGameboardMeta = {
@@ -52,6 +54,12 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 		case UNDO_MOVE:
 			stateDeepCopy.planning.moves.pop();
 			return stateDeepCopy;
+		case CONTAINER_MOVE:
+			stateDeepCopy.planning.moves.push({
+				type: "container",
+				positionId: payload.selectedPositionId
+			});
+			return stateDeepCopy;
 		case PLANNING_SELECT:
 			//TODO: move this to userActions to have more checks there within the thunk
 			stateDeepCopy.planning.moves.push({
@@ -69,6 +77,9 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 		case DELETE_PLAN:
 			delete stateDeepCopy.confirmedPlans[payload.pieceId];
 			stateDeepCopy.selectedPiece = -1;
+			return stateDeepCopy;
+		case INITIAL_GAMESTATE:
+			stateDeepCopy.confirmedPlans = payload.confirmedPlans;
 			return stateDeepCopy;
 		default:
 			return state;

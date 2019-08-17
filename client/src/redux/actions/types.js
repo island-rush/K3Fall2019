@@ -16,3 +16,4 @@ export const PLANNING_SELECT = "PLANNING_SELECT";
 export const PLAN_WAS_CONFIRMED = "PLAN_WAS_CONFIRMED";
 export const DELETE_PLAN = "DELETE_PLAN";
 export const UNDO_MOVE = "UNDO_MOVE";
+export const CONTAINER_MOVE = "CONTAINER_MOVE";

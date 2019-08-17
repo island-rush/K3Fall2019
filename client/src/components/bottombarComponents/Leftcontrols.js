@@ -5,7 +5,8 @@ import {
 	startPlan,
 	cancelPlan,
 	confirmPlan,
-	undoMove
+	undoMove,
+	containerMove
 } from "../../redux/actions/userActions";
 
 const leftcontrolsStyle = {
@@ -68,6 +69,7 @@ class Leftcontrols extends Component {
 				<div
 					title={buttonTitles.container}
 					style={{ ...buttonStyle, ...buttonImages.container }}
+					onClick={() => this.props.containerMove()}
 				/>
 				<div
 					title={buttonTitles.confirm}
@@ -84,7 +86,8 @@ Leftcontrols.propTypes = {
 	cancelPlan: PropTypes.func.isRequired,
 	planning: PropTypes.object.isRequired,
 	confirmPlan: PropTypes.func.isRequired,
-	undoMove: PropTypes.func.isRequired
+	undoMove: PropTypes.func.isRequired,
+	containerMove: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ gameboardMeta }) => ({
@@ -95,7 +98,8 @@ const mapActionsToProps = {
 	startPlan,
 	cancelPlan,
 	confirmPlan,
-	undoMove
+	undoMove,
+	containerMove
 };
 
 export default connect(

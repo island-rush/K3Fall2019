@@ -99,12 +99,15 @@ class Gameboard extends Component {
 		for (let x = 0; x < this.props.planning.moves.length; x++) {
 			const { type, positionId } = this.props.planning.moves[x];
 
-			if (!planningPositions.includes(positionId)) {
-				planningPositions.push(positionId);
+			if (!planningPositions.includes(parseInt(positionId))) {
+				planningPositions.push(parseInt(positionId));
 			}
 
-			if (type === "container" && !containerPositions.includes(positionId)) {
-				containerPositions.push(positionId);
+			if (
+				type === "container" &&
+				!containerPositions.includes(parseInt(positionId))
+			) {
+				containerPositions.push(parseInt(positionId));
 			}
 		}
 
@@ -119,10 +122,10 @@ class Gameboard extends Component {
 						this.props.selectedPiece
 					][z];
 					if (type === "move") {
-						planningPositions.push(positionId);
+						planningPositions.push(parseInt(positionId));
 					}
 					if (type === "container") {
-						containerPositions.push(positionId);
+						containerPositions.push(parseInt(positionId));
 					}
 				}
 			}
@@ -148,11 +151,11 @@ class Gameboard extends Component {
 					event.stopPropagation();
 				}}
 				className={
-					this.props.selectedPosition === parseInt(positionIndex)
+					parseInt(this.props.selectedPosition) === parseInt(positionIndex)
 						? "selectedPos"
-						: containerPositions.includes(positionIndex)
+						: containerPositions.includes(parseInt(positionIndex))
 						? "containerPos"
-						: planningPositions.includes(positionIndex)
+						: planningPositions.includes(parseInt(positionIndex))
 						? "plannedPos"
 						: ""
 				}

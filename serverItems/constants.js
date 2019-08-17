@@ -33,6 +33,9 @@ exports.typeFuel = {
 	4: -1 //transport
 };
 
+//this represents the typeIds that are 'containers' and can perform container moves for a plan, and other things
+exports.containerTypes = [4];
+
 exports.typeNames = {
 	0: "Radar",
 	1: "Plane",
