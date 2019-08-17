@@ -2,12 +2,12 @@ import {
 	POSITION_SELECT,
 	PIECE_CLICK,
 	PIECE_CLEAR_SELECTION,
-	START_PLANNING,
-	CANCEL_PLANNING,
-	UNDO_PLANNING,
+	START_PLAN,
+	CANCEL_PLAN,
 	PLANNING_SELECT,
 	PLAN_WAS_CONFIRMED,
-	DELETE_PLAN
+	DELETE_PLAN,
+	UNDO_MOVE
 } from "../actions/types";
 
 const initialGameboardMeta = {
@@ -41,15 +41,15 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 		case PIECE_CLEAR_SELECTION:
 			stateDeepCopy.selectedPiece = -1;
 			return stateDeepCopy;
-		case START_PLANNING:
+		case START_PLAN:
 			stateDeepCopy.planning.active = true;
 			return stateDeepCopy;
-		case CANCEL_PLANNING:
+		case CANCEL_PLAN:
 			stateDeepCopy.planning.active = false;
 			stateDeepCopy.planning.moves = [];
 			stateDeepCopy.selectedPiece = -1;
 			return stateDeepCopy;
-		case UNDO_PLANNING:
+		case UNDO_MOVE:
 			stateDeepCopy.planning.moves.pop();
 			return stateDeepCopy;
 		case PLANNING_SELECT:

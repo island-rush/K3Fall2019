@@ -3,13 +3,11 @@ import {
 	POSITION_SELECT,
 	PIECE_CLICK,
 	PIECE_CLEAR_SELECTION,
-	START_PLANNING,
+	START_PLAN,
 	SET_USERFEEDBACK,
-	CANCEL_PLANNING,
-	UNDO_PLANNING,
-	OPEN_CONTAINER_PLANNING,
-	CONFIRM_PLANNING,
-	PLANNING_SELECT
+	CANCEL_PLAN,
+	PLANNING_SELECT,
+	UNDO_MOVE
 } from "./types";
 
 import { distanceMatrix } from "./distanceMatrix";
@@ -121,7 +119,7 @@ export const startPlan = () => {
 			if (gameboardMeta.planning.active) {
 				dispatch(setUserFeedback("Already planning a move..."));
 			} else {
-				dispatch({ type: START_PLANNING });
+				dispatch({ type: START_PLAN });
 			}
 		} else {
 			dispatch(setUserFeedback("Must select a piece to plan a move..."));
@@ -134,7 +132,7 @@ export const cancelPlan = () => {
 		const { gameboardMeta } = getState();
 
 		if (gameboardMeta.planning.active) {
-			dispatch({ type: CANCEL_PLANNING });
+			dispatch({ type: CANCEL_PLAN });
 		} else {
 			//check to see if there is a piece selected and if that piece has a confirmed plan
 			if (
@@ -153,6 +151,20 @@ export const cancelPlan = () => {
 					)
 				);
 			}
+		}
+	};
+};
+
+export const undoMove = () => {
+	return (dispatch, getState, emit) => {
+		const { gameboardMeta } = getState();
+
+		if (gameboardMeta.planning.active) {
+			dispatch({
+				type: UNDO_MOVE
+			});
+		} else {
+			dispatch(setUserFeedback("Can only undo while actively planning"));
 		}
 	};
 };

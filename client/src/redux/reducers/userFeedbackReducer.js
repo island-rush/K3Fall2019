@@ -4,9 +4,8 @@ import {
 	SHOP_REFUND,
 	SHOP_PURCHASE,
 	SHOP_TRANSFER,
-	START_PLANNING,
-	UNDO_PLANNING,
-	CANCEL_PLANNING,
+	START_PLAN,
+	CANCEL_PLAN,
 	DELETE_PLAN
 } from "../actions/types";
 
@@ -24,11 +23,9 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "Purchased the item!";
 		case SHOP_TRANSFER:
 			return "Confirmed the purchases...check the inventory!";
-		case START_PLANNING:
+		case START_PLAN:
 			return "Now Planning: Select positions to create the plan...";
-		case UNDO_PLANNING:
-			return "Removed the action from the plan...";
-		case CANCEL_PLANNING:
+		case CANCEL_PLAN:
 			return "Cancelled the plan...";
 		case DELETE_PLAN:
 			return "Deleted the confirmed plan...";
