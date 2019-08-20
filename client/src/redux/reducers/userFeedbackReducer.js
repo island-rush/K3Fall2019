@@ -7,7 +7,10 @@ import {
 	START_PLAN,
 	CANCEL_PLAN,
 	DELETE_PLAN,
-	PLAN_WAS_CONFIRMED
+	PLAN_WAS_CONFIRMED,
+	MAIN_BUTTON_CLICK,
+	PURCHASE_PHASE,
+	COMBAT_PHASE
 } from "../actions/types";
 
 const initialUserFeedback = "Loading...";
@@ -32,6 +35,12 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "Deleted the confirmed plan...";
 		case PLAN_WAS_CONFIRMED:
 			return "Plan was confirmed!";
+		case MAIN_BUTTON_CLICK:
+			return "Waiting on the other team...";
+		case PURCHASE_PHASE:
+			return "Switched to the purchase phase....check out the shop and buy stuff...";
+		case COMBAT_PHASE:
+			return "Switched to the combat phase...start to plan your turn by clicking on pieces!";
 		default:
 			return state;
 	}

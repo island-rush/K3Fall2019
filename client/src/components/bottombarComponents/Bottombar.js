@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import LeftControls from "./Leftcontrols";
 import UserFeedback from "./Userfeedback";
-import MainControl from "./Maincontrol";
+import MainButton from "./MainButton";
 import { connect } from "react-redux";
+import { mainButtonClick } from "../../redux/actions/userActions";
 
 const bottombarStyle = {
 	backgroundColor: "Green",
@@ -24,14 +25,25 @@ class Bottombar extends Component {
 			>
 				<LeftControls />
 				<UserFeedback userFeedback={this.props.userFeedback} />
-				<MainControl />
+				<MainButton
+					gameInfo={this.props.gameInfo}
+					mainButtonClick={this.props.mainButtonClick}
+				/>
 			</div>
 		);
 	}
 }
 
-const mapStateToProps = ({ userFeedback }) => ({
-	userFeedback: userFeedback
+const mapStateToProps = ({ userFeedback, gameInfo }) => ({
+	userFeedback,
+	gameInfo
 });
 
-export default connect(mapStateToProps)(Bottombar);
+const mapActionsToProps = {
+	mainButtonClick
+};
+
+export default connect(
+	mapStateToProps,
+	mapActionsToProps
+)(Bottombar);

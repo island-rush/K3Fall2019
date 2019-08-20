@@ -2,10 +2,13 @@ CREATE TABLE IF NOT EXISTS games (
 	gameId INT(3) NOT NULL UNIQUE AUTO_INCREMENT,
     gameSection VARCHAR(4) NOT NULL,
     gameInstructor VARCHAR(32) NOT NULL,
+    
     gameAdminPassword VARCHAR(32) NOT NULL,
     gameActive INT(1) NOT NULL DEFAULT 0,
+    
     game0Password VARCHAR(32) NOT NULL DEFAULT '5f4dcc3b5aa765d61d8327deb882cf99',
     game1Password VARCHAR(32) NOT NULL DEFAULT '5f4dcc3b5aa765d61d8327deb882cf99',
+    
     game0Controller0 INT(1) NOT NULL DEFAULT 0,
     game0Controller1 INT(1) NOT NULL DEFAULT 0,
     game0Controller2 INT(1) NOT NULL DEFAULT 0,
@@ -14,8 +17,16 @@ CREATE TABLE IF NOT EXISTS games (
     game1Controller1 INT(1) NOT NULL DEFAULT 0,
     game1Controller2 INT(1) NOT NULL DEFAULT 0,
     game1Controller3 INT(1) NOT NULL DEFAULT 0,
+    
+	game0Status INT(1) NOT NULL DEFAULT 0,  -- 0: still active, 1: waiting for other player
+	game1Status INT(1) NOT NULL DEFAULT 0,
+    
     game0Points INT(5) NOT NULL DEFAULT 50,
     game1Points INT(5) NOT NULL DEFAULT 50,
+    
+    gamePhase INT(1) NOT NULL DEFAULT 0, -- 0: news, 1: buy, 2: gameplay, 3: place inv
+    gameRound INT(1) NOT NULL DEFAULT 0, -- 0, 1, 2  rounds of movement
+    gameSlice INT(1) NOT NULL DEFAULT 0, -- 0: planning, 1: battle/movement, 2: refuel, 3: containers
     PRIMARY KEY(gameId)
 ) AUTO_INCREMENT=1;
 

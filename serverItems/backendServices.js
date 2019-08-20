@@ -20,7 +20,10 @@ const {
 	typeFuel,
 	PLAN_WAS_CONFIRMED,
 	DELETE_PLAN,
-	containerTypes
+	containerTypes,
+	MAIN_BUTTON_CLICK,
+	PURCHASE_PHASE,
+	COMBAT_PHASE
 } = require("./constants");
 
 const { distanceMatrix } = require("./distanceMatrix");
@@ -184,8 +187,9 @@ const giveInitialGameState = async socket => {
 	const confirmedPlans = await getTeamPlans(conn, gameId, gameTeam);
 	await conn.release();
 
-	const { gameSection, gameInstructor } = gameInfo;
-	const teamPoints = gameInfo["game" + gameTeam + "Points"];
+	const { gameSection, gameInstructor, gamePhase } = gameInfo;
+	const gamePoints = gameInfo["game" + gameTeam + "Points"];
+	const gameStatus = gameInfo["game" + gameTeam + "Status"];
 
 	const serverAction = {
 		type: INITIAL_GAMESTATE,
@@ -194,7 +198,9 @@ const giveInitialGameState = async socket => {
 				gameSection,
 				gameInstructor,
 				gameController,
-				gamePoints: teamPoints
+				gamePhase,
+				gameStatus,
+				gamePoints
 			},
 			shopItems,
 			invItems,
@@ -231,12 +237,42 @@ const insertShopItem = async (conn, gameId, gameTeam, shopItemTypeId) => {
 };
 
 const shopPurchaseRequest = async (socket, shopItemTypeId) => {
+	//TODO: could do client side checks until the confirm, and then go through 1 by 1 what was requested, checking points
+	//this would be better than network request for each purchase (AND refund)...
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 	const shopItemCost = shopItemTypeCosts[shopItemTypeId];
-	//TODO: figure out if the purchase is allowed (game phase...controller Id....game active....)
+	//TODO: figure out if the purchase is allowed (game phase...controller Id....game active....) (and in other methods...)
 
 	const conn = await promisePool.getConnection();
-	const teamPoints = await getTeamPoints(conn, gameId, gameTeam);
+	const gameInfo = await getGameInfo(conn, gameId);
+	// const teamPoints = await getTeamPoints(conn, gameId, gameTeam);
+
+	const { gameActive, gamePhase } = gameInfo;
+
+	if (!gameActive) {
+		await conn.release();
+		return;
+	}
+
+	if (gamePhase !== 1) {
+		await conn.release();
+		socket.emit(
+			"serverSendingAction",
+			userFeedbackAction("Not the right phase...")
+		);
+		return;
+	}
+
+	if (gameController !== 0) {
+		await conn.release();
+		socket.emit(
+			"serverSendingAction",
+			userFeedbackAction("Not the right controller...")
+		);
+		return;
+	}
+
+	const teamPoints = gameInfo["game" + gameTeam + "Points"];
 
 	if (teamPoints < shopItemCost) {
 		await conn.release();
@@ -484,6 +520,122 @@ const deletePlan = async (socket, pieceId) => {
 	socket.emit("serverSendingAction", serverAction);
 };
 
+const mainButtonClick = async (io, socket) => {
+	//verify that this person is ok to click the button
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+
+	const conn = await promisePool.getConnection();
+	const gameInfo = await getGameInfo(conn, gameId);
+	const { gameActive, gamePhase } = gameInfo;
+
+	//need to do different things based on the phase?
+	if (!gameActive) {
+		await conn.release();
+		return;
+	}
+
+	const thisTeamStatus = gameInfo["game" + gameTeam + "Status"];
+	const otherTeamStatus = gameInfo["game" + ((gameTeam + 1) % 2) + "Status"];
+
+	//thisTeamStatus == 1
+	if (thisTeamStatus) {
+		//already pressed / already waiting
+		await conn.release();
+		socket.emit(
+			"serverSendingAction",
+			userFeedbackAction("Still waiting on other team...")
+		);
+		return;
+	}
+
+	//News Alert Phase
+	if (!otherTeamStatus) {
+		//other team still active, not yet ready to move on
+		//mark this team as waiting
+
+		let queryString = "UPDATE games set ?? = 1 WHERE gameId = ?";
+		let inserts = ["game" + gameTeam + "Status", gameId];
+		await conn.query(queryString, inserts);
+		await conn.release();
+		let serverAction = {
+			type: MAIN_BUTTON_CLICK,
+			payload: {}
+		};
+		socket.emit("serverSendingAction", serverAction);
+		return;
+	} else {
+		//both teams done with this phase, round, slice, move...
+		//mark other team as no longer waiting
+		let queryString = "UPDATE games set ?? = 0 WHERE gameId = ?";
+		let inserts = ["game" + ((gameTeam + 1) % 2) + "Status", gameId];
+		await conn.query(queryString, inserts);
+
+		let serverAction;
+
+		switch (gamePhase) {
+			case 0:
+				//news -> purchase
+				queryString = "UPDATE games set gamePhase = 1 WHERE gameId = ?";
+				inserts = [gameId];
+				await conn.query(queryString, inserts);
+				await conn.release();
+
+				//let the everyone know stuff
+
+				serverAction = {
+					type: PURCHASE_PHASE,
+					payload: {}
+				};
+
+				io.sockets
+					.in("game" + gameId)
+					.emit("serverSendingAction", serverAction);
+
+			case 1:
+				//purchase -> combat
+				queryString = "UPDATE games set gamePhase = 2 WHERE gameId = ?";
+				inserts = [gameId];
+				await conn.query(queryString, inserts);
+				await conn.release();
+
+				//let the everyone know stuff
+
+				serverAction = {
+					type: COMBAT_PHASE,
+					payload: {}
+				};
+
+				io.sockets
+					.in("game" + gameId)
+					.emit("serverSendingAction", serverAction);
+
+			case 2:
+			//combat (gameplay)
+			//handle the slice / round?
+
+			case 3:
+			//place troops (from the inv)
+
+			default:
+				await conn.release();
+				socket.emit(
+					"serverSendingAction",
+					userFeedbackAction("Backend Failure, unkown gamePhase...")
+				);
+				return;
+		}
+	}
+};
+
+const userFeedbackAction = userFeedback => {
+	return {
+		type: SET_USERFEEDBACK,
+		payload: {
+			userFeedback
+		}
+	};
+};
+
 //Exposed / Exported Functions
 exports.gameReset = async (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.teacher || !req.session.ir3.gameId) {
@@ -630,7 +782,7 @@ exports.getGames = async (req, res) => {
 		const [results, fields] = await promisePool.query(queryString);
 		res.send(results);
 	} catch (error) {
-		console.log(error);
+		// console.log(error);  // This error occurs for the course director before he initializes the database
 		res.status(500).send([
 			{
 				gameId: 69,
@@ -760,7 +912,7 @@ exports.gameDelete = async (req, res) => {
 	}
 };
 
-exports.socketSetup = socket => {
+exports.socketSetup = (io, socket) => {
 	if (
 		!socket.handshake.session.ir3 ||
 		!socket.handshake.session.ir3.gameId ||
@@ -772,6 +924,9 @@ exports.socketSetup = socket => {
 	}
 
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+
+	//Room for the Game
+	socket.join("game" + gameId);
 
 	//Room for the Team
 	socket.join("game" + gameId + "team" + gameTeam);
@@ -790,13 +945,10 @@ exports.socketSetup = socket => {
 			shopPurchaseRequest(socket, shopItemTypeId);
 		} catch (error) {
 			console.log(error);
-			const serverAction = {
-				type: SET_USERFEEDBACK,
-				payload: {
-					userFeedback: "INTERNAL SERVER ERROR: CHECK DATABASE"
-				}
-			};
-			socket.emit("serverSendingAction", serverAction);
+			socket.emit(
+				"serverSendingAction",
+				userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE")
+			);
 		}
 	});
 
@@ -805,13 +957,10 @@ exports.socketSetup = socket => {
 			shopRefundRequest(socket, shopItem);
 		} catch (error) {
 			console.log(error);
-			const serverAction = {
-				type: SET_USERFEEDBACK,
-				payload: {
-					userFeedback: "INTERNAL SERVER ERROR: CHECK DATABASE"
-				}
-			};
-			socket.emit("serverSendingAction", serverAction);
+			socket.emit(
+				"serverSendingAction",
+				userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE")
+			);
 		}
 	});
 
@@ -820,13 +969,10 @@ exports.socketSetup = socket => {
 			shopConfirmPurchase(socket);
 		} catch (error) {
 			console.log(error);
-			const serverAction = {
-				type: SET_USERFEEDBACK,
-				payload: {
-					userFeedback: "INTERNAL SERVER ERROR: CHECK DATABASE"
-				}
-			};
-			socket.emit("serverSendingAction", serverAction);
+			socket.emit(
+				"serverSendingAction",
+				userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE")
+			);
 		}
 	});
 
@@ -837,13 +983,10 @@ exports.socketSetup = socket => {
 			confirmPlan(socket, pieceId, plan);
 		} catch (error) {
 			console.log(error);
-			const serverAction = {
-				type: SET_USERFEEDBACK,
-				payload: {
-					userFeedback: "INTERNAL SERVER ERROR: CHECK DATABASE"
-				}
-			};
-			socket.emit("serverSendingAction", serverAction);
+			socket.emit(
+				"serverSendingAction",
+				userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE")
+			);
 		}
 	});
 
@@ -854,13 +997,22 @@ exports.socketSetup = socket => {
 			deletePlan(socket, pieceId);
 		} catch (error) {
 			console.log(error);
-			const serverAction = {
-				type: SET_USERFEEDBACK,
-				payload: {
-					userFeedback: "INTERNAL SERVER ERROR: CHECK DATABASE"
-				}
-			};
-			socket.emit("serverSendingAction", serverAction);
+			socket.emit(
+				"serverSendingAction",
+				userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE")
+			);
+		}
+	});
+
+	socket.on("mainButtonClick", () => {
+		try {
+			mainButtonClick(io, socket);
+		} catch (error) {
+			console.log(error);
+			socket.emit(
+				"serverSendingAction",
+				userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE")
+			);
 		}
 	});
 
