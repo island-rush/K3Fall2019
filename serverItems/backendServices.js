@@ -526,7 +526,7 @@ const mainButtonClick = async (io, socket) => {
 
 	const conn = await promisePool.getConnection();
 	const gameInfo = await getGameInfo(conn, gameId);
-	const { gameActive, gamePhase } = gameInfo;
+	const { gameActive, gamePhase, game0Status, game1Status } = gameInfo;
 
 	//need to do different things based on the phase?
 	if (!gameActive) {
@@ -534,11 +534,16 @@ const mainButtonClick = async (io, socket) => {
 		return;
 	}
 
-	const thisTeamStatus = gameInfo["game" + gameTeam + "Status"];
-	const otherTeamStatus = gameInfo["game" + ((gameTeam + 1) % 2) + "Status"];
+	const thisTeamStatus = parseInt(gameTeam) === 0 ? game0Status : game1Status;
+	const otherTeamStatus = parseInt(gameTeam) === 0 ? game1Status : game0Status;
+
+	// console.log(thisTeamStatus);
+	// console.log(otherTeamStatus);
+
+	// console.log(gameTeam);
 
 	//thisTeamStatus == 1
-	if (thisTeamStatus) {
+	if (parseInt(thisTeamStatus) === 1) {
 		//already pressed / already waiting
 		await conn.release();
 		socket.emit(
@@ -548,13 +553,12 @@ const mainButtonClick = async (io, socket) => {
 		return;
 	}
 
-	//News Alert Phase
-	if (!otherTeamStatus) {
+	if (parseInt(otherTeamStatus) === 0) {
 		//other team still active, not yet ready to move on
 		//mark this team as waiting
 
 		let queryString = "UPDATE games set ?? = 1 WHERE gameId = ?";
-		let inserts = ["game" + gameTeam + "Status", gameId];
+		let inserts = ["game" + parseInt(gameTeam) + "Status", gameId];
 		await conn.query(queryString, inserts);
 		await conn.release();
 		let serverAction = {
@@ -567,12 +571,15 @@ const mainButtonClick = async (io, socket) => {
 		//both teams done with this phase, round, slice, move...
 		//mark other team as no longer waiting
 		let queryString = "UPDATE games set ?? = 0 WHERE gameId = ?";
-		let inserts = ["game" + ((gameTeam + 1) % 2) + "Status", gameId];
+		let inserts = [
+			"game" + (parseInt(gameTeam) === 0 ? 1 : 0) + "Status",
+			gameId
+		];
 		await conn.query(queryString, inserts);
 
 		let serverAction;
 
-		switch (gamePhase) {
+		switch (parseInt(gamePhase)) {
 			case 0:
 				//news -> purchase
 				queryString = "UPDATE games set gamePhase = 1 WHERE gameId = ?";
@@ -590,6 +597,7 @@ const mainButtonClick = async (io, socket) => {
 				io.sockets
 					.in("game" + gameId)
 					.emit("serverSendingAction", serverAction);
+				break;
 
 			case 1:
 				//purchase -> combat
@@ -608,13 +616,16 @@ const mainButtonClick = async (io, socket) => {
 				io.sockets
 					.in("game" + gameId)
 					.emit("serverSendingAction", serverAction);
+				break;
 
 			case 2:
-			//combat (gameplay)
-			//handle the slice / round?
+				//combat (gameplay)
+				//handle the slice / round?
+				break;
 
 			case 3:
-			//place troops (from the inv)
+				//place troops (from the inv)
+				break;
 
 			default:
 				await conn.release();
