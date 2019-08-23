@@ -711,12 +711,11 @@ const mainButtonClick = async (io, socket) => {
 						.emit("serverSendingAction", serverAction);
 					break;
 				} else {
-					//TODO: check events to handle (finish those before handling plans)
+					// check for any events that exist prior to dealing with plans, execute events 1 by 1
 
-					//stepping through all the plans / events
-					//need to get the current movement order? (so that can select all from that order)
 					//TODO: need better standards for results, fields...usually do const, but continuing to use them (different names / numberings?)
 
+					//get current movement order (for each team's plans)
 					queryString =
 						"SELECT planMovementOrder as currentMovementOrder FROM plans WHERE planGameId = ? AND planTeamId = 0 ORDER BY planMovementOrder ASC LIMIT 1";
 					inserts = [gameId];
@@ -728,12 +727,9 @@ const mainButtonClick = async (io, socket) => {
 					let [results1, fields1] = await conn.query(queryString, inserts);
 
 					if (results0.length === 0 && results1.length === 0) {
-						//both teams done with stuff
-						//move on to the next round and deal with things here...
-
+						//both teams are done with plans
 						if (gameRound === 2) {
-							//move to the next phase
-
+							//move to place phase
 							queryString =
 								"UPDATE games SET gameRound = 0, gameSlice = 0, gamePhase = 3 WHERE gameId = ?";
 							inserts = [gameId];
@@ -748,8 +744,7 @@ const mainButtonClick = async (io, socket) => {
 								.in("game" + gameId)
 								.emit("serverSendingAction", serverAction);
 						} else {
-							//move to the next round, reset slice to 0
-
+							//move to next round
 							queryString =
 								"UPDATE games SET gameRound = gameRound + 1, gameSlice = 0 WHERE gameId = ?";
 							inserts = [gameId];
@@ -794,23 +789,10 @@ const mainButtonClick = async (io, socket) => {
 						game1StatusNew = 0;
 					}
 
-					//check to see if there were no remaining plans??
-					//check to see if 1 team has plans and the other does not...
-					//could update the game#Status to show that one team is done with their plans entirely
-					//that way the other team always thinks that the other has clicked already...
-
-					// have all the plans for this move
-					// assume that we are good to move through them? (think of any other checks that need to happen here...)
-
-					// assume done with the other events (tbd)
-
-					// need to check for collisions before moving
-					// create battle events and then move to those before moving the pieces...
-					// need to signal that battles have already been checked???
-					// can't move the pieces until collision's have been handled
-					// after collisions have been handled, can now move the pieces
-
-					// assume collisions have been handled, and now ready to move the pieces...
+					// check for collision battles
+					// create collision battle events
+					// signal that these need to happen (in database)
+					// break if inserted events, continue if no events necessary
 
 					//moving the pieces (non-special flag)
 					queryString =

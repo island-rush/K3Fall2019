@@ -38,7 +38,7 @@ const pieceItemsContainerStyle = {
 class InvMenu extends Component {
 	render() {
 		const warfareInvItems = this.props.invItems.filter(item => {
-			return item.invItemTypeId === 0;
+			return item.invItemTypeId > 19;
 		});
 
 		const warefareInvItemComponents = warfareInvItems.map((invItem, index) => (
@@ -46,7 +46,7 @@ class InvMenu extends Component {
 		));
 
 		const pieceInvItems = this.props.invItems.filter(item => {
-			return item.invItemTypeId !== 0;
+			return item.invItemTypeId <= 19;
 		});
 
 		const pieceInvItemComponents = pieceInvItems.map((invItem, index) => (
