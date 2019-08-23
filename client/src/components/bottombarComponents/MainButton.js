@@ -30,6 +30,8 @@ class MainButton extends Component {
 				}
 			} else if (gamePhase === 3) {
 				buttonText = "Click to go to News";
+			} else {
+				buttonText = "Loading...";
 			}
 		}
 

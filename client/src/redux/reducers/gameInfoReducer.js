@@ -16,10 +16,10 @@ const initialGameInfoState = {
 	gameSection: "Loading...",
 	gameInstructor: "Loading...",
 	gameController: "Loading...",
-	gamePhase: 0,
-	gameRound: 0,
-	gameSlice: 0,
-	gameStatus: 0,
+	gamePhase: -1,
+	gameRound: -1,
+	gameSlice: -1,
+	gameStatus: -1,
 	gamePoints: -1
 };
 
@@ -52,6 +52,7 @@ function gameInfoReducer(state = initialGameInfoState, { type, payload }) {
 			return stateDeepCopy;
 		case PLACE_PHASE:
 			stateDeepCopy.gamePhase = 3;
+			stateDeepCopy.gameStatus = 0;
 			return stateDeepCopy;
 		case PIECES_MOVE:
 			stateDeepCopy.gameStatus = payload.gameStatus;

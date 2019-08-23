@@ -14,7 +14,8 @@ import {
 	SLICE_CHANGE,
 	NEWS_PHASE,
 	NEW_ROUND,
-	PLACE_PHASE
+	PLACE_PHASE,
+	PIECES_MOVE
 } from "../actions/types";
 
 const initialUserFeedback = "Loading...";
@@ -53,6 +54,8 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "New Round of Combat!...";
 		case PLACE_PHASE:
 			return "Place troops onto the board from inventory...";
+		case PIECES_MOVE:
+			return "Executed a step!";
 		default:
 			return state;
 	}

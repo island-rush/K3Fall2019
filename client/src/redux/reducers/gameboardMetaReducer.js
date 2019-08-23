@@ -9,7 +9,8 @@ import {
 	DELETE_PLAN,
 	UNDO_MOVE,
 	CONTAINER_MOVE,
-	INITIAL_GAMESTATE
+	INITIAL_GAMESTATE,
+	SLICE_CHANGE
 } from "../actions/types";
 
 const initialGameboardMeta = {
@@ -80,6 +81,9 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			return stateDeepCopy;
 		case INITIAL_GAMESTATE:
 			stateDeepCopy.confirmedPlans = payload.confirmedPlans;
+			return stateDeepCopy;
+		case SLICE_CHANGE:
+			stateDeepCopy.confirmedPlans = {};
 			return stateDeepCopy;
 		default:
 			return state;

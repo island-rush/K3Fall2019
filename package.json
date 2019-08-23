@@ -6,7 +6,7 @@
 	"scripts": {
 		"start": "node server.js",
 		"fullInstall": "npm install && cd client && npm install && cd ..",
-		"devBackend": "nodemon server.js -ignore './client/'",
+		"devBackend": "nodemon server.js",
 		"devFrontend": "cd client && npm start",
 		"dev": "concurrently \"npm:devBackend\" \"npm:devFrontend\"",
 		"buildClient": "cd client && npm run build && cd .."
@@ -32,5 +32,10 @@
 	"devDependencies": {
 		"concurrently": "^4.1.1",
 		"nodemon": "^1.18.10"
+	},
+	"nodemonConfig": {
+		"ignore": [
+			"client/*"
+		]
 	}
 }

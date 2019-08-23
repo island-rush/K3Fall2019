@@ -183,7 +183,7 @@ class Gameboard extends Component {
 }
 
 Gameboard.propTypes = {
-	gameboard: PropTypes.object.isRequired,
+	gameboard: PropTypes.array.isRequired,
 	selectedPosition: PropTypes.number.isRequired,
 	selectPosition: PropTypes.func.isRequired,
 	newsAlert: PropTypes.object.isRequired,

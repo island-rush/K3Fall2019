@@ -67,7 +67,7 @@ class Zoombox extends Component {
 
 Zoombox.propTypes = {
 	selectedPos: PropTypes.number.isRequired,
-	gameboard: PropTypes.object.isRequired
+	gameboard: PropTypes.array.isRequired
 };
 
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
