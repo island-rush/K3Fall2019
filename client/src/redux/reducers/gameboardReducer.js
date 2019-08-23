@@ -7,19 +7,22 @@ const initialGameboardEmpty = { '0': { type: 'land', pieces: [] }, '1': { type: 
 //TODO: figure out if its more efficient to store as an actual array and not an object, use ES6 MAP?*?*?
 function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
   let stateDeepCopy = JSON.parse(JSON.stringify(state));
+  let positions;
 	switch (type) {
 		case INITIAL_GAMESTATE:
-			const positions = Object.keys(payload.gameboardPieces);
+			positions = Object.keys(payload.gameboardPieces);
 			for (let x = 0; x < positions.length; x++) {
 				stateDeepCopy[positions[x]].pieces = payload.gameboardPieces[positions[x]];
 			}
 			return stateDeepCopy;
 		case PIECES_MOVE:
-			for (let z = 0; z < payload.piecesToUpdate.length; z++) {
-				//need to know where the piece currently is / filter it out
-				
+			//TODO: consolidate this with initial gamestate (or change)
+			let freshBoard = JSON.parse(JSON.stringify(initialGameboardEmpty));
+			positions = Object.keys(payload.gameboardPieces);
+			for (let x = 0; x < positions.length; x++) {
+				freshBoard[positions[x]].pieces = payload.gameboardPieces[positions[x]];
 			}
-			return stateDeepCopy;
+			return freshBoard;
 		default:
 			return stateDeepCopy;
 	}

@@ -105,12 +105,12 @@ Sidebar.propTypes = {
 };
 
 const mapStateToProps = ({ gameInfo, selectedMenu }) => ({
-	gameInfo: gameInfo,
-	selectedMenu: selectedMenu
+	gameInfo,
+	selectedMenu
 });
 
 const mapActionsToProps = {
-	menuSelect: menuSelect
+	menuSelect
 };
 
 export default connect(

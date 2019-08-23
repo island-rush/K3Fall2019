@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 const gameinfoStyle = {
 	backgroundColor: "Yellow",
 	position: "absolute",
-	height: "50%",
+	height: "80%",
 	width: "500%",
 	marginLeft: "200%",
 	marginTop: "20%"
@@ -21,6 +21,9 @@ const Gameinfo = ({ selected, gameInfo }) => {
 			<div>GameSection: {gameInfo.gameSection}</div>
 			<div>GameInstructor: {gameInfo.gameInstructor}</div>
 			<div>GameController: {gameInfo.gameController}</div>
+			<div>GamePhase: {gameInfo.gamePhase}</div>
+			<div>GameRound: {gameInfo.gameRound}</div>
+			<div>GameSlice: {gameInfo.gameSlice}</div>
 		</div>
 	);
 };

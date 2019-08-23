@@ -10,7 +10,8 @@ import {
 	PLAN_WAS_CONFIRMED,
 	MAIN_BUTTON_CLICK,
 	PURCHASE_PHASE,
-	COMBAT_PHASE
+	COMBAT_PHASE,
+	SLICE_CHANGE
 } from "../actions/types";
 
 const initialUserFeedback = "Loading...";
@@ -41,6 +42,8 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "Switched to the purchase phase....check out the shop and buy stuff...";
 		case COMBAT_PHASE:
 			return "Switched to the combat phase...start to plan your turn by clicking on pieces!";
+		case SLICE_CHANGE:
+			return "Done planning, click main button to execute the plan...";
 		default:
 			return state;
 	}

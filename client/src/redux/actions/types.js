@@ -21,3 +21,5 @@ export const MAIN_BUTTON_CLICK = "MAIN_BUTTON_CLICK";
 export const PURCHASE_PHASE = "PURCHASE_PHASE";
 export const COMBAT_PHASE = "COMBAT_PHASE";
 export const PIECES_MOVE = "PIECES_MOVE";
+export const SLICE_CHANGE = "SLICE_CHANGE";
+export const PLACE_PHASE = "PLACE_PHASE";

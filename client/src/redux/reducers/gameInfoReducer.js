@@ -4,7 +4,9 @@ import {
 	SHOP_REFUND,
 	PURCHASE_PHASE,
 	MAIN_BUTTON_CLICK,
-	COMBAT_PHASE
+	COMBAT_PHASE,
+	SLICE_CHANGE,
+	PLACE_PHASE
 } from "../actions/types";
 
 const initialGameInfoState = {
@@ -40,6 +42,13 @@ function gameInfoReducer(state = initialGameInfoState, { type, payload }) {
 		case COMBAT_PHASE:
 			stateDeepCopy.gameStatus = 0;
 			stateDeepCopy.gamePhase = 2;
+			return stateDeepCopy;
+		case SLICE_CHANGE:
+			stateDeepCopy.gameStatus = 0;
+			stateDeepCopy.gameSlice = 1;
+			return stateDeepCopy;
+		case PLACE_PHASE:
+			stateDeepCopy.gamePhase = 3;
 			return stateDeepCopy;
 		default:
 			return state;

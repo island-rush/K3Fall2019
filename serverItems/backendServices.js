@@ -24,7 +24,9 @@ const {
 	MAIN_BUTTON_CLICK,
 	PURCHASE_PHASE,
 	COMBAT_PHASE,
-	PIECES_MOVE
+	PIECES_MOVE,
+	SLICE_CHANGE,
+	PLACE_PHASE
 } = require("./constants");
 
 const { distanceMatrix } = require("./distanceMatrix");
@@ -586,14 +588,14 @@ const mainButtonClick = async (io, socket) => {
 	} else {
 		//both teams done with this phase, round, slice, move...
 		//mark other team as no longer waiting
-		let queryString = "UPDATE games set ?? = 0 WHERE gameId = ?";
-		let inserts = [
-			"game" + (parseInt(gameTeam) === 0 ? 1 : 0) + "Status",
-			gameId
-		];
+		let queryString =
+			"UPDATE games set game0Status = 0, game1Status = 0 WHERE gameId = ?";
+		let inserts = [gameId];
 		await conn.query(queryString, inserts);
 
 		let serverAction;
+		// let queryString;
+		// let inserts;
 
 		switch (parseInt(gamePhase)) {
 			case 0:
@@ -626,6 +628,23 @@ const mainButtonClick = async (io, socket) => {
 
 				serverAction = {
 					type: COMBAT_PHASE,
+					payload: {}
+				};
+
+				io.sockets
+					.in("game" + gameId)
+					.emit("serverSendingAction", serverAction);
+				break;
+
+			case 3:
+				//place troops (from the inv)
+				queryString = "UPDATE games set gamePhase = 2 WHERE gameId = ?";
+				inserts = [gameId];
+				await conn.query(queryString, inserts);
+				await conn.release();
+
+				serverAction = {
+					type: PLACE_PHASE,
 					payload: {}
 				};
 
@@ -678,20 +697,80 @@ const mainButtonClick = async (io, socket) => {
 					queryString = "UPDATE games SET gameSlice = 1 WHERE gameId = ?";
 					inserts = [gameId];
 					await conn.query(queryString, inserts);
+
+					//need to let the clients know that done with planning, ready to execute
+					serverAction = {
+						type: SLICE_CHANGE,
+						payload: {}
+					};
+
+					io.sockets
+						.in("game" + gameId)
+						.emit("serverSendingAction", serverAction);
 					break;
 				} else {
-					//NEED TO CHECK EVENTS FIRST before continuing to move the pieces...
+					//TODO: check events to handle (finish those before handling plans)
 
 					//stepping through all the plans / events
 					//need to get the current movement order? (so that can select all from that order)
 					//TODO: need better standards for results, fields...usually do const, but continuing to use them (different names / numberings?)
-					let results, fields;
+
+					console.log("getting movement order");
 
 					queryString =
-						"SELECT planMovementOrder as currentMovementOrder FROM plans WHERE planGameId = ? ORDER BY planMovementOrder ASC LIMIT 1";
+						"SELECT planMovementOrder as currentMovementOrder FROM plans WHERE planGameId = ? AND planTeamId = 0 ORDER BY planMovementOrder ASC LIMIT 1";
 					inserts = [gameId];
-					[results, fields] = await conn.query(queryString, inserts);
-					const { currentMovementOrder } = results;
+					let [results0, fields0] = await conn.query(queryString, inserts);
+
+					queryString =
+						"SELECT planMovementOrder as currentMovementOrder FROM plans WHERE planGameId = ? AND planTeamId = 1 ORDER BY planMovementOrder ASC LIMIT 1";
+					inserts = [gameId];
+					let [results1, fields1] = await conn.query(queryString, inserts);
+
+					if (results0.length === 0 && results1.length === 0) {
+						//both teams done with stuff
+						//move on to the next round and deal with things here...
+
+						if (gameRound === 2) {
+							//move to the next phase
+
+							queryString =
+								"UPDATE games SET gameRound = 0, gameSlice = 0, gamePhase = 3 WHERE gameId = ?";
+							inserts = [gameId];
+							await conn.query(queryString, inserts);
+						} else {
+							//move to the next round, reset slice to 0
+
+							queryString =
+								"UPDATE games SET gameRound = gameRound + 1, gameSlice = 0 WHERE gameId = ?";
+							inserts = [gameId];
+							await conn.query(queryString, inserts);
+						}
+
+						break;
+					}
+
+					let currentMovementOrder;
+
+					//one of these should fire, since above check failed to exit
+					//keeping the empty plan team at status1
+					if (results0.length === 0) {
+						queryString = "UPDATE games set game0Status = 1 WHERE gameId = ?";
+						inserts = [gameId];
+						await conn.query(queryString, inserts);
+					} else {
+						currentMovementOrder = results0[0]["currentMovementOrder"];
+					}
+
+					if (results1.length === 0) {
+						queryString = "UPDATE games set game1Status = 1 WHERE gameId = ?";
+						inserts = [gameId];
+						await conn.query(queryString, inserts);
+					} else {
+						currentMovementOrder = results1[0]["currentMovementOrder"];
+					}
+
+					console.log("got movement order and it was " + currentMovementOrder);
 
 					//check to see if there were no remaining plans??
 					//check to see if 1 team has plans and the other does not...
@@ -711,112 +790,50 @@ const mainButtonClick = async (io, socket) => {
 
 					// assume collisions have been handled, and now ready to move the pieces...
 
-					// not yet dealing with containers or special flags from the plans
-
-					// getting the previous positions because faster / easier to update the client if it knows...(hard to lookup the big array sorted by position)
-
-					queryString =
-						"SELECT pieceId, piecePositionId, pieceTeamId FROM pieces NATURAL JOIN plans WHERE pieces.pieceGameId = ? AND pieces.pieceId = plans.planPieceId AND planSpecialFlag = 0 AND plans.planMovementOrder = ? ORDER BY pieceId ASC";
-					inserts = [gameId, currentMovementOrder];
-					[previousPositions, fields] = await conn.query(queryString, inserts);
-
-					let previousPositions0Team = [];
-					let previousPositions1Team = [];
-
-					for (let e = 0; e < previousPositions.length; e++) {
-						let { pieceId, piecePositionId, pieceTeamId } = previousPositions[
-							e
-						];
-
-						if (pieceTeamId === 0) {
-							previousPositions0Team.push({ pieceId, piecePositionId });
-						} else {
-							previousPositions1Team.push({ pieceId, piecePositionId });
-						}
-					}
-
+					//moving the pieces (non-special flag)
 					queryString =
 						"UPDATE pieces, plans SET pieces.piecePositionId = plans.planPositionId WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
 					inserts = [gameId, currentMovementOrder];
 					await conn.query(queryString, inserts);
 
+					//delete those plans (non-special flag)
 					queryString =
 						"DELETE FROM plans WHERE planGameId = ? AND planMovementOrder = ? AND planSpecialFlag = 0";
 					inserts = [gameId, currentMovementOrder];
 					await conn.query(queryString, inserts);
 
-					// now need to create battle events, container events, refuel events
-					// also need to UPDATE VISIBILITY HERE...
+					console.log("moved the pieces and deleted the plans");
 
-					// need the client to get the updated pieces from the server (pieceMoveAction)
-					// is there a way to see which pieces were updated? (could have part of the table defined to keep track of it)
-					// this is so we don't send the full board every time a single piece moves, cut down on network traffic and transmission sizes
+					// create battle events
+					// create refuel events (special flag? / proximity)
+					// create container events (special flag)
+					// update visibility (algorithm)
 
-					//this already defined? (maybe need different names for each action for better clarity)
-
-					// TODO: only check the updated stuff? (but new stuff might have become in view...make sure those are included as well)
-					queryString =
-						"SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = 0 OR pieceVisible = 1)";
-					inserts = [gameId];
-					[game0Pieces, fields] = await conn.query(queryString, inserts);
-
-					queryString =
-						"SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = 1 OR pieceVisible = 1)";
-					inserts = [gameId];
-					[game1Pieces, fields] = await conn.query(queryString, inserts);
-
-					// need to send different updates to different clients
-					// TODO: send the previous position to help with the piece update state / redux reducer
-
-					let game0Update = [];
-					let game1Update = [];
-
-					//TODO: see if there is a better way to do for loops in ES6/ES7 for iterable items
-					// assuming that the updated pieces are the same we got before the update, for previous position
-
-					// but what about pieces that come from containers, or going into containers
-					// and what about pieces that weren't visible but are now visible, or vice versa...
-
-					// need to know what pieces to move, to create, and to delete... (different lists? (need to whiteboard that shit...))
-
-					for (let x = 0; x < game0Pieces.length; x++) {
-						let { pieceId, piecePositionId } = game0Pieces[x];
-						game0Update.push({ pieceId, piecePositionId });
-					}
-
-					for (let x = 0; x < game1Pieces.length; x++) {
-						let { pieceId, piecePositionId } = game1Pieces[x];
-						game1Update.push({ pieceId, piecePositionId });
-					}
-
+					//create final update to each client
 					const server0Action = {
 						type: PIECES_MOVE,
 						payload: {
-							piecesToUpdate: game0Update
+							gameboardPieces: await getVisiblePieces(conn, gameId, 0)
 						}
 					};
 
 					const server1Action = {
 						type: PIECES_MOVE,
 						payload: {
-							piecesToUpdate: game1Update
+							gameboardPieces: await getVisiblePieces(conn, gameId, 1)
 						}
 					};
 
-					// io.sockets
-					// 	.in("game" + gameId + "team0")
-					// 	.emit("serverSendingAction", server0Action);
-					// io.sockets
-					// 	.in("game" + gameId + "team1")
-					// 	.emit("serverSendingAction", server1Action);
+					//send final update to each client
+					io.sockets
+						.in("game" + gameId + "team0")
+						.emit("serverSendingAction", server0Action);
+					io.sockets
+						.in("game" + gameId + "team1")
+						.emit("serverSendingAction", server1Action);
 				}
 
 				break;
-
-			case 3:
-				//place troops (from the inv)
-				break;
-
 			default:
 				socket.emit(
 					"serverSendingAction",
