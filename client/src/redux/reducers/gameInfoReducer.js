@@ -12,6 +12,8 @@ const initialGameInfoState = {
 	gameInstructor: "Loading...",
 	gameController: "Loading...",
 	gamePhase: 0,
+	gameRound: 0,
+	gameSlice: 0,
 	gameStatus: 0,
 	gamePoints: -1
 };

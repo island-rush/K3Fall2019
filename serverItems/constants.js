@@ -8,6 +8,7 @@ exports.DELETE_PLAN = "DELETE_PLAN";
 exports.MAIN_BUTTON_CLICK = "MAIN_BUTTON_CLICK";
 exports.PURCHASE_PHASE = "PURCHASE_PHASE";
 exports.COMBAT_PHASE = "COMBAT_PHASE";
+exports.PIECES_MOVE = "PIECES_MOVE";
 
 exports.shopItemTypeCosts = {
 	//TypeId: Cost
