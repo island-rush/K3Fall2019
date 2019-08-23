@@ -11,6 +11,8 @@ exports.COMBAT_PHASE = "COMBAT_PHASE";
 exports.PIECES_MOVE = "PIECES_MOVE";
 exports.SLICE_CHANGE = "SLICE_CHANGE";
 exports.PLACE_PHASE = "PLACE_PHASE";
+exports.NEWS_PHASE = "NEWS_PHASE";
+exports.NEW_ROUND = "NEW_ROUND";
 
 exports.shopItemTypeCosts = {
 	//TypeId: Cost

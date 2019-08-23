@@ -26,7 +26,9 @@ const {
 	COMBAT_PHASE,
 	PIECES_MOVE,
 	SLICE_CHANGE,
-	PLACE_PHASE
+	PLACE_PHASE,
+	NEWS_PHASE,
+	NEW_ROUND
 } = require("./constants");
 
 const { distanceMatrix } = require("./distanceMatrix");
@@ -637,14 +639,14 @@ const mainButtonClick = async (io, socket) => {
 				break;
 
 			case 3:
-				//place troops (from the inv)
-				queryString = "UPDATE games set gamePhase = 2 WHERE gameId = ?";
+				//place troops -> news phase
+				queryString = "UPDATE games set gamePhase = 0 WHERE gameId = ?";
 				inserts = [gameId];
 				await conn.query(queryString, inserts);
 				await conn.release();
 
 				serverAction = {
-					type: PLACE_PHASE,
+					type: NEWS_PHASE,
 					payload: {}
 				};
 
@@ -715,8 +717,6 @@ const mainButtonClick = async (io, socket) => {
 					//need to get the current movement order? (so that can select all from that order)
 					//TODO: need better standards for results, fields...usually do const, but continuing to use them (different names / numberings?)
 
-					console.log("getting movement order");
-
 					queryString =
 						"SELECT planMovementOrder as currentMovementOrder FROM plans WHERE planGameId = ? AND planTeamId = 0 ORDER BY planMovementOrder ASC LIMIT 1";
 					inserts = [gameId];
@@ -738,6 +738,15 @@ const mainButtonClick = async (io, socket) => {
 								"UPDATE games SET gameRound = 0, gameSlice = 0, gamePhase = 3 WHERE gameId = ?";
 							inserts = [gameId];
 							await conn.query(queryString, inserts);
+
+							serverAction = {
+								type: PLACE_PHASE,
+								payload: {}
+							};
+
+							io.sockets
+								.in("game" + gameId)
+								.emit("serverSendingAction", serverAction);
 						} else {
 							//move to the next round, reset slice to 0
 
@@ -745,6 +754,17 @@ const mainButtonClick = async (io, socket) => {
 								"UPDATE games SET gameRound = gameRound + 1, gameSlice = 0 WHERE gameId = ?";
 							inserts = [gameId];
 							await conn.query(queryString, inserts);
+
+							serverAction = {
+								type: NEW_ROUND,
+								payload: {
+									gameRound: gameRound + 1
+								}
+							};
+
+							io.sockets
+								.in("game" + gameId)
+								.emit("serverSendingAction", serverAction);
 						}
 
 						break;
@@ -754,23 +774,25 @@ const mainButtonClick = async (io, socket) => {
 
 					//one of these should fire, since above check failed to exit
 					//keeping the empty plan team at status1
+					let game0StatusNew = 1;
 					if (results0.length === 0) {
 						queryString = "UPDATE games set game0Status = 1 WHERE gameId = ?";
 						inserts = [gameId];
 						await conn.query(queryString, inserts);
 					} else {
 						currentMovementOrder = results0[0]["currentMovementOrder"];
+						game0StatusNew = 0;
 					}
 
+					let game1StatusNew = 1;
 					if (results1.length === 0) {
 						queryString = "UPDATE games set game1Status = 1 WHERE gameId = ?";
 						inserts = [gameId];
 						await conn.query(queryString, inserts);
 					} else {
 						currentMovementOrder = results1[0]["currentMovementOrder"];
+						game1StatusNew = 0;
 					}
-
-					console.log("got movement order and it was " + currentMovementOrder);
 
 					//check to see if there were no remaining plans??
 					//check to see if 1 team has plans and the other does not...
@@ -802,8 +824,6 @@ const mainButtonClick = async (io, socket) => {
 					inserts = [gameId, currentMovementOrder];
 					await conn.query(queryString, inserts);
 
-					console.log("moved the pieces and deleted the plans");
-
 					// create battle events
 					// create refuel events (special flag? / proximity)
 					// create container events (special flag)
@@ -813,14 +833,16 @@ const mainButtonClick = async (io, socket) => {
 					const server0Action = {
 						type: PIECES_MOVE,
 						payload: {
-							gameboardPieces: await getVisiblePieces(conn, gameId, 0)
+							gameboardPieces: await getVisiblePieces(conn, gameId, 0),
+							gameStatus: game0StatusNew
 						}
 					};
 
 					const server1Action = {
 						type: PIECES_MOVE,
 						payload: {
-							gameboardPieces: await getVisiblePieces(conn, gameId, 1)
+							gameboardPieces: await getVisiblePieces(conn, gameId, 1),
+							gameStatus: game1StatusNew
 						}
 					};
 

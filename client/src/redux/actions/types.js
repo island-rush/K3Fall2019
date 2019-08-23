@@ -23,3 +23,5 @@ export const COMBAT_PHASE = "COMBAT_PHASE";
 export const PIECES_MOVE = "PIECES_MOVE";
 export const SLICE_CHANGE = "SLICE_CHANGE";
 export const PLACE_PHASE = "PLACE_PHASE";
+export const NEWS_PHASE = "NEWS_PHASE";
+export const NEW_ROUND = "NEW_ROUND";

@@ -11,12 +11,39 @@ const mainButtonStyle = {
 
 class MainButton extends Component {
 	render() {
-		const buttonText = this.props.gameInfo.gameStatus
-			? "Waiting"
-			: "Main Button";
+		let buttonText;
+
+		let { gameStatus, gamePhase, gameSlice } = this.props.gameInfo;
+
+		if (gameStatus === 1) {
+			buttonText = "Waiting on other Team...";
+		} else {
+			if (gamePhase === 0) {
+				buttonText = "Click to go to Purchase";
+			} else if (gamePhase === 1) {
+				buttonText = "Click to go to Combat";
+			} else if (gamePhase === 2) {
+				if (gameSlice === 0) {
+					buttonText = "Click to end Planning";
+				} else {
+					buttonText = "Click to execute step.";
+				}
+			} else if (gamePhase === 3) {
+				buttonText = "Click to go to News";
+			}
+		}
 
 		return (
-			<div style={mainButtonStyle} onClick={() => this.props.mainButtonClick()}>
+			<div
+				style={mainButtonStyle}
+				onClick={() => {
+					// normally confirms are obtrusive UI, and should use something else TODO: confirm dialog box...
+					// eslint-disable-next-line no-restricted-globals
+					if (confirm("Are you sure you want to move on?")) {
+						this.props.mainButtonClick();
+					}
+				}}
+			>
 				{buttonText}
 			</div>
 		);
