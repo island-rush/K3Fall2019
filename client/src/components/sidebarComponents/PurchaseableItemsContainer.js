@@ -19,6 +19,22 @@ const PurchaseableItemsContainer = ({ purchase, points }) => {
 			<PurchaseableItem purchase={purchase} typeId={1} />
 			<PurchaseableItem purchase={purchase} typeId={2} />
 			<PurchaseableItem purchase={purchase} typeId={3} />
+			<PurchaseableItem purchase={purchase} typeId={4} />
+			<PurchaseableItem purchase={purchase} typeId={5} />
+			<PurchaseableItem purchase={purchase} typeId={6} />
+			<PurchaseableItem purchase={purchase} typeId={7} />
+			<PurchaseableItem purchase={purchase} typeId={8} />
+			<PurchaseableItem purchase={purchase} typeId={9} />
+			<PurchaseableItem purchase={purchase} typeId={10} />
+			<PurchaseableItem purchase={purchase} typeId={11} />
+			<PurchaseableItem purchase={purchase} typeId={12} />
+			<PurchaseableItem purchase={purchase} typeId={13} />
+			<PurchaseableItem purchase={purchase} typeId={14} />
+			<PurchaseableItem purchase={purchase} typeId={15} />
+			<PurchaseableItem purchase={purchase} typeId={16} />
+			<PurchaseableItem purchase={purchase} typeId={17} />
+			<PurchaseableItem purchase={purchase} typeId={18} />
+			<PurchaseableItem purchase={purchase} typeId={19} />
 		</div>
 	);
 };

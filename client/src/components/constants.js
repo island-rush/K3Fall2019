@@ -3,26 +3,26 @@ const relativePath = "./images/unitImages/";
 export const typeImages = {
 	//TypeId: ImageUrlCSS
 	//TODO: fix these links for all units
-	0: { backgroundImage: `url("${relativePath}radar.png")` },
+	0: { backgroundImage: `url("${relativePath}bomber.png")` },
 	1: { backgroundImage: `url("${relativePath}stealthBomber.png")` },
-	2: { backgroundImage: `url("${relativePath}submarine.png")` },
-	3: { backgroundImage: `url("${relativePath}tank.png")` },
-	4: { backgroundImage: `url("${relativePath}transport.png")` },
-	5: { backgroundImage: `url("${relativePath}transport.png")` },
-	6: { backgroundImage: `url("${relativePath}transport.png")` },
-	7: { backgroundImage: `url("${relativePath}transport.png")` },
-	8: { backgroundImage: `url("${relativePath}transport.png")` },
-	9: { backgroundImage: `url("${relativePath}transport.png")` },
-	10: { backgroundImage: `url("${relativePath}transport.png")` },
-	11: { backgroundImage: `url("${relativePath}transport.png")` },
-	12: { backgroundImage: `url("${relativePath}transport.png")` },
-	13: { backgroundImage: `url("${relativePath}transport.png")` },
-	14: { backgroundImage: `url("${relativePath}transport.png")` },
-	15: { backgroundImage: `url("${relativePath}transport.png")` },
+	2: { backgroundImage: `url("${relativePath}fighter.png")` },
+	3: { backgroundImage: `url("${relativePath}tanker.png")` },
+	4: { backgroundImage: `url("${relativePath}c17.png")` },
+	5: { backgroundImage: `url("${relativePath}e3.png")` },
+	6: { backgroundImage: `url("${relativePath}infantry.png")` },
+	7: { backgroundImage: `url("${relativePath}artillery.png")` },
+	8: { backgroundImage: `url("${relativePath}tank.png")` },
+	9: { backgroundImage: `url("${relativePath}marine.png")` },
+	10: { backgroundImage: `url("${relativePath}attackHeli.png")` },
+	11: { backgroundImage: `url("${relativePath}convoy.png")` },
+	12: { backgroundImage: `url("${relativePath}sam.png")` },
+	13: { backgroundImage: `url("${relativePath}destroyer.png")` },
+	14: { backgroundImage: `url("${relativePath}aircraftCarrier.png")` },
+	15: { backgroundImage: `url("${relativePath}submarine.png")` },
 	16: { backgroundImage: `url("${relativePath}transport.png")` },
-	17: { backgroundImage: `url("${relativePath}transport.png")` },
-	18: { backgroundImage: `url("${relativePath}transport.png")` },
-	19: { backgroundImage: `url("${relativePath}transport.png")` }
+	17: { backgroundImage: `url("${relativePath}mc12.png")` },
+	18: { backgroundImage: `url("${relativePath}c130.png")` },
+	19: { backgroundImage: `url("${relativePath}sofTeam.png")` }
 };
 
 export const typeCosts = {
@@ -51,6 +51,30 @@ export const typeCosts = {
 
 export const typeMoves = {
 	//TypdId: Moves
+	0: 5, //bomer
+	1: 5, //stealth bomber
+	2: 5, //stealth fighter
+	3: 5,
+	4: 5,
+	5: 5,
+	6: 5,
+	7: 5,
+	8: 5,
+	9: 5,
+	10: 5,
+	11: 5,
+	12: 5,
+	13: 5,
+	14: 5,
+	15: 5,
+	16: 5,
+	17: 5,
+	18: 5,
+	19: 5
+};
+
+export const typeFuel = {
+	//TypdId: Moves (-1 = warfare)
 	0: 5, //bomer
 	1: 5, //stealth bomber
 	2: 5, //stealth fighter

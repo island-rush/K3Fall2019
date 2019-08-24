@@ -70,3 +70,18 @@ CREATE TABLE IF NOT EXISTS plans(
     PRIMARY KEY(planId)
 ) AUTO_INCREMENT=1;
 
+CREATE TABLE IF NOT EXISTS news(
+	newsId INT(8) NOT NULL AUTO_INCREMENT,
+    newsGameId INT(4) NOT NULL,
+    newsTeam INT(4) NOT NULL,
+    newsOrder INT(4) NOT NULL,
+    newsPieces INT(4) NOT NULL,
+    newsEffect INT(4) NOT NULL,
+    newsRoll INT(4) NOT NULL,
+    newsLength INT(4) NOT NULL,
+    newsZone INT(4) NOT NULL,
+    newsTitle VARCHAR(100) NOT NULL,
+    newsInfo VARCHAR(800) NOT NULL,
+    newsActivated INT(1) NOT NULL,
+    PRIMARY KEY(newsId)
+) AUTO_INCREMENT=1;

@@ -6,7 +6,7 @@ const piece = (
 	pieceTypeName,
 	piecePositionId,
 	pieceContainerId = -1,
-	pieceVisible = 1
+	pieceVisible = 0
 ) => {
 	const pieceTeamId = pieceTeamName === "Blue" ? 0 : 1;
 	const pieceTypeId = typeNameIds[pieceTypeName];
@@ -24,12 +24,12 @@ const piece = (
 	];
 };
 
-exports.generateDefaultPieces = gameId => {
-	return [
+exports.generateDefaultPieces = async (conn, gameId) => {
+	const firstPieces = [
 		piece(gameId, "Blue", "Tank", 0),
 		piece(gameId, "Blue", "Tank", 1),
-		piece(gameId, "Red", "Tank", 2),
-		piece(gameId, "Red", "Tank", 3)
+		piece(gameId, "Red", "Tank", 118),
+		piece(gameId, "Red", "Tank", 119)
 		// piece(gameId, "Blue", "Tank", 1),
 		// piece(gameId, "Red", "Radar", 2),
 		// piece(gameId, "Red", "Sub", 2),
@@ -37,4 +37,10 @@ exports.generateDefaultPieces = gameId => {
 		// piece(gameId, "Red", "Transport", 2),
 		// piece(gameId, "Blue", "Tank", 3)
 	];
+
+	queryString =
+		"INSERT INTO pieces (pieceGameId, pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId, pieceVisible, pieceMoves, pieceFuel) VALUES ?";
+	inserts = [firstPieces];
+	await conn.query(queryString, inserts);
+	return;
 };

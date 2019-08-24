@@ -1,5 +1,11 @@
 import React from "react";
-import { typeImages, typeCosts } from "../constants";
+import {
+	typeImages,
+	typeCosts,
+	typeNames,
+	typeMoves,
+	typeFuel
+} from "../constants";
 import PropTypes from "prop-types";
 
 const purchaseableItemStyle = {
@@ -22,7 +28,7 @@ const PurchaseableItem = ({ typeId, purchase }) => {
 				purchase(typeId);
 				event.stopPropagation();
 			}}
-			title={`Cost: ${typeCosts[typeId]}`}
+			title={`${typeNames[typeId]}\nCost: ${typeCosts[typeId]}\nMoves: ${typeMoves[typeId]}\nFuel: ${typeFuel[typeId]}`}
 		/>
 	);
 };

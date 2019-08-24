@@ -36,6 +36,8 @@ const { distanceMatrix } = require("./distanceMatrix");
 const initialTopPiecesGenerator = require("./initialTopPieces")
 	.generateDefaultPieces; //TODO: This is wordy / weird, fix later
 
+const initialNewsGenerator = require("./initialNews").generateNews;
+
 //Database Pool
 const promisePool = require("./database");
 
@@ -48,8 +50,12 @@ const getGameActiveReal = async (conn, gameId) => {
 };
 
 const gameDeleteReal = async (conn, gameId) => {
-	let queryString = "DELETE FROM pieces WHERE pieceGameId = ?";
+	let queryString = "DELETE FROM news WHERE newsGameId = ?";
 	let inserts = [gameId];
+	await conn.query(queryString, inserts);
+
+	queryString = "DELETE FROM pieces WHERE pieceGameId = ?";
+	inserts = [gameId];
 	await conn.query(queryString, inserts);
 
 	queryString = "DELETE FROM invItems WHERE invItemGameId = ?";
@@ -74,7 +80,11 @@ const getGameId = async (conn, gameSection, gameInstructor) => {
 		"SELECT gameId FROM games WHERE gameSection = ? AND gameInstructor = ?";
 	const inserts = [gameSection, gameInstructor];
 	const [results, fields] = await conn.query(queryString, inserts);
-	return results[0]["gameId"];
+	if (results.length === 1) {
+		return results[0]["gameId"];
+	} else {
+		return null;
+	}
 };
 
 const getGameInfo = async (conn, gameId) => {
@@ -557,11 +567,6 @@ const mainButtonClick = async (io, socket) => {
 	const thisTeamStatus = parseInt(gameTeam) === 0 ? game0Status : game1Status;
 	const otherTeamStatus = parseInt(gameTeam) === 0 ? game1Status : game0Status;
 
-	// console.log(thisTeamStatus);
-	// console.log(otherTeamStatus);
-
-	// console.log(gameTeam);
-
 	//thisTeamStatus == 1
 	if (parseInt(thisTeamStatus) === 1) {
 		//already pressed / already waiting
@@ -656,43 +661,7 @@ const mainButtonClick = async (io, socket) => {
 				break;
 
 			case 2:
-				//combat (gameplay)
-				//handle the slice / round?
-
-				//3 rounds of combat phase (0, 1, 2)
-				//each round has 2 slices (0, 1)
-				//1st slice is planning
-				//2nd slice is execute plans / events
-				//end of 2nd slice indicated when slice == 2 and no more events to process for either team...
-				//may need to know how to handle when 1 team has more events than another team
-
-				//may need an external function for this?
-				//need to start working on the event database table...
-
-				//from each plan move (1 order), we generate each execution (the list of events from it)
-				//movement (we can get this straight from the plan, don't need event?)
-
-				//battles (need to be generated from after the movements)
-				//refuel...
-				//containers...
-
-				//first, check what the slice is
-				//if slice == 0, move to slice 1 and exit
-				//if slice == 1, check for remaining plans / events?
-				//if there are no more events, check for remaining plans
-				//if there are remaining plans, generate the events / move the pieces?
-				//if there are no remaining plans, move onto the next round
-
-				//eventually move onto the next phase of gameplay
-
-				//pretend its round 0, slice 0 to start, that means they have inserted plans if they wanted
-				//move on to slice 1
-				//show that the button is ready to start moving the pieces?
-				//click to confirm the plan
-				//click again to make the first movements
-
-				//check the slice first?
-
+				//combat phase controls (-> slice, -> execute/step, -> round++, -> place phase)
 				if (parseInt(gameSlice) === 0) {
 					//they are done making the plans for this round
 					//change to slice === 1
@@ -880,11 +849,8 @@ exports.gameReset = async (req, res) => {
 		let inserts = [gameId, gameSection, gameInstructor, gameAdminPassword];
 		await conn.query(queryString, inserts);
 
-		queryString =
-			"INSERT INTO pieces (pieceGameId, pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId, pieceVisible, pieceMoves, pieceFuel) VALUES ?";
-		defaultPieceValues = initialTopPiecesGenerator(gameId);
-		inserts = [defaultPieceValues];
-		await conn.query(queryString, inserts);
+		await initialTopPiecesGenerator(conn, gameId);
+		await initialNewsGenerator(conn, gameId);
 
 		conn.release();
 
@@ -917,6 +883,13 @@ exports.adminLoginVerify = async (req, res) => {
 	try {
 		const conn = await promisePool.getConnection();
 		const gameId = await getGameId(conn, adminSection, adminInstructor);
+
+		if (!gameId) {
+			res.redirect("/index.html?error=login");
+			conn.release();
+			return;
+		}
+
 		const gameInfo = await getGameInfo(conn, gameId);
 		conn.release();
 
@@ -966,6 +939,13 @@ exports.gameLoginVerify = async (req, res, callback) => {
 	try {
 		const conn = await promisePool.getConnection();
 		const gameId = await getGameId(conn, gameSection, gameInstructor);
+
+		if (!gameId) {
+			conn.release();
+			res.redirect("/index.html?error=login");
+			return;
+		}
+
 		const gameInfo = await getGameInfo(conn, gameId);
 
 		if (gameInfo["gameActive"] != 1) {
