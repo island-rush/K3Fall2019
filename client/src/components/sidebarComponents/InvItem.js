@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { typeImages } from "../constants";
+import { typeImages, typeNames, typeMoves, typeFuel } from "../constants";
 
 const invItemStyle = {
 	position: "relative",
@@ -15,12 +15,15 @@ const invItemStyle = {
 
 class InvItem extends Component {
 	render() {
+		const itemTypeId = this.props.invItem.invItemTypeId;
+
 		return (
 			<div
 				style={{
 					...invItemStyle,
-					...typeImages[this.props.invItem.invItemTypeId]
+					...typeImages[itemTypeId]
 				}}
+				title={`${typeNames[itemTypeId]}\nMoves: ${typeMoves[itemTypeId]}\nFuel: ${typeFuel[itemTypeId]}`}
 			/>
 		);
 	}

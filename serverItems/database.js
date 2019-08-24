@@ -20,6 +20,7 @@ const databaseConfig = {
 	database: DatabaseName,
 	multipleStatements: true //it allows for SQL injection attacks if values are not properly escaped
 };
+
 let pool = mysql.createPool(databaseConfig);
 
 module.exports = pool;

@@ -41,9 +41,10 @@ class MainButton extends Component {
 				onClick={() => {
 					// normally confirms are obtrusive UI, and should use something else TODO: confirm dialog box...
 					// eslint-disable-next-line no-restricted-globals
-					if (confirm("Are you sure you want to move on?")) {
-						this.props.mainButtonClick();
-					}
+					// if (confirm("Are you sure you want to move on?")) {
+					// 	this.props.mainButtonClick();
+					// }
+					this.props.mainButtonClick();
 				}}
 			>
 				{buttonText}

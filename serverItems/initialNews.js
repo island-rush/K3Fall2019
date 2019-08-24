@@ -15,7 +15,7 @@ const insertNews = async (conn, gameId, newsOrder, newsOptions) => {
 	await conn.query(queryString, inserts);
 };
 
-exports.generateNews = async (conn, gameId) => {
+module.exports = async (conn, gameId) => {
 	let newsOrder = 0;
 	await insertNews(conn, gameId, newsOrder++, {
 		newsTitle: "Title 1",

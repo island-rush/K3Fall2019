@@ -28,18 +28,17 @@ const {
 	SLICE_CHANGE,
 	PLACE_PHASE,
 	NEWS_PHASE,
-	NEW_ROUND
+	NEW_ROUND,
+	visibilityMatrix,
+	attackMatrix
 } = require("./constants");
 
-const { distanceMatrix } = require("./distanceMatrix");
-
-const initialTopPiecesGenerator = require("./initialTopPieces")
-	.generateDefaultPieces; //TODO: This is wordy / weird, fix later
-
-const initialNewsGenerator = require("./initialNews").generateNews;
+const distanceMatrix = require("./distanceMatrix");
+const initialPieces = require("./initialPieces");
+const initialNews = require("./initialNews");
 
 //Database Pool
-const promisePool = require("./database");
+const pool = require("./database");
 
 //Internal Functions
 const getGameActiveReal = async (conn, gameId) => {
@@ -184,7 +183,7 @@ const logout = async socket => {
 	const queryString = "UPDATE games SET ?? = 0 WHERE gameId = ?";
 	const inserts = [loginField, gameId];
 	try {
-		await promisePool.query(queryString, inserts);
+		await pool.query(queryString, inserts);
 	} catch (error) {
 		console.log(error);
 		//nothing to send to client, they disconnected from the socket already...
@@ -194,7 +193,7 @@ const logout = async socket => {
 const giveInitialGameState = async socket => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const conn = await promisePool.getConnection();
+	const conn = await pool.getConnection();
 	const gameInfo = await getGameInfo(conn, gameId);
 	const invItems = await getTeamInvItems(conn, gameId, gameTeam);
 	const shopItems = await getTeamShopItems(conn, gameId, gameTeam);
@@ -266,7 +265,7 @@ const shopPurchaseRequest = async (socket, shopItemTypeId) => {
 	const shopItemCost = shopItemTypeCosts[shopItemTypeId];
 	//TODO: figure out if the purchase is allowed (game phase...controller Id....game active....) (and in other methods...)
 
-	const conn = await promisePool.getConnection();
+	const conn = await pool.getConnection();
 	const gameInfo = await getGameInfo(conn, gameId);
 	// const teamPoints = await getTeamPoints(conn, gameId, gameTeam);
 
@@ -277,7 +276,7 @@ const shopPurchaseRequest = async (socket, shopItemTypeId) => {
 		return;
 	}
 
-	if (gamePhase !== 1) {
+	if (parseInt(gamePhase) !== 1) {
 		await conn.release();
 		socket.emit(
 			"serverSendingAction",
@@ -286,7 +285,7 @@ const shopPurchaseRequest = async (socket, shopItemTypeId) => {
 		return;
 	}
 
-	if (gameController !== 0) {
+	if (parseInt(gameController) !== 0) {
 		await conn.release();
 		socket.emit(
 			"serverSendingAction",
@@ -352,7 +351,7 @@ const shopRefundRequest = async (socket, shopItem) => {
 	//TODO: verify that the refund is available (correct controller, game active....)
 	//verify that the piece exists and the object given matches database values (overkill)
 
-	const conn = await promisePool.getConnection();
+	const conn = await pool.getConnection();
 	const teamPoints = await getTeamPoints(conn, gameId, gameTeam);
 	const newPoints = teamPoints + itemCost;
 	await setTeamPoints(conn, gameId, gameTeam, newPoints);
@@ -374,7 +373,7 @@ const shopConfirmPurchase = async socket => {
 
 	//TODO: verify if it is allowed, game active, phase, controller...
 
-	const conn = await promisePool.getConnection();
+	const conn = await pool.getConnection();
 
 	let queryString =
 		"INSERT INTO invItems (invItemId, invItemGameId, invItemTeamId, invItemTypeId) SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?";
@@ -434,7 +433,7 @@ const confirmPlan = async (socket, pieceId, plan) => {
 	//need to know if this piece is a container or not, to check if container move was inserted
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const conn = await promisePool.getConnection();
+	const conn = await pool.getConnection();
 	const gameInfo = await getGameInfo(conn, gameId);
 	const pieceInfo = await getPieceInfo(conn, pieceId);
 
@@ -521,7 +520,7 @@ const deletePlan = async (socket, pieceId) => {
 
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const conn = await promisePool.getConnection();
+	const conn = await pool.getConnection();
 	const gameInfo = await getGameInfo(conn, gameId);
 	const pieceInfo = await getPieceInfo(conn, pieceId);
 
@@ -543,11 +542,70 @@ const deletePlan = async (socket, pieceId) => {
 	socket.emit("serverSendingAction", serverAction);
 };
 
+const getPieces = async (conn, gameId) => {
+	const queryString = "SELECT * FROM pieces WHERE pieceGameId = ?";
+	const inserts = [gameId];
+	const [results, fields] = await conn.query(queryString, inserts);
+	return results;
+};
+
+// prettier-ignore
+const getCollisionBattles = async (conn, gameId) => {
+	let queryString = "SELECT * FROM (SELECT pieceId as pieceId0, pieceTypeId as pieceTypeId0, piecePositionId as piecePositionId0, planPositionId as planPositionId0 FROM plans NATURAL JOIN pieces WHERE planPieceId = pieceId AND pieceTeamId = 0 AND pieceGameId = ?) as a JOIN (SELECT pieceId as pieceId1, pieceTypeId as pieceTypeId1, piecePositionId as piecePositionId1, planPositionId as planPositionId1 FROM plans NATURAL JOIN pieces WHERE planPieceId = pieceId AND pieceTeamId = 1 AND pieceGameId = ?) as b ON piecePositionId0 = planPositionId1 AND planPositionId0 = piecePositionId1";
+	let inserts = [gameId, gameId];
+	const [results, fields] = await conn.query(queryString, inserts);
+	return results;
+}
+
+// prettier-ignore
+const getPositionBattles = async (conn, gameId) => {
+	let queryString = "SELECT * FROM (SELECT pieceId as pieceId0, piecePositionId as piecePositionId0, pieceTypeId as pieceTypeId0 FROM pieces WHERE pieceGameId = ? AND pieceTeamId = 0) as a JOIN (SELECT pieceId as pieceId1, piecePositionId as piecePositionId1, pieceTypeId as pieceTypeId1 FROM pieces WHERE pieceGameId = ? AND pieceTeamId = 1) as b ON piecePositionId0 = piecePositionId1";
+	let inserts = [gameId, gameId];
+	const [results, fields] = await conn.query(queryString, inserts);
+	return results;
+}
+
+// prettier-ignore
+const whatCanThisPieceSee = async (conn, gameId, pieceTeamId, pieceTypeId, piecePositionId) => {
+	//loop through
+	const thisPieceVisibility = visibilityMatrix[pieceTypeId];
+
+	for (let x = 0; x < 20; x++) {
+		if (thisPieceVisibility) {
+			
+		}
+	}
+}
+
+const updateVisibility = async (conn, gameId) => {
+	//need to update visibility for each piece based on the vision matrix...
+	//what is the best way to determine visibiity for each piece
+	//have the visibility matrix
+	//loop for each piece and update a saved table for positions and what can be seen on them?
+	//loop for each position and update other positions what can be seen on them based on pieces
+	//loop for each piece and look outward for what can see it?
+
+	const pieces = await getPieces(conn, gameId);
+
+	for (let x = 0; x < pieces.length; x++) {
+		//for each piece...
+		let { pieceId, pieceTeamId, pieceTypeId, piecePositionId } = pieces[x];
+
+		await whatCanThisPieceSee(
+			conn,
+			gameId,
+			pieceTeamId,
+			pieceTypeId,
+			piecePositionId
+		);
+	}
+};
+
 const mainButtonClick = async (io, socket) => {
 	//verify that this person is ok to click the button
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const conn = await promisePool.getConnection();
+	const conn = await pool.getConnection();
 	const gameInfo = await getGameInfo(conn, gameId);
 	const {
 		gameActive,
@@ -759,9 +817,17 @@ const mainButtonClick = async (io, socket) => {
 					}
 
 					// check for collision battles
+					const allCollisionBattles = await getCollisionBattles(conn, gameId);
+
+					if (allCollisionBattles.length > 0) {
+						//filter through each collision battle and create events for it
+						//multiple pieces colliding -> same event...
+						//event has a touple identifier? (collision between x,y)
+					}
+
 					// create collision battle events
 					// signal that these need to happen (in database)
-					// break if inserted events, continue if no events necessary
+					// break if inserted events, continue if no events necessary (send client first event?)
 
 					//moving the pieces (non-special flag)
 					queryString =
@@ -776,9 +842,21 @@ const mainButtonClick = async (io, socket) => {
 					await conn.query(queryString, inserts);
 
 					// create battle events
-					// create refuel events (special flag? / proximity)
+
+					const allPositionBattles = await getPositionBattles(conn, gameId);
+
+					if (allPositionBattles.length > 0) {
+						//filter through each position battle and create events for it
+						//multiple pieces in same position -> same event
+						//event has 1 identifier (position battle at x)
+					}
+
+					// where blue pieces same position as red pieces... (and other information)
+					// create refuel events (special flag? / proximity) (check to see that the piece still exists!*!*)
 					// create container events (special flag)
 					// update visibility (algorithm)
+
+					await updateVisibility(conn, gameId);
 
 					//create final update to each client
 					const server0Action = {
@@ -838,7 +916,7 @@ exports.gameReset = async (req, res) => {
 	const { gameId } = req.session.ir3;
 
 	try {
-		const conn = await promisePool.getConnection();
+		const conn = await pool.getConnection();
 		const gameInfo = await getGameInfo(conn, gameId);
 		const { gameSection, gameInstructor, gameAdminPassword } = gameInfo;
 
@@ -849,8 +927,8 @@ exports.gameReset = async (req, res) => {
 		let inserts = [gameId, gameSection, gameInstructor, gameAdminPassword];
 		await conn.query(queryString, inserts);
 
-		await initialTopPiecesGenerator(conn, gameId);
-		await initialNewsGenerator(conn, gameId);
+		await initialPieces(conn, gameId);
+		await initialNews(conn, gameId);
 
 		conn.release();
 
@@ -881,7 +959,7 @@ exports.adminLoginVerify = async (req, res) => {
 	}
 
 	try {
-		const conn = await promisePool.getConnection();
+		const conn = await pool.getConnection();
 		const gameId = await getGameId(conn, adminSection, adminInstructor);
 
 		if (!gameId) {
@@ -937,7 +1015,7 @@ exports.gameLoginVerify = async (req, res, callback) => {
 	const passwordHashToCheck = "game" + gameTeam + "Password"; //ex: 'game0Password
 
 	try {
-		const conn = await promisePool.getConnection();
+		const conn = await pool.getConnection();
 		const gameId = await getGameId(conn, gameSection, gameInstructor);
 
 		if (!gameId) {
@@ -982,7 +1060,7 @@ exports.getGames = async (req, res) => {
 	try {
 		const queryString =
 			"SELECT gameId, gameSection, gameInstructor, gameActive FROM games";
-		const [results, fields] = await promisePool.query(queryString);
+		const [results, fields] = await pool.query(queryString);
 		res.send(results);
 	} catch (error) {
 		// console.log(error);  // This error occurs for the course director before he initializes the database
@@ -1006,7 +1084,7 @@ exports.getGameActive = async (req, res) => {
 	const { gameId } = req.session.ir3;
 
 	try {
-		const conn = await promisePool.getConnection();
+		const conn = await pool.getConnection();
 		const gameActive = await getGameActiveReal(conn, gameId);
 		conn.release();
 		res.send(JSON.stringify(gameActive));
@@ -1018,7 +1096,7 @@ exports.getGameActive = async (req, res) => {
 
 exports.databaseStatus = async (req, res) => {
 	try {
-		const conn = await promisePool.getConnection();
+		const conn = await pool.getConnection();
 		res.send("Connected");
 		conn.release();
 	} catch (error) {
@@ -1039,7 +1117,7 @@ exports.toggleGameActive = async (req, res) => {
 		const queryString =
 			"UPDATE games SET gameActive = (gameActive + 1) % 2, game0Controller0 = 0, game0Controller1 = 0, game0Controller2 = 0, game0Controller3 = 0, game1Controller0 = 0, game1Controller1 = 0, game1Controller2 = 0, game1Controller3 = 0 WHERE gameId = ?";
 		const inserts = [gameId];
-		await promisePool.query(queryString, inserts);
+		await pool.query(queryString, inserts);
 		res.sendStatus(200);
 	} catch (error) {
 		console.log(error);
@@ -1057,7 +1135,7 @@ exports.insertDatabaseTables = async (req, res) => {
 		const queryString = fs
 			.readFileSync("./serverItems/sqlScripts/tableInsert.sql")
 			.toString();
-		await promisePool.query(queryString);
+		await pool.query(queryString);
 		res.redirect("/courseDirector.html?initializeDatabase=success");
 	} catch (error) {
 		console.log(error);
@@ -1083,7 +1161,7 @@ exports.gameAdd = async (req, res) => {
 		const queryString =
 			"INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?)";
 		const inserts = [adminSection, adminInstructor, adminPasswordHashed];
-		await promisePool.query(queryString, inserts);
+		await pool.query(queryString, inserts);
 		res.redirect("/courseDirector.html?gameAdd=success");
 	} catch (error) {
 		//TODO: better error logging probably (more specific errors on CD) (on other functions too)
@@ -1105,7 +1183,7 @@ exports.gameDelete = async (req, res) => {
 	}
 
 	try {
-		const conn = await promisePool.getConnection();
+		const conn = await pool.getConnection();
 		await gameDeleteReal(conn, gameId);
 		conn.release();
 		res.redirect("/courseDirector.html?gameDelete=success");
