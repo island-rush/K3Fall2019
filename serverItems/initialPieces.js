@@ -25,10 +25,7 @@ const piece = (pieceGameId, pieceTeamName, pieceTypeName, piecePositionId, optio
 // prettier-ignore
 module.exports = async (conn, gameId) => {
 	const firstPieces = [
-		// piece(gameId, "Blue", "Tank", 0),
-		// piece(gameId, "Blue", "Tank", 1, {pieceVisible: 1}),
-		// piece(gameId, "Red", "Tank", 118),
-		// piece(gameId, "Red", "Tank", 119, {pieceVisible: 1}),
+		// piece(gameId, "Blue", "Tank", 0, {pieceVisible: 1, pieceContainerId: 23}),
 		piece(gameId, "Blue", "Tank", 0),
 		piece(gameId, "Blue", "Tank", 1),
 		piece(gameId, "Blue", "Tank", 2),
@@ -37,14 +34,6 @@ module.exports = async (conn, gameId) => {
 		piece(gameId, "Blue", "Tank", 5),
 		piece(gameId, "Blue", "Tank", 6),
 		piece(gameId, "Red", "Tank", 7)
-		// piece(gameId, "Blue", "Tank", 3, {pieceVisible: 1}),
-		// piece(gameId, "Red", "Tank", 5, {pieceVisible: 1}),
-		// piece(gameId, "Blue", "Tank", 7, {pieceVisible: 1}),
-		// piece(gameId, "Red", "Tank", 7, {pieceVisible: 1})
-		// piece(gameId, "Red", "Sub", 2),
-		// piece(gameId, "Red", "Plane", 2),
-		// piece(gameId, "Red", "Transport", 2),
-		// piece(gameId, "Blue", "Tank", 3)
 	];
 
 	queryString = "INSERT INTO pieces (pieceGameId, pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId, pieceVisible, pieceMoves, pieceFuel) VALUES ?";

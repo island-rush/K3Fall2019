@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS games (
-	gameId INT(3) NOT NULL UNIQUE AUTO_INCREMENT,
+	gameId INT(3) PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
     gameSection VARCHAR(4) NOT NULL,
     gameInstructor VARCHAR(32) NOT NULL,
     
@@ -26,28 +26,27 @@ CREATE TABLE IF NOT EXISTS games (
     
     gamePhase INT(1) NOT NULL DEFAULT 0, -- 0: news, 1: buy, 2: gameplay, 3: place inv
     gameRound INT(1) NOT NULL DEFAULT 0, -- 0, 1, 2  rounds of movement
-    gameSlice INT(1) NOT NULL DEFAULT 0, -- 0: planning, 1: battle/movement, 2: refuel, 3: containers
-    PRIMARY KEY(gameId)
+    gameSlice INT(1) NOT NULL DEFAULT 0 -- 0: planning, 1: battle/movement, 2: refuel, 3: containers
 ) AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS shopItems (
-    shopItemId INT(8) NOT NULL AUTO_INCREMENT,
+    shopItemId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     shopItemGameId INT(3) NOT NULL,
     shopItemTeamId INT(1) NOT NULL,
     shopItemTypeId INT(2) NOT NULL,
-    PRIMARY KEY(shopItemId)
+    FOREIGN KEY (shopItemGameId) REFERENCES games (gameId) ON DELETE CASCADE
 ) AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS invItems (
-    invItemId INT(8) NOT NULL AUTO_INCREMENT,
+    invItemId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     invItemGameId INT(3) NOT NULL,
     invItemTeamId INT(1) NOT NULL,
     invItemTypeId INT(2) NOT NULL,
-    PRIMARY KEY(invItemId)
+    FOREIGN KEY (invItemGameId) REFERENCES games (gameId) ON DELETE CASCADE
 ) AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS pieces (
-	pieceId INT(8) NOT NULL AUTO_INCREMENT,
+	pieceId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     pieceGameId INT(3) NOT NULL,
     pieceTeamId INT(1) NOT NULL,
     pieceTypeId INT(2) NOT NULL,
@@ -56,22 +55,23 @@ CREATE TABLE IF NOT EXISTS pieces (
     pieceVisible INT(1) NOT NULL,
     pieceMoves INT(2) NOT NULL,
     pieceFuel INT(2) NOT NULL,
-    PRIMARY KEY(pieceId)
+    FOREIGN KEY (pieceGameId) REFERENCES games (gameId) ON DELETE CASCADE
 ) AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS plans(
-	planId INT(8) NOT NULL AUTO_INCREMENT,
     planGameId INT(2) NOT NULL,
     planTeamId INT(1) NOT NULL,
     planPieceId INT(8) NOT NULL,
     planMovementOrder INT(2) NOT NULL,
     planPositionId INT(4) NOT NULL,
     planSpecialFlag INT(1) NOT NULL DEFAULT 0,
-    PRIMARY KEY(planId)
+    FOREIGN KEY (planGameId) REFERENCES games (gameId) ON DELETE CASCADE,
+    FOREIGN KEY (planPieceId) REFERENCES pieces (pieceId) ON DELETE CASCADE,
+    PRIMARY KEY (planPieceId, planMovementOrder)
 ) AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS news(
-	newsId INT(8) NOT NULL AUTO_INCREMENT,
+	newsId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     newsGameId INT(4) NOT NULL,
     newsTeam INT(4) NOT NULL,
     newsOrder INT(4) NOT NULL,
@@ -83,5 +83,21 @@ CREATE TABLE IF NOT EXISTS news(
     newsTitle VARCHAR(100) NOT NULL,
     newsInfo VARCHAR(800) NOT NULL,
     newsActivated INT(1) NOT NULL,
-    PRIMARY KEY(newsId)
+    FOREIGN KEY (newsGameId) REFERENCES games (gameId) ON DELETE CASCADE
 ) AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS eventQueue(
+	eventId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    eventGameId INT(4) NOT NULL,
+    eventTeamId INT(1) NOT NULL, -- 0,1 or 2 for both
+    eventTypeId INT(2) NOT NULL, -- 0 = battle, 1 = container, 2 = refuel
+    FOREIGN KEY (eventGameId) REFERENCES games (gameId) ON DELETE CASCADE
+) AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS eventItems(
+	eventId INT(8) NOT NULL,
+    eventPieceId INT(4) NOT NULL,
+    FOREIGN KEY (eventId) REFERENCES eventQueue (eventId) ON DELETE CASCADE,
+    FOREIGN KEY (eventPieceId) REFERENCES pieces (pieceId) ON DELETE CASCADE,
+    PRIMARY KEY (eventId, eventPieceId)
+);

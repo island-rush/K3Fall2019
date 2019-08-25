@@ -48,26 +48,7 @@ const getGameActiveReal = async (conn, gameId) => {
 };
 
 const gameDeleteReal = async (conn, gameId) => {
-	let queryString = "DELETE FROM news WHERE newsGameId = ?";
-	let inserts = [gameId];
-	await conn.query(queryString, inserts);
-
-	queryString = "DELETE FROM pieces WHERE pieceGameId = ?";
-	inserts = [gameId];
-	await conn.query(queryString, inserts);
-
-	queryString = "DELETE FROM invItems WHERE invItemGameId = ?";
-	inserts = [gameId];
-	await conn.query(queryString, inserts);
-
-	queryString = "DELETE FROM shopItems WHERE shopItemGameId = ?";
-	inserts = [gameId];
-	await conn.query(queryString, inserts);
-
-	queryString = "DELETE FROM plans WHERE planGameId = ?";
-	inserts = [gameId];
-	await conn.query(queryString, inserts);
-
+	//deleting now cascades to all tables with foreign key referencing gameId
 	queryString = "DELETE FROM games WHERE gameId = ?";
 	inserts = [gameId];
 	await conn.query(queryString, inserts);
@@ -344,6 +325,7 @@ const shopConfirmPurchase = async socket => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	//TODO: verify if it is allowed, game active, phase, controller...
+	//could extra verify that purchases were allowed? but redundant since these are already in the database
 
 	const conn = await pool.getConnection();
 
@@ -382,37 +364,35 @@ const sendUserFeedback = async (socket, userFeedback) => {
 
 const insertPlan = async (conn, pieceInfo, plan) => {
 	const { pieceGameId, pieceTeamId, pieceId } = pieceInfo;
-	for (let x = 0; x < plan.length; x++) {
-		//movement order is x?
-		let { positionId, type } = plan[x];
+	let plansToInsert = [];
+	for (let movementOrder = 0; movementOrder < plan.length; movementOrder++) {
+		let { positionId, type } = plan[movementOrder];
 		let specialFlag = type === "move" ? 0 : 1; // 1 = container, use other numbers for future special flags...
-		await conn.query("INSERT INTO plans (planGameId, planTeamId, planPieceId, planMovementOrder, planPositionId, planSpecialFlag) VALUES (?, ?, ?, ?, ?, ?)", [
-			pieceGameId,
-			pieceTeamId,
-			pieceId,
-			x,
-			positionId,
-			specialFlag
-		]);
+		plansToInsert.push([pieceGameId, pieceTeamId, pieceId, movementOrder, positionId, specialFlag]);
 	}
+
+	let queryString = "INSERT INTO plans (planGameId, planTeamId, planPieceId, planMovementOrder, planPositionId, planSpecialFlag) VALUES ?";
+	let inserts = [plansToInsert];
+	await conn.query(queryString, inserts);
 };
 
 const confirmPlan = async (socket, pieceId, plan) => {
 	//plan = moves array, where each move has type and positionId
 	//confirm the plan and report back to the client with a server action
-	//TODO: verify that this user is authorized to make a plan
+	//TODO: verify that this user is authorized to make a plan, among other checks for the entire plan
 	//verify that the piece exists?
 	//verify that this piece belongs to this team? (all those other auths)
 	//need to know if this piece is a container or not, to check if container move was inserted
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	const conn = await pool.getConnection();
-	const gameInfo = await getGameInfo(conn, gameId);
-	const pieceInfo = await getPieceInfo(conn, pieceId);
 
-	const { gameActive } = gameInfo;
+	let queryString = "SELECT * FROM games NATURAL JOIN pieces WHERE pieceId = ? AND gameId = pieceGameId";
+	let inserts = [pieceId];
+	const [results, fields] = await conn.query(queryString, inserts);
+	//TODO: check results.length? (or null...)
 
-	const { pieceGameId, pieceTeamId, piecePositionId, pieceContainerId, pieceTypeId } = pieceInfo;
+	const { gameActive, piecePositionId, pieceTypeId } = results[0]; //results contains all gameInfo and pieceInfo
 
 	const isContainer = containerTypes.includes(pieceTypeId);
 
@@ -452,11 +432,8 @@ const confirmPlan = async (socket, pieceId, plan) => {
 		previousPosition = positionId;
 	}
 
-	//all of the plans checked out and were authorized
-	//send the plan back to the client with confirm action
-
-	//insert all of the plans into the database***
-	await insertPlan(conn, pieceInfo, plan);
+	//insert all of the plans into the database
+	await insertPlan(conn, results[0], plan);
 
 	await conn.release();
 
@@ -507,6 +484,13 @@ const getPieces = async (conn, gameId) => {
 	return results;
 };
 
+const getDistinctPieces = async (conn, gameId) => {
+	const queryString = "SELECT DISTINCT pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId FROM pieces WHERE pieceGameId = ?";
+	const inserts = [gameId];
+	const [results, fields] = await conn.query(queryString, inserts);
+	return results;
+};
+
 // prettier-ignore
 const getCollisionBattles = async (conn, gameId) => {
 	let queryString = "SELECT * FROM (SELECT pieceId as pieceId0, pieceTypeId as pieceTypeId0, piecePositionId as piecePositionId0, planPositionId as planPositionId0 FROM plans NATURAL JOIN pieces WHERE planPieceId = pieceId AND pieceTeamId = 0 AND pieceGameId = ?) as a JOIN (SELECT pieceId as pieceId1, pieceTypeId as pieceTypeId1, piecePositionId as piecePositionId1, planPositionId as planPositionId1 FROM plans NATURAL JOIN pieces WHERE planPieceId = pieceId AND pieceTeamId = 1 AND pieceGameId = ?) as b ON piecePositionId0 = planPositionId1 AND planPositionId0 = piecePositionId1";
@@ -535,26 +519,20 @@ const updateVisibility = async (conn, gameId) => {
 		[[-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1]]
 	];
 
-	const pieces = await getPieces(conn, gameId);
+	const pieces = await getDistinctPieces(conn, gameId);
 
-	let alreadyChecked = [];
 	let otherTeam;
-
 	for (let x = 0; x < pieces.length; x++) {
-		let { pieceTeamId, pieceTypeId, piecePositionId } = pieces[x];
+		let { pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId } = pieces[x]; //TODO: pieces inside containers can't see rule?
 
-		if (!alreadyChecked.includes(`${pieceTeamId}-${pieceTypeId}-${piecePositionId}`)) { //don't check if already checked this team-type-position
-			alreadyChecked.push(`${pieceTeamId}-${pieceTypeId}-${piecePositionId}`);
+		for (let type = 0; type < 20; type++) { //check each type
+			if (visibilityMatrix[pieceTypeId][type] !== -1) { //could it ever see this type?
+				for (let position = 0; position < distanceMatrix[piecePositionId].length; position++) { //for all positions
+					if (distanceMatrix[piecePositionId][position] <= visibilityMatrix[pieceTypeId][type]) { //is this position in range for that type?
+						otherTeam = parseInt(pieceTeamId) === 0 ? 1 : 0;
 
-			for (let type = 0; type < 20; type++) { //check each type
-				if (visibilityMatrix[pieceTypeId][type] !== -1) { //could it ever see this type?
-					for (let position = 0; position < distanceMatrix[piecePositionId].length; position++) { //for all positions
-						if (distanceMatrix[piecePositionId][position] <= visibilityMatrix[pieceTypeId][type]) { //is this position in range for that type?
-							otherTeam = parseInt(pieceTeamId) === 0 ? 1 : 0;
-
-							if (!posTypes[otherTeam][type].includes(position)) { //add this position if not already added by another piece somewhere else
-								posTypes[otherTeam][type].push(position);
-							}
+						if (!posTypes[otherTeam][type].includes(position)) { //add this position if not already added by another piece somewhere else
+							posTypes[otherTeam][type].push(position);
 						}
 					}
 				}
@@ -793,7 +771,6 @@ const mainButtonClick = async (io, socket) => {
 					// where blue pieces same position as red pieces... (and other information)
 					// create refuel events (special flag? / proximity) (check to see that the piece still exists!*!*)
 					// create container events (special flag)
-					// update visibility (algorithm)
 
 					await updateVisibility(conn, gameId);
 
