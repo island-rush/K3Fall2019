@@ -524,35 +524,48 @@ const getPositionBattles = async (conn, gameId) => {
 }
 
 // prettier-ignore
-const whatCanThisPieceSee = async (conn, gameId, pieceTeamId, pieceTypeId, piecePositionId) => {
-	const otherTeam = parseInt(pieceTeamId) === 0 ? 1 : 0;
-	const thisPieceVisibility = visibilityMatrix[pieceTypeId];
-	let queryString = "UPDATE pieces SET pieceVisible = 1 WHERE pieceGameId = ? AND piecePositionId = ? AND pieceTypeId = ? AND pieceTeamId = ?";
-
-	for (let type = 0; type < 20; type++) {
-		if (thisPieceVisibility[type] !== -1) { //can see that piece at all
-			for (let position = 0; position < distanceMatrix[piecePositionId].length; position++) { //for all positions
-				if (distanceMatrix[piecePositionId][position] <= thisPieceVisibility[type]) { //if the position is within range of that vision
-					await conn.query(queryString, [gameId, position, type, otherTeam]);
-				}
-			}
-		}
-	}
-}
-
-// prettier-ignore
 const updateVisibility = async (conn, gameId) => {
-	// Reset all Visibilities
 	let queryString = "UPDATE pieces SET pieceVisible = 0 WHERE pieceGameId = ?";
 	let inserts = [gameId];
 	await conn.query(queryString, inserts);
 
+	//posTypes[teamToUpdate][typeToUpdate] = [...positionsThatThoseTypesAreVisibleOn]
+	let posTypes = [
+		[[-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1]],
+		[[-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1]]
+	];
+
 	const pieces = await getPieces(conn, gameId);
+
+	let alreadyChecked = [];
+	let otherTeam;
 
 	for (let x = 0; x < pieces.length; x++) {
 		let { pieceTeamId, pieceTypeId, piecePositionId } = pieces[x];
-		await whatCanThisPieceSee(conn, gameId, pieceTeamId, pieceTypeId, piecePositionId);
+
+		if (!alreadyChecked.includes(`${pieceTeamId}-${pieceTypeId}-${piecePositionId}`)) { //don't check if already checked this team-type-position
+			alreadyChecked.push(`${pieceTeamId}-${pieceTypeId}-${piecePositionId}`);
+
+			for (let type = 0; type < 20; type++) { //check each type
+				if (visibilityMatrix[pieceTypeId][type] !== -1) { //could it ever see this type?
+					for (let position = 0; position < distanceMatrix[piecePositionId].length; position++) { //for all positions
+						if (distanceMatrix[piecePositionId][position] <= visibilityMatrix[pieceTypeId][type]) { //is this position in range for that type?
+							otherTeam = parseInt(pieceTeamId) === 0 ? 1 : 0;
+
+							if (!posTypes[otherTeam][type].includes(position)) { //add this position if not already added by another piece somewhere else
+								posTypes[otherTeam][type].push(position);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
+
+	//Single update packet for all visibilities (let database handle finding which pieces are included)
+	queryString = "UPDATE pieces SET pieceVisible = 1 WHERE pieceGameId = ? AND ((pieceTeamId = 0 AND pieceTypeId = 0 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 2 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 3 AND piecePositionId IN (?)) OR (pieceTeamId = 4 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 5 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 6 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 7 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 8 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 9 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 10 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 11 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 12 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 13 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 14 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 15 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 16 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 17 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 18 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 19 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 0 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 2 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 3 AND piecePositionId IN (?)) OR (pieceTeamId = 4 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 5 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 6 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 7 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 8 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 9 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 10 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 11 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 12 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 13 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 14 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 15 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 16 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 17 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 18 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 19 AND piecePositionId IN (?)))";
+	inserts = [gameId, posTypes[0][0], posTypes[0][1], posTypes[0][2], posTypes[0][3], posTypes[0][4], posTypes[0][5], posTypes[0][6], posTypes[0][7], posTypes[0][8], posTypes[0][9], posTypes[0][10], posTypes[0][11], posTypes[0][12], posTypes[0][13], posTypes[0][14], posTypes[0][15], posTypes[0][16], posTypes[0][17], posTypes[0][18], posTypes[0][19], posTypes[1][0], posTypes[1][1], posTypes[1][2], posTypes[1][3], posTypes[1][4], posTypes[1][5], posTypes[1][6], posTypes[1][7], posTypes[1][8], posTypes[1][9], posTypes[1][10], posTypes[1][11], posTypes[1][12], posTypes[1][13], posTypes[1][14], posTypes[1][15], posTypes[1][16], posTypes[1][17], posTypes[1][18], posTypes[1][19]];
+	await conn.query(queryString, inserts);
 };
 
 const mainButtonClick = async (io, socket) => {
