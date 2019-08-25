@@ -29,12 +29,12 @@ module.exports = async (conn, gameId) => {
 		// piece(gameId, "Blue", "Tank", 1, {pieceVisible: 1}),
 		// piece(gameId, "Red", "Tank", 118),
 		// piece(gameId, "Red", "Tank", 119, {pieceVisible: 1}),
-		piece(gameId, "Blue", "Tank", 0, {pieceVisible: 1}),
-		piece(gameId, "Red", "Tank", 1, {pieceVisible: 1}),
-		piece(gameId, "Blue", "Tank", 3, {pieceVisible: 1}),
-		piece(gameId, "Red", "Tank", 5, {pieceVisible: 1}),
-		piece(gameId, "Blue", "Tank", 7, {pieceVisible: 1}),
-		piece(gameId, "Red", "Tank", 7, {pieceVisible: 1})
+		piece(gameId, "Blue", "Tank", 0),
+		piece(gameId, "Red", "Tank", 7)
+		// piece(gameId, "Blue", "Tank", 3, {pieceVisible: 1}),
+		// piece(gameId, "Red", "Tank", 5, {pieceVisible: 1}),
+		// piece(gameId, "Blue", "Tank", 7, {pieceVisible: 1}),
+		// piece(gameId, "Red", "Tank", 7, {pieceVisible: 1})
 		// piece(gameId, "Red", "Sub", 2),
 		// piece(gameId, "Red", "Plane", 2),
 		// piece(gameId, "Red", "Transport", 2),

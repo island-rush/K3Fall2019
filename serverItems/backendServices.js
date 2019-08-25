@@ -4,8 +4,7 @@ const fs = require("fs");
 
 //Environment Constants
 const CourseDirectorLastName = process.env.CD_LASTNAME || "Smith";
-const CourseDirectorPasswordHash =
-	process.env.CD_PASSWORD || "912ec803b2ce49e4a541068d495ab570"; //"asdf"
+const CourseDirectorPasswordHash = process.env.CD_PASSWORD || "912ec803b2ce49e4a541068d495ab570"; //"asdf"
 
 //Other Constants
 const {
@@ -75,8 +74,7 @@ const gameDeleteReal = async (conn, gameId) => {
 };
 
 const getGameId = async (conn, gameSection, gameInstructor) => {
-	const queryString =
-		"SELECT gameId FROM games WHERE gameSection = ? AND gameInstructor = ?";
+	const queryString = "SELECT gameId FROM games WHERE gameSection = ? AND gameInstructor = ?";
 	const inserts = [gameSection, gameInstructor];
 	const [results, fields] = await conn.query(queryString, inserts);
 	if (results.length === 1) {
@@ -107,8 +105,7 @@ const markLoggedIn = async (conn, gameId, commanderField) => {
 };
 
 const getVisiblePieces = async (conn, gameId, gameTeam) => {
-	const queryString =
-		"SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = ? OR pieceVisible = 1) ORDER BY pieceContainerId, pieceTeamId ASC";
+	const queryString = "SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = ? OR pieceVisible = 1) ORDER BY pieceContainerId, pieceTeamId ASC";
 	const inserts = [gameId, gameTeam];
 	const [results, fields] = await conn.query(queryString, inserts);
 
@@ -122,14 +119,10 @@ const getVisiblePieces = async (conn, gameId, gameTeam) => {
 		if (currentPiece.pieceContainerId === -1) {
 			allPieces[currentPiece.piecePositionId].push(currentPiece);
 		} else {
-			let indexOfParent = allPieces[currentPiece.piecePositionId].findIndex(
-				piece => {
-					return piece.pieceId === currentPiece.pieceContainerId;
-				}
-			);
-			allPieces[currentPiece.piecePositionId][indexOfParent].pieceContents.push(
-				currentPiece
-			);
+			let indexOfParent = allPieces[currentPiece.piecePositionId].findIndex(piece => {
+				return piece.pieceId === currentPiece.pieceContainerId;
+			});
+			allPieces[currentPiece.piecePositionId][indexOfParent].pieceContents.push(currentPiece);
 		}
 	}
 
@@ -137,24 +130,21 @@ const getVisiblePieces = async (conn, gameId, gameTeam) => {
 };
 
 const getTeamInvItems = async (conn, gameId, gameTeam) => {
-	const queryString =
-		"SELECT * FROM invItems WHERE invItemGameId = ? AND invItemTeamId = ?";
+	const queryString = "SELECT * FROM invItems WHERE invItemGameId = ? AND invItemTeamId = ?";
 	const inserts = [gameId, gameTeam];
 	const [results, fields] = await conn.query(queryString, inserts);
 	return results;
 };
 
 const getTeamShopItems = async (conn, gameId, gameTeam) => {
-	const queryString =
-		"SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?";
+	const queryString = "SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?";
 	const inserts = [gameId, gameTeam];
 	const [results, fields] = await conn.query(queryString, inserts);
 	return results;
 };
 
 const getTeamPlans = async (conn, gameId, gameTeam) => {
-	const queryString =
-		"SELECT * FROM plans WHERE planGameId = ? AND planTeamId = ? ORDER BY planPieceId, planMovementOrder ASC";
+	const queryString = "SELECT * FROM plans WHERE planGameId = ? AND planTeamId = ? ORDER BY planPieceId, planMovementOrder ASC";
 	const inserts = [gameId, gameTeam];
 	const [results, fields] = await conn.query(queryString, inserts);
 
@@ -201,13 +191,7 @@ const giveInitialGameState = async socket => {
 	const confirmedPlans = await getTeamPlans(conn, gameId, gameTeam);
 	await conn.release();
 
-	const {
-		gameSection,
-		gameInstructor,
-		gamePhase,
-		gameRound,
-		gameSlice
-	} = gameInfo;
+	const { gameSection, gameInstructor, gamePhase, gameRound, gameSlice } = gameInfo;
 	const gamePoints = gameInfo["game" + gameTeam + "Points"];
 	const gameStatus = gameInfo["game" + gameTeam + "Status"];
 
@@ -251,8 +235,7 @@ const setTeamPoints = async (conn, gameId, gameTeam, newPoints) => {
 };
 
 const insertShopItem = async (conn, gameId, gameTeam, shopItemTypeId) => {
-	const queryString =
-		"INSERT INTO shopItems (shopItemGameId, shopItemTeamId, shopItemTypeId) values (?, ?, ?)";
+	const queryString = "INSERT INTO shopItems (shopItemGameId, shopItemTeamId, shopItemTypeId) values (?, ?, ?)";
 	const inserts = [gameId, gameTeam, shopItemTypeId];
 	const [results, fields] = await conn.query(queryString, inserts);
 	return results.insertId;
@@ -278,19 +261,13 @@ const shopPurchaseRequest = async (socket, shopItemTypeId) => {
 
 	if (parseInt(gamePhase) !== 1) {
 		await conn.release();
-		socket.emit(
-			"serverSendingAction",
-			userFeedbackAction("Not the right phase...")
-		);
+		socket.emit("serverSendingAction", userFeedbackAction("Not the right phase..."));
 		return;
 	}
 
 	if (parseInt(gameController) !== 0) {
 		await conn.release();
-		socket.emit(
-			"serverSendingAction",
-			userFeedbackAction("Not the right controller...")
-		);
+		socket.emit("serverSendingAction", userFeedbackAction("Not the right controller..."));
 		return;
 	}
 
@@ -310,12 +287,7 @@ const shopPurchaseRequest = async (socket, shopItemTypeId) => {
 
 	const newPoints = teamPoints - shopItemCost;
 	await setTeamPoints(conn, gameId, gameTeam, newPoints);
-	const shopItemId = await insertShopItem(
-		conn,
-		gameId,
-		gameTeam,
-		shopItemTypeId
-	);
+	const shopItemId = await insertShopItem(conn, gameId, gameTeam, shopItemTypeId);
 
 	await conn.release();
 
@@ -375,18 +347,15 @@ const shopConfirmPurchase = async socket => {
 
 	const conn = await pool.getConnection();
 
-	let queryString =
-		"INSERT INTO invItems (invItemId, invItemGameId, invItemTeamId, invItemTypeId) SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?";
+	let queryString = "INSERT INTO invItems (invItemId, invItemGameId, invItemTeamId, invItemTypeId) SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?";
 	let inserts = [gameId, gameTeam];
 	await conn.query(queryString, inserts);
 
-	queryString =
-		"DELETE FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?";
+	queryString = "DELETE FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?";
 	inserts = [gameId, gameTeam];
 	await conn.query(queryString, inserts);
 
-	queryString =
-		"SELECT * FROM invItems WHERE invItemGameId = ? AND invItemTeamId = ?";
+	queryString = "SELECT * FROM invItems WHERE invItemGameId = ? AND invItemTeamId = ?";
 	inserts = [gameId, gameTeam];
 	const [results, fields] = await conn.query(queryString, inserts);
 
@@ -417,10 +386,14 @@ const insertPlan = async (conn, pieceInfo, plan) => {
 		//movement order is x?
 		let { positionId, type } = plan[x];
 		let specialFlag = type === "move" ? 0 : 1; // 1 = container, use other numbers for future special flags...
-		await conn.query(
-			"INSERT INTO plans (planGameId, planTeamId, planPieceId, planMovementOrder, planPositionId, planSpecialFlag) VALUES (?, ?, ?, ?, ?, ?)",
-			[pieceGameId, pieceTeamId, pieceId, x, positionId, specialFlag]
-		);
+		await conn.query("INSERT INTO plans (planGameId, planTeamId, planPieceId, planMovementOrder, planPositionId, planSpecialFlag) VALUES (?, ?, ?, ?, ?, ?)", [
+			pieceGameId,
+			pieceTeamId,
+			pieceId,
+			x,
+			positionId,
+			specialFlag
+		]);
 	}
 };
 
@@ -439,13 +412,7 @@ const confirmPlan = async (socket, pieceId, plan) => {
 
 	const { gameActive } = gameInfo;
 
-	const {
-		pieceGameId,
-		pieceTeamId,
-		piecePositionId,
-		pieceContainerId,
-		pieceTypeId
-	} = pieceInfo;
+	const { pieceGameId, pieceTeamId, piecePositionId, pieceContainerId, pieceTypeId } = pieceInfo;
 
 	const isContainer = containerTypes.includes(pieceTypeId);
 
@@ -465,28 +432,19 @@ const confirmPlan = async (socket, pieceId, plan) => {
 		//make sure positions are equal for container type
 		if (type == "container") {
 			if (!isContainer) {
-				sendUserFeedback(
-					socket,
-					"sent a bad plan, container move for non-container piece..."
-				);
+				sendUserFeedback(socket, "sent a bad plan, container move for non-container piece...");
 				return;
 			}
 
 			if (previousPosition != positionId) {
-				sendUserFeedback(
-					socket,
-					"sent a bad plan, container move was not in previous position..."
-				);
+				sendUserFeedback(socket, "sent a bad plan, container move was not in previous position...");
 				return;
 			}
 		}
 
 		if (distanceMatrix[previousPosition][positionId] !== 1) {
 			if (type !== "container") {
-				sendUserFeedback(
-					socket,
-					"sent a bad plan, positions were not adjacent..."
-				);
+				sendUserFeedback(socket, "sent a bad plan, positions were not adjacent...");
 				return;
 			}
 		}
@@ -567,37 +525,33 @@ const getPositionBattles = async (conn, gameId) => {
 
 // prettier-ignore
 const whatCanThisPieceSee = async (conn, gameId, pieceTeamId, pieceTypeId, piecePositionId) => {
-	//loop through
+	const otherTeam = parseInt(pieceTeamId) === 0 ? 1 : 0;
 	const thisPieceVisibility = visibilityMatrix[pieceTypeId];
+	let queryString = "UPDATE pieces SET pieceVisible = 1 WHERE pieceGameId = ? AND piecePositionId = ? AND pieceTypeId = ? AND pieceTeamId = ?";
 
-	for (let x = 0; x < 20; x++) {
-		if (thisPieceVisibility) {
-			
+	for (let type = 0; type < 20; type++) {
+		if (thisPieceVisibility[type] !== -1) { //can see that piece at all
+			for (let position = 0; position < distanceMatrix[piecePositionId].length; position++) { //for all positions
+				if (distanceMatrix[piecePositionId][position] <= thisPieceVisibility[type]) { //if the position is within range of that vision
+					await conn.query(queryString, [gameId, position, type, otherTeam]);
+				}
+			}
 		}
 	}
 }
 
+// prettier-ignore
 const updateVisibility = async (conn, gameId) => {
-	//need to update visibility for each piece based on the vision matrix...
-	//what is the best way to determine visibiity for each piece
-	//have the visibility matrix
-	//loop for each piece and update a saved table for positions and what can be seen on them?
-	//loop for each position and update other positions what can be seen on them based on pieces
-	//loop for each piece and look outward for what can see it?
+	// Reset all Visibilities
+	let queryString = "UPDATE pieces SET pieceVisible = 0 WHERE pieceGameId = ?";
+	let inserts = [gameId];
+	await conn.query(queryString, inserts);
 
 	const pieces = await getPieces(conn, gameId);
 
 	for (let x = 0; x < pieces.length; x++) {
-		//for each piece...
-		let { pieceId, pieceTeamId, pieceTypeId, piecePositionId } = pieces[x];
-
-		await whatCanThisPieceSee(
-			conn,
-			gameId,
-			pieceTeamId,
-			pieceTypeId,
-			piecePositionId
-		);
+		let { pieceTeamId, pieceTypeId, piecePositionId } = pieces[x];
+		await whatCanThisPieceSee(conn, gameId, pieceTeamId, pieceTypeId, piecePositionId);
 	}
 };
 
@@ -607,14 +561,7 @@ const mainButtonClick = async (io, socket) => {
 
 	const conn = await pool.getConnection();
 	const gameInfo = await getGameInfo(conn, gameId);
-	const {
-		gameActive,
-		gamePhase,
-		game0Status,
-		game1Status,
-		gameRound,
-		gameSlice
-	} = gameInfo;
+	const { gameActive, gamePhase, game0Status, game1Status, gameRound, gameSlice } = gameInfo;
 
 	//need to do different things based on the phase?
 	if (!gameActive) {
@@ -629,10 +576,7 @@ const mainButtonClick = async (io, socket) => {
 	if (parseInt(thisTeamStatus) === 1) {
 		//already pressed / already waiting
 		await conn.release();
-		socket.emit(
-			"serverSendingAction",
-			userFeedbackAction("Still waiting on other team...")
-		);
+		socket.emit("serverSendingAction", userFeedbackAction("Still waiting on other team..."));
 		return;
 	}
 
@@ -653,8 +597,7 @@ const mainButtonClick = async (io, socket) => {
 	} else {
 		//both teams done with this phase, round, slice, move...
 		//mark other team as no longer waiting
-		let queryString =
-			"UPDATE games set game0Status = 0, game1Status = 0 WHERE gameId = ?";
+		let queryString = "UPDATE games set game0Status = 0, game1Status = 0 WHERE gameId = ?";
 		let inserts = [gameId];
 		await conn.query(queryString, inserts);
 
@@ -677,9 +620,7 @@ const mainButtonClick = async (io, socket) => {
 					payload: {}
 				};
 
-				io.sockets
-					.in("game" + gameId)
-					.emit("serverSendingAction", serverAction);
+				io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
 				break;
 
 			case 1:
@@ -696,9 +637,7 @@ const mainButtonClick = async (io, socket) => {
 					payload: {}
 				};
 
-				io.sockets
-					.in("game" + gameId)
-					.emit("serverSendingAction", serverAction);
+				io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
 				break;
 
 			case 3:
@@ -713,9 +652,7 @@ const mainButtonClick = async (io, socket) => {
 					payload: {}
 				};
 
-				io.sockets
-					.in("game" + gameId)
-					.emit("serverSendingAction", serverAction);
+				io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
 				break;
 
 			case 2:
@@ -733,9 +670,7 @@ const mainButtonClick = async (io, socket) => {
 						payload: {}
 					};
 
-					io.sockets
-						.in("game" + gameId)
-						.emit("serverSendingAction", serverAction);
+					io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
 					break;
 				} else {
 					// check for any events that exist prior to dealing with plans, execute events 1 by 1
@@ -743,13 +678,11 @@ const mainButtonClick = async (io, socket) => {
 					//TODO: need better standards for results, fields...usually do const, but continuing to use them (different names / numberings?)
 
 					//get current movement order (for each team's plans)
-					queryString =
-						"SELECT planMovementOrder as currentMovementOrder FROM plans WHERE planGameId = ? AND planTeamId = 0 ORDER BY planMovementOrder ASC LIMIT 1";
+					queryString = "SELECT planMovementOrder as currentMovementOrder FROM plans WHERE planGameId = ? AND planTeamId = 0 ORDER BY planMovementOrder ASC LIMIT 1";
 					inserts = [gameId];
 					let [results0, fields0] = await conn.query(queryString, inserts);
 
-					queryString =
-						"SELECT planMovementOrder as currentMovementOrder FROM plans WHERE planGameId = ? AND planTeamId = 1 ORDER BY planMovementOrder ASC LIMIT 1";
+					queryString = "SELECT planMovementOrder as currentMovementOrder FROM plans WHERE planGameId = ? AND planTeamId = 1 ORDER BY planMovementOrder ASC LIMIT 1";
 					inserts = [gameId];
 					let [results1, fields1] = await conn.query(queryString, inserts);
 
@@ -757,8 +690,7 @@ const mainButtonClick = async (io, socket) => {
 						//both teams are done with plans
 						if (gameRound === 2) {
 							//move to place phase
-							queryString =
-								"UPDATE games SET gameRound = 0, gameSlice = 0, gamePhase = 3 WHERE gameId = ?";
+							queryString = "UPDATE games SET gameRound = 0, gameSlice = 0, gamePhase = 3 WHERE gameId = ?";
 							inserts = [gameId];
 							await conn.query(queryString, inserts);
 
@@ -767,13 +699,10 @@ const mainButtonClick = async (io, socket) => {
 								payload: {}
 							};
 
-							io.sockets
-								.in("game" + gameId)
-								.emit("serverSendingAction", serverAction);
+							io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
 						} else {
 							//move to next round
-							queryString =
-								"UPDATE games SET gameRound = gameRound + 1, gameSlice = 0 WHERE gameId = ?";
+							queryString = "UPDATE games SET gameRound = gameRound + 1, gameSlice = 0 WHERE gameId = ?";
 							inserts = [gameId];
 							await conn.query(queryString, inserts);
 
@@ -784,9 +713,7 @@ const mainButtonClick = async (io, socket) => {
 								}
 							};
 
-							io.sockets
-								.in("game" + gameId)
-								.emit("serverSendingAction", serverAction);
+							io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
 						}
 
 						break;
@@ -836,8 +763,7 @@ const mainButtonClick = async (io, socket) => {
 					await conn.query(queryString, inserts);
 
 					//delete those plans (non-special flag)
-					queryString =
-						"DELETE FROM plans WHERE planGameId = ? AND planMovementOrder = ? AND planSpecialFlag = 0";
+					queryString = "DELETE FROM plans WHERE planGameId = ? AND planMovementOrder = ? AND planSpecialFlag = 0";
 					inserts = [gameId, currentMovementOrder];
 					await conn.query(queryString, inserts);
 
@@ -876,20 +802,13 @@ const mainButtonClick = async (io, socket) => {
 					};
 
 					//send final update to each client
-					io.sockets
-						.in("game" + gameId + "team0")
-						.emit("serverSendingAction", server0Action);
-					io.sockets
-						.in("game" + gameId + "team1")
-						.emit("serverSendingAction", server1Action);
+					io.sockets.in("game" + gameId + "team0").emit("serverSendingAction", server0Action);
+					io.sockets.in("game" + gameId + "team1").emit("serverSendingAction", server1Action);
 				}
 
 				break;
 			default:
-				socket.emit(
-					"serverSendingAction",
-					userFeedbackAction("Backend Failure, unkown gamePhase...")
-				);
+				socket.emit("serverSendingAction", userFeedbackAction("Backend Failure, unkown gamePhase..."));
 		}
 
 		await conn.release();
@@ -922,8 +841,7 @@ exports.gameReset = async (req, res) => {
 
 		await gameDeleteReal(conn, gameId);
 
-		let queryString =
-			"INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?, ?)";
+		let queryString = "INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?, ?)";
 		let inserts = [gameId, gameSection, gameInstructor, gameAdminPassword];
 		await conn.query(queryString, inserts);
 
@@ -948,11 +866,7 @@ exports.adminLoginVerify = async (req, res) => {
 	}
 
 	const inputPasswordHash = md5(adminPassword);
-	if (
-		adminSection == "CourseDirector" &&
-		adminInstructor == CourseDirectorLastName &&
-		inputPasswordHash == CourseDirectorPasswordHash
-	) {
+	if (adminSection == "CourseDirector" && adminInstructor == CourseDirectorLastName && inputPasswordHash == CourseDirectorPasswordHash) {
 		req.session.ir3 = { courseDirector: true };
 		res.redirect("/courseDirector.html");
 		return;
@@ -991,21 +905,9 @@ exports.adminLoginVerify = async (req, res) => {
 };
 
 exports.gameLoginVerify = async (req, res, callback) => {
-	const {
-		gameSection,
-		gameInstructor,
-		gameTeam,
-		gameTeamPassword,
-		gameController
-	} = req.body;
+	const { gameSection, gameInstructor, gameTeam, gameTeamPassword, gameController } = req.body;
 
-	if (
-		!gameSection ||
-		!gameInstructor ||
-		!gameTeam ||
-		!gameTeamPassword ||
-		!gameController
-	) {
+	if (!gameSection || !gameInstructor || !gameTeam || !gameTeamPassword || !gameController) {
 		res.redirect("/index.html?error=badRequest");
 		return;
 	}
@@ -1058,8 +960,7 @@ exports.getGames = async (req, res) => {
 	}
 
 	try {
-		const queryString =
-			"SELECT gameId, gameSection, gameInstructor, gameActive FROM games";
+		const queryString = "SELECT gameId, gameSection, gameInstructor, gameActive FROM games";
 		const [results, fields] = await pool.query(queryString);
 		res.send(results);
 	} catch (error) {
@@ -1132,9 +1033,7 @@ exports.insertDatabaseTables = async (req, res) => {
 	}
 
 	try {
-		const queryString = fs
-			.readFileSync("./serverItems/sqlScripts/tableInsert.sql")
-			.toString();
+		const queryString = fs.readFileSync("./serverItems/sqlScripts/tableInsert.sql").toString();
 		await pool.query(queryString);
 		res.redirect("/courseDirector.html?initializeDatabase=success");
 	} catch (error) {
@@ -1158,8 +1057,7 @@ exports.gameAdd = async (req, res) => {
 
 	try {
 		const adminPasswordHashed = md5(adminPassword);
-		const queryString =
-			"INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?)";
+		const queryString = "INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?)";
 		const inserts = [adminSection, adminInstructor, adminPasswordHashed];
 		await pool.query(queryString, inserts);
 		res.redirect("/courseDirector.html?gameAdd=success");
@@ -1194,12 +1092,7 @@ exports.gameDelete = async (req, res) => {
 };
 
 exports.socketSetup = (io, socket) => {
-	if (
-		!socket.handshake.session.ir3 ||
-		!socket.handshake.session.ir3.gameId ||
-		!socket.handshake.session.ir3.gameTeam ||
-		!socket.handshake.session.ir3.gameController
-	) {
+	if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
 		socket.emit("serverRedirect", "access");
 		return;
 	}
@@ -1213,9 +1106,7 @@ exports.socketSetup = (io, socket) => {
 	socket.join("game" + gameId + "team" + gameTeam);
 
 	//Room for the Indiviual Controller
-	socket.join(
-		"game" + gameId + "team" + gameTeam + "controller" + gameController
-	);
+	socket.join("game" + gameId + "team" + gameTeam + "controller" + gameController);
 
 	//TODO: Server Side Rendering with react?
 	giveInitialGameState(socket);
@@ -1226,10 +1117,7 @@ exports.socketSetup = (io, socket) => {
 			shopPurchaseRequest(socket, shopItemTypeId);
 		} catch (error) {
 			console.log(error);
-			socket.emit(
-				"serverSendingAction",
-				userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE")
-			);
+			socket.emit("serverSendingAction", userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE"));
 		}
 	});
 
@@ -1238,10 +1126,7 @@ exports.socketSetup = (io, socket) => {
 			shopRefundRequest(socket, shopItem);
 		} catch (error) {
 			console.log(error);
-			socket.emit(
-				"serverSendingAction",
-				userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE")
-			);
+			socket.emit("serverSendingAction", userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE"));
 		}
 	});
 
@@ -1250,10 +1135,7 @@ exports.socketSetup = (io, socket) => {
 			shopConfirmPurchase(socket);
 		} catch (error) {
 			console.log(error);
-			socket.emit(
-				"serverSendingAction",
-				userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE")
-			);
+			socket.emit("serverSendingAction", userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE"));
 		}
 	});
 
@@ -1264,10 +1146,7 @@ exports.socketSetup = (io, socket) => {
 			confirmPlan(socket, pieceId, plan);
 		} catch (error) {
 			console.log(error);
-			socket.emit(
-				"serverSendingAction",
-				userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE")
-			);
+			socket.emit("serverSendingAction", userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE"));
 		}
 	});
 
@@ -1278,10 +1157,7 @@ exports.socketSetup = (io, socket) => {
 			deletePlan(socket, pieceId);
 		} catch (error) {
 			console.log(error);
-			socket.emit(
-				"serverSendingAction",
-				userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE")
-			);
+			socket.emit("serverSendingAction", userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE"));
 		}
 	});
 
@@ -1290,10 +1166,7 @@ exports.socketSetup = (io, socket) => {
 			mainButtonClick(io, socket);
 		} catch (error) {
 			console.log(error);
-			socket.emit(
-				"serverSendingAction",
-				userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE")
-			);
+			socket.emit("serverSendingAction", userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE"));
 		}
 	});
 
