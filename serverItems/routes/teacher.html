@@ -116,18 +116,8 @@
 			<a href="index.html">Home</a>
 			<a href="troubleshoot.html">Troubleshoot</a>
 			<a href="credits.html">Credits</a>
-			<a
-				href="https://gitreports.com/issue/island-rush/K3.1"
-				target="_blank"
-				style="float: right"
-				>Report an Issue</a
-			>
-			<a
-				href="https://github.com/island-rush/K3.1/wiki"
-				target="_blank"
-				style="float: right"
-				>Wiki</a
-			>
+			<a href="https://gitreports.com/issue/island-rush/K3" target="_blank" style="float: right">Report an Issue</a>
+			<a href="https://github.com/island-rush/K3/wiki" target="_blank" style="float: right">Wiki</a>
 		</nav>
 		<h2>Teacher Tools</h2>
 		<div id="SuccessTag" style="color: green"></div>
@@ -147,20 +137,8 @@
 
 		<h3>Game Reset</h3>
 
-		<form
-			name="gameResetForm"
-			method="post"
-			id="gameResetForm"
-			onsubmit="return gameReset()"
-			action="/gameReset"
-		>
-			<input
-				type="submit"
-				class="btn btn-danger"
-				name="Submit"
-				id="gameResetButton"
-				value="GAME RESET"
-			/>
+		<form name="gameResetForm" method="post" id="gameResetForm" onsubmit="return gameReset()" action="/gameReset">
+			<input type="submit" class="btn btn-danger" name="Submit" id="gameResetButton" value="GAME RESET" />
 		</form>
 
 		<hr />
@@ -172,9 +150,7 @@
 		<script>
 			function gameReset() {
 				if (confirm("ARE YOU SURE YOU WANT TO RESET THIS GAME?")) {
-					return confirm(
-						"ARE YOU EXTRA SURE? THIS WILL DELETE ALL DATA FOR THIS GAME..."
-					);
+					return confirm("ARE YOU EXTRA SURE? THIS WILL DELETE ALL DATA FOR THIS GAME...");
 				}
 				return false;
 			}
@@ -198,12 +174,9 @@
 
 			function getUrlVars() {
 				var vars = {};
-				var parts = window.location.href.replace(
-					/[?&]+([^=&]+)=([^&]*)/gi,
-					function(m, key, value) {
-						vars[key] = value;
-					}
-				);
+				var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+					vars[key] = value;
+				});
 				return vars;
 			}
 
@@ -217,12 +190,10 @@
 
 			switch (getUrlParam("gameReset")) {
 				case "success":
-					document.getElementById("SuccessTag").innerHTML =
-						"Successfully Reset Game";
+					document.getElementById("SuccessTag").innerHTML = "Successfully Reset Game";
 					break;
 				case "failed":
-					document.getElementById("ErrorTag").innerHTML =
-						"Failed to Reset Game";
+					document.getElementById("ErrorTag").innerHTML = "Failed to Reset Game";
 					break;
 			}
 		</script>

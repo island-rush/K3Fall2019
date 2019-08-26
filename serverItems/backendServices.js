@@ -666,6 +666,16 @@ const mainButtonClick = async (io, socket) => {
 				} else {
 					// check for any events that exist prior to dealing with plans, execute events 1 by 1
 
+					queryString = "SELECT * FROM eventQueue WHERE eventGameId = ? ORDER BY eventId ASC";
+					inserts = [gameId];
+					let [events, fields] = await conn.query(queryString, inserts);
+
+					if (events.length > 0) {
+						//deal with the event for one or both clients
+						//loop through the events until one is doable, delete any that are no longer applicable
+						//this happens when pieces get deleted (unless run script to auto delete those events...)
+					}
+
 					//TODO: need better standards for results, fields...usually do const, but continuing to use them (different names / numberings?)
 
 					//get current movement order (for each team's plans)
@@ -921,6 +931,7 @@ const mainButtonClick = async (io, socket) => {
 					};
 
 					//send final update to each client
+					//TODO: probably cleaner way of doing this, instead of passing down io, pass down a function that has access to io?
 					io.sockets.in("game" + gameId + "team0").emit("serverSendingAction", server0Action);
 					io.sockets.in("game" + gameId + "team1").emit("serverSendingAction", server1Action);
 				}

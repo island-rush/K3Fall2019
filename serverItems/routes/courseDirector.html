@@ -74,18 +74,8 @@
 			<a href="index.html">Home</a>
 			<a href="troubleshoot.html">Troubleshoot</a>
 			<a href="credits.html">Credits</a>
-			<a
-				href="https://gitreports.com/issue/island-rush/K3.1"
-				target="_blank"
-				style="float: right"
-				>Report an Issue</a
-			>
-			<a
-				href="https://github.com/island-rush/K3.1/wiki"
-				target="_blank"
-				style="float: right"
-				>Wiki</a
-			>
+			<a href="https://gitreports.com/issue/island-rush/K3" target="_blank" style="float: right">Report an Issue</a>
+			<a href="https://github.com/island-rush/K3/wiki" target="_blank" style="float: right">Wiki</a>
 		</nav>
 
 		<div id="SuccessTag" style="color: green"></div>
@@ -104,39 +94,16 @@
 				</tr>
 				<tr>
 					<td>
-						<input
-							name="adminSection"
-							type="text"
-							id="adminSection"
-							placeholder="ex: m1a1"
-							autofocus="autofocus"
-							required
-						/>
+						<input name="adminSection" type="text" id="adminSection" placeholder="ex: m1a1" autofocus="autofocus" required />
 					</td>
 					<td>
-						<input
-							name="adminInstructor"
-							type="text"
-							id="adminInstructor"
-							placeholder="ex: Smith"
-							required
-						/>
+						<input name="adminInstructor" type="text" id="adminInstructor" placeholder="ex: Smith" required />
 					</td>
 					<td>
-						<input
-							name="adminPassword"
-							type="password"
-							id="adminPassword"
-							required
-						/>
+						<input name="adminPassword" type="password" id="adminPassword" required />
 					</td>
 					<td>
-						<input
-							name="adminPasswordConfirm"
-							type="password"
-							id="adminPasswordConfirm"
-							required
-						/>
+						<input name="adminPasswordConfirm" type="password" id="adminPasswordConfirm" required />
 					</td>
 					<td colspan="2">
 						<input type="submit" name="Submit" value="Add Game" />
@@ -157,26 +124,14 @@
 		</table>
 
 		<h1>Delete a Game</h1>
-		<form
-			name="gameDelete"
-			method="post"
-			id="gameDeleteForm"
-			onsubmit="return confirmDelete()"
-			action="/gameDelete"
-		>
+		<form name="gameDelete" method="post" id="gameDeleteForm" onsubmit="return confirmDelete()" action="/gameDelete">
 			<table border="0" cellpadding="3" cellspacing="1">
 				<tr>
 					<td>Game Id</td>
 				</tr>
 				<tr>
 					<td>
-						<input
-							name="gameId"
-							type="text"
-							id="gameId"
-							placeholder="Game Id #"
-							required
-						/>
+						<input name="gameId" type="text" id="gameId" placeholder="Game Id #" required />
 					</td>
 					<td colspan="2">
 						<input type="submit" name="Submit" value="Delete Game" />
@@ -187,20 +142,8 @@
 
 		<br /><br />
 
-		<form
-			name="insertDatabaseTablesForm"
-			method="post"
-			id="insertDatabaseTablesForm"
-			onsubmit="return insertDatabaseTables()"
-			action="/insertDatabaseTables"
-		>
-			<input
-				type="submit"
-				class="btn btn-danger"
-				name="Submit"
-				id="databaseResetButton"
-				value="INITIALIZE DATABASE"
-			/>
+		<form name="insertDatabaseTablesForm" method="post" id="insertDatabaseTablesForm" onsubmit="return insertDatabaseTables()" action="/insertDatabaseTables">
+			<input type="submit" class="btn btn-danger" name="Submit" id="databaseResetButton" value="INITIALIZE DATABASE" />
 		</form>
 
 		<script>
@@ -218,10 +161,7 @@
 						let cell3 = row.insertCell(2);
 						cell3.innerHTML = games[x].gameInstructor;
 						let cell4 = row.insertCell(3);
-						cell4.innerHTML =
-							games[x].gameActive == 1
-								? "<Green>Active</Green>"
-								: "<Red>Inactive</Red>";
+						cell4.innerHTML = games[x].gameActive == 1 ? "<Green>Active</Green>" : "<Red>Inactive</Red>";
 					}
 				}
 			};
@@ -231,8 +171,7 @@
 			let getDatabaseStatusXMLHttp = new XMLHttpRequest();
 			getDatabaseStatusXMLHttp.onreadystatechange = function() {
 				if (this.readyState === 4) {
-					document.getElementById("DatabaseConnectionTag").innerHTML =
-						"Database:" + this.response;
+					document.getElementById("DatabaseConnectionTag").innerHTML = "Database:" + this.response;
 				}
 			};
 			getDatabaseStatusXMLHttp.open("GET", "/databaseStatus", true);
@@ -240,12 +179,9 @@
 
 			function getUrlVars() {
 				var vars = {};
-				var parts = window.location.href.replace(
-					/[?&]+([^=&]+)=([^&]*)/gi,
-					function(m, key, value) {
-						vars[key] = value;
-					}
-				);
+				var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+					vars[key] = value;
+				});
 				return vars;
 			}
 
@@ -259,34 +195,28 @@
 
 			switch (getUrlParam("gameAdd")) {
 				case "success":
-					document.getElementById("SuccessTag").innerHTML =
-						"Successfully Created Game";
+					document.getElementById("SuccessTag").innerHTML = "Successfully Created Game";
 					break;
 				case "failed":
-					document.getElementById("ErrorTag").innerHTML =
-						"Failed to Create Game: Check Database Initialization";
+					document.getElementById("ErrorTag").innerHTML = "Failed to Create Game: Check Database Initialization";
 					break;
 			}
 
 			switch (getUrlParam("gameDelete")) {
 				case "success":
-					document.getElementById("SuccessTag").innerHTML =
-						"Successfully Deleted Game";
+					document.getElementById("SuccessTag").innerHTML = "Successfully Deleted Game";
 					break;
 				case "failed":
-					document.getElementById("ErrorTag").innerHTML =
-						"Failed to Delete Game";
+					document.getElementById("ErrorTag").innerHTML = "Failed to Delete Game";
 					break;
 			}
 
 			switch (getUrlParam("initializeDatabase")) {
 				case "success":
-					document.getElementById("SuccessTag").innerHTML =
-						"Successfully Initialized Database";
+					document.getElementById("SuccessTag").innerHTML = "Successfully Initialized Database";
 					break;
 				case "failed":
-					document.getElementById("ErrorTag").innerHTML =
-						"Failed to Initialize Database";
+					document.getElementById("ErrorTag").innerHTML = "Failed to Initialize Database";
 					break;
 			}
 
