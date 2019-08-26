@@ -91,13 +91,22 @@ CREATE TABLE IF NOT EXISTS eventQueue(
     eventGameId INT(4) NOT NULL,
     eventTeamId INT(1) NOT NULL, -- 0,1 or 2 for both
     eventTypeId INT(2) NOT NULL, -- 0 = battle, 1 = container, 2 = refuel
+    eventPosA INT(4) NOT NULL DEFAULT -1,
+    eventPosB INT(4) NOT NULL DEFAULT -1,
     FOREIGN KEY (eventGameId) REFERENCES games (gameId) ON DELETE CASCADE
 ) AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS eventItems(
 	eventId INT(8) NOT NULL,
-    eventPieceId INT(4) NOT NULL,
+    eventPieceId INT(8) NOT NULL,
     FOREIGN KEY (eventId) REFERENCES eventQueue (eventId) ON DELETE CASCADE,
     FOREIGN KEY (eventPieceId) REFERENCES pieces (pieceId) ON DELETE CASCADE,
     PRIMARY KEY (eventId, eventPieceId)
+);
+
+CREATE TABLE IF NOT EXISTS eventItemsTemp(
+    eventPieceId INT(8) PRIMARY KEY NOT NULL,
+    eventItemGameId INT(4) NOT NULL,
+    eventPosA INT(4) NOT NULL DEFAULT -1,
+    eventPosB INT(4) NOT NULL DEFAULT -1
 );

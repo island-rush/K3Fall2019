@@ -27,13 +27,13 @@ module.exports = async (conn, gameId) => {
 	const firstPieces = [
 		// piece(gameId, "Blue", "Tank", 0, {pieceVisible: 1, pieceContainerId: 23}),
 		piece(gameId, "Blue", "Tank", 0),
-		piece(gameId, "Blue", "Tank", 1),
-		piece(gameId, "Blue", "Tank", 2),
+		piece(gameId, "Red", "Tank", 1),
+		// piece(gameId, "Blue", "Tank", 2),
 		piece(gameId, "Blue", "Tank", 3),
-		piece(gameId, "Blue", "Tank", 4),
-		piece(gameId, "Blue", "Tank", 5),
-		piece(gameId, "Blue", "Tank", 6),
-		piece(gameId, "Red", "Tank", 7)
+		// piece(gameId, "Blue", "Tank", 4),
+		piece(gameId, "Red", "Tank", 5)
+		// piece(gameId, "Blue", "Tank", 6),
+		// piece(gameId, "Red", "Tank", 7)
 	];
 
 	queryString = "INSERT INTO pieces (pieceGameId, pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId, pieceVisible, pieceMoves, pieceFuel) VALUES ?";

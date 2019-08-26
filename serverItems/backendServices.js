@@ -492,16 +492,16 @@ const getDistinctPieces = async (conn, gameId) => {
 };
 
 // prettier-ignore
-const getCollisionBattles = async (conn, gameId) => {
-	let queryString = "SELECT * FROM (SELECT pieceId as pieceId0, pieceTypeId as pieceTypeId0, piecePositionId as piecePositionId0, planPositionId as planPositionId0 FROM plans NATURAL JOIN pieces WHERE planPieceId = pieceId AND pieceTeamId = 0 AND pieceGameId = ?) as a JOIN (SELECT pieceId as pieceId1, pieceTypeId as pieceTypeId1, piecePositionId as piecePositionId1, planPositionId as planPositionId1 FROM plans NATURAL JOIN pieces WHERE planPieceId = pieceId AND pieceTeamId = 1 AND pieceGameId = ?) as b ON piecePositionId0 = planPositionId1 AND planPositionId0 = piecePositionId1";
-	let inserts = [gameId, gameId];
+const getCollisionBattles = async (conn, gameId, movementOrder) => {
+	let queryString = "SELECT * FROM (SELECT pieceId as pieceId0, pieceTypeId as pieceTypeId0, pieceContainerId as pieceContainerId0, piecePositionId as piecePositionId0, planPositionId as planPositionId0 FROM plans NATURAL JOIN pieces WHERE planPieceId = pieceId AND pieceTeamId = 0 AND pieceGameId = ? AND planMovementOrder = ?) as a JOIN (SELECT pieceId as pieceId1, pieceTypeId as pieceTypeId1, pieceContainerId as pieceContainerId1, piecePositionId as piecePositionId1, planPositionId as planPositionId1 FROM plans NATURAL JOIN pieces WHERE planPieceId = pieceId AND pieceTeamId = 1 AND pieceGameId = ? AND planMovementOrder = ?) as b ON piecePositionId0 = planPositionId1 AND planPositionId0 = piecePositionId1";
+	let inserts = [gameId, movementOrder, gameId, movementOrder];
 	const [results, fields] = await conn.query(queryString, inserts);
 	return results;
 }
 
 // prettier-ignore
 const getPositionBattles = async (conn, gameId) => {
-	let queryString = "SELECT * FROM (SELECT pieceId as pieceId0, piecePositionId as piecePositionId0, pieceTypeId as pieceTypeId0 FROM pieces WHERE pieceGameId = ? AND pieceTeamId = 0) as a JOIN (SELECT pieceId as pieceId1, piecePositionId as piecePositionId1, pieceTypeId as pieceTypeId1 FROM pieces WHERE pieceGameId = ? AND pieceTeamId = 1) as b ON piecePositionId0 = piecePositionId1";
+	let queryString = "SELECT * FROM (SELECT pieceId as pieceId0, piecePositionId as piecePositionId0, pieceTypeId as pieceTypeId0, pieceContainerId as pieceContainerId0 FROM pieces WHERE pieceGameId = ? AND pieceTeamId = 0) as a JOIN (SELECT pieceId as pieceId1, piecePositionId as piecePositionId1, pieceTypeId as pieceTypeId1, pieceContainerId as pieceContainerId1 FROM pieces WHERE pieceGameId = ? AND pieceTeamId = 1) as b ON piecePositionId0 = piecePositionId1";
 	let inserts = [gameId, gameId];
 	const [results, fields] = await conn.query(queryString, inserts);
 	return results;
@@ -735,17 +735,89 @@ const mainButtonClick = async (io, socket) => {
 					}
 
 					// check for collision battles
-					const allCollisionBattles = await getCollisionBattles(conn, gameId);
+					const allCollisionBattles = await getCollisionBattles(conn, gameId, currentMovementOrder);
 
 					if (allCollisionBattles.length > 0) {
 						//filter through each collision battle and create events for it
 						//multiple pieces colliding -> same event...
 						//event has a touple identifier? (collision between x,y)
-					}
+						//each one of these has {pieceId0, pieceTypeId0, pieceContainerId0, piecePositionId0, planPositionId0, pieceId1, pieceTypeId1, pieceContainerId1, piecePositionId1, planPositionId1 }
+						//multiple collisions need to go to the same event, but getting multiple's from the database query, since 1 tank vs 2 tanks has 2 separate collisions
+						let allEvents = {};
 
-					// create collision battle events
-					// signal that these need to happen (in database)
-					// break if inserted events, continue if no events necessary (send client first event?)
+						//'position0-position1' => [piecesInvolved?]
+						//all events are team0 - team1, so no need to worry about team1 - team0 duplicates (probably)
+
+						for (let x = 0; x < allCollisionBattles.length; x++) {
+							let {
+								pieceId0,
+								pieceTypeId0,
+								pieceContainerId0,
+								piecePositionId0,
+								planPositionId0,
+								pieceId1,
+								pieceTypeId1,
+								pieceContainerId1,
+								piecePositionId1,
+								planPositionId1
+							} = allCollisionBattles[x];
+
+							// only need to check stuff from 0 -> 1
+							let thisEventPositions = `${piecePositionId0}-${planPositionId0}`;
+
+							//TODO: figure out if these 2 pieces would actually collide / battle
+							//need to consider pieceVisibility as well...do pieces see each other when crossing over?
+
+							if (!Object.keys(allEvents).includes(thisEventPositions)) {
+								allEvents[thisEventPositions] = [];
+							}
+
+							if (!allEvents[thisEventPositions].includes(pieceId0)) {
+								allEvents[thisEventPositions].push(pieceId0);
+							}
+
+							if (!allEvents[thisEventPositions].includes(pieceId1)) {
+								allEvents[thisEventPositions].push(pieceId1);
+							}
+						}
+
+						//bulk insert for eventQueue
+						let allInserts = [];
+						const bothTeamsIndicator = 2;
+						const collisionEventType = 0;
+						for (let key in allEvents) {
+							let newInsert = [gameId, bothTeamsIndicator, collisionEventType, key.split("-")[0], key.split("-")[1]];
+							allInserts.push(newInsert);
+						}
+
+						queryString = "INSERT INTO eventQueue (eventGameId, eventTeamId, eventTypeId, eventPosA, eventPosB) VALUES ?";
+						inserts = [allInserts];
+						await conn.query(queryString, inserts);
+
+						//bulk insert for eventItems where posa = posb (to match the eventId?)
+						//need to insert into temporary table and then insert into table1 select whatever from table2 join table3
+						allInserts = [];
+
+						for (let key in allEvents) {
+							let eventPieces = allEvents[key];
+							for (let z = 0; z < eventPieces.length; z++) {
+								let newInsert = [eventPieces[z], gameId, key.split("-")[0], key.split("-")[1]];
+								allInserts.push(newInsert);
+							}
+						}
+
+						queryString = "INSERT INTO eventItemsTemp (eventPieceId, eventItemGameId, eventPosA, eventPosB) VALUES ?";
+						inserts = [allInserts];
+						await conn.query(queryString, inserts);
+
+						queryString =
+							"INSERT INTO eventItems SELECT eventId, eventPieceId FROM eventItemsTemp NATURAL JOIN eventQueue WHERE eventItemsTemp.eventPosA = eventQueue.eventPosA AND eventItemsTemp.eventPosB = eventQueue.eventPosB AND eventItemsTemp.eventItemGameId = eventQueue.eventGameId";
+						await conn.query(queryString);
+
+						queryString = "DELETE FROM eventItemsTemp WHERE eventItemGameId = ?";
+						inserts = [gameId];
+						await conn.query(queryString, inserts);
+					}
 
 					//moving the pieces (non-special flag)
 					queryString =
@@ -758,7 +830,7 @@ const mainButtonClick = async (io, socket) => {
 					inserts = [gameId, currentMovementOrder];
 					await conn.query(queryString, inserts);
 
-					// create battle events
+					await updateVisibility(conn, gameId);
 
 					const allPositionBattles = await getPositionBattles(conn, gameId);
 
@@ -766,13 +838,70 @@ const mainButtonClick = async (io, socket) => {
 						//filter through each position battle and create events for it
 						//multiple pieces in same position -> same event
 						//event has 1 identifier (position battle at x)
+						//TODO: also consider pieceVisibility?
+
+						let allPosEvents = {};
+
+						for (let x = 0; x < allPositionBattles.length; x++) {
+							let { pieceId0, pieceTypeId0, pieceContainerId0, piecePositionId0, pieceId1, pieceTypeId1, pieceContainerId1, piecePositionId1 } = allPositionBattles[x];
+
+							// only need to check stuff from 0 -> 1
+							let thisEventPosition = `${piecePositionId0}`;
+
+							//TODO: figure out if these 2 pieces would actually collide / battle
+
+							if (!Object.keys(allPosEvents).includes(thisEventPosition)) {
+								allPosEvents[thisEventPosition] = [];
+							}
+
+							if (!allPosEvents[thisEventPosition].includes(pieceId0)) {
+								allPosEvents[thisEventPosition].push(pieceId0);
+							}
+
+							if (!allPosEvents[thisEventPosition].includes(pieceId1)) {
+								allPosEvents[thisEventPosition].push(pieceId1);
+							}
+						}
+
+						//bulk insert for eventQueue
+						let allInserts = [];
+						const bothTeamsIndicator = 2;
+						const posBattleEventType = 1;
+						for (let key in allPosEvents) {
+							let newInsert = [gameId, bothTeamsIndicator, posBattleEventType, key];
+							allInserts.push(newInsert);
+						}
+
+						queryString = "INSERT INTO eventQueue (eventGameId, eventTeamId, eventTypeId, eventPosA) VALUES ?";
+						inserts = [allInserts];
+						await conn.query(queryString, inserts);
+
+						//bulk insert for eventItems
+						allInserts = [];
+
+						for (let key in allPosEvents) {
+							let eventPieces = allPosEvents[key];
+							for (let z = 0; z < eventPieces.length; z++) {
+								let newInsert = [eventPieces[z], gameId, key];
+								allInserts.push(newInsert);
+							}
+						}
+
+						queryString = "INSERT INTO eventItemsTemp (eventPieceId, eventItemGameId, eventPosA) VALUES ?";
+						inserts = [allInserts];
+						await conn.query(queryString, inserts);
+
+						queryString =
+							"INSERT INTO eventItems SELECT eventId, eventPieceId FROM eventItemsTemp NATURAL JOIN eventQueue WHERE eventItemsTemp.eventPosA = eventQueue.eventPosA AND eventItemsTemp.eventItemGameId = eventQueue.eventGameId";
+						await conn.query(queryString);
+
+						queryString = "DELETE FROM eventItemsTemp WHERE eventItemGameId = ?";
+						inserts = [gameId];
+						await conn.query(queryString, inserts);
 					}
 
-					// where blue pieces same position as red pieces... (and other information)
 					// create refuel events (special flag? / proximity) (check to see that the piece still exists!*!*)
 					// create container events (special flag)
-
-					await updateVisibility(conn, gameId);
 
 					//create final update to each client
 					const server0Action = {
