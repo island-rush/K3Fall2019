@@ -161,6 +161,34 @@ const logout = async socket => {
 	}
 };
 
+const getNews = async (conn, gameInfo) => {
+	const { gameId, gamePhase } = gameInfo;
+	const queryString = "SELECT newsTitle, newsInfo FROM news WHERE newsGameId = ? AND newsActivated = 1 AND newsLength != 0 ORDER BY newsOrder ASC LIMIT 1";
+	const inserts = [gameId];
+	const [results, fields] = await conn.query(queryString, inserts);
+
+	const { newsTitle, newsInfo } = results[0] !== undefined ? results[0] : { newsTitle: "No More News", newsInfo: "Obviously you've been playing this game too long..." };
+
+	const currentNews = {
+		active: parseInt(gamePhase) === 0,
+		newsTitle,
+		newsInfo
+	};
+
+	return currentNews;
+};
+
+const getBattle = async (conn, gameInfo, gameTeam) => {
+	const { gameId, gamePhase, gameRound, gameSlice } = gameInfo;
+
+	//fill in default values for battle object
+	const currentBattle = {
+		active: false
+	};
+
+	return currentBattle;
+};
+
 const giveInitialGameState = async socket => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
@@ -170,6 +198,8 @@ const giveInitialGameState = async socket => {
 	const shopItems = await getTeamShopItems(conn, gameId, gameTeam);
 	const gameboardPieces = await getVisiblePieces(conn, gameId, gameTeam);
 	const confirmedPlans = await getTeamPlans(conn, gameId, gameTeam);
+	const news = await getNews(conn, gameInfo);
+	const battle = await getBattle(conn, gameInfo, gameTeam);
 	await conn.release();
 
 	const { gameSection, gameInstructor, gamePhase, gameRound, gameSlice } = gameInfo;
@@ -192,7 +222,17 @@ const giveInitialGameState = async socket => {
 			shopItems,
 			invItems,
 			gameboardPieces,
-			confirmedPlans
+			gameboardMeta: {
+				selectedPosition: -1,
+				selectedPiece: -1,
+				news,
+				battle,
+				planning: {
+					active: false, //nothing during planning is saved by server, always defaults to this
+					moves: []
+				},
+				confirmedPlans
+			}
 		}
 	};
 

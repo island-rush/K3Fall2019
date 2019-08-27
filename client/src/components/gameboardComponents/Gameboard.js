@@ -6,7 +6,7 @@ import { HexGrid, Layout, Hexagon } from "react-hexgrid";
 import { typeHighLow } from "../constants";
 import Patterns from "./Patterns";
 import BattlePopup from "./BattlePopup";
-import NewsAlertPopup from "./NewsAlertPopup";
+import NewsPopup from "./NewsPopup";
 
 const gameboardStyle = {
 	backgroundColor: "blue",
@@ -62,28 +62,16 @@ const patternSolver = position => {
 	if (pieces) {
 		for (let x = 0; x < pieces.length; x++) {
 			let thisPiece = pieces[x];
-			if (
-				thisPiece.pieceTeamId === 1 &&
-				highPieces.includes(thisPiece.pieceTypeId)
-			) {
+			if (thisPiece.pieceTeamId === 1 && highPieces.includes(thisPiece.pieceTypeId)) {
 				redHigh = 1;
 			}
-			if (
-				thisPiece.pieceTeamId === 1 &&
-				lowPieces.includes(thisPiece.pieceTypeId)
-			) {
+			if (thisPiece.pieceTeamId === 1 && lowPieces.includes(thisPiece.pieceTypeId)) {
 				redLow = 1;
 			}
-			if (
-				thisPiece.pieceTeamId === 0 &&
-				highPieces.includes(thisPiece.pieceTypeId)
-			) {
+			if (thisPiece.pieceTeamId === 0 && highPieces.includes(thisPiece.pieceTypeId)) {
 				blueHigh = 1;
 			}
-			if (
-				thisPiece.pieceTeamId === 0 &&
-				lowPieces.includes(thisPiece.pieceTypeId)
-			) {
+			if (thisPiece.pieceTeamId === 0 && lowPieces.includes(thisPiece.pieceTypeId)) {
 				blueLow = 1;
 			}
 		}
@@ -103,24 +91,15 @@ class Gameboard extends Component {
 				planningPositions.push(parseInt(positionId));
 			}
 
-			if (
-				type === "container" &&
-				!containerPositions.includes(parseInt(positionId))
-			) {
+			if (type === "container" && !containerPositions.includes(parseInt(positionId))) {
 				containerPositions.push(parseInt(positionId));
 			}
 		}
 
 		if (this.props.selectedPiece !== -1) {
 			if (this.props.selectedPiece in this.props.confirmedPlans) {
-				for (
-					let z = 0;
-					z < this.props.confirmedPlans[this.props.selectedPiece].length;
-					z++
-				) {
-					const { type, positionId } = this.props.confirmedPlans[
-						this.props.selectedPiece
-					][z];
+				for (let z = 0; z < this.props.confirmedPlans[this.props.selectedPiece].length; z++) {
+					const { type, positionId } = this.props.confirmedPlans[this.props.selectedPiece][z];
 					if (type === "move") {
 						planningPositions.push(parseInt(positionId));
 					}
@@ -141,9 +120,7 @@ class Gameboard extends Component {
 				fill={patternSolver(this.props.gameboard[positionIndex])}
 				onClick={event => {
 					event.preventDefault();
-					if (
-						parseInt(positionIndex) === parseInt(this.props.selectedPosition)
-					) {
+					if (parseInt(positionIndex) === parseInt(this.props.selectedPosition)) {
 						this.props.selectPosition(-1);
 					} else {
 						this.props.selectPosition(positionIndex);
@@ -165,18 +142,13 @@ class Gameboard extends Component {
 		return (
 			<div style={gameboardStyle}>
 				<HexGrid width={"100%"} height={"100%"} viewBox="-50 -50 100 100">
-					<Layout
-						size={{ x: 3.15, y: 3.15 }}
-						flat={true}
-						spacing={1.03}
-						origin={{ x: -98, y: -46 }}
-					>
+					<Layout size={{ x: 3.15, y: 3.15 }} flat={true} spacing={1.03} origin={{ x: -98, y: -46 }}>
 						{positions}
 					</Layout>
 					<Patterns />
 				</HexGrid>
-				<NewsAlertPopup newsAlert={this.props.newsAlert} />
-				<BattlePopup />
+				<NewsPopup news={this.props.news} />
+				<BattlePopup battle={this.props.battle} />
 			</div>
 		);
 	}
@@ -186,7 +158,8 @@ Gameboard.propTypes = {
 	gameboard: PropTypes.array.isRequired,
 	selectedPosition: PropTypes.number.isRequired,
 	selectPosition: PropTypes.func.isRequired,
-	newsAlert: PropTypes.object.isRequired,
+	news: PropTypes.object.isRequired,
+	battle: PropTypes.object.isRequired,
 	planning: PropTypes.object.isRequired,
 	selectedPiece: PropTypes.number.isRequired,
 	confirmedPlans: PropTypes.object.isRequired
@@ -195,7 +168,8 @@ Gameboard.propTypes = {
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 	gameboard,
 	selectedPosition: gameboardMeta.selectedPosition,
-	newsAlert: gameboardMeta.newsAlert,
+	news: gameboardMeta.news,
+	battle: gameboardMeta.battle,
 	planning: gameboardMeta.planning,
 	selectedPiece: gameboardMeta.selectedPiece,
 	confirmedPlans: gameboardMeta.confirmedPlans

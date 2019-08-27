@@ -10,17 +10,19 @@ import {
 	UNDO_MOVE,
 	CONTAINER_MOVE,
 	INITIAL_GAMESTATE,
-	SLICE_CHANGE
+	SLICE_CHANGE,
+	PURCHASE_PHASE,
+	NEWS_PHASE
 } from "../actions/types";
 
 const initialGameboardMeta = {
-	//TODO: change to selectedPositionId and selectedPieceId to better represent the values
+	//TODO: change to selectedPositionId and selectedPieceId to better represent the values (ints)
 	selectedPosition: -1,
 	selectedPiece: -1,
-	newsAlert: {
+	news: {
 		active: false,
-		title: "Loading Title...",
-		info: "Loading Info..."
+		newsTitle: "Loading Title...",
+		newsInfo: "Loading Info..."
 	},
 	battle: {
 		active: false
@@ -37,6 +39,12 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 	switch (type) {
 		case POSITION_SELECT:
 			stateDeepCopy.selectedPosition = parseInt(payload.selectedPositionId);
+			return stateDeepCopy;
+		case PURCHASE_PHASE:
+			stateDeepCopy.news.active = false; //hide the popup
+			return stateDeepCopy;
+		case NEWS_PHASE:
+			stateDeepCopy.news.active = true; //TODO: get the actual news from the database payload
 			return stateDeepCopy;
 		case PIECE_CLICK:
 			stateDeepCopy.selectedPiece = parseInt(payload.selectedPieceId);
@@ -80,8 +88,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.selectedPiece = -1;
 			return stateDeepCopy;
 		case INITIAL_GAMESTATE:
-			stateDeepCopy.confirmedPlans = payload.confirmedPlans;
-			return stateDeepCopy;
+			return payload.gameboardMeta;
 		case SLICE_CHANGE:
 			stateDeepCopy.confirmedPlans = {};
 			return stateDeepCopy;

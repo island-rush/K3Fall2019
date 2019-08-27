@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const newsAlertPopupStyle = {
+const newsPopupStyle = {
 	backgroundColor: "white",
 	width: "50%",
 	height: "50%",
@@ -14,18 +14,18 @@ const invisibleStyle = {
 	display: "none"
 };
 
-const NewsAlertPopup = ({ newsAlert }) => {
+const NewsAlertPopup = ({ news }) => {
 	return (
-		<div style={newsAlert.active ? newsAlertPopupStyle : invisibleStyle}>
+		<div style={news.active ? newsPopupStyle : invisibleStyle}>
 			<div>NEWS ALERT!</div>
-			<div>Title: {newsAlert.title}</div>
-			<div>Info: {newsAlert.info}</div>
+			<div>Title: {news.newsTitle}</div>
+			<div>Info: {news.newsInfo}</div>
 		</div>
 	);
 };
 
 NewsAlertPopup.propTypes = {
-	newsAlert: PropTypes.object.isRequired
+	news: PropTypes.object.isRequired
 };
 
 export default NewsAlertPopup;

@@ -8,7 +8,7 @@ Island Rush is a military strategy teaching tool/game for use by DFMI at The Uni
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system. Please note that Island Rush is designed and tested on Chrome, and other browsers may work but are not officially recommended or supported.
 
 ### Prerequisites
 
@@ -21,7 +21,7 @@ mysql
 
 ### Installing
 
-This command will install both Server and Client dependencies
+This command will install both Server and Client dependencies. Clone the repository, cd into it, and then run this command.
 
 ```
 npm run fullInstall
@@ -127,6 +127,5 @@ Version 3.1.0
   - Set up testing early and use test-driven development
 
 Please [report](https://gitreports.com/issue/island-rush/K3.1) any issues.
-
 
 adding stuff by Jack
