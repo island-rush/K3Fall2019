@@ -189,6 +189,26 @@ const getBattle = async (conn, gameInfo, gameTeam) => {
 	return currentBattle;
 };
 
+const getContainer = async (conn, gameInfo, gameTeam) => {
+	const { gameId, gamePhase, gameRound, gameSlice } = gameInfo;
+
+	const currentContainer = {
+		active: false
+	};
+
+	return currentContainer;
+};
+
+const getRefuel = async (conn, gameInfo, gameTeam) => {
+	const { gameId, gamePhase, gameRound, gameSlice } = gameInfo;
+
+	const currentRefuel = {
+		active: false
+	};
+
+	return currentRefuel;
+};
+
 const giveInitialGameState = async socket => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
@@ -200,6 +220,8 @@ const giveInitialGameState = async socket => {
 	const confirmedPlans = await getTeamPlans(conn, gameId, gameTeam);
 	const news = await getNews(conn, gameInfo);
 	const battle = await getBattle(conn, gameInfo, gameTeam);
+	const container = await getContainer(conn, gameInfo, gameTeam);
+	const refuel = await getRefuel(conn, gameInfo, gameTeam);
 	await conn.release();
 
 	const { gameSection, gameInstructor, gamePhase, gameRound, gameSlice } = gameInfo;
@@ -227,6 +249,8 @@ const giveInitialGameState = async socket => {
 				selectedPiece: -1,
 				news,
 				battle,
+				container,
+				refuel,
 				planning: {
 					active: false, //nothing during planning is saved by server, always defaults to this
 					moves: []

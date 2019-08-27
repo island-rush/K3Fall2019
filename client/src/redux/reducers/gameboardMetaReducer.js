@@ -27,6 +27,12 @@ const initialGameboardMeta = {
 	battle: {
 		active: false
 	},
+	refuel: {
+		active: false
+	},
+	container: {
+		active: false
+	},
 	planning: {
 		active: false,
 		moves: []
