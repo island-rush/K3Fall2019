@@ -40,6 +40,8 @@ const pool = require("./database");
 //OOP Attempt to cleanup this file
 const Game = require("./Game");
 const Piece = require("./Piece");
+const Plan = require("./Plan");
+const Event = require("./Event");
 
 //Internal Functions
 const getVisiblePieces = async (conn, gameId, gameTeam) => {
@@ -76,18 +78,6 @@ const giveInitialGameState = async socket => {
 	const personSpecificAction = await thisGame.initialStatePayload(gameTeam, gameController);
 
 	socket.emit("serverSendingAction", personSpecificAction);
-};
-
-const getTeamPoints = async (conn, gameId, gameTeam) => {
-	const thisGame = new Game(gameId);
-	await thisGame.init();
-	return thisGame["game" + gameTeam + "Points"];
-};
-
-const setTeamPoints = async (gameId, gameTeam, newPoints) => {
-	const thisGame = new Game(gameId);
-	await thisGame.init();
-	await thisGame.setPoints(gameTeam, newPoints);
 };
 
 const insertShopItem = async (conn, gameId, gameTeam, shopItemTypeId) => {
@@ -143,7 +133,7 @@ const shopPurchaseRequest = async (socket, shopItemTypeId) => {
 	}
 
 	const newPoints = teamPoints - shopItemCost;
-	await setTeamPoints(conn, gameId, gameTeam, newPoints);
+	await thisGame.setPoints(gameTeam, newPoints);
 	const shopItemId = await insertShopItem(conn, gameId, gameTeam, shopItemTypeId);
 
 	await conn.release();
@@ -177,13 +167,17 @@ const shopRefundRequest = async (socket, shopItem) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 	const itemCost = shopItemTypeCosts[shopItem.shopItemTypeId];
 
+	const thisGame = new Game(gameId);
+	await thisGame.init();
+
+	const teamPoints = thisGame["game" + gameTeam + "Points"];
+
 	//TODO: verify that the refund is available (correct controller, game active....)
 	//verify that the piece exists and the object given matches database values (overkill)
 
 	const conn = await pool.getConnection();
-	const teamPoints = await getTeamPoints(conn, gameId, gameTeam);
 	const newPoints = teamPoints + itemCost;
-	await setTeamPoints(conn, gameId, gameTeam, newPoints);
+	await thisGame.setPoints(gameTeam, newPoints);
 	await deleteShopItem(conn, shopItem.shopItemId);
 	await conn.release();
 
@@ -238,20 +232,6 @@ const sendUserFeedback = async (socket, userFeedback) => {
 	socket.emit("serverSendingAction", serverAction);
 };
 
-const insertPlan = async (conn, pieceInfo, plan) => {
-	const { pieceGameId, pieceTeamId, pieceId } = pieceInfo;
-	let plansToInsert = [];
-	for (let movementOrder = 0; movementOrder < plan.length; movementOrder++) {
-		let { positionId, type } = plan[movementOrder];
-		let specialFlag = type === "move" ? 0 : 1; // 1 = container, use other numbers for future special flags...
-		plansToInsert.push([pieceGameId, pieceTeamId, pieceId, movementOrder, positionId, specialFlag]);
-	}
-
-	let queryString = "INSERT INTO plans (planGameId, planTeamId, planPieceId, planMovementOrder, planPositionId, planSpecialFlag) VALUES ?";
-	let inserts = [plansToInsert];
-	await conn.query(queryString, inserts);
-};
-
 const confirmPlan = async (socket, pieceId, plan) => {
 	//plan = moves array, where each move has type and positionId
 	//confirm the plan and report back to the client with a server action
@@ -261,14 +241,13 @@ const confirmPlan = async (socket, pieceId, plan) => {
 	//need to know if this piece is a container or not, to check if container move was inserted
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const conn = await pool.getConnection();
+	const thisGame = new Game(gameId); //TODO: init could fail if gameId was invalid
+	await thisGame.init();
 
-	let queryString = "SELECT * FROM games NATURAL JOIN pieces WHERE pieceId = ? AND gameId = pieceGameId";
-	let inserts = [pieceId];
-	const [results, fields] = await conn.query(queryString, inserts);
-	//TODO: check results.length? (or null...)
+	const thisPiece = new Piece(pieceId); //TODO: init could fail if pieceId was invalid
+	await thisPiece.init();
 
-	const { gameActive, piecePositionId, pieceTypeId } = results[0]; //results contains all gameInfo and pieceInfo
+	const { piecePositionId, pieceTypeId } = thisPiece;
 
 	const isContainer = containerTypes.includes(pieceTypeId);
 
@@ -308,10 +287,17 @@ const confirmPlan = async (socket, pieceId, plan) => {
 		previousPosition = positionId;
 	}
 
-	//insert all of the plans into the database
-	await insertPlan(conn, results[0], plan);
+	//prepare the bulk insert
+	const { pieceGameId, pieceTeamId } = thisPiece;
+	let plansToInsert = [];
+	for (let movementOrder = 0; movementOrder < plan.length; movementOrder++) {
+		let { positionId, type } = plan[movementOrder];
+		let specialFlag = type === "move" ? 0 : 1; // 1 = container, use other numbers for future special flags...
+		plansToInsert.push([pieceGameId, pieceTeamId, pieceId, movementOrder, positionId, specialFlag]);
+	}
 
-	await conn.release();
+	//bulk insert (always insert bulk, don't really ever insert single stuff, since a 'plan' is a collection of moves, but the table is 'Plans')
+	await Plan.insert(plansToInsert);
 
 	const serverAction = {
 		type: PLAN_WAS_CONFIRMED,
@@ -331,18 +317,16 @@ const deletePlan = async (socket, pieceId) => {
 
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const conn = await pool.getConnection();
+	const thisGame = new Game(gameId);
+	await thisGame.init();
 
-	// const thisGame = new Game(gameId);
-	// await thisGame.init();
+	if (!thisGame.gameActive) {
+		return;
+	}
 
 	//can still run the query if the plan doesn't exist? (it won't fail...)
 
-	const queryString = "DELETE FROM plans WHERE planPieceId = ?";
-	const inserts = [pieceId];
-	await conn.query(queryString, inserts);
-
-	await conn.release();
+	await Plan.delete(pieceId);
 
 	const serverAction = {
 		type: DELETE_PLAN,
@@ -352,13 +336,6 @@ const deletePlan = async (socket, pieceId) => {
 	};
 
 	socket.emit("serverSendingAction", serverAction);
-};
-
-const getDistinctPieces = async (conn, gameId) => {
-	const queryString = "SELECT DISTINCT pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId FROM pieces WHERE pieceGameId = ?";
-	const inserts = [gameId];
-	const [results, fields] = await conn.query(queryString, inserts);
-	return results;
 };
 
 // prettier-ignore
@@ -378,44 +355,6 @@ const getPositionBattles = async (conn, gameId) => {
 }
 
 // prettier-ignore
-const updateVisibility = async (conn, gameId) => {
-	let queryString = "UPDATE pieces SET pieceVisible = 0 WHERE pieceGameId = ?";
-	let inserts = [gameId];
-	await conn.query(queryString, inserts);
-
-	//posTypes[teamToUpdate][typeToUpdate] = [...positionsThatThoseTypesAreVisibleOn]
-	let posTypes = [
-		[[-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1]],
-		[[-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1]]
-	];
-
-	const pieces = await getDistinctPieces(conn, gameId);
-
-	let otherTeam;
-	for (let x = 0; x < pieces.length; x++) {
-		let { pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId } = pieces[x]; //TODO: pieces inside containers can't see rule?
-
-		for (let type = 0; type < 20; type++) { //check each type
-			if (visibilityMatrix[pieceTypeId][type] !== -1) { //could it ever see this type?
-				for (let position = 0; position < distanceMatrix[piecePositionId].length; position++) { //for all positions
-					if (distanceMatrix[piecePositionId][position] <= visibilityMatrix[pieceTypeId][type]) { //is this position in range for that type?
-						otherTeam = parseInt(pieceTeamId) === 0 ? 1 : 0;
-
-						if (!posTypes[otherTeam][type].includes(position)) { //add this position if not already added by another piece somewhere else
-							posTypes[otherTeam][type].push(position);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	//Single update packet for all visibilities (let database handle finding which pieces are included)
-	queryString = "UPDATE pieces SET pieceVisible = 1 WHERE pieceGameId = ? AND ((pieceTeamId = 0 AND pieceTypeId = 0 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 2 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 3 AND piecePositionId IN (?)) OR (pieceTeamId = 4 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 5 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 6 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 7 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 8 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 9 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 10 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 11 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 12 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 13 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 14 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 15 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 16 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 17 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 18 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 19 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 0 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 2 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 3 AND piecePositionId IN (?)) OR (pieceTeamId = 4 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 5 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 6 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 7 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 8 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 9 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 10 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 11 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 12 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 13 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 14 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 15 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 16 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 17 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 18 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 19 AND piecePositionId IN (?)))";
-	inserts = [gameId, posTypes[0][0], posTypes[0][1], posTypes[0][2], posTypes[0][3], posTypes[0][4], posTypes[0][5], posTypes[0][6], posTypes[0][7], posTypes[0][8], posTypes[0][9], posTypes[0][10], posTypes[0][11], posTypes[0][12], posTypes[0][13], posTypes[0][14], posTypes[0][15], posTypes[0][16], posTypes[0][17], posTypes[0][18], posTypes[0][19], posTypes[1][0], posTypes[1][1], posTypes[1][2], posTypes[1][3], posTypes[1][4], posTypes[1][5], posTypes[1][6], posTypes[1][7], posTypes[1][8], posTypes[1][9], posTypes[1][10], posTypes[1][11], posTypes[1][12], posTypes[1][13], posTypes[1][14], posTypes[1][15], posTypes[1][16], posTypes[1][17], posTypes[1][18], posTypes[1][19]];
-	await conn.query(queryString, inserts);
-};
-
 const mainButtonClick = async (io, socket) => {
 	//verify that this person is ok to click the button
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
@@ -530,28 +469,18 @@ const mainButtonClick = async (io, socket) => {
 				} else {
 					// check for any events that exist prior to dealing with plans, execute events 1 by 1
 
-					queryString = "SELECT * FROM eventQueue WHERE eventGameId = ? ORDER BY eventId ASC";
-					inserts = [gameId];
-					let [events, fields] = await conn.query(queryString, inserts);
+					let events = await Event.all(gameId);
 
 					if (events.length > 0) {
 						//deal with the event for one or both clients
 						//loop through the events until one is doable, delete any that are no longer applicable
 						//this happens when pieces get deleted (unless run script to auto delete those events...)
 					}
+					
+					const currentMovementOrder0 = await Plan.getCurrentMovementOrder(gameId, 0);
+					const currentMovementOrder1 = await Plan.getCurrentMovementOrder(gameId, 1);
 
-					//TODO: need better standards for results, fields...usually do const, but continuing to use them (different names / numberings?)
-
-					//get current movement order (for each team's plans)
-					queryString = "SELECT planMovementOrder as currentMovementOrder FROM plans WHERE planGameId = ? AND planTeamId = 0 ORDER BY planMovementOrder ASC LIMIT 1";
-					inserts = [gameId];
-					let [results0] = await conn.query(queryString, inserts);
-
-					queryString = "SELECT planMovementOrder as currentMovementOrder FROM plans WHERE planGameId = ? AND planTeamId = 1 ORDER BY planMovementOrder ASC LIMIT 1";
-					inserts = [gameId];
-					let [results1] = await conn.query(queryString, inserts);
-
-					if (results0.length === 0 && results1.length === 0) {
+					if (!currentMovementOrder0 && !currentMovementOrder1) {
 						//both teams are done with plans
 						if (gameRound === 2) {
 							//move to place phase
@@ -588,18 +517,18 @@ const mainButtonClick = async (io, socket) => {
 					//one of these should fire, since above check failed to exit
 					//keeping the empty plan team at status1
 					let game0StatusNew = 1;
-					if (results0.length === 0) {
+					if (!currentMovementOrder0) {
 						await thisGame.setStatus(0, 1);
 					} else {
-						currentMovementOrder = results0[0]["currentMovementOrder"];
+						currentMovementOrder = currentMovementOrder0;
 						game0StatusNew = 0;
 					}
 
 					let game1StatusNew = 1;
-					if (results1.length === 0) {
+					if (!currentMovementOrder1) {
 						await thisGame.setStatus(1, 1);
 					} else {
-						currentMovementOrder = results1[0]["currentMovementOrder"];
+						currentMovementOrder = currentMovementOrder1;
 						game1StatusNew = 0;
 					}
 
@@ -699,7 +628,7 @@ const mainButtonClick = async (io, socket) => {
 					inserts = [gameId, currentMovementOrder];
 					await conn.query(queryString, inserts);
 
-					await updateVisibility(conn, gameId);
+					await Piece.updateVisibilities(gameId);
 
 					const allPositionBattles = await getPositionBattles(conn, gameId);
 
