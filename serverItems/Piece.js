@@ -5,11 +5,58 @@ class Piece {
 		this.pieceId = pieceId;
 	}
 
-	static async getInfo(pieceId) {
+	async init() {
 		const queryString = "SELECT * FROM pieces WHERE pieceId = ?";
-		const inserts = [pieceId];
-		const [results, fields] = await pool.query(queryString, inserts);
-		return results[0];
+		const inserts = [this.pieceId];
+		const [results] = await pool.query(queryString, inserts);
+		Object.assign(this, results[0]);
+	}
+
+	// prettier-ignore
+	static async updateVisibilities(gameId) {
+		const conn = await pool.getConnection();
+
+		//set all to invisible
+		let queryString = "UPDATE pieces SET pieceVisible = 0 WHERE pieceGameId = ?";
+		let inserts = [gameId];
+		await conn.query(queryString, inserts);
+
+		//posTypes[teamToUpdate][typeToUpdate] = [...positionsThatThoseTypesAreVisibleOn]
+		let posTypesVisible = [
+			[[-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1]],
+			[[-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1]]
+		];
+
+		//only need to check distinct pieces, (100 red tanks in same position == 1 red tank in same position)
+		queryString = "SELECT DISTINCT pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId FROM pieces WHERE pieceGameId = ?";
+		inserts = [gameId];
+		const [pieces] = await conn.query(queryString, inserts);
+
+		let otherTeam;
+		for (let x = 0; x < pieces.length; x++) {
+			let { pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId } = pieces[x]; //TODO: pieces inside containers can't see rule?
+
+			for (let type = 0; type < 20; type++) { //check each type
+				if (visibilityMatrix[pieceTypeId][type] !== -1) { //could it ever see this type?
+					for (let position = 0; position < distanceMatrix[piecePositionId].length; position++) { //for all positions
+						if (distanceMatrix[piecePositionId][position] <= visibilityMatrix[pieceTypeId][type]) { //is this position in range for that type?
+							otherTeam = parseInt(pieceTeamId) === 0 ? 1 : 0;
+
+							if (!posTypesVisible[otherTeam][type].includes(position)) { //add this position if not already added by another piece somewhere else
+								posTypesVisible[otherTeam][type].push(position);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		//Bulk update for all visibilities
+		queryString = "UPDATE pieces SET pieceVisible = 1 WHERE pieceGameId = ? AND ((pieceTeamId = 0 AND pieceTypeId = 0 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 2 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 3 AND piecePositionId IN (?)) OR (pieceTeamId = 4 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 5 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 6 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 7 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 8 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 9 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 10 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 11 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 12 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 13 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 14 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 15 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 16 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 17 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 18 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 19 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 0 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 2 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 3 AND piecePositionId IN (?)) OR (pieceTeamId = 4 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 5 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 6 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 7 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 8 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 9 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 10 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 11 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 12 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 13 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 14 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 15 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 16 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 17 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 18 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 19 AND piecePositionId IN (?)))";
+		inserts = [gameId, posTypesVisible[0][0], posTypesVisible[0][1], posTypesVisible[0][2], posTypesVisible[0][3], posTypesVisible[0][4], posTypesVisible[0][5], posTypesVisible[0][6], posTypesVisible[0][7], posTypesVisible[0][8], posTypesVisible[0][9], posTypesVisible[0][10], posTypesVisible[0][11], posTypesVisible[0][12], posTypesVisible[0][13], posTypesVisible[0][14], posTypesVisible[0][15], posTypesVisible[0][16], posTypesVisible[0][17], posTypesVisible[0][18], posTypesVisible[0][19], posTypesVisible[1][0], posTypesVisible[1][1], posTypesVisible[1][2], posTypesVisible[1][3], posTypesVisible[1][4], posTypesVisible[1][5], posTypesVisible[1][6], posTypesVisible[1][7], posTypesVisible[1][8], posTypesVisible[1][9], posTypesVisible[1][10], posTypesVisible[1][11], posTypesVisible[1][12], posTypesVisible[1][13], posTypesVisible[1][14], posTypesVisible[1][15], posTypesVisible[1][16], posTypesVisible[1][17], posTypesVisible[1][18], posTypesVisible[1][19]];
+		await conn.query(queryString, inserts);
+
+		await conn.release();
 	}
 }
 

@@ -162,12 +162,24 @@ class Game {
 		return serverAction;
 	}
 
+	//TODO: should switch this to a true setting (setGameActive()) instead of a toggle
 	async toggleGameActive() {
 		const queryString =
 			"UPDATE games SET gameActive = (gameActive + 1) % 2, game0Controller0 = 0, game0Controller1 = 0, game0Controller2 = 0, game0Controller3 = 0, game1Controller0 = 0, game1Controller1 = 0, game1Controller2 = 0, game1Controller3 = 0 WHERE gameId = ?";
 		const inserts = [this.gameId];
 		await pool.query(queryString, inserts);
-		this.gameActive = (this.gameActive + 1) % 2;
+		const updatedInfo = {
+			gameActive: (this.gameActive + 1) % 2,
+			game0Controller0: 0,
+			game0Controller1: 0,
+			game0Controller2: 0,
+			game0Controller3: 0,
+			game1Controller0: 0,
+			game1Controller1: 0,
+			game1Controller2: 0,
+			game1Controller3: 0
+		};
+		Object.assign(this, updatedInfo); //very unlikely we would need the updated info on this object...
 	}
 
 	async markLoggedIn(gameTeam, gameController) {
@@ -187,7 +199,7 @@ class Game {
 	async reset() {
 		Game.delete(this.gameId);
 
-		const conn = await pool.getConnection();
+		const conn = await pool.getConnection(); //TODO: combine this method with .add(), overloading
 		const queryString = "INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?, ?)";
 		const inserts = [this.gameId, this.gameSection, this.gameInstructor, this.gameAdminPassword];
 		await conn.query(queryString, inserts);
