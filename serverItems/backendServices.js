@@ -33,60 +33,15 @@ const {
 } = require("./constants");
 
 const distanceMatrix = require("./distanceMatrix");
-const initialPieces = require("./initialPieces");
-const initialNews = require("./initialNews");
 
 //Database Pool
 const pool = require("./database");
 
 //OOP Attempt to cleanup this file
 const Game = require("./Game");
+const Piece = require("./Piece");
 
 //Internal Functions
-const getGameActiveReal = async (conn, gameId) => {
-	// const queryString = "SELECT gameActive FROM games WHERE gameId = ?";
-	// const inserts = [gameId];
-	// const [results, fields] = await conn.query(queryString, inserts);
-	// return results[0]["gameActive"];
-
-	return await Game.getGameActive(gameId);
-};
-
-const gameDeleteReal = async (conn, gameId) => {
-	//deleting now cascades to all tables with foreign key referencing gameId
-	queryString = "DELETE FROM games WHERE gameId = ?";
-	inserts = [gameId];
-	await conn.query(queryString, inserts);
-};
-
-const getGameId = async (conn, gameSection, gameInstructor) => {
-	const queryString = "SELECT gameId FROM games WHERE gameSection = ? AND gameInstructor = ?";
-	const inserts = [gameSection, gameInstructor];
-	const [results, fields] = await conn.query(queryString, inserts);
-	if (results.length === 1) {
-		return results[0]["gameId"];
-	} else {
-		return null;
-	}
-};
-
-const getGameInfo = async (conn, gameId) => {
-	return await Game.getInfo(gameId);
-};
-
-const getPieceInfo = async (conn, pieceId) => {
-	const queryString = "SELECT * FROM pieces WHERE pieceId = ?";
-	const inserts = [pieceId];
-	const [results, fields] = await conn.query(queryString, inserts);
-	return results[0];
-};
-
-const markLoggedIn = async (conn, gameId, commanderField) => {
-	const queryString = "UPDATE games SET ?? = 1 WHERE gameId = ?";
-	const inserts = [commanderField, gameId];
-	await conn.query(queryString, inserts); //TODO: do we need to await if this is run and forget? (don't want to release early?)
-};
-
 const getVisiblePieces = async (conn, gameId, gameTeam) => {
 	const queryString = "SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = ? OR pieceVisible = 1) ORDER BY pieceContainerId, pieceTeamId ASC";
 	const inserts = [gameId, gameTeam];
@@ -112,173 +67,27 @@ const getVisiblePieces = async (conn, gameId, gameTeam) => {
 	return allPieces;
 };
 
-const getTeamInvItems = async (conn, gameId, gameTeam) => {
-	const queryString = "SELECT * FROM invItems WHERE invItemGameId = ? AND invItemTeamId = ?";
-	const inserts = [gameId, gameTeam];
-	const [results, fields] = await conn.query(queryString, inserts);
-	return results;
-};
-
-const getTeamShopItems = async (conn, gameId, gameTeam) => {
-	const queryString = "SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?";
-	const inserts = [gameId, gameTeam];
-	const [results, fields] = await conn.query(queryString, inserts);
-	return results;
-};
-
-const getTeamPlans = async (conn, gameId, gameTeam) => {
-	const queryString = "SELECT * FROM plans WHERE planGameId = ? AND planTeamId = ? ORDER BY planPieceId, planMovementOrder ASC";
-	const inserts = [gameId, gameTeam];
-	const [results, fields] = await conn.query(queryString, inserts);
-
-	let confirmedPlans = {};
-
-	for (let x = 0; x < results.length; x++) {
-		let { planPieceId, planPositionId, planSpecialFlag } = results[x];
-		let type = planSpecialFlag === 0 ? "move" : "container"; //TODO: unknown future special flags could interfere
-
-		if (!(planPieceId in confirmedPlans)) {
-			confirmedPlans[planPieceId] = [];
-		}
-
-		confirmedPlans[planPieceId].push({
-			type,
-			positionId: planPositionId
-		});
-	}
-
-	return confirmedPlans;
-};
-
-const logout = async socket => {
-	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3; //Assume we have this, if this method is ever called (from sockets)
-	const loginField = "game" + gameTeam + "Controller" + gameController;
-	const queryString = "UPDATE games SET ?? = 0 WHERE gameId = ?";
-	const inserts = [loginField, gameId];
-	try {
-		await pool.query(queryString, inserts);
-	} catch (error) {
-		console.log(error);
-		//nothing to send to client, they disconnected from the socket already...
-	}
-};
-
-const getNews = async (conn, gameInfo) => {
-	const { gameId, gamePhase } = gameInfo;
-	const queryString = "SELECT newsTitle, newsInfo FROM news WHERE newsGameId = ? AND newsActivated = 1 AND newsLength != 0 ORDER BY newsOrder ASC LIMIT 1";
-	const inserts = [gameId];
-	const [results, fields] = await conn.query(queryString, inserts);
-
-	const { newsTitle, newsInfo } = results[0] !== undefined ? results[0] : { newsTitle: "No More News", newsInfo: "Obviously you've been playing this game too long..." };
-
-	const currentNews = {
-		active: parseInt(gamePhase) === 0,
-		newsTitle,
-		newsInfo
-	};
-
-	return currentNews;
-};
-
-const getBattle = async (conn, gameInfo, gameTeam) => {
-	const { gameId, gamePhase, gameRound, gameSlice } = gameInfo;
-
-	//fill in default values for battle object
-	const currentBattle = {
-		active: false
-	};
-
-	return currentBattle;
-};
-
-const getContainer = async (conn, gameInfo, gameTeam) => {
-	const { gameId, gamePhase, gameRound, gameSlice } = gameInfo;
-
-	const currentContainer = {
-		active: false
-	};
-
-	return currentContainer;
-};
-
-const getRefuel = async (conn, gameInfo, gameTeam) => {
-	const { gameId, gamePhase, gameRound, gameSlice } = gameInfo;
-
-	const currentRefuel = {
-		active: false
-	};
-
-	return currentRefuel;
-};
-
 const giveInitialGameState = async socket => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const conn = await pool.getConnection();
-	const gameInfo = await getGameInfo(conn, gameId);
-	const invItems = await getTeamInvItems(conn, gameId, gameTeam);
-	const shopItems = await getTeamShopItems(conn, gameId, gameTeam);
-	const gameboardPieces = await getVisiblePieces(conn, gameId, gameTeam);
-	const confirmedPlans = await getTeamPlans(conn, gameId, gameTeam);
-	const news = await getNews(conn, gameInfo);
-	const battle = await getBattle(conn, gameInfo, gameTeam);
-	const container = await getContainer(conn, gameInfo, gameTeam);
-	const refuel = await getRefuel(conn, gameInfo, gameTeam);
-	await conn.release();
+	const thisGame = new Game(gameId);
+	await thisGame.init();
 
-	const { gameSection, gameInstructor, gamePhase, gameRound, gameSlice } = gameInfo;
-	const gamePoints = gameInfo["game" + gameTeam + "Points"];
-	const gameStatus = gameInfo["game" + gameTeam + "Status"];
+	const personSpecificAction = await thisGame.initialStatePayload(gameTeam, gameController);
 
-	const serverAction = {
-		type: INITIAL_GAMESTATE,
-		payload: {
-			gameInfo: {
-				gameSection,
-				gameInstructor,
-				gameController,
-				gamePhase,
-				gameRound,
-				gameSlice,
-				gameStatus,
-				gamePoints
-			},
-			shopItems,
-			invItems,
-			gameboardPieces,
-			gameboardMeta: {
-				selectedPosition: -1,
-				selectedPiece: -1,
-				news,
-				battle,
-				container,
-				refuel,
-				planning: {
-					active: false, //nothing during planning is saved by server, always defaults to this
-					moves: []
-				},
-				confirmedPlans
-			}
-		}
-	};
-
-	socket.emit("serverSendingAction", serverAction);
+	socket.emit("serverSendingAction", personSpecificAction);
 };
 
 const getTeamPoints = async (conn, gameId, gameTeam) => {
-	const pointsField = "game" + gameTeam + "Points";
-	const queryString = "SELECT ?? as teamPoints from games WHERE gameId = ?";
-	const inserts = [pointsField, gameId];
-	const [results, fields] = await conn.query(queryString, inserts);
-	const teamPoints = results[0]["teamPoints"];
-	return teamPoints;
+	const thisGame = new Game(gameId);
+	await thisGame.init();
+	return thisGame["game" + gameTeam + "Points"];
 };
 
-const setTeamPoints = async (conn, gameId, gameTeam, newPoints) => {
-	const pointsField = "game" + gameTeam + "Points";
-	const queryString = "UPDATE games SET ?? = ? WHERE gameId = ?";
-	const inserts = [pointsField, newPoints, gameId];
-	await conn.query(queryString, inserts);
+const setTeamPoints = async (gameId, gameTeam, newPoints) => {
+	const thisGame = new Game(gameId);
+	await thisGame.init();
+	await thisGame.setPoints(gameTeam, newPoints);
 };
 
 const insertShopItem = async (conn, gameId, gameTeam, shopItemTypeId) => {
@@ -296,10 +105,11 @@ const shopPurchaseRequest = async (socket, shopItemTypeId) => {
 	//TODO: figure out if the purchase is allowed (game phase...controller Id....game active....) (and in other methods...)
 
 	const conn = await pool.getConnection();
-	const gameInfo = await getGameInfo(conn, gameId);
-	// const teamPoints = await getTeamPoints(conn, gameId, gameTeam);
 
-	const { gameActive, gamePhase } = gameInfo;
+	const thisGame = new Game(gameId);
+	await thisGame.init();
+
+	const { gameActive, gamePhase } = thisGame;
 
 	if (!gameActive) {
 		await conn.release();
@@ -318,7 +128,7 @@ const shopPurchaseRequest = async (socket, shopItemTypeId) => {
 		return;
 	}
 
-	const teamPoints = gameInfo["game" + gameTeam + "Points"];
+	const teamPoints = thisGame["game" + gameTeam + "Points"];
 
 	if (teamPoints < shopItemCost) {
 		await conn.release();
@@ -522,8 +332,9 @@ const deletePlan = async (socket, pieceId) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	const conn = await pool.getConnection();
-	const gameInfo = await getGameInfo(conn, gameId);
-	const pieceInfo = await getPieceInfo(conn, pieceId);
+
+	// const thisGame = new Game(gameId);
+	// await thisGame.init();
 
 	//can still run the query if the plan doesn't exist? (it won't fail...)
 
@@ -541,13 +352,6 @@ const deletePlan = async (socket, pieceId) => {
 	};
 
 	socket.emit("serverSendingAction", serverAction);
-};
-
-const getPieces = async (conn, gameId) => {
-	const queryString = "SELECT * FROM pieces WHERE pieceGameId = ?";
-	const inserts = [gameId];
-	const [results, fields] = await conn.query(queryString, inserts);
-	return results;
 };
 
 const getDistinctPieces = async (conn, gameId) => {
@@ -617,8 +421,11 @@ const mainButtonClick = async (io, socket) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	const conn = await pool.getConnection();
-	const gameInfo = await getGameInfo(conn, gameId);
-	const { gameActive, gamePhase, game0Status, game1Status, gameRound, gameSlice } = gameInfo;
+
+	const thisGame = new Game(gameId);
+	await thisGame.init();
+
+	const { gameActive, gamePhase, game0Status, game1Status, gameRound, gameSlice } = thisGame;
 
 	//need to do different things based on the phase?
 	if (!gameActive) {
@@ -641,9 +448,8 @@ const mainButtonClick = async (io, socket) => {
 		//other team still active, not yet ready to move on
 		//mark this team as waiting
 
-		let queryString = "UPDATE games set ?? = 1 WHERE gameId = ?";
-		let inserts = ["game" + parseInt(gameTeam) + "Status", gameId];
-		await conn.query(queryString, inserts);
+		thisGame.setStatus(gameTeam, 1);
+
 		await conn.release();
 		let serverAction = {
 			type: MAIN_BUTTON_CLICK,
@@ -654,20 +460,17 @@ const mainButtonClick = async (io, socket) => {
 	} else {
 		//both teams done with this phase, round, slice, move...
 		//mark other team as no longer waiting
-		let queryString = "UPDATE games set game0Status = 0, game1Status = 0 WHERE gameId = ?";
-		let inserts = [gameId];
-		await conn.query(queryString, inserts);
+		//TODO: figure out which team would actually be changing, instead of calling twice
+		thisGame.setStatus(0, 0);
+		thisGame.setStatus(1, 0);
 
 		let serverAction;
-		// let queryString;
-		// let inserts;
 
 		switch (parseInt(gamePhase)) {
 			case 0:
 				//news -> purchase
-				queryString = "UPDATE games set gamePhase = 1 WHERE gameId = ?";
-				inserts = [gameId];
-				await conn.query(queryString, inserts);
+				await thisGame.setPhase(1);
+
 				await conn.release();
 
 				//let the everyone know stuff
@@ -682,9 +485,8 @@ const mainButtonClick = async (io, socket) => {
 
 			case 1:
 				//purchase -> combat
-				queryString = "UPDATE games set gamePhase = 2 WHERE gameId = ?";
-				inserts = [gameId];
-				await conn.query(queryString, inserts);
+				await thisGame.setPhase(2);
+
 				await conn.release();
 
 				//let the everyone know stuff
@@ -699,9 +501,8 @@ const mainButtonClick = async (io, socket) => {
 
 			case 3:
 				//place troops -> news phase
-				queryString = "UPDATE games set gamePhase = 0 WHERE gameId = ?";
-				inserts = [gameId];
-				await conn.query(queryString, inserts);
+				await thisGame.setPhase(0);
+
 				await conn.release();
 
 				serverAction = {
@@ -716,10 +517,7 @@ const mainButtonClick = async (io, socket) => {
 				//combat phase controls (-> slice, -> execute/step, -> round++, -> place phase)
 				if (parseInt(gameSlice) === 0) {
 					//they are done making the plans for this round
-					//change to slice === 1
-					queryString = "UPDATE games SET gameSlice = 1 WHERE gameId = ?";
-					inserts = [gameId];
-					await conn.query(queryString, inserts);
+					await thisGame.setSlice(1);
 
 					//need to let the clients know that done with planning, ready to execute
 					serverAction = {
@@ -747,19 +545,19 @@ const mainButtonClick = async (io, socket) => {
 					//get current movement order (for each team's plans)
 					queryString = "SELECT planMovementOrder as currentMovementOrder FROM plans WHERE planGameId = ? AND planTeamId = 0 ORDER BY planMovementOrder ASC LIMIT 1";
 					inserts = [gameId];
-					let [results0, fields0] = await conn.query(queryString, inserts);
+					let [results0] = await conn.query(queryString, inserts);
 
 					queryString = "SELECT planMovementOrder as currentMovementOrder FROM plans WHERE planGameId = ? AND planTeamId = 1 ORDER BY planMovementOrder ASC LIMIT 1";
 					inserts = [gameId];
-					let [results1, fields1] = await conn.query(queryString, inserts);
+					let [results1] = await conn.query(queryString, inserts);
 
 					if (results0.length === 0 && results1.length === 0) {
 						//both teams are done with plans
 						if (gameRound === 2) {
 							//move to place phase
-							queryString = "UPDATE games SET gameRound = 0, gameSlice = 0, gamePhase = 3 WHERE gameId = ?";
-							inserts = [gameId];
-							await conn.query(queryString, inserts);
+							await thisGame.setRound(0);
+							await thisGame.setSlice(0);
+							await thisGame.setPhase(3);
 
 							serverAction = {
 								type: PLACE_PHASE,
@@ -769,14 +567,13 @@ const mainButtonClick = async (io, socket) => {
 							io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
 						} else {
 							//move to next round
-							queryString = "UPDATE games SET gameRound = gameRound + 1, gameSlice = 0 WHERE gameId = ?";
-							inserts = [gameId];
-							await conn.query(queryString, inserts);
+							await thisGame.setRound(thisGame.gameRound + 1);
+							await thisGame.setSlice(0);
 
 							serverAction = {
 								type: NEW_ROUND,
 								payload: {
-									gameRound: gameRound + 1
+									gameRound: this.gameRound
 								}
 							};
 
@@ -792,9 +589,7 @@ const mainButtonClick = async (io, socket) => {
 					//keeping the empty plan team at status1
 					let game0StatusNew = 1;
 					if (results0.length === 0) {
-						queryString = "UPDATE games set game0Status = 1 WHERE gameId = ?";
-						inserts = [gameId];
-						await conn.query(queryString, inserts);
+						await thisGame.setStatus(0, 1);
 					} else {
 						currentMovementOrder = results0[0]["currentMovementOrder"];
 						game0StatusNew = 0;
@@ -802,9 +597,7 @@ const mainButtonClick = async (io, socket) => {
 
 					let game1StatusNew = 1;
 					if (results1.length === 0) {
-						queryString = "UPDATE games set game1Status = 1 WHERE gameId = ?";
-						inserts = [gameId];
-						await conn.query(queryString, inserts);
+						await thisGame.setStatus(1, 1);
 					} else {
 						currentMovementOrder = results1[0]["currentMovementOrder"];
 						game1StatusNew = 0;
@@ -1031,21 +824,9 @@ exports.gameReset = async (req, res) => {
 	const { gameId } = req.session.ir3;
 
 	try {
-		const conn = await pool.getConnection();
-		const gameInfo = await getGameInfo(conn, gameId);
-		const { gameSection, gameInstructor, gameAdminPassword } = gameInfo;
-
-		await gameDeleteReal(conn, gameId);
-
-		let queryString = "INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?, ?)";
-		let inserts = [gameId, gameSection, gameInstructor, gameAdminPassword];
-		await conn.query(queryString, inserts);
-
-		await initialPieces(conn, gameId);
-		await initialNews(conn, gameId);
-
-		conn.release();
-
+		const thisGame = new Game(gameId);
+		await thisGame.init(); //need init to know section/instructor.... to reset back to those
+		await thisGame.reset();
 		res.redirect("/teacher.html?gameReset=success");
 	} catch (error) {
 		console.log(error);
@@ -1069,19 +850,17 @@ exports.adminLoginVerify = async (req, res) => {
 	}
 
 	try {
-		const conn = await pool.getConnection();
-		const gameId = await getGameId(conn, adminSection, adminInstructor);
+		const gameId = await Game.findGameId(adminSection, adminInstructor);
 
 		if (!gameId) {
 			res.redirect("/index.html?error=login");
-			conn.release();
 			return;
 		}
 
-		const gameInfo = await getGameInfo(conn, gameId);
-		conn.release();
+		const thisGame = new Game(gameId);
+		await thisGame.init();
 
-		if (gameInfo["gameAdminPassword"] != inputPasswordHash) {
+		if (thisGame["gameAdminPassword"] != inputPasswordHash) {
 			res.redirect("/index.html?error=login");
 			return;
 		}
@@ -1113,36 +892,33 @@ exports.gameLoginVerify = async (req, res, callback) => {
 	const passwordHashToCheck = "game" + gameTeam + "Password"; //ex: 'game0Password
 
 	try {
-		const conn = await pool.getConnection();
-		const gameId = await getGameId(conn, gameSection, gameInstructor);
+		const gameId = await Game.findGameId(gameSection, gameInstructor);
 
 		if (!gameId) {
-			conn.release();
 			res.redirect("/index.html?error=login");
 			return;
 		}
 
-		const gameInfo = await getGameInfo(conn, gameId);
+		const thisGame = new Game(gameId);
+		await thisGame.init();
 
-		if (gameInfo["gameActive"] != 1) {
+		if (thisGame["gameActive"] != 1) {
 			res.redirect("/index.html?error=gameNotActive");
-		} else if (gameInfo[commanderLoginField] != 0) {
+		} else if (thisGame[commanderLoginField] != 0) {
 			res.redirect("/index.html?error=alreadyLoggedIn");
-		} else if (inputPasswordHash != gameInfo[passwordHashToCheck]) {
+		} else if (inputPasswordHash != thisGame[passwordHashToCheck]) {
 			res.redirect("/index.html?error=login");
 		} else {
-			await markLoggedIn(conn, gameId, commanderLoginField);
+			await thisGame.markLoggedIn(gameTeam, gameController);
 
 			req.session.ir3 = {
-				gameId: gameId,
-				gameTeam: gameTeam,
-				gameController: gameController
+				gameId,
+				gameTeam,
+				gameController
 			};
 
 			res.redirect("/game.html");
 		}
-
-		conn.release();
 	} catch (error) {
 		console.log(error);
 		res.status(500).redirect("./index.html?error=database");
@@ -1156,8 +932,7 @@ exports.getGames = async (req, res) => {
 	}
 
 	try {
-		const queryString = "SELECT gameId, gameSection, gameInstructor, gameActive FROM games";
-		const [results, fields] = await pool.query(queryString);
+		const results = await Game.getGames();
 		res.send(results);
 	} catch (error) {
 		// console.log(error);  // This error occurs for the course director before he initializes the database
@@ -1181,9 +956,11 @@ exports.getGameActive = async (req, res) => {
 	const { gameId } = req.session.ir3;
 
 	try {
-		const conn = await pool.getConnection();
-		const gameActive = await getGameActiveReal(conn, gameId);
-		conn.release();
+		const thisGame = new Game(gameId);
+		await thisGame.init();
+
+		const { gameActive } = thisGame;
+
 		res.send(JSON.stringify(gameActive));
 	} catch (error) {
 		console.log(error);
@@ -1211,10 +988,9 @@ exports.toggleGameActive = async (req, res) => {
 	const { gameId } = req.session.ir3;
 
 	try {
-		const queryString =
-			"UPDATE games SET gameActive = (gameActive + 1) % 2, game0Controller0 = 0, game0Controller1 = 0, game0Controller2 = 0, game0Controller3 = 0, game1Controller0 = 0, game1Controller1 = 0, game1Controller2 = 0, game1Controller3 = 0 WHERE gameId = ?";
-		const inserts = [gameId];
-		await pool.query(queryString, inserts);
+		const thisGame = new Game(gameId); //didn't need to .init(), that only adds the gameInfo
+		thisGame.toggleGameActive();
+
 		res.sendStatus(200);
 	} catch (error) {
 		console.log(error);
@@ -1253,9 +1029,9 @@ exports.gameAdd = async (req, res) => {
 
 	try {
 		const adminPasswordHashed = md5(adminPassword);
-		const queryString = "INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?)";
-		const inserts = [adminSection, adminInstructor, adminPasswordHashed];
-		await pool.query(queryString, inserts);
+
+		await Game.add(adminSection, adminInstructor, adminPasswordHashed);
+
 		res.redirect("/courseDirector.html?gameAdd=success");
 	} catch (error) {
 		//TODO: better error logging probably (more specific errors on CD) (on other functions too)
@@ -1277,9 +1053,7 @@ exports.gameDelete = async (req, res) => {
 	}
 
 	try {
-		const conn = await pool.getConnection();
-		await gameDeleteReal(conn, gameId);
-		conn.release();
+		await Game.delete(gameId);
 		res.redirect("/courseDirector.html?gameDelete=success");
 	} catch (error) {
 		console.log(error);
@@ -1366,8 +1140,14 @@ exports.socketSetup = (io, socket) => {
 		}
 	});
 
-	socket.on("disconnect", () => {
-		//TODO: do try catch at this level instead of within the specific function
-		logout(socket);
+	socket.on("disconnect", async () => {
+		const { gameId, gameTeam, gameController } = socket.handshake.session.ir3; //Assume we have this, if this method is ever called (from sockets)
+		const thisGame = new Game(gameId);
+		try {
+			await thisGame.markLoggedOut(gameTeam, gameController);
+		} catch (error) {
+			console.log(error);
+			//nothing to send to client, they disconnected from the socket already...
+		}
 	});
 };
