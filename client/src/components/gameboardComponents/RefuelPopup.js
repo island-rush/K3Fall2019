@@ -16,10 +16,12 @@ const invisibleStyle = {
 
 class RefuelPopup extends Component {
 	render() {
-		return <div style={true ? refuelPopupStyle : invisibleStyle}>Container Popup</div>;
+		return <div style={this.props.refuel.active ? refuelPopupStyle : invisibleStyle}>Refuel Popup</div>;
 	}
 }
 
-RefuelPopup.propTypes = {};
+RefuelPopup.propTypes = {
+	refuel: PropTypes.object.isRequired
+};
 
 export default RefuelPopup;

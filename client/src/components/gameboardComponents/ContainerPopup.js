@@ -16,10 +16,12 @@ const invisibleStyle = {
 
 class ContainerPopup extends Component {
 	render() {
-		return <div style={true ? containerPopupStyle : invisibleStyle}>Container Popup</div>;
+		return <div style={this.props.container.active ? containerPopupStyle : invisibleStyle}>Container Popup</div>;
 	}
 }
 
-ContainerPopup.propTypes = {};
+ContainerPopup.propTypes = {
+	container: PropTypes.object.isRequired
+};
 
 export default ContainerPopup;

@@ -7,6 +7,8 @@ import { typeHighLow } from "../constants";
 import Patterns from "./Patterns";
 import BattlePopup from "./BattlePopup";
 import NewsPopup from "./NewsPopup";
+import ContainerPopup from "./ContainerPopup";
+import RefuelPopup from "./RefuelPopup";
 
 const gameboardStyle = {
 	backgroundColor: "blue",
@@ -149,6 +151,8 @@ class Gameboard extends Component {
 				</HexGrid>
 				<NewsPopup news={this.props.news} />
 				<BattlePopup battle={this.props.battle} />
+				<RefuelPopup refuel={this.props.refuel} />
+				<ContainerPopup container={this.props.container} />
 			</div>
 		);
 	}
@@ -160,6 +164,8 @@ Gameboard.propTypes = {
 	selectPosition: PropTypes.func.isRequired,
 	news: PropTypes.object.isRequired,
 	battle: PropTypes.object.isRequired,
+	container: PropTypes.object.isRequired,
+	refuel: PropTypes.object.isRequired,
 	planning: PropTypes.object.isRequired,
 	selectedPiece: PropTypes.number.isRequired,
 	confirmedPlans: PropTypes.object.isRequired
@@ -170,6 +176,8 @@ const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 	selectedPosition: gameboardMeta.selectedPosition,
 	news: gameboardMeta.news,
 	battle: gameboardMeta.battle,
+	refuel: gameboardMeta.refuel,
+	container: gameboardMeta.container,
 	planning: gameboardMeta.planning,
 	selectedPiece: gameboardMeta.selectedPiece,
 	confirmedPlans: gameboardMeta.confirmedPlans
