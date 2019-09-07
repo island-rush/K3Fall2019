@@ -39,12 +39,17 @@ const initialNews = require("./initialNews");
 //Database Pool
 const pool = require("./database");
 
+//OOP Attempt to cleanup this file
+const Game = require("./Game");
+
 //Internal Functions
 const getGameActiveReal = async (conn, gameId) => {
-	const queryString = "SELECT gameActive FROM games WHERE gameId = ?";
-	const inserts = [gameId];
-	const [results, fields] = await conn.query(queryString, inserts);
-	return results[0]["gameActive"];
+	// const queryString = "SELECT gameActive FROM games WHERE gameId = ?";
+	// const inserts = [gameId];
+	// const [results, fields] = await conn.query(queryString, inserts);
+	// return results[0]["gameActive"];
+
+	return await Game.getGameActive(gameId);
 };
 
 const gameDeleteReal = async (conn, gameId) => {
@@ -66,10 +71,7 @@ const getGameId = async (conn, gameSection, gameInstructor) => {
 };
 
 const getGameInfo = async (conn, gameId) => {
-	const queryString = "SELECT * FROM games WHERE gameId = ?";
-	const inserts = [gameId];
-	const [results, fields] = await conn.query(queryString, inserts);
-	return results[0];
+	return await Game.getInfo(gameId);
 };
 
 const getPieceInfo = async (conn, pieceId) => {
