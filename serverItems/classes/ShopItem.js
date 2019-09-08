@@ -9,7 +9,17 @@ class ShopItem {
 		const queryString = "SELECT * FROM shopItems WHERE shopItemId = ?";
 		const inserts = [this.shopItemId];
 		const [results] = await pool.query(queryString, inserts);
-		Object.assign(this, results[0]);
+
+		if (results.length != 1) {
+			return null;
+		} else {
+			Object.assign(this, results[0]);
+			return this;
+		}
+	}
+
+	async delete() {
+		await ShopItem.delete(this.shopItemId);
 	}
 
 	static async insert(shopItemGameId, shopItemTeamId, shopItemTypeId) {

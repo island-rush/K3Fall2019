@@ -9,7 +9,13 @@ class InvItem {
 		const queryString = "SELECT * FROM invItems WHERE invItemId = ?";
 		const inserts = [this.invItemId];
 		const [results] = await pool.query(queryString, inserts);
-		Object.assign(this, results[0]);
+
+		if (results.length != 1) {
+			return null;
+		} else {
+			Object.assign(this, results[0]);
+			return this;
+		}
 	}
 
 	static async insertFromShop(gameId, gameTeam) {

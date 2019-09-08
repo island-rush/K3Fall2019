@@ -9,7 +9,13 @@ class Event {
 		const queryString = "SELECT * FROM eventQueue WHERE eventId = ?";
 		const inserts = [this.eventId];
 		const [results] = await pool.query(queryString, inserts);
-		Object.assign(this, results[0]);
+
+		if (results.length != 1) {
+			return null;
+		} else {
+			Object.assign(this, results[0]);
+			return this;
+		}
 	}
 
 	static async all(gameId) {

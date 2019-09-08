@@ -1,88 +1,60 @@
-//Libraries and Other External Code
 const md5 = require("md5");
 const fs = require("fs");
+const CONSTANTS = require("./constants");
+const distanceMatrix = require("./distanceMatrix");
+const pool = require("./database");
+const { Game, ShopItem, InvItem, Piece, Plan, Event } = require("./classes");
 
-//Environment Constants
 const CourseDirectorLastName = process.env.CD_LASTNAME || "Smith";
 const CourseDirectorPasswordHash = process.env.CD_PASSWORD || "912ec803b2ce49e4a541068d495ab570"; //"asdf"
 
-//Other Constants
-const {
-	SHOP_PURCHASE,
-	SHOP_REFUND,
-	SET_USERFEEDBACK,
-	SHOP_TRANSFER,
-	shopItemTypeCosts,
-	typeNameIds,
-	typeMoves,
-	typeFuel,
-	PLAN_WAS_CONFIRMED,
-	DELETE_PLAN,
-	containerTypes,
-	MAIN_BUTTON_CLICK,
-	PURCHASE_PHASE,
-	COMBAT_PHASE,
-	PIECES_MOVE,
-	SLICE_CHANGE,
-	PLACE_PHASE,
-	NEWS_PHASE,
-	NEW_ROUND,
-	visibilityMatrix,
-	attackMatrix
-} = require("./constants");
-
-const distanceMatrix = require("./distanceMatrix");
-
-//Database Pool
-const pool = require("./database");
-
-//OOP Attempt to cleanup this file
-const { Game, ShopItem, InvItem, Piece, Plan, Event } = require("./classes");
-
-//Internal Functions
 const shopPurchaseRequest = async (socket, shopItemTypeId) => {
-	//TODO: could do client side checks until the confirm, and then go through 1 by 1 what was requested, checking points
-	//this would be better than network request for each purchase (AND refund)...
-	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
-	const shopItemCost = shopItemTypeCosts[shopItemTypeId];
-	//TODO: figure out if the purchase is allowed (game phase...controller Id....game active....) (and in other methods...)
+	if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
+		socket.emit("serverRedirect", CONSTANTS.BAD_SESSION);
+		return;
+	}
 
-	const thisGame = new Game({ gameId });
-	await thisGame.init();
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+	const thisGame = await new Game({ gameId }).init();
+
+	if (!thisGame) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_DOES_NOT_EXIST);
+		return;
+	}
 
 	const { gameActive, gamePhase } = thisGame;
 
 	if (!gameActive) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_INACTIVE_TAG);
+		return;
+	}
+	if (gamePhase != 1) {
+		sendUserFeedback(socket, "Not the right phase...");
+		return;
+	}
+	if (gameController != 0) {
+		sendUserFeedback(socket, "Not the main controller (0)...");
 		return;
 	}
 
-	if (parseInt(gamePhase) !== 1) {
-		socket.emit("serverSendingAction", userFeedbackAction("Not the right phase..."));
-		return;
-	}
-
-	if (parseInt(gameController) !== 0) {
-		socket.emit("serverSendingAction", userFeedbackAction("Not the right controller..."));
-		return;
-	}
-
+	const shopItemCost = CONSTANTS.SHOP_ITEM_TYPE_COSTS[shopItemTypeId];
 	const teamPoints = thisGame["game" + gameTeam + "Points"];
 
 	if (teamPoints < shopItemCost) {
-		socket.emit("serverSendingAction", userFeedbackAction("Not enough points to purchase"));
+		sendUserFeedback(socket, "Not enough points to purchase");
 		return;
 	}
 
-	const points = teamPoints - shopItemCost;
-	await thisGame.setPoints(gameTeam, points);
+	const newPoints = teamPoints - shopItemCost;
+	await thisGame.setPoints(gameTeam, newPoints);
 
 	const shopItem = await ShopItem.insert(gameId, gameTeam, shopItemTypeId);
 
 	const serverAction = {
-		type: SHOP_PURCHASE,
+		type: CONSTANTS.SHOP_PURCHASE,
 		payload: {
 			shopItem,
-			points
+			points: newPoints
 		}
 	};
 	socket.emit("serverSendingAction", serverAction);
@@ -90,24 +62,62 @@ const shopPurchaseRequest = async (socket, shopItemTypeId) => {
 };
 
 const shopRefundRequest = async (socket, shopItem) => {
-	//TODO: check that these session objects exist before using them
+	//Does the server know this user?
+	if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
+		socket.emit("serverRedirect", CONSTANTS.BAD_SESSION);
+		return;
+	}
+
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
-	const itemCost = shopItemTypeCosts[shopItem.shopItemTypeId];
 
-	const thisGame = new Game({ gameId });
-	await thisGame.init();
+	//Does the game exist?
+	const thisGame = await new Game({ gameId }).init();
+	if (!thisGame) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_DOES_NOT_EXIST);
+		return;
+	}
 
+	//Is this action currently allowed to this user?
+	const { gameActive, gamePhase } = thisGame;
+	if (!gameActive) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_INACTIVE_TAG);
+		return;
+	}
+	if (gamePhase != 1) {
+		sendUserFeedback(socket, "Not the right phase...");
+		return;
+	}
+	if (gameController != 0) {
+		sendUserFeedback(socket, "Not the main controller (0)...");
+		return;
+	}
+
+	//Does the item exist?
+	const { shopItemId } = shopItem;
+	const thisShopItem = await new ShopItem(shopItemId).init();
+	if (!thisShopItem) {
+		sendUserFeedback(socket, "Shop Item did not exist...");
+		return;
+	}
+
+	const { shopItemGameId, shopItemTeamId, shopItemTypeId } = thisShopItem;
+
+	//Do they own the shop item?
+	if (shopItemGameId != gameId || shopItemTeamId != gameTeam) {
+		socket.emit("serverRedirect", CONSTANTS.BAD_REQUEST_TAG);
+		return;
+	}
+
+	const itemCost = CONSTANTS.SHOP_ITEM_TYPE_COSTS[shopItemTypeId];
 	const teamPoints = thisGame["game" + gameTeam + "Points"];
-
-	//TODO: verify that the refund is available (correct controller, game active....)
-	//verify that the piece exists and the object given matches database values (overkill)
 
 	const newPoints = teamPoints + itemCost;
 	await thisGame.setPoints(gameTeam, newPoints);
-	await ShopItem.delete(shopItem.shopItemId);
+	await thisShopItem.delete();
 
+	//TODO: consistency between payloads for different actions (pointsAdded vs points)
 	const serverAction = {
-		type: SHOP_REFUND,
+		type: CONSTANTS.SHOP_REFUND,
 		payload: {
 			shopItem: shopItem,
 			pointsAdded: itemCost
@@ -117,17 +127,42 @@ const shopRefundRequest = async (socket, shopItem) => {
 };
 
 const shopConfirmPurchase = async socket => {
+	//Does the server know this user?
+	if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
+		socket.emit("serverRedirect", CONSTANTS.BAD_SESSION);
+		return;
+	}
+
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	//TODO: verify if it is allowed, game active, phase, controller...
-	//could extra verify that purchases were allowed? but redundant since these are already in the database
+	//Does the game exist?
+	const thisGame = await new Game({ gameId }).init();
+	if (!thisGame) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_DOES_NOT_EXIST);
+		return;
+	}
+
+	//Is this action currently allowed to this user?
+	const { gameActive, gamePhase } = thisGame;
+	if (!gameActive) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_INACTIVE_TAG);
+		return;
+	}
+	if (gamePhase != 1) {
+		sendUserFeedback(socket, "Not the right phase...");
+		return;
+	}
+	if (gameController != 0) {
+		sendUserFeedback(socket, "Not the main controller (0)...");
+		return;
+	}
 
 	await InvItem.insertFromShop(gameId, gameTeam);
 	await ShopItem.deleteAll(gameId, gameTeam);
-	const invItems = InvItem.all(gameId, gameTeam);
+	const invItems = InvItem.all(gameId, gameTeam); //TODO: this may cause an error on the front end, check what happens when confirm purchase executes...
 
 	const serverAction = {
-		type: SHOP_TRANSFER,
+		type: CONSTANTS.SHOP_TRANSFER,
 		payload: {
 			invItems
 		}
@@ -137,7 +172,7 @@ const shopConfirmPurchase = async socket => {
 
 const sendUserFeedback = async (socket, userFeedback) => {
 	const serverAction = {
-		type: SET_USERFEEDBACK,
+		type: CONSTANTS.SET_USERFEEDBACK,
 		payload: {
 			userFeedback
 		}
@@ -154,11 +189,8 @@ const confirmPlan = async (socket, pieceId, plan) => {
 	//need to know if this piece is a container or not, to check if container move was inserted
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const thisGame = new Game({ gameId });
-	await thisGame.init();
-
-	const thisPiece = new Piece(pieceId);
-	await thisPiece.init();
+	const thisGame = await new Game({ gameId }).init();
+	const thisPiece = await new Piece(pieceId).init();
 
 	if (!thisGame || !thisPiece) {
 		return;
@@ -166,7 +198,7 @@ const confirmPlan = async (socket, pieceId, plan) => {
 
 	const { piecePositionId, pieceTypeId, pieceGameId, pieceTeamId } = thisPiece;
 
-	const isContainer = containerTypes.includes(pieceTypeId);
+	const isContainer = CONSTANTS.CONTAINER_TYPES.includes(pieceTypeId);
 
 	//did the piece exists, same team as this one / same game...
 	//make sure plan isnt empty...
@@ -216,7 +248,7 @@ const confirmPlan = async (socket, pieceId, plan) => {
 	await Plan.insert(plansToInsert);
 
 	const serverAction = {
-		type: PLAN_WAS_CONFIRMED,
+		type: CONSTANTS.PLAN_WAS_CONFIRMED,
 		payload: {
 			pieceId,
 			plan
@@ -233,10 +265,9 @@ const deletePlan = async (socket, pieceId) => {
 
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const thisGame = new Game({ gameId });
-	await thisGame.init();
+	const thisGame = await new Game({ gameId }).init();
 
-	if (!thisGame.gameActive) {
+	if (!thisGame || !thisGame.gameActive) {
 		return;
 	}
 
@@ -245,7 +276,7 @@ const deletePlan = async (socket, pieceId) => {
 	await Plan.delete(pieceId);
 
 	const serverAction = {
-		type: DELETE_PLAN,
+		type: CONSTANTS.DELETE_PLAN,
 		payload: {
 			pieceId
 		}
@@ -254,16 +285,20 @@ const deletePlan = async (socket, pieceId) => {
 	socket.emit("serverSendingAction", serverAction);
 };
 
-// prettier-ignore
 const mainButtonClick = async (io, socket) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const thisGame = new Game({gameId});
-	await thisGame.init();
+	const thisGame = await new Game({ gameId }).init();
+
+	if (!thisGame) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_DOES_NOT_EXIST);
+		return;
+	}
 
 	const { gameActive, gamePhase, gameRound, gameSlice } = thisGame;
 
 	if (!gameActive) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_INACTIVE_TAG);
 		return;
 	}
 
@@ -273,7 +308,7 @@ const mainButtonClick = async (io, socket) => {
 
 	//Still Waiting
 	if (thisTeamStatus == 1) {
-		socket.emit("serverSendingAction", userFeedbackAction("Still waiting on other team..."));
+		sendUserFeedback(socket, "Still waiting on other team...");
 		return;
 	}
 
@@ -281,14 +316,14 @@ const mainButtonClick = async (io, socket) => {
 	if (otherTeamStatus == 0) {
 		await thisGame.setStatus(gameTeam, 1);
 		let serverAction = {
-			type: MAIN_BUTTON_CLICK,
+			type: CONSTANTS.MAIN_BUTTON_CLICK,
 			payload: {}
 		};
 		socket.emit("serverSendingAction", serverAction);
 		return;
 	}
 
-	await thisGame.setStatus(otherTeam, 0);  //Could skip awaiting since not used later in this function...
+	await thisGame.setStatus(otherTeam, 0); //Could skip awaiting since not used later in this function...
 
 	let serverAction;
 
@@ -298,7 +333,7 @@ const mainButtonClick = async (io, socket) => {
 			await thisGame.setPhase(1);
 
 			serverAction = {
-				type: PURCHASE_PHASE,
+				type: CONSTANTS.PURCHASE_PHASE,
 				payload: {}
 			};
 			io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
@@ -309,7 +344,7 @@ const mainButtonClick = async (io, socket) => {
 			await thisGame.setPhase(2);
 
 			serverAction = {
-				type: COMBAT_PHASE,
+				type: CONSTANTS.COMBAT_PHASE,
 				payload: {}
 			};
 			io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
@@ -320,7 +355,7 @@ const mainButtonClick = async (io, socket) => {
 			await thisGame.setPhase(0);
 
 			serverAction = {
-				type: NEWS_PHASE,
+				type: CONSTANTS.NEWS_PHASE,
 				payload: {}
 			};
 			io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
@@ -332,7 +367,7 @@ const mainButtonClick = async (io, socket) => {
 				await thisGame.setSlice(1);
 
 				serverAction = {
-					type: SLICE_CHANGE,
+					type: CONSTANTS.SLICE_CHANGE,
 					payload: {}
 				};
 				io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
@@ -358,7 +393,7 @@ const mainButtonClick = async (io, socket) => {
 						await thisGame.setPhase(3);
 
 						serverAction = {
-							type: PLACE_PHASE,
+							type: CONSTANTS.PLACE_PHASE,
 							payload: {}
 						};
 						io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
@@ -368,7 +403,7 @@ const mainButtonClick = async (io, socket) => {
 						await thisGame.setSlice(0);
 
 						serverAction = {
-							type: NEW_ROUND,
+							type: CONSTANTS.NEW_ROUND,
 							payload: {
 								gameRound: thisGame.gameRound
 							}
@@ -395,7 +430,18 @@ const mainButtonClick = async (io, socket) => {
 					let allEvents = {};
 
 					for (let x = 0; x < allCollisionBattles.length; x++) {
-						let { pieceId0, pieceTypeId0, pieceContainerId0, piecePositionId0, planPositionId0, pieceId1, pieceTypeId1, pieceContainerId1, piecePositionId1, planPositionId1 } = allCollisionBattles[x];
+						let {
+							pieceId0,
+							pieceTypeId0,
+							pieceContainerId0,
+							piecePositionId0,
+							planPositionId0,
+							pieceId1,
+							pieceTypeId1,
+							pieceContainerId1,
+							piecePositionId1,
+							planPositionId1
+						} = allCollisionBattles[x];
 
 						let thisEventPositions = `${piecePositionId0}-${planPositionId0}`;
 
@@ -459,7 +505,7 @@ const mainButtonClick = async (io, socket) => {
 							allPosEvents[thisEventPosition].push(pieceId1);
 						}
 					}
-					
+
 					const bothTeamsIndicator = 2;
 					const posBattleEventType = 1;
 					let eventInserts = [];
@@ -487,14 +533,14 @@ const mainButtonClick = async (io, socket) => {
 				// TODO: create container events (special flag)
 
 				const server0Action = {
-					type: PIECES_MOVE,
+					type: CONSTANTS.PIECES_MOVE,
 					payload: {
 						gameboardPieces: await Piece.getVisiblePieces(gameId, 0),
 						gameStatus: thisGame.game0Status
 					}
 				};
 				const server1Action = {
-					type: PIECES_MOVE,
+					type: CONSTANTS.PIECES_MOVE,
 					payload: {
 						gameboardPieces: await Piece.getVisiblePieces(gameId, 1),
 						gameStatus: thisGame.game1Status
@@ -506,19 +552,10 @@ const mainButtonClick = async (io, socket) => {
 
 			break;
 		default:
-			socket.emit("serverSendingAction", userFeedbackAction("Backend Failure, unkown gamePhase..."));
+			sendUserFeedback(socket, "Backend Failure, unkown gamePhase...");
 	}
 
 	return;
-};
-
-const userFeedbackAction = userFeedback => {
-	return {
-		type: SET_USERFEEDBACK,
-		payload: {
-			userFeedback
-		}
-	};
 };
 
 //Exposed / Exported Functions
@@ -531,8 +568,8 @@ exports.gameReset = async (req, res) => {
 	const { gameId } = req.session.ir3;
 
 	try {
-		const thisGame = new Game({ gameId });
-		await thisGame.init(); //need init to know section/instructor.... to reset back to those
+		const thisGame = await new Game({ gameId }).init();
+		if (!thisGame) return;
 		await thisGame.reset();
 		res.redirect("/teacher.html?gameReset=success");
 	} catch (error) {
@@ -545,7 +582,7 @@ exports.adminLoginVerify = async (req, res) => {
 	const { adminSection, adminInstructor, adminPassword } = req.body;
 
 	if (!adminSection || !adminInstructor || !adminPassword) {
-		res.redirect("/index.html?error=badRequest");
+		res.redirect(`/index.html?error=${CONSTANTS.BAD_REQUEST_TAG}`);
 		return;
 	}
 
@@ -557,16 +594,15 @@ exports.adminLoginVerify = async (req, res) => {
 	}
 
 	try {
-		const thisGame = new Game({ gameSection: adminSection, gameInstructor: adminInstructor });
-		await thisGame.init();
+		const thisGame = await new Game({ gameSection: adminSection, gameInstructor: adminInstructor }).init();
 
 		if (!thisGame) {
-			res.redirect("/index.html?error=login");
+			res.redirect(`/index.html?error=${CONSTANTS.GAME_DOES_NOT_EXIST}`);
 			return;
 		}
 
 		if (thisGame["gameAdminPassword"] != inputPasswordHash) {
-			res.redirect("/index.html?error=login");
+			res.redirect(`/index.html?error=${CONSTANTS.LOGIN_TAG}`);
 			return;
 		}
 
@@ -580,15 +616,15 @@ exports.adminLoginVerify = async (req, res) => {
 		return;
 	} catch (error) {
 		console.log(error);
-		res.status(500).redirect("/index.html?error=database");
+		res.status(500).redirect(`/index.html?error=${CONSTANTS.DATABASE_TAG}`);
 	}
 };
 
-exports.gameLoginVerify = async (req, res, callback) => {
+exports.gameLoginVerify = async (req, res) => {
 	const { gameSection, gameInstructor, gameTeam, gameTeamPassword, gameController } = req.body;
 
 	if (!gameSection || !gameInstructor || !gameTeam || !gameTeamPassword || !gameController) {
-		res.redirect("/index.html?error=badRequest");
+		res.redirect(`/index.html?error=${CONSTANTS.BAD_REQUEST_TAG}`);
 		return;
 	}
 
@@ -597,20 +633,19 @@ exports.gameLoginVerify = async (req, res, callback) => {
 	const passwordHashToCheck = "game" + gameTeam + "Password"; //ex: 'game0Password
 
 	try {
-		const thisGame = new Game({ gameSection, gameInstructor });
-		await thisGame.init();
+		const thisGame = await new Game({ gameSection, gameInstructor }).init();
 
 		if (!thisGame) {
-			res.redirect("/index.html?error=login");
+			res.redirect(`/index.html?error=${CONSTANTS.GAME_DOES_NOT_EXIST}`);
 			return;
 		}
 
 		if (thisGame["gameActive"] != 1) {
-			res.redirect("/index.html?error=gameNotActive");
+			res.redirect(`/index.html?error=${CONSTANTS.GAME_INACTIVE_TAG}`);
 		} else if (thisGame[commanderLoginField] != 0) {
-			res.redirect("/index.html?error=alreadyLoggedIn");
+			res.redirect(`/index.html?error=${CONSTANTS.ALREADY_IN_TAG}`);
 		} else if (inputPasswordHash != thisGame[passwordHashToCheck]) {
-			res.redirect("/index.html?error=login");
+			res.redirect(`/index.html?error=${CONSTANTS.LOGIN_TAG}`);
 		} else {
 			await thisGame.setLoggedIn(gameTeam, gameController, 1);
 
@@ -626,13 +661,13 @@ exports.gameLoginVerify = async (req, res, callback) => {
 		}
 	} catch (error) {
 		console.log(error);
-		res.status(500).redirect("./index.html?error=database");
+		res.status(500).redirect(`./index.html?error=${CONSTANTS.DATABASE_TAG}`);
 	}
 };
 
 exports.getGames = async (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.courseDirector) {
-		res.redirect("/index.html?error=access");
+		res.redirect(`/index.html?error=${CONSTANTS.ACCESS_TAG}`);
 		return;
 	}
 
@@ -661,8 +696,7 @@ exports.getGameActive = async (req, res) => {
 	const { gameId } = req.session.ir3;
 
 	try {
-		const thisGame = new Game({ gameId });
-		await thisGame.init();
+		const thisGame = await new Game({ gameId }).init();
 
 		const { gameActive } = thisGame;
 
@@ -693,8 +727,7 @@ exports.toggleGameActive = async (req, res) => {
 	const { gameId } = req.session.ir3;
 
 	try {
-		const thisGame = new Game({ gameId });
-		await thisGame.init();
+		const thisGame = await new Game({ gameId }).init();
 		const newValue = (thisGame.gameActive + 1) % 2;
 		await thisGame.setGameActive(newValue);
 
@@ -707,7 +740,7 @@ exports.toggleGameActive = async (req, res) => {
 
 exports.insertDatabaseTables = async (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.courseDirector) {
-		res.redirect("/index.html?error=access");
+		res.redirect(`/index.html?error=${CONSTANTS.BAD_SESSION}`);
 		return;
 	}
 
@@ -723,14 +756,14 @@ exports.insertDatabaseTables = async (req, res) => {
 
 exports.gameAdd = async (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.courseDirector) {
-		res.redirect(403, "/index.html?error=access");
+		res.redirect(403, `/index.html?error=${CONSTANTS.ACCESS_TAG}`);
 		return;
 	}
 
 	const { adminSection, adminInstructor, adminPassword } = req.body;
 	if (!adminSection || !adminInstructor || !adminPassword) {
 		//TODO: better errors on CD (could have same as index) (status?)
-		res.redirect("/index.html?error=badRequest");
+		res.redirect(`/index.html?error=${CONSTANTS.BAD_REQUEST_TAG}`);
 		return;
 	}
 
@@ -751,9 +784,12 @@ exports.gameAdd = async (req, res) => {
 
 exports.gameDelete = async (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.courseDirector) {
-		res.status(403).redirect("/index.html?error=access");
+		res.status(403).redirect(`/index.html?error=${CONSTANTS.ACCESS_TAG}`);
 		return;
 	}
+
+	//TODO: delete all sockets assosiated with the game that was deleted?
+	//send socket redirect? (if they were still on the game...prevent bad sessions from existing (extra protection from forgetting validation checks))
 
 	const { gameId } = req.body;
 	if (!gameId) {
@@ -772,7 +808,7 @@ exports.gameDelete = async (req, res) => {
 
 exports.socketSetup = async (io, socket) => {
 	if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
-		socket.emit("serverRedirect", "access");
+		socket.emit("serverRedirect", CONSTANTS.BAD_SESSION);
 		return;
 	}
 
@@ -789,8 +825,7 @@ exports.socketSetup = async (io, socket) => {
 
 	//TODO: Server Side Rendering with react?
 	//"Immediatly" send the client intial game state data
-	const thisGame = new Game({ gameId });
-	await thisGame.init();
+	const thisGame = await new Game({ gameId }).init();
 	const action = await thisGame.initialStateAction(gameTeam, gameController);
 	socket.emit("serverSendingAction", action);
 
@@ -800,7 +835,7 @@ exports.socketSetup = async (io, socket) => {
 			shopPurchaseRequest(socket, shopItemTypeId);
 		} catch (error) {
 			console.log(error);
-			socket.emit("serverSendingAction", userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE"));
+			sendUserFeedback(socket, "INTERNAL SERVER ERROR: CHECK DATABASE");
 		}
 	});
 
@@ -809,7 +844,7 @@ exports.socketSetup = async (io, socket) => {
 			shopRefundRequest(socket, shopItem);
 		} catch (error) {
 			console.log(error);
-			socket.emit("serverSendingAction", userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE"));
+			sendUserFeedback(socket, "INTERNAL SERVER ERROR: CHECK DATABASE");
 		}
 	});
 
@@ -818,7 +853,7 @@ exports.socketSetup = async (io, socket) => {
 			shopConfirmPurchase(socket);
 		} catch (error) {
 			console.log(error);
-			socket.emit("serverSendingAction", userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE"));
+			sendUserFeedback(socket, "INTERNAL SERVER ERROR: CHECK DATABASE");
 		}
 	});
 
@@ -829,7 +864,7 @@ exports.socketSetup = async (io, socket) => {
 			confirmPlan(socket, pieceId, plan);
 		} catch (error) {
 			console.log(error);
-			socket.emit("serverSendingAction", userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE"));
+			sendUserFeedback(socket, "INTERNAL SERVER ERROR: CHECK DATABASE");
 		}
 	});
 
@@ -840,7 +875,7 @@ exports.socketSetup = async (io, socket) => {
 			deletePlan(socket, pieceId);
 		} catch (error) {
 			console.log(error);
-			socket.emit("serverSendingAction", userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE"));
+			sendUserFeedback(socket, "INTERNAL SERVER ERROR: CHECK DATABASE");
 		}
 	});
 
@@ -849,18 +884,19 @@ exports.socketSetup = async (io, socket) => {
 			mainButtonClick(io, socket);
 		} catch (error) {
 			console.log(error);
-			socket.emit("serverSendingAction", userFeedbackAction("INTERNAL SERVER ERROR: CHECK DATABASE"));
+			sendUserFeedback(socket, "INTERNAL SERVER ERROR: CHECK DATABASE");
 		}
 	});
 
 	socket.on("disconnect", async () => {
 		const { gameId, gameTeam, gameController } = socket.handshake.session.ir3; //Assume we have this, if this method is ever called (from sockets)
-		const thisGame = new Game({ gameId });
-		try {
-			await thisGame.setLoggedIn(gameTeam, gameController, 0);
-		} catch (error) {
-			console.log(error);
-			//nothing to send to client, they disconnected from the socket already...
+		const thisGame = await new Game({ gameId }).init();
+		if (thisGame) {
+			try {
+				await thisGame.setLoggedIn(gameTeam, gameController, 0);
+			} catch (error) {
+				console.log(error);
+			}
 		}
 	});
 };

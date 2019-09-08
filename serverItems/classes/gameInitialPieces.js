@@ -1,4 +1,4 @@
-const { typeNameIds, typeMoves, typeFuel } = require("../constants");
+const CONSTANTS = require("../constants");
 
 // prettier-ignore
 const piece = (pieceGameId, pieceTeamName, pieceTypeName, piecePositionId, options) => {
@@ -7,9 +7,10 @@ const piece = (pieceGameId, pieceTeamName, pieceTypeName, piecePositionId, optio
 	const pieceVisible = pieceOptions.pieceVisible === undefined ? 0 : pieceOptions.pieceVisible;
 
 	const pieceTeamId = pieceTeamName === "Blue" ? 0 : 1;
-	const pieceTypeId = typeNameIds[pieceTypeName];
-	const pieceMoves = typeMoves[pieceTypeId];
-	const pieceFuel = typeFuel[pieceTypeId];
+	const pieceTypeId = CONSTANTS.TYPE_NAME_IDS[pieceTypeName];
+	const pieceMoves = CONSTANTS.TYPE_MOVES[pieceTypeId];
+	const pieceFuel = CONSTANTS.TYPE_FUEL[pieceTypeId];
+
 	return [
 		pieceGameId,
 		pieceTeamId,

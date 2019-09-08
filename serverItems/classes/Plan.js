@@ -10,7 +10,13 @@ class Plan {
 		const queryString = "SELECT * FROM plans WHERE planPieceId = ? AND planMovementOrder = ?";
 		const inserts = [this.planPieceId, this.planMovementOrder];
 		const [results] = await pool.query(queryString, inserts);
-		Object.assign(this, results[0]);
+
+		if (results.length != 1) {
+			return null;
+		} else {
+			Object.assign(this, results[0]);
+			return this;
+		}
 	}
 
 	static async insert(plansToInsert) {

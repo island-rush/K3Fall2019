@@ -1,7 +1,7 @@
 const pool = require("../database");
 const gameInitialPieces = require("./gameInitialPieces"); //script to insert pieces
 const gameInitialNews = require("./gameInitialNews"); //script to insert news
-const { INITIAL_GAMESTATE } = require("../constants");
+const CONSTANTS = require("../constants");
 
 class Game {
 	constructor(options) {
@@ -26,7 +26,13 @@ class Game {
 		}
 
 		const [results] = await pool.query(queryString, inserts);
-		Object.assign(this, results[0]);
+
+		if (results.length != 1) {
+			return null;
+		} else {
+			Object.assign(this, results[0]);
+			return this;
+		}
 	}
 
 	static async delete(gameId) {
@@ -137,7 +143,7 @@ class Game {
 		const gameStatus = this["game" + gameTeam + "Status"];
 
 		const serverAction = {
-			type: INITIAL_GAMESTATE,
+			type: CONSTANTS.INITIAL_GAMESTATE,
 			payload: {
 				gameInfo: {
 					gameSection: this.gameSection,

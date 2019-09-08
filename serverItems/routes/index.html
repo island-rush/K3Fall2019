@@ -186,7 +186,7 @@
 		}
 
 		switch (getUrlParam("error")) {
-			case "login":
+			case "loginFail":
 				document.getElementById("formFeedback").innerHTML = "Login Credentials Failed";
 				break;
 			case "access":
@@ -206,6 +206,12 @@
 				break;
 			case "database":
 				document.getElementById("formFeedback").innerHTML = "Database had a failure.";
+				break;
+			case "badSession":
+				document.getElementById("formFeedback").innerHTML = "Server Lost the Session.";
+				break;
+			case "gameDoesNotExist":
+				document.getElementById("formFeedback").innerHTML = "Game does not exist.";
 				break;
 		}
 	</script>

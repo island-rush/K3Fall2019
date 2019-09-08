@@ -1,5 +1,5 @@
 const pool = require("../database");
-const { visibilityMatrix } = require("../constants");
+const CONSTANTS = require("../constants");
 const distanceMatrix = require("../distanceMatrix");
 
 class Piece {
@@ -11,7 +11,13 @@ class Piece {
 		const queryString = "SELECT * FROM pieces WHERE pieceId = ?";
 		const inserts = [this.pieceId];
 		const [results] = await pool.query(queryString, inserts);
-		Object.assign(this, results[0]);
+
+		if (results.length != 1) {
+			return null;
+		} else {
+			Object.assign(this, results[0]);
+			return this;
+		}
 	}
 
 	// prettier-ignore
@@ -39,9 +45,9 @@ class Piece {
 			let { pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId } = pieces[x]; //TODO: pieces inside containers can't see rule?
 
 			for (let type = 0; type < 20; type++) { //check each type
-				if (visibilityMatrix[pieceTypeId][type] !== -1) { //could it ever see this type?
+				if (CONSTANTS.VISIBILITY_MATRIX[pieceTypeId][type] !== -1) { //could it ever see this type?
 					for (let position = 0; position < distanceMatrix[piecePositionId].length; position++) { //for all positions
-						if (distanceMatrix[piecePositionId][position] <= visibilityMatrix[pieceTypeId][type]) { //is this position in range for that type?
+						if (distanceMatrix[piecePositionId][position] <= CONSTANTS.VISIBILITY_MATRIX[pieceTypeId][type]) { //is this position in range for that type?
 							otherTeam = parseInt(pieceTeamId) === 0 ? 1 : 0;
 
 							if (!posTypesVisible[otherTeam][type].includes(position)) { //add this position if not already added by another piece somewhere else

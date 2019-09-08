@@ -1,5 +1,6 @@
 const path = require("path");
 const backendServices = require("./backendServices");
+const CONSTANTS = require("./constants");
 
 const router = require("express").Router();
 
@@ -25,7 +26,7 @@ router.get("/credits.html", (req, res) => {
 
 router.get("/teacher.html", (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.teacher || !req.session.ir3.gameId) {
-		res.redirect("/index.html?error=login");
+		res.redirect(`/index.html?error=${CONSTANTS.LOGIN_TAG}`);
 		return;
 	}
 
@@ -34,7 +35,7 @@ router.get("/teacher.html", (req, res) => {
 
 router.get("/courseDirector.html", (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.courseDirector) {
-		res.redirect("/index.html?error=login");
+		res.redirect(`/index.html?error=${CONSTANTS.LOGIN_TAG}`);
 		return;
 	}
 
@@ -42,13 +43,8 @@ router.get("/courseDirector.html", (req, res) => {
 });
 
 router.get("/game.html", (req, res) => {
-	if (
-		!req.session.ir3 ||
-		!req.session.ir3.gameId ||
-		!req.session.ir3.gameTeam ||
-		!req.session.ir3.gameController
-	) {
-		res.redirect("/index.html?error=login");
+	if (!req.session.ir3 || !req.session.ir3.gameId || !req.session.ir3.gameTeam || !req.session.ir3.gameController) {
+		res.redirect(`/index.html?error=${CONSTANTS.LOGIN_TAG}`);
 		return;
 	}
 
