@@ -256,336 +256,260 @@ const deletePlan = async (socket, pieceId) => {
 
 // prettier-ignore
 const mainButtonClick = async (io, socket) => {
-	//verify that this person is ok to click the button
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	const thisGame = new Game({gameId});
 	await thisGame.init();
 
-	const { gameActive, gamePhase, game0Status, game1Status, gameRound, gameSlice } = thisGame;
+	const { gameActive, gamePhase, gameRound, gameSlice } = thisGame;
 
-	//need to do different things based on the phase?
 	if (!gameActive) {
 		return;
 	}
 
-	const thisTeamStatus = parseInt(gameTeam) === 0 ? game0Status : game1Status;
-	const otherTeamStatus = parseInt(gameTeam) === 0 ? game1Status : game0Status;
+	const otherTeam = gameTeam == 0 ? 1 : 0;
+	const thisTeamStatus = thisGame["game" + gameTeam + "Status"];
+	const otherTeamStatus = thisGame["game" + otherTeam + "Status"];
 
-	//thisTeamStatus == 1
-	if (parseInt(thisTeamStatus) === 1) {
-		//already pressed / already waiting
+	//Still Waiting
+	if (thisTeamStatus == 1) {
 		socket.emit("serverSendingAction", userFeedbackAction("Still waiting on other team..."));
 		return;
 	}
 
-	if (parseInt(otherTeamStatus) === 0) {
-		//other team still active, not yet ready to move on
-		//mark this team as waiting
-
-		thisGame.setStatus(gameTeam, 1);
-
+	//Now Waiting
+	if (otherTeamStatus == 0) {
+		await thisGame.setStatus(gameTeam, 1);
 		let serverAction = {
 			type: MAIN_BUTTON_CLICK,
 			payload: {}
 		};
 		socket.emit("serverSendingAction", serverAction);
 		return;
-	} else {
-		//both teams done with this phase, round, slice, move...
-		//mark other team as no longer waiting
-		//TODO: figure out which team would actually be changing, instead of calling twice
-		thisGame.setStatus(0, 0);
-		thisGame.setStatus(1, 0);
+	}
 
-		let serverAction;
+	await thisGame.setStatus(otherTeam, 0);  //Could skip awaiting since not used later in this function...
 
-		switch (parseInt(gamePhase)) {
-			case 0:
-				//news -> purchase
-				await thisGame.setPhase(1);
+	let serverAction;
 
-				//let the everyone know stuff
+	switch (gamePhase) {
+		//News -> Purchase
+		case 0:
+			await thisGame.setPhase(1);
+
+			serverAction = {
+				type: PURCHASE_PHASE,
+				payload: {}
+			};
+			io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
+			break;
+
+		//Purchase -> Combat
+		case 1:
+			await thisGame.setPhase(2);
+
+			serverAction = {
+				type: COMBAT_PHASE,
+				payload: {}
+			};
+			io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
+			break;
+
+		//Place Troops -> News
+		case 3:
+			await thisGame.setPhase(0);
+
+			serverAction = {
+				type: NEWS_PHASE,
+				payload: {}
+			};
+			io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
+			break;
+
+		//Combat Phase -> Slice, Round, Place Troops...
+		case 2:
+			if (gameSlice == 0) {
+				await thisGame.setSlice(1);
 
 				serverAction = {
-					type: PURCHASE_PHASE,
+					type: SLICE_CHANGE,
 					payload: {}
 				};
-
 				io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
 				break;
+			} else {
+				//Slice 1 functionality
+				let events = await Event.all(gameId);
 
-			case 1:
-				//purchase -> combat
-				await thisGame.setPhase(2);
-
-				//let the everyone know stuff
-
-				serverAction = {
-					type: COMBAT_PHASE,
-					payload: {}
-				};
-
-				io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
-				break;
-
-			case 3:
-				//place troops -> news phase
-				await thisGame.setPhase(0);
-
-				serverAction = {
-					type: NEWS_PHASE,
-					payload: {}
-				};
-
-				io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
-				break;
-
-			case 2:
-				//combat phase controls (-> slice, -> execute/step, -> round++, -> place phase)
-				if (parseInt(gameSlice) === 0) {
-					//they are done making the plans for this round
-					await thisGame.setSlice(1);
-
-					//need to let the clients know that done with planning, ready to execute
-					serverAction = {
-						type: SLICE_CHANGE,
-						payload: {}
-					};
-
-					io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
-					break;
-				} else {
-					// check for any events that exist prior to dealing with plans, execute events 1 by 1
-
-					let events = await Event.all(gameId);
-
-					if (events.length > 0) {
-						//deal with the event for one or both clients
-						//loop through the events until one is doable, delete any that are no longer applicable
-						//this happens when pieces get deleted (unless run script to auto delete those events...)
-					}
-
-					const currentMovementOrder0 = await Plan.getCurrentMovementOrder(gameId, 0);
-					const currentMovementOrder1 = await Plan.getCurrentMovementOrder(gameId, 1);
-
-					if (!currentMovementOrder0 && !currentMovementOrder1) {
-						//both teams are done with plans
-						if (gameRound === 2) {
-							//move to place phase
-							await thisGame.setRound(0);
-							await thisGame.setSlice(0);
-							await thisGame.setPhase(3);
-
-							serverAction = {
-								type: PLACE_PHASE,
-								payload: {}
-							};
-
-							io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
-						} else {
-							//move to next round
-							await thisGame.setRound(thisGame.gameRound + 1);
-							await thisGame.setSlice(0);
-
-							serverAction = {
-								type: NEW_ROUND,
-								payload: {
-									gameRound: this.gameRound
-								}
-							};
-
-							io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
-						}
-
-						break;
-					}
-
-					let currentMovementOrder;
-
-					//one of these should fire, since above check failed to exit
-					//keeping the empty plan team at status1
-					let game0StatusNew = 1;
-					if (!currentMovementOrder0) {
-						await thisGame.setStatus(0, 1);
-					} else {
-						currentMovementOrder = currentMovementOrder0;
-						game0StatusNew = 0;
-					}
-
-					let game1StatusNew = 1;
-					if (!currentMovementOrder1) {
-						await thisGame.setStatus(1, 1);
-					} else {
-						currentMovementOrder = currentMovementOrder1;
-						game1StatusNew = 0;
-					}
-
-					// check for collision battles
-					const allCollisionBattles = await Plan.getCollisionBattles(gameId, currentMovementOrder);
-
-					if (allCollisionBattles.length > 0) {
-						//filter through each collision battle and create events for it
-						//multiple pieces colliding -> same event...
-						//event has a touple identifier? (collision between x,y)
-						//each one of these has {pieceId0, pieceTypeId0, pieceContainerId0, piecePositionId0, planPositionId0, pieceId1, pieceTypeId1, pieceContainerId1, piecePositionId1, planPositionId1 }
-						//multiple collisions need to go to the same event, but getting multiple's from the database query, since 1 tank vs 2 tanks has 2 separate collisions
-						let allEvents = {};
-
-						//'position0-position1' => [piecesInvolved?]
-						//all events are team0 - team1, so no need to worry about team1 - team0 duplicates (probably)
-
-						for (let x = 0; x < allCollisionBattles.length; x++) {
-							let {
-								pieceId0,
-								pieceTypeId0,
-								pieceContainerId0,
-								piecePositionId0,
-								planPositionId0,
-								pieceId1,
-								pieceTypeId1,
-								pieceContainerId1,
-								piecePositionId1,
-								planPositionId1
-							} = allCollisionBattles[x];
-
-							// only need to check stuff from 0 -> 1
-							let thisEventPositions = `${piecePositionId0}-${planPositionId0}`;
-
-							//TODO: figure out if these 2 pieces would actually collide / battle
-							//need to consider pieceVisibility as well...do pieces see each other when crossing over?
-
-							if (!Object.keys(allEvents).includes(thisEventPositions)) {
-								allEvents[thisEventPositions] = [];
-							}
-
-							if (!allEvents[thisEventPositions].includes(pieceId0)) {
-								allEvents[thisEventPositions].push(pieceId0);
-							}
-
-							if (!allEvents[thisEventPositions].includes(pieceId1)) {
-								allEvents[thisEventPositions].push(pieceId1);
-							}
-						}
-
-						//bulk insert for eventQueue
-						let allInserts = [];
-						const bothTeamsIndicator = 2;
-						const collisionEventType = 0;
-						for (let key in allEvents) {
-							let newInsert = [gameId, bothTeamsIndicator, collisionEventType, key.split("-")[0], key.split("-")[1]];
-							allInserts.push(newInsert);
-						}
-
-						await Event.bulkInsertEvents(allInserts)
-
-						//bulk insert for eventItems where posa = posb (to match the eventId?)
-						//need to insert into temporary table and then insert into table1 select whatever from table2 join table3
-						allInserts = [];
-
-						for (let key in allEvents) {
-							let eventPieces = allEvents[key];
-							for (let z = 0; z < eventPieces.length; z++) {
-								let newInsert = [eventPieces[z], gameId, key.split("-")[0], key.split("-")[1]];
-								allInserts.push(newInsert);
-							}
-						}
-
-						await Event.bulkInsertItems(gameId, allInserts);
-					}
-
-					await Piece.move(gameId, currentMovementOrder);
-
-					await Piece.updateVisibilities(gameId);
-
-					const allPositionBattles = await Plan.getPositionBattles(gameId);
-
-					if (allPositionBattles.length > 0) {
-						//filter through each position battle and create events for it
-						//multiple pieces in same position -> same event
-						//event has 1 identifier (position battle at x)
-						//TODO: also consider pieceVisibility?
-
-						let allPosEvents = {};
-
-						for (let x = 0; x < allPositionBattles.length; x++) {
-							let { pieceId0, pieceTypeId0, pieceContainerId0, piecePositionId0, pieceId1, pieceTypeId1, pieceContainerId1, piecePositionId1 } = allPositionBattles[x];
-
-							// only need to check stuff from 0 -> 1
-							let thisEventPosition = `${piecePositionId0}`;
-
-							//TODO: figure out if these 2 pieces would actually collide / battle
-
-							if (!Object.keys(allPosEvents).includes(thisEventPosition)) {
-								allPosEvents[thisEventPosition] = [];
-							}
-
-							if (!allPosEvents[thisEventPosition].includes(pieceId0)) {
-								allPosEvents[thisEventPosition].push(pieceId0);
-							}
-
-							if (!allPosEvents[thisEventPosition].includes(pieceId1)) {
-								allPosEvents[thisEventPosition].push(pieceId1);
-							}
-						}
-
-						//bulk insert for eventQueue
-						let allInserts = [];
-						const bothTeamsIndicator = 2;
-						const posBattleEventType = 1;
-						for (let key in allPosEvents) {
-							let newInsert = [gameId, bothTeamsIndicator, posBattleEventType, key];
-							allInserts.push(newInsert);
-						}
-
-						await Event.bulkInsertEvents(allInserts);
-
-						//bulk insert for eventItems
-						allInserts = [];
-
-						for (let key in allPosEvents) {
-							let eventPieces = allPosEvents[key];
-							for (let z = 0; z < eventPieces.length; z++) {
-								let newInsert = [eventPieces[z], gameId, key];
-								allInserts.push(newInsert);
-							}
-						}
-
-						await Event.bulkInsertItems(gameId, allInserts);
-					}
-
-					// create refuel events (special flag? / proximity) (check to see that the piece still exists!*!*)
-					// create container events (special flag)
-
-					//create final update to each client
-					const server0Action = {
-						type: PIECES_MOVE,
-						payload: {
-							gameboardPieces: await Piece.getVisiblePieces(gameId, 0),
-							gameStatus: game0StatusNew
-						}
-					};
-
-					const server1Action = {
-						type: PIECES_MOVE,
-						payload: {
-							gameboardPieces: await Piece.getVisiblePieces(gameId, 1),
-							gameStatus: game1StatusNew
-						}
-					};
-
-					//send final update to each client
-					io.sockets.in("game" + gameId + "team0").emit("serverSendingAction", server0Action);
-					io.sockets.in("game" + gameId + "team1").emit("serverSendingAction", server1Action);
+				if (events.length > 0) {
+					//deal with the event for one or both clients
+					//loop through the events until one is doable, delete any that are no longer applicable
+					//this happens when pieces get deleted (unless run script to auto delete those events...)
 				}
 
-				break;
-			default:
-				socket.emit("serverSendingAction", userFeedbackAction("Backend Failure, unkown gamePhase..."));
-		}
+				const currentMovementOrder0 = await Plan.getCurrentMovementOrder(gameId, 0);
+				const currentMovementOrder1 = await Plan.getCurrentMovementOrder(gameId, 1);
 
-		return;
+				//No More Plans for either team
+				if (currentMovementOrder0 == null && currentMovementOrder1 == null) {
+					if (gameRound == 2) {
+						await thisGame.setRound(0);
+						await thisGame.setSlice(0);
+						await thisGame.setPhase(3);
+
+						serverAction = {
+							type: PLACE_PHASE,
+							payload: {}
+						};
+						io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
+						break;
+					} else {
+						await thisGame.setRound(thisGame.gameRound + 1);
+						await thisGame.setSlice(0);
+
+						serverAction = {
+							type: NEW_ROUND,
+							payload: {
+								gameRound: thisGame.gameRound
+							}
+						};
+						io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
+						break;
+					}
+				}
+
+				//One of the teams may be without plans, keep them waiting
+				if (currentMovementOrder0 == null) {
+					await thisGame.setStatus(0, 1);
+				}
+				if (currentMovementOrder1 == null) {
+					await thisGame.setStatus(1, 1);
+				}
+
+				const currentMovementOrder = currentMovementOrder0 || currentMovementOrder1;
+
+				const allCollisionBattles = await Plan.getCollisionBattles(gameId, currentMovementOrder);
+				if (allCollisionBattles.length > 0) {
+					//each one of these has {pieceId0, pieceTypeId0, pieceContainerId0, piecePositionId0, planPositionId0, pieceId1, pieceTypeId1, pieceContainerId1, piecePositionId1, planPositionId1 }
+					//'position0-position1' => [piecesInvolved?]
+					let allEvents = {};
+
+					for (let x = 0; x < allCollisionBattles.length; x++) {
+						let { pieceId0, pieceTypeId0, pieceContainerId0, piecePositionId0, planPositionId0, pieceId1, pieceTypeId1, pieceContainerId1, piecePositionId1, planPositionId1 } = allCollisionBattles[x];
+
+						let thisEventPositions = `${piecePositionId0}-${planPositionId0}`;
+
+						//TODO: figure out if these 2 pieces would actually collide / battle
+						//need to consider pieceVisibility as well...do pieces see each other when crossing over?
+
+						if (!Object.keys(allEvents).includes(thisEventPositions)) {
+							allEvents[thisEventPositions] = [];
+						}
+						if (!allEvents[thisEventPositions].includes(pieceId0)) {
+							allEvents[thisEventPositions].push(pieceId0);
+						}
+						if (!allEvents[thisEventPositions].includes(pieceId1)) {
+							allEvents[thisEventPositions].push(pieceId1);
+						}
+					}
+
+					const bothTeamsIndicator = 2;
+					const collisionEventType = 0;
+					let eventInserts = [];
+					for (let key in allEvents) {
+						let newInsert = [gameId, bothTeamsIndicator, collisionEventType, key.split("-")[0], key.split("-")[1]];
+						eventInserts.push(newInsert);
+					}
+
+					await Event.bulkInsertEvents(eventInserts);
+
+					let eventItemInserts = [];
+					for (let key in allEvents) {
+						let eventPieces = allEvents[key];
+						for (let z = 0; z < eventPieces.length; z++) {
+							let newInsert = [eventPieces[z], gameId, key.split("-")[0], key.split("-")[1]];
+							eventItemInserts.push(newInsert);
+						}
+					}
+
+					await Event.bulkInsertItems(gameId, eventItemInserts);
+				}
+
+				await Piece.move(gameId, currentMovementOrder);
+				await Piece.updateVisibilities(gameId);
+
+				const allPositionBattles = await Plan.getPositionBattles(gameId);
+				if (allPositionBattles.length > 0) {
+					//TODO: also consider pieceVisibility
+					let allPosEvents = {};
+					for (let x = 0; x < allPositionBattles.length; x++) {
+						let { pieceId0, pieceTypeId0, pieceContainerId0, piecePositionId0, pieceId1, pieceTypeId1, pieceContainerId1, piecePositionId1 } = allPositionBattles[x];
+
+						let thisEventPosition = `${piecePositionId0}`;
+
+						//TODO: figure out if these 2 pieces would actually collide / battle
+
+						if (!Object.keys(allPosEvents).includes(thisEventPosition)) {
+							allPosEvents[thisEventPosition] = [];
+						}
+						if (!allPosEvents[thisEventPosition].includes(pieceId0)) {
+							allPosEvents[thisEventPosition].push(pieceId0);
+						}
+						if (!allPosEvents[thisEventPosition].includes(pieceId1)) {
+							allPosEvents[thisEventPosition].push(pieceId1);
+						}
+					}
+					
+					const bothTeamsIndicator = 2;
+					const posBattleEventType = 1;
+					let eventInserts = [];
+					for (let key in allPosEvents) {
+						let newInsert = [gameId, bothTeamsIndicator, posBattleEventType, key, key]; //second key is to match # of columns for sql insert
+						eventInserts.push(newInsert);
+					}
+
+					await Event.bulkInsertEvents(eventInserts);
+
+					let eventItemInserts = [];
+					for (let key in allPosEvents) {
+						let eventPieces = allPosEvents[key];
+						for (let z = 0; z < eventPieces.length; z++) {
+							let newInsert = [eventPieces[z], gameId, key, key]; //second key is to match # of columns for sql insert
+							eventItemInserts.push(newInsert);
+						}
+					}
+
+					await Event.bulkInsertItems(gameId, eventItemInserts);
+				}
+
+				// TODO: create refuel events (special flag? / proximity) (check to see that the piece still exists!*!*) (still have plans from old pieces that used to exist? (but those would delete on cascade probaby...except the events themselves...))
+
+				// TODO: create container events (special flag)
+
+				const server0Action = {
+					type: PIECES_MOVE,
+					payload: {
+						gameboardPieces: await Piece.getVisiblePieces(gameId, 0),
+						gameStatus: thisGame.game0Status
+					}
+				};
+				const server1Action = {
+					type: PIECES_MOVE,
+					payload: {
+						gameboardPieces: await Piece.getVisiblePieces(gameId, 1),
+						gameStatus: thisGame.game1Status
+					}
+				};
+				io.sockets.in("game" + gameId + "team0").emit("serverSendingAction", server0Action);
+				io.sockets.in("game" + gameId + "team1").emit("serverSendingAction", server1Action);
+			}
+
+			break;
+		default:
+			socket.emit("serverSendingAction", userFeedbackAction("Backend Failure, unkown gamePhase..."));
 	}
+
+	return;
 };
 
 const userFeedbackAction = userFeedback => {

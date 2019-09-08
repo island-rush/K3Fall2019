@@ -1,4 +1,6 @@
 const pool = require("../database");
+const { visibilityMatrix } = require("../constants");
+const distanceMatrix = require("../distanceMatrix");
 
 class Piece {
 	constructor(pieceId) {
@@ -61,7 +63,7 @@ class Piece {
 
 	static async move(gameId, movementOrder) {
 		//movement based on plans (for this order/step)
-		const conn = pool.getConnection();
+		const conn = await pool.getConnection();
 
 		const inserts = [gameId, movementOrder];
 		const movePiecesQuery =

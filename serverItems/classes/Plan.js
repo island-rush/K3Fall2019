@@ -28,7 +28,7 @@ class Plan {
 	static async getCurrentMovementOrder(gameId, gameTeam) {
 		const queryString = "SELECT planMovementOrder FROM plans WHERE planGameId = ? AND planTeamId = ? ORDER BY planMovementOrder ASC LIMIT 1";
 		const inserts = [gameId, gameTeam];
-		const [results] = await conn.query(queryString, inserts);
+		const [results] = await pool.query(queryString, inserts);
 		return results.length !== 0 ? results[0]["planMovementOrder"] : null;
 	}
 

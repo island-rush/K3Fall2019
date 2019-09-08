@@ -26,7 +26,7 @@ class Event {
 	}
 
 	static async bulkInsertItems(gameId, allInserts) {
-		const conn = pool.getConnection();
+		const conn = await pool.getConnection();
 
 		let queryString = "INSERT INTO eventItemsTemp (eventPieceId, eventItemGameId, eventPosA, eventPosB) VALUES ?";
 		let inserts = [allInserts];
