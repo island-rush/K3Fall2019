@@ -811,6 +811,8 @@ exports.gameAdd = async (req, res) => {
 	try {
 		const adminPasswordHashed = md5(adminPassword);
 
+		//TODO: validate inputs are within limits of database (4 characters for section....etc)
+
 		await Game.add(adminSection, adminInstructor, adminPasswordHashed);
 
 		res.redirect("/courseDirector.html?gameAdd=success");

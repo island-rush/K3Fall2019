@@ -195,7 +195,7 @@ class Game {
 	}
 
 	async reset() {
-		Game.delete(this.gameId);
+		await Game.delete(this.gameId);
 
 		const conn = await pool.getConnection(); //TODO: combine this method with .add(), overloading
 		const queryString = "INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?, ?)";
