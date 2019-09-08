@@ -47,7 +47,7 @@ const shopPurchaseRequest = async (socket, shopItemTypeId) => {
 	const shopItemCost = shopItemTypeCosts[shopItemTypeId];
 	//TODO: figure out if the purchase is allowed (game phase...controller Id....game active....) (and in other methods...)
 
-	const thisGame = new Game(gameId);
+	const thisGame = new Game({ gameId });
 	await thisGame.init();
 
 	const { gameActive, gamePhase } = thisGame;
@@ -94,7 +94,7 @@ const shopRefundRequest = async (socket, shopItem) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 	const itemCost = shopItemTypeCosts[shopItem.shopItemTypeId];
 
-	const thisGame = new Game(gameId);
+	const thisGame = new Game({ gameId });
 	await thisGame.init();
 
 	const teamPoints = thisGame["game" + gameTeam + "Points"];
@@ -154,7 +154,7 @@ const confirmPlan = async (socket, pieceId, plan) => {
 	//need to know if this piece is a container or not, to check if container move was inserted
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const thisGame = new Game(gameId); //TODO: init could fail if gameId was invalid
+	const thisGame = new Game({ gameId }); //TODO: init could fail if gameId was invalid
 	await thisGame.init();
 
 	const thisPiece = new Piece(pieceId); //TODO: init could fail if pieceId was invalid
@@ -230,7 +230,7 @@ const deletePlan = async (socket, pieceId) => {
 
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const thisGame = new Game(gameId);
+	const thisGame = new Game({ gameId });
 	await thisGame.init();
 
 	if (!thisGame.gameActive) {
@@ -256,7 +256,7 @@ const mainButtonClick = async (io, socket) => {
 	//verify that this person is ok to click the button
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const thisGame = new Game(gameId);
+	const thisGame = new Game({gameId});
 	await thisGame.init();
 
 	const { gameActive, gamePhase, game0Status, game1Status, gameRound, gameSlice } = thisGame;
@@ -605,7 +605,7 @@ exports.gameReset = async (req, res) => {
 	const { gameId } = req.session.ir3;
 
 	try {
-		const thisGame = new Game(gameId);
+		const thisGame = new Game({ gameId });
 		await thisGame.init(); //need init to know section/instructor.... to reset back to those
 		await thisGame.reset();
 		res.redirect("/teacher.html?gameReset=success");
@@ -631,15 +631,13 @@ exports.adminLoginVerify = async (req, res) => {
 	}
 
 	try {
-		const gameId = await Game.findGameId(adminSection, adminInstructor);
+		const thisGame = new Game({ gameSection: adminSection, gameInstructor: adminInstructor });
+		await thisGame.init();
 
-		if (!gameId) {
+		if (!thisGame) {
 			res.redirect("/index.html?error=login");
 			return;
 		}
-
-		const thisGame = new Game(gameId);
-		await thisGame.init();
 
 		if (thisGame["gameAdminPassword"] != inputPasswordHash) {
 			res.redirect("/index.html?error=login");
@@ -647,7 +645,7 @@ exports.adminLoginVerify = async (req, res) => {
 		}
 
 		req.session.ir3 = {
-			gameId: gameId,
+			gameId: thisGame.gameId,
 			teacher: true,
 			adminSection, //same name = don't need : inside the object...
 			adminInstructor
@@ -673,15 +671,13 @@ exports.gameLoginVerify = async (req, res, callback) => {
 	const passwordHashToCheck = "game" + gameTeam + "Password"; //ex: 'game0Password
 
 	try {
-		const gameId = await Game.findGameId(gameSection, gameInstructor);
+		const thisGame = new Game({ gameSection, gameInstructor });
+		await thisGame.init();
 
-		if (!gameId) {
+		if (!thisGame) {
 			res.redirect("/index.html?error=login");
 			return;
 		}
-
-		const thisGame = new Game(gameId);
-		await thisGame.init();
 
 		if (thisGame["gameActive"] != 1) {
 			res.redirect("/index.html?error=gameNotActive");
@@ -690,7 +686,9 @@ exports.gameLoginVerify = async (req, res, callback) => {
 		} else if (inputPasswordHash != thisGame[passwordHashToCheck]) {
 			res.redirect("/index.html?error=login");
 		} else {
-			await thisGame.markLoggedIn(gameTeam, gameController);
+			await thisGame.setLoggedIn(gameTeam, gameController, 1);
+
+			const { gameId } = thisGame;
 
 			req.session.ir3 = {
 				gameId,
@@ -737,7 +735,7 @@ exports.getGameActive = async (req, res) => {
 	const { gameId } = req.session.ir3;
 
 	try {
-		const thisGame = new Game(gameId);
+		const thisGame = new Game({ gameId });
 		await thisGame.init();
 
 		const { gameActive } = thisGame;
@@ -769,8 +767,10 @@ exports.toggleGameActive = async (req, res) => {
 	const { gameId } = req.session.ir3;
 
 	try {
-		const thisGame = new Game(gameId); //didn't need to .init(), that only adds the gameInfo
-		thisGame.toggleGameActive();
+		const thisGame = new Game({ gameId });
+		await thisGame.init();
+		const newValue = (thisGame.gameActive + 1) % 2;
+		await thisGame.setGameActive(newValue);
 
 		res.sendStatus(200);
 	} catch (error) {
@@ -813,7 +813,7 @@ exports.gameAdd = async (req, res) => {
 
 		//TODO: validate inputs are within limits of database (4 characters for section....etc)
 
-		await Game.add(adminSection, adminInstructor, adminPasswordHashed);
+		const thisGame = await Game.add(adminSection, adminInstructor, adminPasswordHashed);
 
 		res.redirect("/courseDirector.html?gameAdd=success");
 	} catch (error) {
@@ -863,7 +863,7 @@ exports.socketSetup = async (io, socket) => {
 
 	//TODO: Server Side Rendering with react?
 	//"Immediatly" send the client intial game state data
-	const thisGame = new Game(gameId);
+	const thisGame = new Game({ gameId });
 	await thisGame.init();
 	const action = await thisGame.initialStateAction(gameTeam, gameController);
 	socket.emit("serverSendingAction", action);
@@ -929,9 +929,9 @@ exports.socketSetup = async (io, socket) => {
 
 	socket.on("disconnect", async () => {
 		const { gameId, gameTeam, gameController } = socket.handshake.session.ir3; //Assume we have this, if this method is ever called (from sockets)
-		const thisGame = new Game(gameId);
+		const thisGame = new Game({ gameId });
 		try {
-			await thisGame.markLoggedOut(gameTeam, gameController);
+			await thisGame.setLoggedIn(gameTeam, gameController, 0);
 		} catch (error) {
 			console.log(error);
 			//nothing to send to client, they disconnected from the socket already...

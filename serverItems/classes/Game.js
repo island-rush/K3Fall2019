@@ -3,14 +3,27 @@ const gameInitialPieces = require("./gameInitialPieces"); //script to insert pie
 const gameInitialNews = require("./gameInitialNews"); //script to insert news
 
 class Game {
-	//TODO: could overload this with the init, to get rid of the findGameId static method (by using parameter options / hash, and manually check)
-	constructor(gameId) {
-		this.gameId = gameId;
+	constructor(options) {
+		if (options.gameId) {
+			this.gameId = options.gameId;
+		} else if (options.gameSection && options.gameInstructor) {
+			this.gameSection = options.gameSection;
+			this.gameInstructor = options.gameInstructor;
+		}
 	}
 
 	async init() {
-		const queryString = "SELECT * FROM games WHERE gameId = ?";
-		const inserts = [this.gameId];
+		let queryString;
+		let inserts;
+
+		if (this.gameId) {
+			queryString = "SELECT * FROM games WHERE gameId = ?";
+			inserts = [this.gameId];
+		} else if (this.gameSection && this.gameInstructor) {
+			queryString = "SELECT * FROM games WHERE gameSection = ? AND gameInstructor = ?";
+			inserts = [this.gameSection, this.gameInstructor];
+		}
+
 		const [results] = await pool.query(queryString, inserts);
 		Object.assign(this, results[0]);
 	}
@@ -21,21 +34,19 @@ class Game {
 		await pool.query(queryString, inserts);
 	}
 
-	static async add(gameSection, gameInstructor, gameAdminPasswordHash) {
-		const queryString = "INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?)";
-		const inserts = [gameSection, gameInstructor, gameAdminPasswordHash];
-		await pool.query(queryString, inserts);
-	}
+	static async add(gameSection, gameInstructor, gameAdminPasswordHash, options = {}) {
+		let queryString;
+		let inserts;
 
-	static async findGameId(gameSection, gameInstructor) {
-		const queryString = "SELECT gameId FROM games WHERE gameSection = ? AND gameInstructor = ?";
-		const inserts = [gameSection, gameInstructor];
-		const [results] = await pool.query(queryString, inserts);
-		if (results.length === 1) {
-			return results[0]["gameId"];
+		if (options.gameId) {
+			queryString = "INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?, ?)";
+			inserts = [options.gameId, gameSection, gameInstructor, gameAdminPasswordHash];
 		} else {
-			return null;
+			queryString = "INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?)";
+			inserts = [gameSection, gameInstructor, gameAdminPasswordHash];
 		}
+
+		await pool.query(queryString, inserts);
 	}
 
 	static async getGames() {
@@ -160,14 +171,13 @@ class Game {
 		return serverAction;
 	}
 
-	//TODO: should switch this to a true setting (setGameActive()) instead of a toggle
-	async toggleGameActive() {
+	async setGameActive(newValue) {
 		const queryString =
-			"UPDATE games SET gameActive = (gameActive + 1) % 2, game0Controller0 = 0, game0Controller1 = 0, game0Controller2 = 0, game0Controller3 = 0, game1Controller0 = 0, game1Controller1 = 0, game1Controller2 = 0, game1Controller3 = 0 WHERE gameId = ?";
-		const inserts = [this.gameId];
+			"UPDATE games SET gameActive = ?, game0Controller0 = 0, game0Controller1 = 0, game0Controller2 = 0, game0Controller3 = 0, game1Controller0 = 0, game1Controller1 = 0, game1Controller2 = 0, game1Controller3 = 0 WHERE gameId = ?";
+		const inserts = [newValue, this.gameId];
 		await pool.query(queryString, inserts);
 		const updatedInfo = {
-			gameActive: (this.gameActive + 1) % 2,
+			gameActive: newValue,
 			game0Controller0: 0,
 			game0Controller1: 0,
 			game0Controller2: 0,
@@ -180,33 +190,20 @@ class Game {
 		Object.assign(this, updatedInfo); //very unlikely we would need the updated info on this object...
 	}
 
-	async markLoggedIn(gameTeam, gameController) {
-		const queryString = "UPDATE games SET ?? = 1 WHERE gameId = ?";
-		const inserts = ["game" + gameTeam + "Controller" + gameController, this.gameId];
-		await pool.query(queryString, inserts); //TODO: do we need to await if this is run and forget? (don't want to release early?)
-		this["game" + gameTeam + "Controller" + gameController] = 1;
-	}
-
-	async markLoggedOut(gameTeam, gameController) {
-		const queryString = "UPDATE games SET ?? = 0 WHERE gameId = ?";
-		const inserts = ["game" + gameTeam + "Controller" + gameController, this.gameId];
+	async setLoggedIn(gameTeam, gameController, value) {
+		const queryString = "UPDATE games SET ?? = ? WHERE gameId = ?";
+		const inserts = ["game" + gameTeam + "Controller" + gameController, value, this.gameId];
 		await pool.query(queryString, inserts);
-		this["game" + gameTeam + "Controller" + gameController] = 0;
+		this["game" + gameTeam + "Controller" + gameController] = value;
 	}
 
 	async reset() {
 		await Game.delete(this.gameId);
+		await Game.add(this.gameSection, this.gameInstructor, this.gameAdminPassword, { gameId: this.gameId });
 
-		const conn = await pool.getConnection(); //TODO: combine this method with .add(), overloading
-		const queryString = "INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?, ?)";
-		const inserts = [this.gameId, this.gameSection, this.gameInstructor, this.gameAdminPassword];
-		await conn.query(queryString, inserts);
-
-		await this.init(); //re-write old object values with new defaults from db
-
+		const conn = await pool.getConnection();
 		await gameInitialPieces(conn, this.gameId);
 		await gameInitialNews(conn, this.gameId);
-
 		conn.release();
 	}
 
