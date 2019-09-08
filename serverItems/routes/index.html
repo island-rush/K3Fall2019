@@ -164,13 +164,6 @@
 		getDatabaseStatus.onreadystatechange = function() {
 			if (this.readyState === 4) {
 				document.getElementById("DatabaseConnectionTag").innerHTML = "Database: " + this.response;
-
-				//TODO: fade this out slowly
-				setTimeout(() => {
-					if (this.response === "Connected") {
-						document.getElementById("DatabaseConnectionTag").innerHTML = "";
-					}
-				}, 1500);
 			}
 		};
 		getDatabaseStatus.open("GET", "/databaseStatus", true);

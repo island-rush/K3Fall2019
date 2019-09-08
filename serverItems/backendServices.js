@@ -154,13 +154,17 @@ const confirmPlan = async (socket, pieceId, plan) => {
 	//need to know if this piece is a container or not, to check if container move was inserted
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const thisGame = new Game({ gameId }); //TODO: init could fail if gameId was invalid
+	const thisGame = new Game({ gameId });
 	await thisGame.init();
 
-	const thisPiece = new Piece(pieceId); //TODO: init could fail if pieceId was invalid
+	const thisPiece = new Piece(pieceId);
 	await thisPiece.init();
 
-	const { piecePositionId, pieceTypeId } = thisPiece;
+	if (!thisGame || !thisPiece) {
+		return;
+	}
+
+	const { piecePositionId, pieceTypeId, pieceGameId, pieceTeamId } = thisPiece;
 
 	const isContainer = containerTypes.includes(pieceTypeId);
 
@@ -201,7 +205,6 @@ const confirmPlan = async (socket, pieceId, plan) => {
 	}
 
 	//prepare the bulk insert
-	const { pieceGameId, pieceTeamId } = thisPiece;
 	let plansToInsert = [];
 	for (let movementOrder = 0; movementOrder < plan.length; movementOrder++) {
 		let { positionId, type } = plan[movementOrder];
@@ -572,7 +575,6 @@ const mainButtonClick = async (io, socket) => {
 					};
 
 					//send final update to each client
-					//TODO: probably cleaner way of doing this, instead of passing down io, pass down a function that has access to io?
 					io.sockets.in("game" + gameId + "team0").emit("serverSendingAction", server0Action);
 					io.sockets.in("game" + gameId + "team1").emit("serverSendingAction", server1Action);
 				}

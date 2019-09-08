@@ -1,6 +1,7 @@
 const pool = require("../database");
 const gameInitialPieces = require("./gameInitialPieces"); //script to insert pieces
 const gameInitialNews = require("./gameInitialNews"); //script to insert news
+const { INITIAL_GAMESTATE } = require("../constants");
 
 class Game {
 	constructor(options) {
@@ -95,7 +96,7 @@ class Game {
 
 		for (let x = 0; x < resultPlans.length; x++) {
 			let { planPieceId, planPositionId, planSpecialFlag } = resultPlans[x];
-			let type = planSpecialFlag === 0 ? "move" : "container"; //TODO: unknown future special flags could interfere
+			let type = planSpecialFlag === 0 ? "move" : planSpecialFlag === 1 ? "container" : "NULL_SPECIAL";
 
 			if (!(planPieceId in confirmedPlans)) {
 				confirmedPlans[planPieceId] = [];
@@ -136,8 +137,7 @@ class Game {
 		const gameStatus = this["game" + gameTeam + "Status"];
 
 		const serverAction = {
-			//TODO: make this a constant from a file
-			type: "INITIAL_GAMESTATE",
+			type: INITIAL_GAMESTATE,
 			payload: {
 				gameInfo: {
 					gameSection: this.gameSection,
@@ -223,9 +223,9 @@ class Game {
 
 	async setPhase(newGamePhase) {
 		const queryString = "UPDATE games set gamePhase = ? WHERE gameId = ?";
-		const inserts = [parseInt(newGamePhase), this.gameId];
+		const inserts = [newGamePhase, this.gameId];
 		await pool.query(queryString, inserts);
-		this.gamePhase = parseInt(newGamePhase); //TODO: when to use parseInt and when not? (overkill or not needed or randomly used...)
+		this.gamePhase = newGamePhase;
 	}
 
 	async setSlice(newGameSlice) {
