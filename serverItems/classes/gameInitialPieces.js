@@ -1,4 +1,4 @@
-const { typeNameIds, typeMoves, typeFuel } = require("./constants");
+const { typeNameIds, typeMoves, typeFuel } = require("../constants");
 
 // prettier-ignore
 const piece = (pieceGameId, pieceTeamName, pieceTypeName, piecePositionId, options) => {
@@ -36,7 +36,7 @@ module.exports = async (conn, gameId) => {
 		// piece(gameId, "Red", "Tank", 7)
 	];
 
-	queryString = "INSERT INTO pieces (pieceGameId, pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId, pieceVisible, pieceMoves, pieceFuel) VALUES ?";
-	inserts = [firstPieces];
+	const queryString = "INSERT INTO pieces (pieceGameId, pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId, pieceVisible, pieceMoves, pieceFuel) VALUES ?";
+	const inserts = [firstPieces];
 	await conn.query(queryString, inserts);
 };

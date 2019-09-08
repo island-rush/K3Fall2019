@@ -8,7 +8,6 @@ const CourseDirectorPasswordHash = process.env.CD_PASSWORD || "912ec803b2ce49e4a
 
 //Other Constants
 const {
-	INITIAL_GAMESTATE,
 	SHOP_PURCHASE,
 	SHOP_REFUND,
 	SET_USERFEEDBACK,
@@ -38,55 +37,9 @@ const distanceMatrix = require("./distanceMatrix");
 const pool = require("./database");
 
 //OOP Attempt to cleanup this file
-const Game = require("./Game");
-const Piece = require("./Piece");
-const Plan = require("./Plan");
-const Event = require("./Event");
+const { Game, ShopItem, InvItem, Piece, Plan, Event } = require("./classes");
 
 //Internal Functions
-const getVisiblePieces = async (conn, gameId, gameTeam) => {
-	const queryString = "SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = ? OR pieceVisible = 1) ORDER BY pieceContainerId, pieceTeamId ASC";
-	const inserts = [gameId, gameTeam];
-	const [results, fields] = await conn.query(queryString, inserts);
-
-	let allPieces = {};
-	for (let x = 0; x < results.length; x++) {
-		let currentPiece = results[x];
-		currentPiece.pieceContents = { pieces: [] };
-		if (!allPieces[currentPiece.piecePositionId]) {
-			allPieces[currentPiece.piecePositionId] = [];
-		}
-		if (currentPiece.pieceContainerId === -1) {
-			allPieces[currentPiece.piecePositionId].push(currentPiece);
-		} else {
-			let indexOfParent = allPieces[currentPiece.piecePositionId].findIndex(piece => {
-				return piece.pieceId === currentPiece.pieceContainerId;
-			});
-			allPieces[currentPiece.piecePositionId][indexOfParent].pieceContents.push(currentPiece);
-		}
-	}
-
-	return allPieces;
-};
-
-const giveInitialGameState = async socket => {
-	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
-
-	const thisGame = new Game(gameId);
-	await thisGame.init();
-
-	const personSpecificAction = await thisGame.initialStatePayload(gameTeam, gameController);
-
-	socket.emit("serverSendingAction", personSpecificAction);
-};
-
-const insertShopItem = async (conn, gameId, gameTeam, shopItemTypeId) => {
-	const queryString = "INSERT INTO shopItems (shopItemGameId, shopItemTeamId, shopItemTypeId) values (?, ?, ?)";
-	const inserts = [gameId, gameTeam, shopItemTypeId];
-	const [results, fields] = await conn.query(queryString, inserts);
-	return results.insertId;
-};
-
 const shopPurchaseRequest = async (socket, shopItemTypeId) => {
 	//TODO: could do client side checks until the confirm, and then go through 1 by 1 what was requested, checking points
 	//this would be better than network request for each purchase (AND refund)...
@@ -94,26 +47,21 @@ const shopPurchaseRequest = async (socket, shopItemTypeId) => {
 	const shopItemCost = shopItemTypeCosts[shopItemTypeId];
 	//TODO: figure out if the purchase is allowed (game phase...controller Id....game active....) (and in other methods...)
 
-	const conn = await pool.getConnection();
-
 	const thisGame = new Game(gameId);
 	await thisGame.init();
 
 	const { gameActive, gamePhase } = thisGame;
 
 	if (!gameActive) {
-		await conn.release();
 		return;
 	}
 
 	if (parseInt(gamePhase) !== 1) {
-		await conn.release();
 		socket.emit("serverSendingAction", userFeedbackAction("Not the right phase..."));
 		return;
 	}
 
 	if (parseInt(gameController) !== 0) {
-		await conn.release();
 		socket.emit("serverSendingAction", userFeedbackAction("Not the right controller..."));
 		return;
 	}
@@ -121,45 +69,24 @@ const shopPurchaseRequest = async (socket, shopItemTypeId) => {
 	const teamPoints = thisGame["game" + gameTeam + "Points"];
 
 	if (teamPoints < shopItemCost) {
-		await conn.release();
-		const serverAction = {
-			type: SET_USERFEEDBACK,
-			payload: {
-				userFeedback: "Not enough points to purchase"
-			}
-		};
-		socket.emit("serverSendingAction", serverAction);
+		socket.emit("serverSendingAction", userFeedbackAction("Not enough points to purchase"));
 		return;
 	}
 
-	const newPoints = teamPoints - shopItemCost;
-	await thisGame.setPoints(gameTeam, newPoints);
-	const shopItemId = await insertShopItem(conn, gameId, gameTeam, shopItemTypeId);
+	const points = teamPoints - shopItemCost;
+	await thisGame.setPoints(gameTeam, points);
 
-	await conn.release();
-
-	const shopItem = {
-		shopItemId,
-		shopItemGameId: gameId,
-		shopItemTeamId: gameTeam,
-		shopItemTypeId: shopItemTypeId
-	};
+	const shopItem = await ShopItem.insert(gameId, gameTeam, shopItemTypeId);
 
 	const serverAction = {
 		type: SHOP_PURCHASE,
 		payload: {
-			shopItem: shopItem,
-			points: newPoints
+			shopItem,
+			points
 		}
 	};
 	socket.emit("serverSendingAction", serverAction);
 	return;
-};
-
-const deleteShopItem = async (conn, shopItemId) => {
-	const queryString = "DELETE FROM shopItems WHERE shopItemId = ?";
-	const inserts = [shopItemId];
-	await conn.query(queryString, inserts);
 };
 
 const shopRefundRequest = async (socket, shopItem) => {
@@ -175,11 +102,9 @@ const shopRefundRequest = async (socket, shopItem) => {
 	//TODO: verify that the refund is available (correct controller, game active....)
 	//verify that the piece exists and the object given matches database values (overkill)
 
-	const conn = await pool.getConnection();
 	const newPoints = teamPoints + itemCost;
 	await thisGame.setPoints(gameTeam, newPoints);
-	await deleteShopItem(conn, shopItem.shopItemId);
-	await conn.release();
+	await ShopItem.delete(shopItem.shopItemId);
 
 	const serverAction = {
 		type: SHOP_REFUND,
@@ -197,26 +122,14 @@ const shopConfirmPurchase = async socket => {
 	//TODO: verify if it is allowed, game active, phase, controller...
 	//could extra verify that purchases were allowed? but redundant since these are already in the database
 
-	const conn = await pool.getConnection();
-
-	let queryString = "INSERT INTO invItems (invItemId, invItemGameId, invItemTeamId, invItemTypeId) SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?";
-	let inserts = [gameId, gameTeam];
-	await conn.query(queryString, inserts);
-
-	queryString = "DELETE FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?";
-	inserts = [gameId, gameTeam];
-	await conn.query(queryString, inserts);
-
-	queryString = "SELECT * FROM invItems WHERE invItemGameId = ? AND invItemTeamId = ?";
-	inserts = [gameId, gameTeam];
-	const [results, fields] = await conn.query(queryString, inserts);
-
-	await conn.release();
+	await InvItem.insertFromShop(gameId, gameTeam);
+	await ShopItem.deleteAll(gameId, gameTeam);
+	const invItems = InvItem.all(gameId, gameTeam);
 
 	const serverAction = {
 		type: SHOP_TRANSFER,
 		payload: {
-			invItems: results
+			invItems
 		}
 	};
 	socket.emit("serverSendingAction", serverAction);
@@ -339,27 +252,9 @@ const deletePlan = async (socket, pieceId) => {
 };
 
 // prettier-ignore
-const getCollisionBattles = async (conn, gameId, movementOrder) => {
-	let queryString = "SELECT * FROM (SELECT pieceId as pieceId0, pieceTypeId as pieceTypeId0, pieceContainerId as pieceContainerId0, piecePositionId as piecePositionId0, planPositionId as planPositionId0 FROM plans NATURAL JOIN pieces WHERE planPieceId = pieceId AND pieceTeamId = 0 AND pieceGameId = ? AND planMovementOrder = ?) as a JOIN (SELECT pieceId as pieceId1, pieceTypeId as pieceTypeId1, pieceContainerId as pieceContainerId1, piecePositionId as piecePositionId1, planPositionId as planPositionId1 FROM plans NATURAL JOIN pieces WHERE planPieceId = pieceId AND pieceTeamId = 1 AND pieceGameId = ? AND planMovementOrder = ?) as b ON piecePositionId0 = planPositionId1 AND planPositionId0 = piecePositionId1";
-	let inserts = [gameId, movementOrder, gameId, movementOrder];
-	const [results, fields] = await conn.query(queryString, inserts);
-	return results;
-}
-
-// prettier-ignore
-const getPositionBattles = async (conn, gameId) => {
-	let queryString = "SELECT * FROM (SELECT pieceId as pieceId0, piecePositionId as piecePositionId0, pieceTypeId as pieceTypeId0, pieceContainerId as pieceContainerId0 FROM pieces WHERE pieceGameId = ? AND pieceTeamId = 0) as a JOIN (SELECT pieceId as pieceId1, piecePositionId as piecePositionId1, pieceTypeId as pieceTypeId1, pieceContainerId as pieceContainerId1 FROM pieces WHERE pieceGameId = ? AND pieceTeamId = 1) as b ON piecePositionId0 = piecePositionId1";
-	let inserts = [gameId, gameId];
-	const [results, fields] = await conn.query(queryString, inserts);
-	return results;
-}
-
-// prettier-ignore
 const mainButtonClick = async (io, socket) => {
 	//verify that this person is ok to click the button
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
-
-	const conn = await pool.getConnection();
 
 	const thisGame = new Game(gameId);
 	await thisGame.init();
@@ -368,7 +263,6 @@ const mainButtonClick = async (io, socket) => {
 
 	//need to do different things based on the phase?
 	if (!gameActive) {
-		await conn.release();
 		return;
 	}
 
@@ -378,7 +272,6 @@ const mainButtonClick = async (io, socket) => {
 	//thisTeamStatus == 1
 	if (parseInt(thisTeamStatus) === 1) {
 		//already pressed / already waiting
-		await conn.release();
 		socket.emit("serverSendingAction", userFeedbackAction("Still waiting on other team..."));
 		return;
 	}
@@ -389,7 +282,6 @@ const mainButtonClick = async (io, socket) => {
 
 		thisGame.setStatus(gameTeam, 1);
 
-		await conn.release();
 		let serverAction = {
 			type: MAIN_BUTTON_CLICK,
 			payload: {}
@@ -410,8 +302,6 @@ const mainButtonClick = async (io, socket) => {
 				//news -> purchase
 				await thisGame.setPhase(1);
 
-				await conn.release();
-
 				//let the everyone know stuff
 
 				serverAction = {
@@ -426,8 +316,6 @@ const mainButtonClick = async (io, socket) => {
 				//purchase -> combat
 				await thisGame.setPhase(2);
 
-				await conn.release();
-
 				//let the everyone know stuff
 
 				serverAction = {
@@ -441,8 +329,6 @@ const mainButtonClick = async (io, socket) => {
 			case 3:
 				//place troops -> news phase
 				await thisGame.setPhase(0);
-
-				await conn.release();
 
 				serverAction = {
 					type: NEWS_PHASE,
@@ -476,7 +362,7 @@ const mainButtonClick = async (io, socket) => {
 						//loop through the events until one is doable, delete any that are no longer applicable
 						//this happens when pieces get deleted (unless run script to auto delete those events...)
 					}
-					
+
 					const currentMovementOrder0 = await Plan.getCurrentMovementOrder(gameId, 0);
 					const currentMovementOrder1 = await Plan.getCurrentMovementOrder(gameId, 1);
 
@@ -533,7 +419,7 @@ const mainButtonClick = async (io, socket) => {
 					}
 
 					// check for collision battles
-					const allCollisionBattles = await getCollisionBattles(conn, gameId, currentMovementOrder);
+					const allCollisionBattles = await Plan.getCollisionBattles(gameId, currentMovementOrder);
 
 					if (allCollisionBattles.length > 0) {
 						//filter through each collision battle and create events for it
@@ -588,9 +474,7 @@ const mainButtonClick = async (io, socket) => {
 							allInserts.push(newInsert);
 						}
 
-						queryString = "INSERT INTO eventQueue (eventGameId, eventTeamId, eventTypeId, eventPosA, eventPosB) VALUES ?";
-						inserts = [allInserts];
-						await conn.query(queryString, inserts);
+						await Event.bulkInsertEvents(allInserts)
 
 						//bulk insert for eventItems where posa = posb (to match the eventId?)
 						//need to insert into temporary table and then insert into table1 select whatever from table2 join table3
@@ -604,33 +488,14 @@ const mainButtonClick = async (io, socket) => {
 							}
 						}
 
-						queryString = "INSERT INTO eventItemsTemp (eventPieceId, eventItemGameId, eventPosA, eventPosB) VALUES ?";
-						inserts = [allInserts];
-						await conn.query(queryString, inserts);
-
-						queryString =
-							"INSERT INTO eventItems SELECT eventId, eventPieceId FROM eventItemsTemp NATURAL JOIN eventQueue WHERE eventItemsTemp.eventPosA = eventQueue.eventPosA AND eventItemsTemp.eventPosB = eventQueue.eventPosB AND eventItemsTemp.eventItemGameId = eventQueue.eventGameId";
-						await conn.query(queryString);
-
-						queryString = "DELETE FROM eventItemsTemp WHERE eventItemGameId = ?";
-						inserts = [gameId];
-						await conn.query(queryString, inserts);
+						await Event.bulkInsertItems(gameId, allInserts);
 					}
 
-					//moving the pieces (non-special flag)
-					queryString =
-						"UPDATE pieces, plans SET pieces.piecePositionId = plans.planPositionId WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
-					inserts = [gameId, currentMovementOrder];
-					await conn.query(queryString, inserts);
-
-					//delete those plans (non-special flag)
-					queryString = "DELETE FROM plans WHERE planGameId = ? AND planMovementOrder = ? AND planSpecialFlag = 0";
-					inserts = [gameId, currentMovementOrder];
-					await conn.query(queryString, inserts);
+					await Piece.move(gameId, currentMovementOrder);
 
 					await Piece.updateVisibilities(gameId);
 
-					const allPositionBattles = await getPositionBattles(conn, gameId);
+					const allPositionBattles = await Plan.getPositionBattles(gameId);
 
 					if (allPositionBattles.length > 0) {
 						//filter through each position battle and create events for it
@@ -670,9 +535,7 @@ const mainButtonClick = async (io, socket) => {
 							allInserts.push(newInsert);
 						}
 
-						queryString = "INSERT INTO eventQueue (eventGameId, eventTeamId, eventTypeId, eventPosA) VALUES ?";
-						inserts = [allInserts];
-						await conn.query(queryString, inserts);
+						await Event.bulkInsertEvents(allInserts);
 
 						//bulk insert for eventItems
 						allInserts = [];
@@ -685,17 +548,7 @@ const mainButtonClick = async (io, socket) => {
 							}
 						}
 
-						queryString = "INSERT INTO eventItemsTemp (eventPieceId, eventItemGameId, eventPosA) VALUES ?";
-						inserts = [allInserts];
-						await conn.query(queryString, inserts);
-
-						queryString =
-							"INSERT INTO eventItems SELECT eventId, eventPieceId FROM eventItemsTemp NATURAL JOIN eventQueue WHERE eventItemsTemp.eventPosA = eventQueue.eventPosA AND eventItemsTemp.eventItemGameId = eventQueue.eventGameId";
-						await conn.query(queryString);
-
-						queryString = "DELETE FROM eventItemsTemp WHERE eventItemGameId = ?";
-						inserts = [gameId];
-						await conn.query(queryString, inserts);
+						await Event.bulkInsertItems(gameId, allInserts);
 					}
 
 					// create refuel events (special flag? / proximity) (check to see that the piece still exists!*!*)
@@ -705,7 +558,7 @@ const mainButtonClick = async (io, socket) => {
 					const server0Action = {
 						type: PIECES_MOVE,
 						payload: {
-							gameboardPieces: await getVisiblePieces(conn, gameId, 0),
+							gameboardPieces: await Piece.getVisiblePieces(gameId, 0),
 							gameStatus: game0StatusNew
 						}
 					};
@@ -713,7 +566,7 @@ const mainButtonClick = async (io, socket) => {
 					const server1Action = {
 						type: PIECES_MOVE,
 						payload: {
-							gameboardPieces: await getVisiblePieces(conn, gameId, 1),
+							gameboardPieces: await Piece.getVisiblePieces(gameId, 1),
 							gameStatus: game1StatusNew
 						}
 					};
@@ -729,7 +582,6 @@ const mainButtonClick = async (io, socket) => {
 				socket.emit("serverSendingAction", userFeedbackAction("Backend Failure, unkown gamePhase..."));
 		}
 
-		await conn.release();
 		return;
 	}
 };
@@ -990,7 +842,7 @@ exports.gameDelete = async (req, res) => {
 	}
 };
 
-exports.socketSetup = (io, socket) => {
+exports.socketSetup = async (io, socket) => {
 	if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
 		socket.emit("serverRedirect", "access");
 		return;
@@ -1008,7 +860,11 @@ exports.socketSetup = (io, socket) => {
 	socket.join("game" + gameId + "team" + gameTeam + "controller" + gameController);
 
 	//TODO: Server Side Rendering with react?
-	giveInitialGameState(socket);
+	//"Immediatly" send the client intial game state data
+	const thisGame = new Game(gameId);
+	await thisGame.init();
+	const action = await thisGame.initialStateAction(gameTeam, gameController);
+	socket.emit("serverSendingAction", action);
 
 	//TODO: reflect that the argument is a payload, change these to be objects that the server is receiving for continuity
 	socket.on("shopPurchaseRequest", shopItemTypeId => {

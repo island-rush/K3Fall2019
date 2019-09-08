@@ -1,5 +1,5 @@
 // prettier-ignore
-const insertNews = async (conn, gameId, newsOrder, newsOptions) => {
+const news = (gameId, newsOrder, newsOptions) => {
 	const newsTeam = newsOptions.newsTeam === undefined ? -1 : newsOptions.newsTeam;
 	const newsPieces = newsOptions.newsPieces === undefined ? -1 : newsOptions.newsPieces;
 	const newsEffect = newsOptions.newsEffect === undefined ? -1 : newsOptions.newsEffect;
@@ -10,27 +10,28 @@ const insertNews = async (conn, gameId, newsOrder, newsOptions) => {
 	const newsInfo = newsOptions.newsInfo === undefined ? "Default Info" : newsOptions.newsInfo;
 	const newsActivated = newsOptions.newsActivated === undefined ? 0 : newsOptions.newsActivated;
 
-	const queryString = "INSERT INTO news (newsGameId, newsTeam, newsOrder, newsPieces, newsEffect, newsRoll, newsLength, newsZone, newsTitle, newsInfo, newsActivated) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
-	const inserts = [gameId, newsTeam, newsOrder, newsPieces, newsEffect, newsRoll, newsLength, newsZone, newsTitle, newsInfo, newsActivated];
-	await conn.query(queryString, inserts);
+	return [gameId, newsTeam, newsOrder, newsPieces, newsEffect, newsRoll, newsLength, newsZone, newsTitle, newsInfo, newsActivated];
 };
 
 module.exports = async (conn, gameId) => {
 	let newsOrder = 0;
-	await insertNews(conn, gameId, newsOrder++, {
-		newsTitle: "Title 1",
-		newsInfo: "Info 1"
-	});
-	await insertNews(conn, gameId, newsOrder++, {
-		newsTitle: "Title 2",
-		newsInfo: "Info 2"
-	});
-	await insertNews(conn, gameId, newsOrder++, {
-		newsTitle: "Title 3",
-		newsInfo: "Info 3"
-	});
-	await insertNews(conn, gameId, newsOrder++, {
-		newsTitle: "Title 4",
-		newsInfo: "Info 4"
-	});
+
+	const allInserts = [
+		news(gameId, newsOrder++, {
+			newsTitle: "Title 1",
+			newsInfo: "Info 1"
+		}),
+		news(gameId, newsOrder++, {
+			newsTitle: "Title 2",
+			newsInfo: "Info 2"
+		}),
+		news(gameId, newsOrder++, {
+			newsTitle: "Title 3",
+			newsInfo: "Info 3"
+		})
+	];
+
+	const queryString = "INSERT INTO news (newsGameId, newsTeam, newsOrder, newsPieces, newsEffect, newsRoll, newsLength, newsZone, newsTitle, newsInfo, newsActivated) VALUES ?";
+	const inserts = [allInserts];
+	await conn.query(queryString, inserts);
 };

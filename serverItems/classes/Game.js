@@ -1,6 +1,6 @@
-const pool = require("./database");
-const initialPieces = require("./initialPieces"); //script to insert pieces
-const initialNews = require("./initialNews"); //script to insert news
+const pool = require("../database");
+const gameInitialPieces = require("./gameInitialPieces"); //script to insert pieces
+const gameInitialNews = require("./gameInitialNews"); //script to insert news
 
 class Game {
 	//TODO: could overload this with the init, to get rid of the findGameId static method (by using parameter options / hash, and manually check)
@@ -30,7 +30,7 @@ class Game {
 	static async findGameId(gameSection, gameInstructor) {
 		const queryString = "SELECT gameId FROM games WHERE gameSection = ? AND gameInstructor = ?";
 		const inserts = [gameSection, gameInstructor];
-		const [results, fields] = await pool.query(queryString, inserts);
+		const [results] = await pool.query(queryString, inserts);
 		if (results.length === 1) {
 			return results[0]["gameId"];
 		} else {
@@ -44,14 +44,11 @@ class Game {
 		return results;
 	}
 
-	async initialStatePayload(gameTeam, gameController) {
-		let queryString = "";
-		let inserts = [];
-
+	async initialStateAction(gameTeam, gameController) {
 		const conn = await pool.getConnection();
 
-		queryString = "SELECT * FROM invItems WHERE invItemGameId = ? AND invItemTeamId = ?";
-		inserts = [this.gameId, gameTeam];
+		let queryString = "SELECT * FROM invItems WHERE invItemGameId = ? AND invItemTeamId = ?";
+		let inserts = [this.gameId, gameTeam];
 		const [invItems] = await conn.query(queryString, inserts);
 
 		queryString = "SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?";
@@ -122,12 +119,13 @@ class Game {
 			active: false
 		};
 
-		await conn.release();
+		conn.release();
 
 		const gamePoints = this["game" + gameTeam + "Points"];
 		const gameStatus = this["game" + gameTeam + "Status"];
 
 		const serverAction = {
+			//TODO: make this a constant from a file
 			type: "INITIAL_GAMESTATE",
 			payload: {
 				gameInfo: {
@@ -206,10 +204,10 @@ class Game {
 
 		await this.init(); //re-write old object values with new defaults from db
 
-		await initialPieces(conn, this.gameId);
-		await initialNews(conn, this.gameId);
+		await gameInitialPieces(conn, this.gameId);
+		await gameInitialNews(conn, this.gameId);
 
-		await conn.release();
+		conn.release();
 	}
 
 	async setPoints(gameTeam, newPoints) {

@@ -1,4 +1,4 @@
-const pool = require("./database");
+const pool = require("../database");
 
 class Piece {
 	constructor(pieceId) {
@@ -56,7 +56,48 @@ class Piece {
 		inserts = [gameId, posTypesVisible[0][0], posTypesVisible[0][1], posTypesVisible[0][2], posTypesVisible[0][3], posTypesVisible[0][4], posTypesVisible[0][5], posTypesVisible[0][6], posTypesVisible[0][7], posTypesVisible[0][8], posTypesVisible[0][9], posTypesVisible[0][10], posTypesVisible[0][11], posTypesVisible[0][12], posTypesVisible[0][13], posTypesVisible[0][14], posTypesVisible[0][15], posTypesVisible[0][16], posTypesVisible[0][17], posTypesVisible[0][18], posTypesVisible[0][19], posTypesVisible[1][0], posTypesVisible[1][1], posTypesVisible[1][2], posTypesVisible[1][3], posTypesVisible[1][4], posTypesVisible[1][5], posTypesVisible[1][6], posTypesVisible[1][7], posTypesVisible[1][8], posTypesVisible[1][9], posTypesVisible[1][10], posTypesVisible[1][11], posTypesVisible[1][12], posTypesVisible[1][13], posTypesVisible[1][14], posTypesVisible[1][15], posTypesVisible[1][16], posTypesVisible[1][17], posTypesVisible[1][18], posTypesVisible[1][19]];
 		await conn.query(queryString, inserts);
 
-		await conn.release();
+		conn.release();
+	}
+
+	static async move(gameId, movementOrder) {
+		//movement based on plans (for this order/step)
+		const conn = pool.getConnection();
+
+		const inserts = [gameId, movementOrder];
+		const movePiecesQuery =
+			"UPDATE pieces, plans SET pieces.piecePositionId = plans.planPositionId WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
+		await conn.query(movePiecesQuery, inserts);
+
+		const deletePlansQuery = "DELETE FROM plans WHERE planGameId = ? AND planMovementOrder = ? AND planSpecialFlag = 0";
+		await conn.query(deletePlansQuery, inserts);
+
+		conn.release();
+	}
+
+	static async getVisiblePieces(gameId, gameTeam) {
+		const queryString = "SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = ? OR pieceVisible = 1) ORDER BY pieceContainerId, pieceTeamId ASC";
+		const inserts = [gameId, gameTeam];
+		const [results] = await pool.query(queryString, inserts);
+
+		//format for the client state
+		let allPieces = {};
+		for (let x = 0; x < results.length; x++) {
+			let currentPiece = results[x];
+			currentPiece.pieceContents = { pieces: [] };
+			if (!allPieces[currentPiece.piecePositionId]) {
+				allPieces[currentPiece.piecePositionId] = [];
+			}
+			if (currentPiece.pieceContainerId === -1) {
+				allPieces[currentPiece.piecePositionId].push(currentPiece);
+			} else {
+				let indexOfParent = allPieces[currentPiece.piecePositionId].findIndex(piece => {
+					return piece.pieceId === currentPiece.pieceContainerId;
+				});
+				allPieces[currentPiece.piecePositionId][indexOfParent].pieceContents.push(currentPiece);
+			}
+		}
+
+		return allPieces;
 	}
 }
 

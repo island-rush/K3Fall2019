@@ -13,7 +13,7 @@ const DatabaseName = process.env.DB_NAME || "X0MOPhjMXL";
 // const DatabaseName = process.env.DB_NAME || "X0MOPhjMXL";
 
 const databaseConfig = {
-	connectionLimit: 10,
+	connectionLimit: 25,
 	host: DatabaseHostname,
 	user: DatabaseUsername,
 	password: DatabasePassword,
