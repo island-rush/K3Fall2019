@@ -596,14 +596,19 @@ const mainButtonClick = async (io, socket) => {
 						}
 					};
 				} else {
-					//sending an event to client
-					const eventItems = await nextEvent0.getItems();
-					//put the items into the serverAction probably
+					const type = nextEvent0.eventTypeId;
 
-					serverActions[0] = {
-						type: CONSTANTS.EVENT_BATTLE,
-						payload: {}
-					};
+					switch (type) {
+						case 1:
+							//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
+							serverActions[0] = {
+								type: CONSTANTS.EVENT_BATTLE,
+								payload: {
+									eventItems: await nextEvent0.getItems()
+								}
+							};
+							break;
+					}
 				}
 
 				const nextEvent1 = await Event.getNext(gameId, 1);
@@ -617,11 +622,11 @@ const mainButtonClick = async (io, socket) => {
 					};
 				} else {
 					//sending an event to client
-					const eventItems = await nextEvent1.getItems();
-
 					serverActions[1] = {
 						type: CONSTANTS.EVENT_BATTLE,
-						payload: {}
+						payload: {
+							eventItems: await nextEvent1.getItems()
+						}
 					};
 				}
 
@@ -633,8 +638,6 @@ const mainButtonClick = async (io, socket) => {
 		default:
 			sendUserFeedback(socket, "Backend Failure, unkown gamePhase...");
 	}
-
-	return;
 };
 
 //Exposed / Exported Functions
