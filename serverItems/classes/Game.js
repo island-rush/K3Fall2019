@@ -35,9 +35,9 @@ class Game {
 		}
 	}
 
-	static async delete(gameId) {
+	async delete() {
 		const queryString = "DELETE FROM games WHERE gameId = ?";
-		const inserts = [gameId];
+		const inserts = [this.gameId];
 		await pool.query(queryString, inserts);
 	}
 
@@ -204,9 +204,8 @@ class Game {
 	}
 
 	async reset() {
-		await Game.delete(this.gameId);
+		await this.delete();
 		await Game.add(this.gameSection, this.gameInstructor, this.gameAdminPassword, { gameId: this.gameId });
-
 		const conn = await pool.getConnection();
 		await gameInitialPieces(conn, this.gameId);
 		await gameInitialNews(conn, this.gameId);

@@ -18,6 +18,31 @@ class Event {
 		}
 	}
 
+	static async getNext(gameId, gameTeam) {
+		const queryString = "SELECT * FROM eventQueue WHERE eventGameId = ? AND (eventTeamId = ? OR eventTeamId = 2) ORDER BY eventId ASC LIMIT 1";
+		const inserts = [gameId, gameTeam];
+		const [events] = await pool.query(queryString, inserts);
+
+		if (events.length != 1) {
+			return null;
+		} else {
+			const thisEvent = await new Event(events[0]["eventId"]).init();
+			return thisEvent;
+		}
+	}
+
+	async getItems() {
+		const queryString = "SELECT * FROM eventItems NATURAL JOIN pieces WHERE eventId = ? AND eventPieceId = pieceId";
+		const inserts = [this.eventId];
+		const [eventItems] = await pool.query(queryString, inserts);
+
+		if (eventItems.length == 0) {
+			return null;
+		} else {
+			return eventItems;
+		}
+	}
+
 	static async all(gameId) {
 		const queryString = "SELECT * FROM eventQueue WHERE eventGameId = ? ORDER BY eventId ASC";
 		const inserts = [gameId];

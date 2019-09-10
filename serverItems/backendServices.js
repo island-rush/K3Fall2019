@@ -481,7 +481,7 @@ const mainButtonClick = async (io, socket) => {
 					await Event.bulkInsertItems(gameId, eventItemInserts);
 				}
 
-				await Piece.move(gameId, currentMovementOrder);
+				await Piece.move(gameId, currentMovementOrder); //changes the piecePositionId, deletes the plan, all for specialflag = 0
 				await Piece.updateVisibilities(gameId);
 
 				const allPositionBattles = await Plan.getPositionBattles(gameId);
@@ -532,20 +532,41 @@ const mainButtonClick = async (io, socket) => {
 
 				// TODO: create container events (special flag)
 
-				const server0Action = {
-					type: CONSTANTS.PIECES_MOVE,
-					payload: {
-						gameboardPieces: await Piece.getVisiblePieces(gameId, 0),
-						gameStatus: thisGame.game0Status
-					}
-				};
-				const server1Action = {
+				// Note: All non-move (specialflag != 0) plans should result in events (refuel/container)...
+				// If there is now an event, send to user instead of PIECES_MOVE
+
+				let server0Action;
+				let server1Action;
+
+				const nextEvent0 = await Event.getNext(gameId, 0);
+				if (!nextEvent0) {
+					server0Action = {
+						type: CONSTANTS.PIECES_MOVE,
+						payload: {
+							gameboardPieces: await Piece.getVisiblePieces(gameId, 0),
+							gameStatus: thisGame.game0Status
+						}
+					};
+				} else {
+					//sending an event to client
+					const eventItems = await nextEvent0.getItems();
+					//put the items into the serverAction probably
+
+					server0Action = {
+						type: CONSTANTS.EVENT_BATTLE,
+						payload: {}
+					};
+				}
+
+				const nextEvent1 = await Event.getNext(gameId, 1);
+				server1Action = {
 					type: CONSTANTS.PIECES_MOVE,
 					payload: {
 						gameboardPieces: await Piece.getVisiblePieces(gameId, 1),
 						gameStatus: thisGame.game1Status
 					}
 				};
+
 				io.sockets.in("game" + gameId + "team0").emit("serverSendingAction", server0Action);
 				io.sockets.in("game" + gameId + "team1").emit("serverSendingAction", server1Action);
 			}
@@ -569,7 +590,10 @@ exports.gameReset = async (req, res) => {
 
 	try {
 		const thisGame = await new Game({ gameId }).init();
-		if (!thisGame) return;
+		if (!thisGame) {
+			res.status(500).redirect("/teacher.html?gameReset=failed");
+			return;
+		}
 		await thisGame.reset();
 		res.redirect("/teacher.html?gameReset=success");
 	} catch (error) {
@@ -797,8 +821,14 @@ exports.gameDelete = async (req, res) => {
 		return;
 	}
 
+	const thisGame = await new Game({ gameId }).init();
+	if (!thisGame) {
+		res.status(400).redirect("/courseDirector.html?gameDelete=failed");
+		return;
+	}
+
 	try {
-		await Game.delete(gameId);
+		await thisGame.delete();
 		res.redirect("/courseDirector.html?gameDelete=success");
 	} catch (error) {
 		console.log(error);
