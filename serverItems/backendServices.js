@@ -181,32 +181,50 @@ const sendUserFeedback = async (socket, userFeedback) => {
 };
 
 const confirmPlan = async (socket, pieceId, plan) => {
-	//plan = moves array, where each move has type and positionId
-	//confirm the plan and report back to the client with a server action
-	//TODO: verify that this user is authorized to make a plan, among other checks for the entire plan
-	//verify that the piece exists?
-	//verify that this piece belongs to this team? (all those other auths)
-	//need to know if this piece is a container or not, to check if container move was inserted
-	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
-
-	const thisGame = await new Game({ gameId }).init();
-	const thisPiece = await new Piece(pieceId).init();
-
-	if (!thisGame || !thisPiece) {
+	//Does the server know this user?
+	if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
+		socket.emit("serverRedirect", CONSTANTS.BAD_SESSION);
 		return;
 	}
 
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+
+	//Does the game exist?
+	const thisGame = await new Game({ gameId }).init();
+	if (!thisGame) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_DOES_NOT_EXIST);
+		return;
+	}
+
+	//Is this action currently allowed to this user?
+	const { gameActive, gamePhase, gameSlice } = thisGame;
+	if (!gameActive) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_INACTIVE_TAG);
+		return;
+	}
+	if (gamePhase != 2 && gameSlice != 0) {
+		sendUserFeedback(socket, "Not the right phase/slice...looking for phase 2 slice 0");
+		return;
+	}
+
+	//Does the piece exist? (And match for this game/team/controller)
+	const thisPiece = await new Piece(pieceId).init();
+	if (!thisPiece) {
+		sendUserFeedback(socket, "Piece did not exists...refresh page?");
+		return;
+	}
 	const { piecePositionId, pieceTypeId, pieceGameId, pieceTeamId } = thisPiece;
+	if (pieceGameId != gameId && pieceTeamId != gameTeam) {
+		sendUserFeedback(socket, "Piece did not belong to your team...(or this game)");
+		return;
+	}
+
+	//TODO: what controllers can make the plans for this piece type?
 
 	const isContainer = CONSTANTS.CONTAINER_TYPES.includes(pieceTypeId);
 
-	//did the piece exists, same team as this one / same game...
-	//make sure plan isnt empty...
-
-	//can you do container to start the plan?
-
+	//Check adjacency and other parts of the plan to make sure the whole thing makes sense
 	let previousPosition = piecePositionId;
-
 	for (let x = 0; x < plan.length; x++) {
 		//make sure adjacency between positions in the plan...
 		//other checks...piece type and number of moves?
@@ -245,8 +263,10 @@ const confirmPlan = async (socket, pieceId, plan) => {
 	}
 
 	//bulk insert (always insert bulk, don't really ever insert single stuff, since a 'plan' is a collection of moves, but the table is 'Plans')
+	//TODO: could change the phrasing on Plan vs Moves (as far as inserting..function names...database entries??)
 	await Plan.insert(plansToInsert);
 
+	//TODO: send the pieceId or the whole piece object? (be consistent if possible with other payloads...)
 	const serverAction = {
 		type: CONSTANTS.PLAN_WAS_CONFIRMED,
 		payload: {
@@ -254,26 +274,51 @@ const confirmPlan = async (socket, pieceId, plan) => {
 			plan
 		}
 	};
-
 	socket.emit("serverSendingAction", serverAction);
 };
 
 const deletePlan = async (socket, pieceId) => {
-	//verify that the person is authorized to delete the plan (correct team, game, gameactive)
-	//need lots of other checks in here for full security, assuming that they have a socket for whatever reason
-	//could cut back the security checks for better performance...but not ideal
-
-	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
-
-	const thisGame = await new Game({ gameId }).init();
-
-	if (!thisGame || !thisGame.gameActive) {
+	//Does the server know this user?
+	if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
+		socket.emit("serverRedirect", CONSTANTS.BAD_SESSION);
 		return;
 	}
 
-	//can still run the query if the plan doesn't exist? (it won't fail...)
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	await Plan.delete(pieceId);
+	//Does the game exist?
+	const thisGame = await new Game({ gameId }).init();
+	if (!thisGame) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_DOES_NOT_EXIST);
+		return;
+	}
+
+	//Is this action currently allowed to this user?
+	const { gameActive, gamePhase, gameSlice } = thisGame;
+	if (!gameActive) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_INACTIVE_TAG);
+		return;
+	}
+	if (gamePhase != 2 && gameSlice != 0) {
+		sendUserFeedback(socket, "Not the right phase/slice...looking for phase 2 slice 0");
+		return;
+	}
+
+	//Does the piece exist? (And match for this game/team/controller)
+	const thisPiece = await new Piece(pieceId).init();
+	if (!thisPiece) {
+		sendUserFeedback(socket, "Piece did not exists...refresh page?");
+		return;
+	}
+	const { piecePositionId, pieceTypeId, pieceGameId, pieceTeamId } = thisPiece;
+	if (pieceGameId != gameId && pieceTeamId != gameTeam) {
+		sendUserFeedback(socket, "Piece did not belong to your team...(or this game)");
+		return;
+	}
+
+	//TODO: what controllers can make the plans for this piece type?
+
+	await thisPiece.deletePlans();
 
 	const serverAction = {
 		type: CONSTANTS.DELETE_PLAN,
@@ -281,22 +326,25 @@ const deletePlan = async (socket, pieceId) => {
 			pieceId
 		}
 	};
-
 	socket.emit("serverSendingAction", serverAction);
 };
 
 const mainButtonClick = async (io, socket) => {
+	//Does the server know this user?
+	if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
+		socket.emit("serverRedirect", CONSTANTS.BAD_SESSION);
+		return;
+	}
+
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
+	//Does the game exist?
 	const thisGame = await new Game({ gameId }).init();
-
 	if (!thisGame) {
 		socket.emit("serverRedirect", CONSTANTS.GAME_DOES_NOT_EXIST);
 		return;
 	}
-
 	const { gameActive, gamePhase, gameRound, gameSlice } = thisGame;
-
 	if (!gameActive) {
 		socket.emit("serverRedirect", CONSTANTS.GAME_INACTIVE_TAG);
 		return;
@@ -374,7 +422,7 @@ const mainButtonClick = async (io, socket) => {
 				break;
 			} else {
 				//Slice 1 functionality
-				let events = await Event.all(gameId);
+				let events = await Event.all(gameId); //TODO: could limit this to 1 event? (but need to check events that no longer matter...)
 
 				if (events.length > 0) {
 					//deal with the event for one or both clients
@@ -535,12 +583,12 @@ const mainButtonClick = async (io, socket) => {
 				// Note: All non-move (specialflag != 0) plans should result in events (refuel/container)...
 				// If there is now an event, send to user instead of PIECES_MOVE
 
-				let server0Action;
-				let server1Action;
+				let serverActions = [{}, {}];
 
+				//TODO: remove this duplicate code, put into a function probably...(or rename variables to be part of the equation for these??
 				const nextEvent0 = await Event.getNext(gameId, 0);
 				if (!nextEvent0) {
-					server0Action = {
+					serverActions[0] = {
 						type: CONSTANTS.PIECES_MOVE,
 						payload: {
 							gameboardPieces: await Piece.getVisiblePieces(gameId, 0),
@@ -552,23 +600,33 @@ const mainButtonClick = async (io, socket) => {
 					const eventItems = await nextEvent0.getItems();
 					//put the items into the serverAction probably
 
-					server0Action = {
+					serverActions[0] = {
 						type: CONSTANTS.EVENT_BATTLE,
 						payload: {}
 					};
 				}
 
 				const nextEvent1 = await Event.getNext(gameId, 1);
-				server1Action = {
-					type: CONSTANTS.PIECES_MOVE,
-					payload: {
-						gameboardPieces: await Piece.getVisiblePieces(gameId, 1),
-						gameStatus: thisGame.game1Status
-					}
-				};
+				if (!nextEvent1) {
+					serverActions[1] = {
+						type: CONSTANTS.PIECES_MOVE,
+						payload: {
+							gameboardPieces: await Piece.getVisiblePieces(gameId, 1),
+							gameStatus: thisGame.game1Status
+						}
+					};
+				} else {
+					//sending an event to client
+					const eventItems = await nextEvent1.getItems();
 
-				io.sockets.in("game" + gameId + "team0").emit("serverSendingAction", server0Action);
-				io.sockets.in("game" + gameId + "team1").emit("serverSendingAction", server1Action);
+					serverActions[1] = {
+						type: CONSTANTS.EVENT_BATTLE,
+						payload: {}
+					};
+				}
+
+				io.sockets.in("game" + gameId + "team0").emit("serverSendingAction", serverActions[0]);
+				io.sockets.in("game" + gameId + "team1").emit("serverSendingAction", serverActions[1]);
 			}
 
 			break;
@@ -798,9 +856,13 @@ exports.gameAdd = async (req, res) => {
 
 		const thisGame = await Game.add(adminSection, adminInstructor, adminPasswordHashed);
 
-		res.redirect("/courseDirector.html?gameAdd=success");
+		if (!thisGame) {
+			res.redirect("/courseDirector.html?gameAdd=failed");
+		} else {
+			res.redirect("/courseDirector.html?gameAdd=success");
+		}
 	} catch (error) {
-		//TODO: better error logging probably (more specific errors on CD) (on other functions too)
+		//TODO: (more specific errors on CD) (on other functions too)
 		console.log(error);
 		res.redirect(500, "/courseDirector.html?gameAdd=failed");
 	}

@@ -31,6 +31,13 @@ class Plan {
 		await pool.query(queryString, inserts);
 	}
 
+	// this may be not used since this already taken care of by Pieces.move or something...
+	// async delete() {
+	// 	const queryString = "DELETE FROM plans WHERE planPieceId = ?";
+	// 	const inserts = [this.planPieceId];
+	// 	await pool.query(queryString, inserts);
+	// }
+
 	static async getCurrentMovementOrder(gameId, gameTeam) {
 		const queryString = "SELECT planMovementOrder FROM plans WHERE planGameId = ? AND planTeamId = ? ORDER BY planMovementOrder ASC LIMIT 1";
 		const inserts = [gameId, gameTeam];

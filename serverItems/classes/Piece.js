@@ -20,6 +20,18 @@ class Piece {
 		}
 	}
 
+	async delete() {
+		const queryString = "DELETE FROM pieces WHERE pieceId = ?";
+		const inserts = [this.pieceId];
+		await pool.query(queryString, inserts);
+	}
+
+	async deletePlans() {
+		const queryString = "DELETE FROM plans WHERE planPieceId = ?";
+		const inserts = [this.pieceId];
+		await pool.query(queryString, inserts);
+	}
+
 	// prettier-ignore
 	static async updateVisibilities(gameId) {
 		const conn = await pool.getConnection();

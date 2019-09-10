@@ -18,6 +18,12 @@ class InvItem {
 		}
 	}
 
+	async delete() {
+		const queryString = "DELETE FROM invItems WHERE invItemId = ?";
+		const inserts = [this.invItemId];
+		await pool.query(queryString, inserts);
+	}
+
 	static async insertFromShop(gameId, gameTeam) {
 		const queryString = "INSERT INTO invItems (invItemId, invItemGameId, invItemTeamId, invItemTypeId) SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?";
 		const inserts = [gameId, gameTeam];

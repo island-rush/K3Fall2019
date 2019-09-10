@@ -18,17 +18,10 @@ class Event {
 		}
 	}
 
-	static async getNext(gameId, gameTeam) {
-		const queryString = "SELECT * FROM eventQueue WHERE eventGameId = ? AND (eventTeamId = ? OR eventTeamId = 2) ORDER BY eventId ASC LIMIT 1";
-		const inserts = [gameId, gameTeam];
-		const [events] = await pool.query(queryString, inserts);
-
-		if (events.length != 1) {
-			return null;
-		} else {
-			const thisEvent = await new Event(events[0]["eventId"]).init();
-			return thisEvent;
-		}
+	async delete() {
+		const queryString = "DELETE FROM eventQueue WHERE eventId = ?";
+		const inserts = [this.eventId];
+		await pool.query(queryString, inserts);
 	}
 
 	async getItems() {
@@ -40,6 +33,19 @@ class Event {
 			return null;
 		} else {
 			return eventItems;
+		}
+	}
+
+	static async getNext(gameId, gameTeam) {
+		const queryString = "SELECT * FROM eventQueue WHERE eventGameId = ? AND (eventTeamId = ? OR eventTeamId = 2) ORDER BY eventId ASC LIMIT 1";
+		const inserts = [gameId, gameTeam];
+		const [events] = await pool.query(queryString, inserts);
+
+		if (events.length != 1) {
+			return null;
+		} else {
+			const thisEvent = await new Event(events[0]["eventId"]).init();
+			return thisEvent;
 		}
 	}
 

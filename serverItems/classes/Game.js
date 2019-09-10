@@ -41,27 +41,6 @@ class Game {
 		await pool.query(queryString, inserts);
 	}
 
-	static async add(gameSection, gameInstructor, gameAdminPasswordHash, options = {}) {
-		let queryString;
-		let inserts;
-
-		if (options.gameId) {
-			queryString = "INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?, ?)";
-			inserts = [options.gameId, gameSection, gameInstructor, gameAdminPasswordHash];
-		} else {
-			queryString = "INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?)";
-			inserts = [gameSection, gameInstructor, gameAdminPasswordHash];
-		}
-
-		await pool.query(queryString, inserts);
-	}
-
-	static async getGames() {
-		const queryString = "SELECT gameId, gameSection, gameInstructor, gameActive FROM games";
-		const [results] = await pool.query(queryString);
-		return results;
-	}
-
 	async initialStateAction(gameTeam, gameController) {
 		const conn = await pool.getConnection();
 
@@ -245,6 +224,32 @@ class Game {
 		const inserts = [parseInt(newGameRound), this.gameId];
 		await pool.query(queryString, inserts);
 		this.gameRound = parseInt(newGameRound);
+	}
+
+	//TODO: Prevent errors with 2 games sharing the same section AND instructor (would never be able to log into them...need to come back with error?)
+	//Could make this part of the database schema somehow...probably by making the section + instructor a primary key instead of the gameId...(but probably too much to refactor...)
+	static async add(gameSection, gameInstructor, gameAdminPasswordHash, options = {}) {
+		let queryString;
+		let inserts;
+
+		if (options.gameId) {
+			queryString = "INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?, ?)";
+			inserts = [options.gameId, gameSection, gameInstructor, gameAdminPasswordHash];
+		} else {
+			queryString = "INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?)";
+			inserts = [gameSection, gameInstructor, gameAdminPasswordHash];
+		}
+
+		await pool.query(queryString, inserts);
+
+		const thisGame = await new Game({ gameSection, gameInstructor }).init();
+		return thisGame;
+	}
+
+	static async getGames() {
+		const queryString = "SELECT gameId, gameSection, gameInstructor, gameActive FROM games";
+		const [results] = await pool.query(queryString);
+		return results;
 	}
 }
 
