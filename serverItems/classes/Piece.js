@@ -119,6 +119,25 @@ class Piece {
 
 		return allPieces;
 	}
+
+	static async insert(pieceGameId, pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId, pieceVisible, pieceMoves, pieceFuel) {
+		let queryString =
+			"INSERT INTO pieces (pieceGameId, pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId, pieceVisible, pieceMoves, pieceFuel) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+		let inserts = [pieceGameId, pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId, pieceVisible, pieceMoves, pieceFuel];
+		const [results] = await pool.query(queryString, inserts);
+		const thisPiece = new Piece(results.insertId);
+		Object.assign(thisPiece, {
+			pieceGameId,
+			pieceTeamId,
+			pieceTypeId,
+			piecePositionId,
+			pieceContainerId,
+			pieceVisible,
+			pieceMoves,
+			pieceFuel
+		});
+		return thisPiece;
+	}
 }
 
 module.exports = Piece;

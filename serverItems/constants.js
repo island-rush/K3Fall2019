@@ -15,6 +15,7 @@ exports.PLACE_PHASE = "PLACE_PHASE";
 exports.NEWS_PHASE = "NEWS_PHASE";
 exports.NEW_ROUND = "NEW_ROUND";
 exports.EVENT_BATTLE = "EVENT_BATTLE";
+exports.PIECE_PLACE = "PIECE_PLACE";
 
 exports.LOGIN_TAG = "loginFail";
 exports.ACCESS_TAG = "access";

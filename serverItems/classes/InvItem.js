@@ -1,4 +1,6 @@
 const pool = require("../database");
+const CONSTANTS = require("../constants");
+const Piece = require("./Piece");
 
 class InvItem {
 	constructor(invItemId) {
@@ -22,6 +24,23 @@ class InvItem {
 		const queryString = "DELETE FROM invItems WHERE invItemId = ?";
 		const inserts = [this.invItemId];
 		await pool.query(queryString, inserts);
+	}
+
+	async placeOnBoard(selectedPosition) {
+		const newPiece = await Piece.insert(
+			this.invItemGameId,
+			this.invItemTeamId,
+			this.invItemTypeId,
+			selectedPosition,
+			-1,
+			0,
+			CONSTANTS.TYPE_MOVES[this.invItemTypeId],
+			CONSTANTS.TYPE_FUEL[this.invItemTypeId]
+		);
+
+		await this.delete();
+
+		return newPiece;
 	}
 
 	static async insertFromShop(gameId, gameTeam) {

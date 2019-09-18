@@ -1,15 +1,4 @@
-import {
-	MENU_SELECT,
-	POSITION_SELECT,
-	PIECE_CLICK,
-	PIECE_CLEAR_SELECTION,
-	START_PLAN,
-	SET_USERFEEDBACK,
-	CANCEL_PLAN,
-	PLANNING_SELECT,
-	UNDO_MOVE,
-	CONTAINER_MOVE
-} from "./types";
+import { MENU_SELECT, POSITION_SELECT, PIECE_CLICK, PIECE_CLEAR_SELECTION, START_PLAN, SET_USERFEEDBACK, CANCEL_PLAN, PLANNING_SELECT, UNDO_MOVE, CONTAINER_MOVE } from "./types";
 
 import { distanceMatrix } from "./distanceMatrix";
 
@@ -42,11 +31,7 @@ export const selectPosition = selectedPositionId => {
 				//from the selected position or the last move in the plan?
 
 				const lastSelectedPosition =
-					gameboardMeta.planning.moves.length > 0
-						? gameboardMeta.planning.moves[
-								gameboardMeta.planning.moves.length - 1
-						  ].positionId
-						: gameboardMeta.selectedPosition;
+					gameboardMeta.planning.moves.length > 0 ? gameboardMeta.planning.moves[gameboardMeta.planning.moves.length - 1].positionId : gameboardMeta.selectedPosition;
 
 				if (distanceMatrix[lastSelectedPosition][selectedPositionId] === 1) {
 					dispatch({
@@ -139,21 +124,14 @@ export const cancelPlan = () => {
 			dispatch({ type: CANCEL_PLAN });
 		} else {
 			//check to see if there is a piece selected and if that piece has a confirmed plan
-			if (
-				gameboardMeta.selectedPiece !== -1 &&
-				gameboardMeta.selectedPiece in gameboardMeta.confirmedPlans
-			) {
+			if (gameboardMeta.selectedPiece !== -1 && gameboardMeta.selectedPiece in gameboardMeta.confirmedPlans) {
 				//delete the plans from the database request
 				const payload = {
 					pieceId: gameboardMeta.selectedPiece
 				};
 				emit("deletePlan", payload);
 			} else {
-				dispatch(
-					setUserFeedback(
-						"Must select a piece to delete + already have a plan for it to cancel/delete"
-					)
-				);
+				dispatch(setUserFeedback("Must select a piece to delete + already have a plan for it to cancel/delete"));
 			}
 		}
 	};
@@ -183,11 +161,7 @@ export const containerMove = () => {
 			// need other checks, such as doing it multiple times in a row prevention...other game rule checks for containers
 
 			const lastSelectedPosition =
-				gameboardMeta.planning.moves.length > 0
-					? gameboardMeta.planning.moves[
-							gameboardMeta.planning.moves.length - 1
-					  ].positionId
-					: gameboardMeta.selectedPosition;
+				gameboardMeta.planning.moves.length > 0 ? gameboardMeta.planning.moves[gameboardMeta.planning.moves.length - 1].positionId : gameboardMeta.selectedPosition;
 
 			dispatch({
 				type: CONTAINER_MOVE,
@@ -196,11 +170,7 @@ export const containerMove = () => {
 				}
 			});
 		} else {
-			dispatch(
-				setUserFeedback(
-					"Can only do container moves while actively planning..."
-				)
-			);
+			dispatch(setUserFeedback("Can only do container moves while actively planning..."));
 		}
 	};
 };
@@ -255,5 +225,40 @@ export const mainButtonClick = () => {
 		//check the local state before sending to the server
 
 		emit("mainButtonClick");
+	};
+};
+
+export const invItemClick = invItem => {
+	return (dispatch, getState, emit) => {
+		//check to see if allowed to use this inv item?
+		//check locally before sending request...but ultimately still check on the server side
+
+		const { gameboardMeta, gameInfo } = getState();
+		const { selectedPosition } = gameboardMeta;
+		const { gamePhase } = gameInfo;
+
+		const { invItemId, invItemTypeId } = invItem;
+
+		//place reinforcements...clicking should transfer the piece to the selected position
+		if (gamePhase === 3) {
+			if (selectedPosition === -1) {
+				dispatch(setUserFeedback("Must select a position before using an inv item..."));
+				return;
+			}
+
+			//placing an actual piece and not a special thing?
+			if (invItemTypeId <= 19) {
+				//need to delete the inv item
+				//need to create the piece
+				//need to place the piece on the board at the spot
+
+				const payload = {
+					invItemId,
+					selectedPosition
+				};
+
+				emit("piecePlace", payload);
+			}
+		}
 	};
 };

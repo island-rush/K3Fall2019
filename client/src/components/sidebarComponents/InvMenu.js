@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import InvItem from "./InvItem";
 import { connect } from "react-redux";
+import { invItemClick } from "../../redux/actions/userActions";
 
 const inventoryStyle = {
 	backgroundColor: "Yellow",
@@ -41,17 +42,13 @@ class InvMenu extends Component {
 			return item.invItemTypeId > 19;
 		});
 
-		const warefareInvItemComponents = warfareInvItems.map((invItem, index) => (
-			<InvItem key={index} invItem={invItem} />
-		));
+		const warefareInvItemComponents = warfareInvItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={this.props.invItemClick} />);
 
 		const pieceInvItems = this.props.invItems.filter(item => {
 			return item.invItemTypeId <= 19;
 		});
 
-		const pieceInvItemComponents = pieceInvItems.map((invItem, index) => (
-			<InvItem key={index} invItem={invItem} />
-		));
+		const pieceInvItemComponents = pieceInvItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={this.props.invItemClick} />);
 
 		return (
 			<div style={this.props.selected ? inventoryStyle : invisibleStyle}>
@@ -74,7 +71,14 @@ InvMenu.propTypes = {
 };
 
 const mapStateToProps = ({ invItems }) => ({
-	invItems: invItems
+	invItems
 });
 
-export default connect(mapStateToProps)(InvMenu);
+const mapActionsToProps = {
+	invItemClick
+};
+
+export default connect(
+	mapStateToProps,
+	mapActionsToProps
+)(InvMenu);

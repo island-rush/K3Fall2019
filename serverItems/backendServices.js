@@ -159,7 +159,7 @@ const shopConfirmPurchase = async socket => {
 
 	await InvItem.insertFromShop(gameId, gameTeam);
 	await ShopItem.deleteAll(gameId, gameTeam);
-	const invItems = InvItem.all(gameId, gameTeam); //TODO: this may cause an error on the front end, check what happens when confirm purchase executes...
+	const invItems = await InvItem.all(gameId, gameTeam); //TODO: this may cause an error on the front end, check what happens when confirm purchase executes...
 
 	const serverAction = {
 		type: CONSTANTS.SHOP_TRANSFER,
@@ -350,6 +350,12 @@ const mainButtonClick = async (io, socket) => {
 		return;
 	}
 
+	//Who is allowed to press that button?
+	if (gameController != 0) {
+		sendUserFeedback(socket, "Wrong Controller to click that button...");
+		return;
+	}
+
 	const otherTeam = gameTeam == 0 ? 1 : 0;
 	const thisTeamStatus = thisGame["game" + gameTeam + "Status"];
 	const otherTeamStatus = thisGame["game" + otherTeam + "Status"];
@@ -409,7 +415,7 @@ const mainButtonClick = async (io, socket) => {
 			io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
 			break;
 
-		//Combat Phase -> Slice, Round, Place Troops...
+		//Combat Phase -> Slice, Round, Place Troops... (stepping through)
 		case 2:
 			if (gameSlice == 0) {
 				await thisGame.setSlice(1);
@@ -419,225 +425,312 @@ const mainButtonClick = async (io, socket) => {
 					payload: {}
 				};
 				io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
-				break;
 			} else {
-				//Slice 1 functionality
-				let events = await Event.all(gameId); //TODO: could limit this to 1 event? (but need to check events that no longer matter...)
-
-				if (events.length > 0) {
-					//deal with the event for one or both clients
-					//loop through the events until one is doable, delete any that are no longer applicable
-					//this happens when pieces get deleted (unless run script to auto delete those events...)
-				}
-
-				const currentMovementOrder0 = await Plan.getCurrentMovementOrder(gameId, 0);
-				const currentMovementOrder1 = await Plan.getCurrentMovementOrder(gameId, 1);
-
-				//No More Plans for either team
-				if (currentMovementOrder0 == null && currentMovementOrder1 == null) {
-					if (gameRound == 2) {
-						await thisGame.setRound(0);
-						await thisGame.setSlice(0);
-						await thisGame.setPhase(3);
-
-						serverAction = {
-							type: CONSTANTS.PLACE_PHASE,
-							payload: {}
-						};
-						io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
-						break;
-					} else {
-						await thisGame.setRound(thisGame.gameRound + 1);
-						await thisGame.setSlice(0);
-
-						serverAction = {
-							type: CONSTANTS.NEW_ROUND,
-							payload: {
-								gameRound: thisGame.gameRound
-							}
-						};
-						io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
-						break;
-					}
-				}
-
-				//One of the teams may be without plans, keep them waiting
-				if (currentMovementOrder0 == null) {
-					await thisGame.setStatus(0, 1);
-				}
-				if (currentMovementOrder1 == null) {
-					await thisGame.setStatus(1, 1);
-				}
-
-				const currentMovementOrder = currentMovementOrder0 || currentMovementOrder1;
-
-				const allCollisionBattles = await Plan.getCollisionBattles(gameId, currentMovementOrder);
-				if (allCollisionBattles.length > 0) {
-					//each one of these has {pieceId0, pieceTypeId0, pieceContainerId0, piecePositionId0, planPositionId0, pieceId1, pieceTypeId1, pieceContainerId1, piecePositionId1, planPositionId1 }
-					//'position0-position1' => [piecesInvolved?]
-					let allEvents = {};
-
-					for (let x = 0; x < allCollisionBattles.length; x++) {
-						let {
-							pieceId0,
-							pieceTypeId0,
-							pieceContainerId0,
-							piecePositionId0,
-							planPositionId0,
-							pieceId1,
-							pieceTypeId1,
-							pieceContainerId1,
-							piecePositionId1,
-							planPositionId1
-						} = allCollisionBattles[x];
-
-						let thisEventPositions = `${piecePositionId0}-${planPositionId0}`;
-
-						//TODO: figure out if these 2 pieces would actually collide / battle
-						//need to consider pieceVisibility as well...do pieces see each other when crossing over?
-
-						if (!Object.keys(allEvents).includes(thisEventPositions)) {
-							allEvents[thisEventPositions] = [];
-						}
-						if (!allEvents[thisEventPositions].includes(pieceId0)) {
-							allEvents[thisEventPositions].push(pieceId0);
-						}
-						if (!allEvents[thisEventPositions].includes(pieceId1)) {
-							allEvents[thisEventPositions].push(pieceId1);
-						}
-					}
-
-					const bothTeamsIndicator = 2;
-					const collisionEventType = 0;
-					let eventInserts = [];
-					for (let key in allEvents) {
-						let newInsert = [gameId, bothTeamsIndicator, collisionEventType, key.split("-")[0], key.split("-")[1]];
-						eventInserts.push(newInsert);
-					}
-
-					await Event.bulkInsertEvents(eventInserts);
-
-					let eventItemInserts = [];
-					for (let key in allEvents) {
-						let eventPieces = allEvents[key];
-						for (let z = 0; z < eventPieces.length; z++) {
-							let newInsert = [eventPieces[z], gameId, key.split("-")[0], key.split("-")[1]];
-							eventItemInserts.push(newInsert);
-						}
-					}
-
-					await Event.bulkInsertItems(gameId, eventItemInserts);
-				}
-
-				await Piece.move(gameId, currentMovementOrder); //changes the piecePositionId, deletes the plan, all for specialflag = 0
-				await Piece.updateVisibilities(gameId);
-
-				const allPositionBattles = await Plan.getPositionBattles(gameId);
-				if (allPositionBattles.length > 0) {
-					//TODO: also consider pieceVisibility
-					let allPosEvents = {};
-					for (let x = 0; x < allPositionBattles.length; x++) {
-						let { pieceId0, pieceTypeId0, pieceContainerId0, piecePositionId0, pieceId1, pieceTypeId1, pieceContainerId1, piecePositionId1 } = allPositionBattles[x];
-
-						let thisEventPosition = `${piecePositionId0}`;
-
-						//TODO: figure out if these 2 pieces would actually collide / battle
-
-						if (!Object.keys(allPosEvents).includes(thisEventPosition)) {
-							allPosEvents[thisEventPosition] = [];
-						}
-						if (!allPosEvents[thisEventPosition].includes(pieceId0)) {
-							allPosEvents[thisEventPosition].push(pieceId0);
-						}
-						if (!allPosEvents[thisEventPosition].includes(pieceId1)) {
-							allPosEvents[thisEventPosition].push(pieceId1);
-						}
-					}
-
-					const bothTeamsIndicator = 2;
-					const posBattleEventType = 1;
-					let eventInserts = [];
-					for (let key in allPosEvents) {
-						let newInsert = [gameId, bothTeamsIndicator, posBattleEventType, key, key]; //second key is to match # of columns for sql insert
-						eventInserts.push(newInsert);
-					}
-
-					await Event.bulkInsertEvents(eventInserts);
-
-					let eventItemInserts = [];
-					for (let key in allPosEvents) {
-						let eventPieces = allPosEvents[key];
-						for (let z = 0; z < eventPieces.length; z++) {
-							let newInsert = [eventPieces[z], gameId, key, key]; //second key is to match # of columns for sql insert
-							eventItemInserts.push(newInsert);
-						}
-					}
-
-					await Event.bulkInsertItems(gameId, eventItemInserts);
-				}
-
-				// TODO: create refuel events (special flag? / proximity) (check to see that the piece still exists!*!*) (still have plans from old pieces that used to exist? (but those would delete on cascade probaby...except the events themselves...))
-
-				// TODO: create container events (special flag)
-
-				// Note: All non-move (specialflag != 0) plans should result in events (refuel/container)...
-				// If there is now an event, send to user instead of PIECES_MOVE
-
-				let serverActions = [{}, {}];
-
-				//TODO: remove this duplicate code, put into a function probably...(or rename variables to be part of the equation for these??
-				const nextEvent0 = await Event.getNext(gameId, 0);
-				if (!nextEvent0) {
-					serverActions[0] = {
-						type: CONSTANTS.PIECES_MOVE,
-						payload: {
-							gameboardPieces: await Piece.getVisiblePieces(gameId, 0),
-							gameStatus: thisGame.game0Status
-						}
-					};
-				} else {
-					const type = nextEvent0.eventTypeId;
-
-					switch (type) {
-						case 1:
-							//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
-							serverActions[0] = {
-								type: CONSTANTS.EVENT_BATTLE,
-								payload: {
-									eventItems: await nextEvent0.getItems()
-								}
-							};
-							break;
-					}
-				}
-
-				const nextEvent1 = await Event.getNext(gameId, 1);
-				if (!nextEvent1) {
-					serverActions[1] = {
-						type: CONSTANTS.PIECES_MOVE,
-						payload: {
-							gameboardPieces: await Piece.getVisiblePieces(gameId, 1),
-							gameStatus: thisGame.game1Status
-						}
-					};
-				} else {
-					//sending an event to client
-					serverActions[1] = {
-						type: CONSTANTS.EVENT_BATTLE,
-						payload: {
-							eventItems: await nextEvent1.getItems()
-						}
-					};
-				}
-
-				io.sockets.in("game" + gameId + "team0").emit("serverSendingAction", serverActions[0]);
-				io.sockets.in("game" + gameId + "team1").emit("serverSendingAction", serverActions[1]);
+				await handleSlice2Step(io, thisGame);
 			}
-
 			break;
 		default:
 			sendUserFeedback(socket, "Backend Failure, unkown gamePhase...");
 	}
+};
+
+const handleSlice2Step = async (io, thisGame) => {
+	const { gameId, gameRound } = thisGame;
+
+	//Slice 1 functionality
+	let events = await Event.all(gameId); //TODO: could limit this to 1 event? (but need to check events that no longer matter...)
+
+	if (events.length > 0) {
+		//deal with the event for one or both clients
+		//loop through the events until one is doable, delete any that are no longer applicable
+		//this happens when pieces get deleted (unless run script to auto delete those events...)
+	}
+
+	const currentMovementOrder0 = await Plan.getCurrentMovementOrder(gameId, 0);
+	const currentMovementOrder1 = await Plan.getCurrentMovementOrder(gameId, 1);
+
+	//No More Plans for either team
+	if (currentMovementOrder0 == null && currentMovementOrder1 == null) {
+		if (gameRound == 2) {
+			await thisGame.setRound(0);
+			await thisGame.setSlice(0);
+			await thisGame.setPhase(3);
+
+			serverAction = {
+				type: CONSTANTS.PLACE_PHASE,
+				payload: {}
+			};
+			io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
+			return;
+		} else {
+			await thisGame.setRound(gameRound + 1);
+			await thisGame.setSlice(0);
+
+			serverAction = {
+				type: CONSTANTS.NEW_ROUND,
+				payload: {
+					gameRound: thisGame.gameRound
+				}
+			};
+			io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
+			return;
+		}
+	}
+
+	//One of the teams may be without plans, keep them waiting
+	if (currentMovementOrder0 == null) {
+		await thisGame.setStatus(0, 1);
+	}
+	if (currentMovementOrder1 == null) {
+		await thisGame.setStatus(1, 1);
+	}
+
+	const currentMovementOrder = currentMovementOrder0 || currentMovementOrder1;
+
+	const allCollisionBattles = await Plan.getCollisionBattles(gameId, currentMovementOrder);
+	if (allCollisionBattles.length > 0) {
+		//each one of these has {pieceId0, pieceTypeId0, pieceContainerId0, piecePositionId0, planPositionId0, pieceId1, pieceTypeId1, pieceContainerId1, piecePositionId1, planPositionId1 }
+		//'position0-position1' => [piecesInvolved?]
+		let allEvents = {};
+
+		for (let x = 0; x < allCollisionBattles.length; x++) {
+			let {
+				pieceId0,
+				pieceTypeId0,
+				pieceContainerId0,
+				piecePositionId0,
+				planPositionId0,
+				pieceId1,
+				pieceTypeId1,
+				pieceContainerId1,
+				piecePositionId1,
+				planPositionId1
+			} = allCollisionBattles[x];
+
+			let thisEventPositions = `${piecePositionId0}-${planPositionId0}`;
+
+			//TODO: figure out if these 2 pieces would actually collide / battle
+			//need to consider pieceVisibility as well...do pieces see each other when crossing over?
+
+			if (!Object.keys(allEvents).includes(thisEventPositions)) {
+				allEvents[thisEventPositions] = [];
+			}
+			if (!allEvents[thisEventPositions].includes(pieceId0)) {
+				allEvents[thisEventPositions].push(pieceId0);
+			}
+			if (!allEvents[thisEventPositions].includes(pieceId1)) {
+				allEvents[thisEventPositions].push(pieceId1);
+			}
+		}
+
+		const bothTeamsIndicator = 2;
+		const collisionEventType = 0;
+		let eventInserts = [];
+		for (let key in allEvents) {
+			let newInsert = [gameId, bothTeamsIndicator, collisionEventType, key.split("-")[0], key.split("-")[1]];
+			eventInserts.push(newInsert);
+		}
+
+		await Event.bulkInsertEvents(eventInserts);
+
+		let eventItemInserts = [];
+		for (let key in allEvents) {
+			let eventPieces = allEvents[key];
+			for (let z = 0; z < eventPieces.length; z++) {
+				let newInsert = [eventPieces[z], gameId, key.split("-")[0], key.split("-")[1]];
+				eventItemInserts.push(newInsert);
+			}
+		}
+
+		await Event.bulkInsertItems(gameId, eventItemInserts);
+	}
+
+	await Piece.move(gameId, currentMovementOrder); //changes the piecePositionId, deletes the plan, all for specialflag = 0
+	await Piece.updateVisibilities(gameId);
+
+	const allPositionBattles = await Plan.getPositionBattles(gameId);
+	if (allPositionBattles.length > 0) {
+		//TODO: also consider pieceVisibility
+		let allPosEvents = {};
+		for (let x = 0; x < allPositionBattles.length; x++) {
+			let { pieceId0, pieceTypeId0, pieceContainerId0, piecePositionId0, pieceId1, pieceTypeId1, pieceContainerId1, piecePositionId1 } = allPositionBattles[x];
+
+			let thisEventPosition = `${piecePositionId0}`;
+
+			//TODO: figure out if these 2 pieces would actually collide / battle
+
+			if (!Object.keys(allPosEvents).includes(thisEventPosition)) {
+				allPosEvents[thisEventPosition] = [];
+			}
+			if (!allPosEvents[thisEventPosition].includes(pieceId0)) {
+				allPosEvents[thisEventPosition].push(pieceId0);
+			}
+			if (!allPosEvents[thisEventPosition].includes(pieceId1)) {
+				allPosEvents[thisEventPosition].push(pieceId1);
+			}
+		}
+
+		const bothTeamsIndicator = 2;
+		const posBattleEventType = 1;
+		let eventInserts = [];
+		for (let key in allPosEvents) {
+			let newInsert = [gameId, bothTeamsIndicator, posBattleEventType, key, key]; //second key is to match # of columns for sql insert
+			eventInserts.push(newInsert);
+		}
+
+		await Event.bulkInsertEvents(eventInserts);
+
+		let eventItemInserts = [];
+		for (let key in allPosEvents) {
+			let eventPieces = allPosEvents[key];
+			for (let z = 0; z < eventPieces.length; z++) {
+				let newInsert = [eventPieces[z], gameId, key, key]; //second key is to match # of columns for sql insert
+				eventItemInserts.push(newInsert);
+			}
+		}
+
+		await Event.bulkInsertItems(gameId, eventItemInserts);
+	}
+
+	// TODO: create refuel events (special flag? / proximity) (check to see that the piece still exists!*!*) (still have plans from old pieces that used to exist? (but those would delete on cascade probaby...except the events themselves...))
+
+	// TODO: create container events (special flag)
+
+	// Note: All non-move (specialflag != 0) plans should result in events (refuel/container)...
+	// If there is now an event, send to user instead of PIECES_MOVE
+
+	let gameEvents = [null, null];
+	let serverActions = [{}, {}];
+
+	//TODO: remove this duplicate code, put into a function probably...(or rename variables to be part of the equation for these??
+	gameEvents[0] = await Event.getNext(gameId, 0);
+	if (!gameEvents[0]) {
+		serverActions[0] = {
+			type: CONSTANTS.PIECES_MOVE,
+			payload: {
+				gameboardPieces: await Piece.getVisiblePieces(gameId, 0),
+				gameStatus: thisGame["game" + 0 + "Status"]
+			}
+		};
+	} else {
+		const type = gameEvents[0].eventTypeId;
+
+		switch (type) {
+			case 1:
+				//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
+				serverActions[0] = {
+					type: CONSTANTS.EVENT_BATTLE,
+					payload: {
+						eventItems: await nextEvent0.getItems()
+					}
+				};
+				break;
+			default:
+				//this would never happen
+				return;
+		}
+	}
+
+	gameEvents[1] = await Event.getNext(gameId, 1);
+	if (!gameEvents[1]) {
+		serverActions[1] = {
+			type: CONSTANTS.PIECES_MOVE,
+			payload: {
+				gameboardPieces: await Piece.getVisiblePieces(gameId, 1),
+				gameStatus: thisGame["game" + 1 + "Status"]
+			}
+		};
+	} else {
+		const type = gameEvents[1].eventTypeId;
+
+		switch (type) {
+			case 1:
+				//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
+				serverActions[1] = {
+					type: CONSTANTS.EVENT_BATTLE,
+					payload: {
+						eventItems: await gameEvents[1].getItems()
+					}
+				};
+				break;
+			default:
+				//this would never happen
+				return;
+		}
+	}
+
+	io.sockets.in("game" + gameId + "team0").emit("serverSendingAction", serverActions[0]);
+	io.sockets.in("game" + gameId + "team1").emit("serverSendingAction", serverActions[1]);
+};
+
+const piecePlace = async (io, socket, invItemId, selectedPosition) => {
+	//Does the server know this user?
+	if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
+		socket.emit("serverRedirect", CONSTANTS.BAD_SESSION);
+		return;
+	}
+
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+
+	//Does the game exist?
+	const thisGame = await new Game({ gameId }).init();
+	if (!thisGame) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_DOES_NOT_EXIST);
+		return;
+	}
+
+	//Is this action currently allowed to this user?
+	const { gameActive, gamePhase } = thisGame;
+	if (!gameActive) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_INACTIVE_TAG);
+		return;
+	}
+	if (gamePhase != 3) {
+		sendUserFeedback(socket, "Not the right phase...");
+		return;
+	}
+
+	// Different controllers place their own piece types? TODO: make this part of the checks...
+	// if (gameController != 0) {
+	// 	sendUserFeedback(socket, "Not the main controller (0)...");
+	// 	return;
+	// }
+
+	const thisInvItem = await new InvItem(invItemId).init();
+
+	//Does the item exist?
+	if (!thisInvItem) {
+		sendUserFeedback(socket, "Inv Item did not exist...");
+		return;
+	}
+
+	const { invItemGameId, invItemTeamId } = thisInvItem;
+
+	//Do they own this item?
+	if (invItemGameId != gameId || invItemTeamId != gameTeam) {
+		socket.emit("serverRedirect", CONSTANTS.BAD_REQUEST_TAG);
+		return;
+	}
+
+	//Other checks go here.......TODO: more checks...(position types and piece types...blah blah blah...)
+	//does this positionId even exist? (lots of weird things could happen....(but probably won't...))
+
+	const newPiece = await thisInvItem.placeOnBoard(selectedPosition); //should also check that this piece actually got created, could return null (should return null if it failed...TODO: return null if failed...)
+	//need to send this piece to the client...
+
+	newPiece.pieceContents = { pieces: [] }; //new pieces have nothing in them, and piece contents is required for the frontend...
+
+	const serverAction = {
+		type: CONSTANTS.PIECE_PLACE,
+		payload: {
+			invItemId,
+			positionId: selectedPosition,
+			newPiece
+		}
+	};
+
+	//need to send this to the whole team...
+	io.sockets.in("game" + gameId + "team" + gameTeam).emit("serverSendingAction", serverAction);
 };
 
 //Exposed / Exported Functions
@@ -977,6 +1070,16 @@ exports.socketSetup = async (io, socket) => {
 	socket.on("mainButtonClick", () => {
 		try {
 			mainButtonClick(io, socket);
+		} catch (error) {
+			console.log(error);
+			sendUserFeedback(socket, "INTERNAL SERVER ERROR: CHECK DATABASE");
+		}
+	});
+
+	socket.on("piecePlace", payload => {
+		try {
+			const { invItemId, selectedPosition } = payload;
+			piecePlace(io, socket, invItemId, selectedPosition);
 		} catch (error) {
 			console.log(error);
 			sendUserFeedback(socket, "INTERNAL SERVER ERROR: CHECK DATABASE");
