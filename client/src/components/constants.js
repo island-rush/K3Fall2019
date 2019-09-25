@@ -2,7 +2,6 @@ const relativePath = "./images/unitImages/";
 
 export const typeImages = {
 	//TypeId: ImageUrlCSS
-	//TODO: fix these links for all units
 	0: { backgroundImage: `url("${relativePath}bomber.png")` },
 	1: { backgroundImage: `url("${relativePath}stealthBomber.png")` },
 	2: { backgroundImage: `url("${relativePath}fighter.png")` },
@@ -23,6 +22,24 @@ export const typeImages = {
 	17: { backgroundImage: `url("${relativePath}mc12.png")` },
 	18: { backgroundImage: `url("${relativePath}c130.png")` },
 	19: { backgroundImage: `url("${relativePath}sofTeam.png")` }
+};
+
+export const diceImages = {
+	//TODO: use actual dice images instead of unit images
+	// 0 => no dice roll yet
+	0: { backgroundImage: `url("${relativePath}bomber.png")` },
+	1: { backgroundImage: `url("${relativePath}stealthBomber.png")` },
+	2: { backgroundImage: `url("${relativePath}fighter.png")` },
+	3: { backgroundImage: `url("${relativePath}tanker.png")` },
+	4: { backgroundImage: `url("${relativePath}c17.png")` },
+	5: { backgroundImage: `url("${relativePath}e3.png")` },
+	6: { backgroundImage: `url("${relativePath}infantry.png")` },
+	7: { backgroundImage: `url("${relativePath}artillery.png")` },
+	8: { backgroundImage: `url("${relativePath}tank.png")` },
+	9: { backgroundImage: `url("${relativePath}marine.png")` },
+	10: { backgroundImage: `url("${relativePath}attackHeli.png")` },
+	11: { backgroundImage: `url("${relativePath}convoy.png")` },
+	12: { backgroundImage: `url("${relativePath}sam.png")` }
 };
 
 export const typeCosts = {

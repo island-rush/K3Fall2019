@@ -228,6 +228,38 @@ export const mainButtonClick = () => {
 	};
 };
 
+export const battlePieceClick = battlePiece => {
+	return (dispatch, getState, emit) => {
+		//check the local state before sending to the server
+
+		alert("clicked the friendly battle piece probably");
+	};
+};
+
+export const targetPieceClick = battlePiece => {
+	return (dispatch, getState, emit) => {
+		//check the local state before sending to the server
+
+		alert("clicked the target piece probably");
+	};
+};
+
+export const enemyBattlePieceClick = battlePiece => {
+	return (dispatch, getState, emit) => {
+		//check the local state before sending to the server
+
+		alert("clicked an enemy battle piece probably");
+	};
+};
+
+export const confirmBattleSelections = () => {
+	return (dispatch, getState, emit) => {
+		//check the local state before sending to the server
+
+		alert("confirmed battle selections alert");
+	};
+};
+
 export const invItemClick = invItem => {
 	return (dispatch, getState, emit) => {
 		//check to see if allowed to use this inv item?

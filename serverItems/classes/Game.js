@@ -98,14 +98,32 @@ class Game {
 		const [resultNews] = await conn.query(queryString, inserts);
 		const { newsTitle, newsInfo } = resultNews[0] !== undefined ? resultNews[0] : { newsTitle: "No More News", newsInfo: "Obviously you've been playing this game too long..." };
 		const news = {
-			active: parseInt(this.gamePhase) === 0,
+			// active: parseInt(this.gamePhase) === 0,
+			active: false,
 			newsTitle,
 			newsInfo
 		};
 
 		//fill in default values for battle object
+		// queryString = "SELECT pieceId, pieceTeamId, pieceTypeId, pieceContainerId, pieceVisible FROM eventItems NATUAL JOIN pieces WHERE ";
+		// inserts = [this.gameId];
+		// const [resultNews] = await conn.query(queryString, inserts);
+
 		const battle = {
-			active: false
+			active: true,
+			friendlyPieces: [
+				{
+					piece: {
+						pieceId: 6969,
+						pieceTeamId: 0,
+						pieceTypeId: 1
+					},
+					targetPiece: null,
+					targetPieceIndex: -1,
+					diceRolled: 0
+				}
+			],
+			enemyPieces: []
 		};
 
 		const container = {

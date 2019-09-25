@@ -664,6 +664,7 @@ const handleSlice2Step = async (io, thisGame) => {
 };
 
 const piecePlace = async (io, socket, invItemId, selectedPosition) => {
+	//TODO: need a way of undoing piece places
 	//Does the server know this user?
 	if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
 		socket.emit("serverRedirect", CONSTANTS.BAD_SESSION);

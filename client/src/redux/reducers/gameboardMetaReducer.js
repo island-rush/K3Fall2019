@@ -25,7 +25,10 @@ const initialGameboardMeta = {
 		newsInfo: "Loading Info..."
 	},
 	battle: {
-		active: false
+		active: false,
+		selectedBattlePiece: -1,
+		friendlyPieces: [],
+		enemyPieces: []
 	},
 	refuel: {
 		active: false
