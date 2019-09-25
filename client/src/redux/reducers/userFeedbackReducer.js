@@ -15,7 +15,10 @@ import {
 	NEWS_PHASE,
 	NEW_ROUND,
 	PLACE_PHASE,
-	PIECES_MOVE
+	PIECES_MOVE,
+	BATTLE_PIECE_SELECT,
+	TARGET_PIECE_SELECT,
+	ENEMY_PIECE_SELECT
 } from "../actions/types";
 
 const initialUserFeedback = "Loading...";
@@ -56,6 +59,12 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "Place troops onto the board from inventory...";
 		case PIECES_MOVE:
 			return "Executed a step!";
+		case BATTLE_PIECE_SELECT:
+			return "Selected Piece to attack with...";
+		case TARGET_PIECE_SELECT:
+			return "Target piece clicked?";
+		case ENEMY_PIECE_SELECT:
+			return "Enemy piece clicked?";
 		default:
 			return state;
 	}

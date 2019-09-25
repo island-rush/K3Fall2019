@@ -1,4 +1,18 @@
-import { MENU_SELECT, POSITION_SELECT, PIECE_CLICK, PIECE_CLEAR_SELECTION, START_PLAN, SET_USERFEEDBACK, CANCEL_PLAN, PLANNING_SELECT, UNDO_MOVE, CONTAINER_MOVE } from "./types";
+import {
+	MENU_SELECT,
+	POSITION_SELECT,
+	PIECE_CLICK,
+	PIECE_CLEAR_SELECTION,
+	START_PLAN,
+	SET_USERFEEDBACK,
+	CANCEL_PLAN,
+	PLANNING_SELECT,
+	UNDO_MOVE,
+	CONTAINER_MOVE,
+	BATTLE_PIECE_SELECT,
+	ENEMY_PIECE_SELECT,
+	TARGET_PIECE_SELECT
+} from "./types";
 
 import { distanceMatrix } from "./distanceMatrix";
 
@@ -228,27 +242,49 @@ export const mainButtonClick = () => {
 	};
 };
 
-export const battlePieceClick = battlePiece => {
+export const battlePieceClick = (battlePiece, battlePieceIndex) => {
 	return (dispatch, getState, emit) => {
-		//check the local state before sending to the server
-
-		alert("clicked the friendly battle piece probably");
+		dispatch({
+			type: BATTLE_PIECE_SELECT,
+			payload: {
+				battlePiece,
+				battlePieceIndex
+			}
+		});
 	};
 };
 
-export const targetPieceClick = battlePiece => {
+export const targetPieceClick = (battlePiece, battlePieceIndex) => {
 	return (dispatch, getState, emit) => {
 		//check the local state before sending to the server
 
-		alert("clicked the target piece probably");
+		dispatch({
+			type: TARGET_PIECE_SELECT,
+			payload: {
+				battlePiece,
+				battlePieceIndex
+			}
+		});
 	};
 };
 
-export const enemyBattlePieceClick = battlePiece => {
+export const enemyBattlePieceClick = (battlePiece, battlePieceIndex) => {
 	return (dispatch, getState, emit) => {
-		//check the local state before sending to the server
+		const { gameboardMeta } = getState();
+		const { battle } = gameboardMeta;
+		const { selectedBattlePiece, selectedBattlePieceIndex } = battle;
 
-		alert("clicked an enemy battle piece probably");
+		if (selectedBattlePiece === -1 || selectedBattlePieceIndex === -1) {
+			dispatch(setUserFeedback("Must select piece to attack with.."));
+		} else {
+			dispatch({
+				type: ENEMY_PIECE_SELECT,
+				payload: {
+					battlePiece,
+					battlePieceIndex
+				}
+			});
+		}
 	};
 };
 

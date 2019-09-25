@@ -111,6 +111,8 @@ class Game {
 
 		const battle = {
 			active: true,
+			selectedBattlePiece: -1,
+			selectedBattlePieceIndex: -1,
 			friendlyPieces: [
 				{
 					piece: {
@@ -121,9 +123,40 @@ class Game {
 					targetPiece: null,
 					targetPieceIndex: -1,
 					diceRolled: 0
+				},
+				{
+					piece: {
+						pieceId: 6970,
+						pieceTeamId: 0,
+						pieceTypeId: 2
+					},
+					targetPiece: null,
+					targetPieceIndex: -1,
+					diceRolled: 0
+				},
+				{
+					piece: {
+						pieceId: 6971,
+						pieceTeamId: 0,
+						pieceTypeId: 3
+					},
+					targetPiece: null,
+					targetPieceIndex: -1,
+					diceRolled: 0
 				}
 			],
-			enemyPieces: []
+			enemyPieces: [
+				{
+					piece: {
+						pieceId: 420,
+						pieceTeamId: 1,
+						pieceTypeId: 2
+					},
+					targetPiece: null,
+					targetPieceIndex: -1,
+					diceRolled: 0
+				}
+			]
 		};
 
 		const container = {

@@ -30,16 +30,16 @@ const rightBattleStyle = {
 	position: "relative",
 	overflow: "scroll",
 	backgroundColor: "grey",
-	height: "90%",
+	height: "96%",
 	width: "48%",
 	float: "right",
 	margin: "1%"
 };
 
 const battleButtonStyle = {
-	position: "relative",
-	bottom: "1%",
-	left: "40%"
+	position: "absolute",
+	bottom: "-7%",
+	right: "2%"
 };
 
 const invisibleStyle = {
@@ -53,7 +53,7 @@ class BattlePopup extends Component {
 
 		const friendlyBattlePieces = friendlyPieces.map((battlePiece, index) => (
 			<BattlePiece
-				isFriendly={true} //indicates left side battle peice functionality
+				isFriendly={true} //indicates left side battle piece functionality
 				battlePieceClick={battlePieceClick}
 				targetPieceClick={targetPieceClick}
 				enemyBattlePieceClick={enemyBattlePieceClick}
@@ -87,7 +87,7 @@ class BattlePopup extends Component {
 					}}
 					style={battleButtonStyle}
 				>
-					DONE
+					Confirm Selections
 				</button>
 			</div>
 		);

@@ -34,8 +34,10 @@ class BattlePiece extends Component {
 
 		const battlePieceBox = (
 			<div
-				onClick={() => {
-					isFriendly ? battlePieceClick(battlePiece) : enemyBattlePieceClick(battlePiece);
+				onClick={event => {
+					event.preventDefault();
+					isFriendly ? battlePieceClick(battlePiece, battlePieceIndex) : enemyBattlePieceClick(battlePiece, battlePieceIndex);
+					event.stopPropagation();
 				}}
 				style={{
 					...boxStyle,
@@ -48,16 +50,20 @@ class BattlePiece extends Component {
 		);
 
 		//TODO: need actual arrow images instead of piece images
-		const arrowBox = battlePiece.targetPiece === null ? null : <div style={{ ...boxStyle, ...typeImages[19] }}>arrow -></div>;
+		const arrowBox = battlePiece.targetPiece === null ? null : <div style={{ ...boxStyle }}>-----></div>;
 
 		const targetBox =
 			battlePiece.targetPiece === null ? null : (
 				<div
-					onClick={() => {
-						targetPieceClick(battlePiece);
+					onClick={event => {
+						event.preventDefault();
+						targetPieceClick(battlePiece, battlePieceIndex);
+						event.stopPropagation();
 					}}
 					style={{ ...boxStyle, ...typeImages[battlePiece.targetPiece.pieceTypeId] }}
-				></div>
+				>
+					{battlePiece.targetPieceIndex}
+				</div>
 			);
 
 		const diceBox = battlePiece.diceRolled === 0 ? null : <div style={{ ...boxStyle, ...diceImages[battlePiece.piece.pieceTypeId] }} />;
