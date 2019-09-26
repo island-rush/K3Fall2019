@@ -53,10 +53,7 @@ class Sidebar extends Component {
 			>
 				<ShopMenu selected={this.props.selectedMenu === 1} />
 				<InvMenu selected={this.props.selectedMenu === 2} />
-				<Gameinfo
-					gameInfo={this.props.gameInfo}
-					selected={this.props.selectedMenu === 3}
-				/>
+				<Gameinfo gameInfo={this.props.gameInfo} selected={this.props.selectedMenu === 3} />
 				<div
 					onClick={event => {
 						event.preventDefault();

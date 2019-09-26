@@ -18,7 +18,8 @@ import {
 	PIECES_MOVE,
 	BATTLE_PIECE_SELECT,
 	TARGET_PIECE_SELECT,
-	ENEMY_PIECE_SELECT
+	ENEMY_PIECE_SELECT,
+	MENU_SELECT
 } from "../actions/types";
 
 const initialUserFeedback = "Loading...";
@@ -65,6 +66,8 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "Target piece clicked?";
 		case ENEMY_PIECE_SELECT:
 			return "Enemy piece clicked?";
+		case MENU_SELECT:
+			return "selected the menu";
 		default:
 			return state;
 	}

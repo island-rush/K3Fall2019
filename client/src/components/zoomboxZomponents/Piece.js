@@ -32,11 +32,7 @@ class Piece extends Component {
 	render() {
 		const contents =
 			this.props.piece.pieceContents.pieces.length === 0 ? null : (
-				<Container
-					selected={this.props.selected}
-					pieces={this.props.piece.pieceContents.pieces}
-					pieceClick={this.props.pieceClick}
-				/>
+				<Container selected={this.props.selected} pieces={this.props.piece.pieceContents.pieces} pieceClick={this.props.pieceClick} />
 			);
 
 		const pieceCombinedStyle = {
@@ -48,18 +44,16 @@ class Piece extends Component {
 			...(this.props.selected ? selectedStyle : "")
 		};
 
-		const title = `${typeNames[this.props.piece.pieceTypeId]}\nMoves: ${
-			this.props.piece.pieceMoves
-		}\nFuel: ${this.props.piece.pieceFuel}`;
+		const title = `${typeNames[this.props.piece.pieceTypeId]}\nMoves: ${this.props.piece.pieceMoves}\nFuel: ${this.props.piece.pieceFuel}`;
 
 		return (
 			<div
 				style={{ ...pieceCombinedStyle }}
 				title={title}
-				onClick={e => {
-					e.preventDefault();
+				onClick={event => {
+					event.preventDefault();
 					this.props.pieceClick(this.props.piece);
-					e.stopPropagation();
+					event.stopPropagation();
 				}}
 			>
 				{contents}

@@ -24,8 +24,10 @@ class InvItem extends Component {
 					...typeImages[itemTypeId]
 				}}
 				title={`${typeNames[itemTypeId]}\nMoves: ${typeMoves[itemTypeId]}\nFuel: ${typeFuel[itemTypeId]}`}
-				onClick={() => {
+				onClick={event => {
+					event.preventDefault();
 					this.props.invItemClick(this.props.invItem);
+					event.stopPropagation();
 				}}
 			/>
 		);

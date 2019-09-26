@@ -1,13 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import {
-	startPlan,
-	cancelPlan,
-	confirmPlan,
-	undoMove,
-	containerMove
-} from "../../redux/actions/userActions";
+import { startPlan, cancelPlan, confirmPlan, undoMove, containerMove } from "../../redux/actions/userActions";
 
 const leftcontrolsStyle = {
 	background: "grey",
@@ -54,27 +48,47 @@ class Leftcontrols extends Component {
 				<div
 					title={buttonTitles.start}
 					style={{ ...buttonStyle, ...buttonImages.start }}
-					onClick={() => this.props.startPlan()}
+					onClick={event => {
+						event.preventDefault();
+						this.props.startPlan();
+						event.stopPropagation();
+					}}
 				/>
 				<div
 					title={buttonTitles.cancel}
 					style={{ ...buttonStyle, ...buttonImages.cancel }}
-					onClick={() => this.props.cancelPlan()}
+					onClick={event => {
+						event.preventDefault();
+						this.props.cancelPlan();
+						event.stopPropagation();
+					}}
 				/>
 				<div
 					title={buttonTitles.undo}
 					style={{ ...buttonStyle, ...buttonImages.undo }}
-					onClick={() => this.props.undoMove()}
+					onClick={event => {
+						event.preventDefault();
+						this.props.undoMove();
+						event.stopPropagation();
+					}}
 				/>
 				<div
 					title={buttonTitles.container}
 					style={{ ...buttonStyle, ...buttonImages.container }}
-					onClick={() => this.props.containerMove()}
+					onClick={event => {
+						event.preventDefault();
+						this.props.containerMove();
+						event.stopPropagation();
+					}}
 				/>
 				<div
 					title={buttonTitles.confirm}
 					style={{ ...buttonStyle, ...buttonImages.confirm }}
-					onClick={() => this.props.confirmPlan()}
+					onClick={event => {
+						event.preventDefault();
+						this.props.confirmPlan();
+						event.stopPropagation();
+					}}
 				/>
 			</div>
 		);

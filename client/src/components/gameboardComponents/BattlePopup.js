@@ -82,8 +82,10 @@ class BattlePopup extends Component {
 				<div style={leftBattleStyle}>Friend{friendlyBattlePieces}</div>
 				<div style={rightBattleStyle}>Foe{enemyBattlePieces}</div>
 				<button
-					onClick={() => {
+					onClick={event => {
+						event.preventDefault();
 						confirmBattleSelections();
+						event.stopPropagation();
 					}}
 					style={battleButtonStyle}
 				>

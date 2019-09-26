@@ -38,13 +38,15 @@ class MainButton extends Component {
 		return (
 			<div
 				style={mainButtonStyle}
-				onClick={() => {
+				onClick={event => {
 					// normally confirms are obtrusive UI, and should use something else TODO: confirm dialog box...
 					// eslint-disable-next-line no-restricted-globals
 					// if (confirm("Are you sure you want to move on?")) {
 					// 	this.props.mainButtonClick();
 					// }
+					event.preventDefault();
 					this.props.mainButtonClick();
+					event.stopPropagation();
 				}}
 			>
 				{buttonText}
