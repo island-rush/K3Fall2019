@@ -24,13 +24,17 @@ class InvItem extends Component {
 					...typeImages[itemTypeId]
 				}}
 				title={`${typeNames[itemTypeId]}\nMoves: ${typeMoves[itemTypeId]}\nFuel: ${typeFuel[itemTypeId]}`}
+				onClick={() => {
+					this.props.invItemClick(this.props.invItem);
+				}}
 			/>
 		);
 	}
 }
 
 InvItem.propTypes = {
-	invItem: PropTypes.object.isRequired
+	invItem: PropTypes.object.isRequired,
+	invItemClick: PropTypes.func.isRequired
 };
 
 export default InvItem;

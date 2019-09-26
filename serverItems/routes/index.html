@@ -92,13 +92,13 @@
 		</style>
 	</head>
 	<body>
-		<h1>Island Rush V3.1</h1>
+		<h1>Island Rush V3.2.0</h1>
 		<nav>
 			<a class="active" href="index.html">Home</a>
 			<a href="troubleshoot.html">Troubleshoot</a>
 			<a href="credits.html">Credits</a>
-			<a href="https://gitreports.com/issue/island-rush/K3.1" target="_blank" style="float: right">Report an Issue</a>
-			<a href="https://github.com/island-rush/K3.1/wiki" target="_blank" style="float: right">Wiki</a>
+			<a href="https://gitreports.com/issue/island-rush/K3" target="_blank" style="float: right">Report an Issue</a>
+			<a href="https://github.com/island-rush/K3/wiki" target="_blank" style="float: right">Wiki</a>
 		</nav>
 		<div id="mainContentContainer">
 			<div id="playerLogin">
@@ -223,7 +223,7 @@
 		}
 
 		switch (getUrlParam("error")) {
-			case "login":
+			case "loginFail":
 				document.getElementById("formFeedback").innerHTML = "Login Credentials Failed";
 				break;
 			case "access":
@@ -243,6 +243,12 @@
 				break;
 			case "database":
 				document.getElementById("formFeedback").innerHTML = "Database had a failure.";
+				break;
+			case "badSession":
+				document.getElementById("formFeedback").innerHTML = "Server Lost the Session.";
+				break;
+			case "gameDoesNotExist":
+				document.getElementById("formFeedback").innerHTML = "Game does not exist.";
 				break;
 		}
 	</script>

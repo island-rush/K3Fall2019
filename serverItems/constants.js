@@ -14,8 +14,20 @@ exports.SLICE_CHANGE = "SLICE_CHANGE";
 exports.PLACE_PHASE = "PLACE_PHASE";
 exports.NEWS_PHASE = "NEWS_PHASE";
 exports.NEW_ROUND = "NEW_ROUND";
+exports.EVENT_BATTLE = "EVENT_BATTLE";
+exports.PIECE_PLACE = "PIECE_PLACE";
 
-exports.shopItemTypeCosts = {
+exports.LOGIN_TAG = "loginFail";
+exports.ACCESS_TAG = "access";
+exports.UNKOWN_ACCESS_TAG = "unkownGameAccess";
+exports.BAD_REQUEST_TAG = "badRequest";
+exports.GAME_INACTIVE_TAG = "gameNotActive";
+exports.ALREADY_IN_TAG = "alreadyLoggedIn";
+exports.DATABASE_TAG = "database";
+exports.BAD_SESSION = "badSession";
+exports.GAME_DOES_NOT_EXIST = "gameDoesNotExist";
+
+exports.SHOP_ITEM_TYPE_COSTS = {
 	//TypeId: Cost
 	0: 5, //bomer
 	1: 5, //stealth bomber
@@ -39,7 +51,7 @@ exports.shopItemTypeCosts = {
 	19: 5
 };
 
-exports.typeMoves = {
+exports.TYPE_MOVES = {
 	//TypdId: Moves
 	0: 5, //bomer
 	1: 5, //stealth bomber
@@ -63,7 +75,7 @@ exports.typeMoves = {
 	19: 5
 };
 
-exports.typeFuel = {
+exports.TYPE_FUEL = {
 	//TypdId: Moves (-1 = warfare)
 	0: 5, //bomer
 	1: 5, //stealth bomber
@@ -88,9 +100,9 @@ exports.typeFuel = {
 };
 
 //this represents the typeIds that are 'containers' and can perform container moves for a plan, and other things
-exports.containerTypes = [4, 14, 16, 18];
+exports.CONTAINER_TYPES = [4, 14, 16, 18];
 
-exports.typeNames = {
+exports.TYPE_NAMES = {
 	0: "Bomber",
 	1: "Stealth Bomber",
 	2: "Stealth Fighter",
@@ -113,7 +125,7 @@ exports.typeNames = {
 	19: "SOF Team"
 };
 
-exports.typeNameIds = {
+exports.TYPE_NAME_IDS = {
 	"Bomber": 0,
 	"Stealth Bomber": 1,
 	"Stealth Fighter": 2,
@@ -137,7 +149,8 @@ exports.typeNameIds = {
 };
 
 // used the updated units excel at https://docs.google.com/spreadsheets/d/1kiMLv05oK6IZKtiYdErvD4Kp5tI3lXLL2-qbO3ZqHAI/edit#gid=306372336
-exports.visibilityMatrix = [
+//TODO: double check that both matrices are correct for the latest information...
+exports.VISIBILITY_MATRIX = [
 	[1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, -1, 2, 1, 1, -1], //bomber
 	[1, 0, -1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, -1, 2, 1, 1, -1], //stealth bomber
 	[1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, -1, 2, 1, 1, -1], //stealth fighter
@@ -160,7 +173,7 @@ exports.visibilityMatrix = [
 	[-1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 0, 0, -1, 0, 0, 0, 0] //sof team
 ];
 
-exports.attackMatrix = [
+exports.ATTACK_MATRIX = [
 	[0, 0, 0, 0, 0, 0, 11, 11, 10, 11, 0, 10, 3, 10, 9, 0, 8, 0, 0, 8, 11, 0, 0], //bomber
 	[0, 0, 0, 0, 0, 0, 10, 10, 9, 10, 0, 9, 8, 9, 8, 0, 8, 0, 0, 8, 11, 0, 0], //stealth bomber
 	[10, 4, 3, 11, 10, 11, 5, 5, 4, 5, 9, 6, 7, 4, 3, 0, 6, 10, 9, 8, 8, 0, 0], //stealth fighter

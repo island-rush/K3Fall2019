@@ -1,4 +1,4 @@
-import { INITIAL_GAMESTATE, PIECES_MOVE } from "../actions/types";
+import { INITIAL_GAMESTATE, PIECES_MOVE, PIECE_PLACE } from "../actions/types";
 import { initialGameboardEmpty } from "./initialGameboardEmpty";
 
 function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
@@ -8,8 +8,7 @@ function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
 		case INITIAL_GAMESTATE:
 			positions = Object.keys(payload.gameboardPieces);
 			for (let x = 0; x < positions.length; x++) {
-				stateDeepCopy[positions[x]].pieces =
-					payload.gameboardPieces[positions[x]];
+				stateDeepCopy[positions[x]].pieces = payload.gameboardPieces[positions[x]];
 			}
 			return stateDeepCopy;
 		case PIECES_MOVE:
@@ -20,6 +19,9 @@ function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
 				freshBoard[positions[x]].pieces = payload.gameboardPieces[positions[x]];
 			}
 			return freshBoard;
+		case PIECE_PLACE:
+			stateDeepCopy[payload.positionId].pieces.push(payload.newPiece);
+			return stateDeepCopy;
 		default:
 			return stateDeepCopy;
 	}

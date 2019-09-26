@@ -10,19 +10,34 @@ import {
 	UNDO_MOVE,
 	CONTAINER_MOVE,
 	INITIAL_GAMESTATE,
-	SLICE_CHANGE
+	SLICE_CHANGE,
+	PURCHASE_PHASE,
+	NEWS_PHASE,
+	BATTLE_PIECE_SELECT,
+	ENEMY_PIECE_SELECT,
+	TARGET_PIECE_SELECT
 } from "../actions/types";
 
 const initialGameboardMeta = {
-	//TODO: change to selectedPositionId and selectedPieceId to better represent the values
+	//TODO: change to selectedPositionId and selectedPieceId to better represent the values (ints) (and also selectedBattlePiece -> selectedBattlePieceId)
 	selectedPosition: -1,
 	selectedPiece: -1,
-	newsAlert: {
+	news: {
 		active: false,
-		title: "Loading Title...",
-		info: "Loading Info..."
+		newsTitle: "Loading Title...",
+		newsInfo: "Loading Info..."
 	},
 	battle: {
+		active: false,
+		selectedBattlePiece: -1,
+		selectedBattlePieceIndex: -1, //helper to find the piece within the array
+		friendlyPieces: [],
+		enemyPieces: []
+	},
+	refuel: {
+		active: false
+	},
+	container: {
 		active: false
 	},
 	planning: {
@@ -37,6 +52,12 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 	switch (type) {
 		case POSITION_SELECT:
 			stateDeepCopy.selectedPosition = parseInt(payload.selectedPositionId);
+			return stateDeepCopy;
+		case PURCHASE_PHASE:
+			stateDeepCopy.news.active = false; //hide the popup
+			return stateDeepCopy;
+		case NEWS_PHASE:
+			stateDeepCopy.news.active = true; //TODO: get the actual news from the database payload
 			return stateDeepCopy;
 		case PIECE_CLICK:
 			stateDeepCopy.selectedPiece = parseInt(payload.selectedPieceId);
@@ -80,10 +101,26 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.selectedPiece = -1;
 			return stateDeepCopy;
 		case INITIAL_GAMESTATE:
-			stateDeepCopy.confirmedPlans = payload.confirmedPlans;
-			return stateDeepCopy;
+			return payload.gameboardMeta;
 		case SLICE_CHANGE:
 			stateDeepCopy.confirmedPlans = {};
+			return stateDeepCopy;
+		case BATTLE_PIECE_SELECT:
+			//select if different, unselect if was the same
+			let lastSelectedBattlePiece = stateDeepCopy.battle.selectedBattlePiece;
+			stateDeepCopy.battle.selectedBattlePiece = payload.battlePiece.piece.pieceId === lastSelectedBattlePiece ? -1 : payload.battlePiece.piece.pieceId;
+			stateDeepCopy.battle.selectedBattlePieceIndex = payload.battlePiece.piece.pieceId === lastSelectedBattlePiece ? -1 : payload.battlePieceIndex;
+			return stateDeepCopy;
+		case ENEMY_PIECE_SELECT:
+			//need to get the piece that was selected, and put it into the target for the thing
+			stateDeepCopy.battle.friendlyPieces[stateDeepCopy.battle.selectedBattlePieceIndex].targetPiece = payload.battlePiece.piece;
+			stateDeepCopy.battle.friendlyPieces[stateDeepCopy.battle.selectedBattlePieceIndex].targetPieceIndex = payload.battlePieceIndex;
+
+			return stateDeepCopy;
+		case TARGET_PIECE_SELECT:
+			//removing the target piece
+			stateDeepCopy.battle.friendlyPieces[payload.battlePieceIndex].targetPiece = null;
+			stateDeepCopy.battle.friendlyPieces[payload.battlePieceIndex].targetPieceIndex = -1;
 			return stateDeepCopy;
 		default:
 			return state;
