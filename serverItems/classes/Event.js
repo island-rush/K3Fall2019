@@ -1,6 +1,7 @@
 const pool = require("../database");
 
 class Event {
+	//TODO: we have a class for event, but multiple tables for keeping track of events, event items, and that one for temp stuff (efficient)
 	constructor(eventId) {
 		this.eventId = eventId;
 	}

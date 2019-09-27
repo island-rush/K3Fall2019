@@ -1,16 +1,16 @@
 const mysql = require("mysql2/promise");
 
 // Normal Defaults
-// const DatabaseHostname = process.env.DB_HOSTNAME || "localhost";
-// const DatabaseUsername = process.env.DB_USERNAME || "root";
-// const DatabasePassword = process.env.DB_PASSWORD || "";
-// const DatabaseName = process.env.DB_NAME || "X0MOPhjMXL";
+const DatabaseHostname = process.env.DB_HOSTNAME || "localhost";
+const DatabaseUsername = process.env.DB_USERNAME || "root";
+const DatabasePassword = process.env.DB_PASSWORD || "";
+const DatabaseName = process.env.DB_NAME || "X0MOPhjMXL";
 
 // Personal Dev Database Defaults
-const DatabaseHostname = process.env.DB_HOSTNAME || "remotemysql.com";
-const DatabaseUsername = process.env.DB_USERNAME || "X0MOPhjMXL";
-const DatabasePassword = process.env.DB_PASSWORD || "1bhg03PyGl";
-const DatabaseName = process.env.DB_NAME || "X0MOPhjMXL";
+// const DatabaseHostname = process.env.DB_HOSTNAME || "remotemysql.com";
+// const DatabaseUsername = process.env.DB_USERNAME || "X0MOPhjMXL";
+// const DatabasePassword = process.env.DB_PASSWORD || "1bhg03PyGl";
+// const DatabaseName = process.env.DB_NAME || "X0MOPhjMXL";
 
 const databaseConfig = {
 	connectionLimit: 25,

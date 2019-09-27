@@ -19,7 +19,8 @@ module.exports = async (conn, gameId) => {
 	const allInserts = [
 		news(gameId, newsOrder++, {
 			newsTitle: "Title 1",
-			newsInfo: "Info 1"
+			newsInfo: "Info 1",
+			newsActivated: 1
 		}),
 		news(gameId, newsOrder++, {
 			newsTitle: "Title 2",

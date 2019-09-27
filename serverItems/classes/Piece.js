@@ -26,6 +26,7 @@ class Piece {
 		await pool.query(queryString, inserts);
 	}
 
+	//TODO: referencing another table, could potentially move this function (maybe)
 	async deletePlans() {
 		const queryString = "DELETE FROM plans WHERE planPieceId = ?";
 		const inserts = [this.pieceId];
@@ -88,6 +89,7 @@ class Piece {
 			"UPDATE pieces, plans SET pieces.piecePositionId = plans.planPositionId WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
 		await conn.query(movePiecesQuery, inserts);
 
+		//TODO: referencing another table here...(could change to put into the plans class)
 		const deletePlansQuery = "DELETE FROM plans WHERE planGameId = ? AND planMovementOrder = ? AND planSpecialFlag = 0";
 		await conn.query(deletePlansQuery, inserts);
 

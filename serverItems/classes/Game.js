@@ -3,6 +3,11 @@ const gameInitialPieces = require("./gameInitialPieces"); //script to insert pie
 const gameInitialNews = require("./gameInitialNews"); //script to insert news
 const CONSTANTS = require("../constants");
 
+const InvItem = require("./InvItem");
+const ShopItem = require("./ShopItem");
+const Piece = require("./Piece");
+const Plan = require("./Plan");
+
 class Game {
 	constructor(options) {
 		if (options.gameId) {
@@ -42,75 +47,26 @@ class Game {
 	}
 
 	async initialStateAction(gameTeam, gameController) {
-		const conn = await pool.getConnection();
+		const invItems = await InvItem.all(this.gameId, gameTeam);
+		const shopItems = await ShopItem.all(this.gameId, gameTeam);
+		const gameboardPieces = await Piece.getVisiblePieces(this.gameId, gameTeam);
+		const confirmedPlans = await Plan.getConfirmedPlans(this.gameId, gameTeam);
 
-		let queryString = "SELECT * FROM invItems WHERE invItemGameId = ? AND invItemTeamId = ?";
-		let inserts = [this.gameId, gameTeam];
-		const [invItems] = await conn.query(queryString, inserts);
-
-		queryString = "SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?";
-		inserts = [this.gameId, gameTeam];
-		const [shopItems] = await conn.query(queryString, inserts);
-
-		queryString = "SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = ? OR pieceVisible = 1) ORDER BY pieceContainerId, pieceTeamId ASC";
-		inserts = [this.gameId, gameTeam];
-		const [resultPieces] = await conn.query(queryString, inserts);
-
-		let gameboardPieces = {};
-		for (let x = 0; x < resultPieces.length; x++) {
-			let currentPiece = resultPieces[x];
-			currentPiece.pieceContents = { pieces: [] };
-			if (!gameboardPieces[currentPiece.piecePositionId]) {
-				gameboardPieces[currentPiece.piecePositionId] = [];
-			}
-			if (currentPiece.pieceContainerId === -1) {
-				gameboardPieces[currentPiece.piecePositionId].push(currentPiece);
-			} else {
-				let indexOfParent = gameboardPieces[currentPiece.piecePositionId].findIndex(piece => {
-					return piece.pieceId === currentPiece.pieceContainerId;
-				});
-				gameboardPieces[currentPiece.piecePositionId][indexOfParent].pieceContents.push(currentPiece);
-			}
-		}
-
-		queryString = "SELECT * FROM plans WHERE planGameId = ? AND planTeamId = ? ORDER BY planPieceId, planMovementOrder ASC";
-		inserts = [this.gameId, gameTeam];
-		const [resultPlans] = await conn.query(queryString, inserts);
-
-		let confirmedPlans = {};
-
-		for (let x = 0; x < resultPlans.length; x++) {
-			let { planPieceId, planPositionId, planSpecialFlag } = resultPlans[x];
-			let type = planSpecialFlag === 0 ? "move" : planSpecialFlag === 1 ? "container" : "NULL_SPECIAL";
-
-			if (!(planPieceId in confirmedPlans)) {
-				confirmedPlans[planPieceId] = [];
-			}
-
-			confirmedPlans[planPieceId].push({
-				type,
-				positionId: planPositionId
-			});
-		}
-
-		queryString = "SELECT newsTitle, newsInfo FROM news WHERE newsGameId = ? AND newsActivated = 1 AND newsLength != 0 ORDER BY newsOrder ASC LIMIT 1";
-		inserts = [this.gameId];
-		const [resultNews] = await conn.query(queryString, inserts);
+		//Could put news into its own object, but don't really use it much...(TODO: figure out if need to refactor this...)
+		let queryString = "SELECT newsTitle, newsInfo FROM news WHERE newsGameId = ? AND newsActivated = 1 AND newsLength != 0 ORDER BY newsOrder ASC LIMIT 1";
+		let inserts = [this.gameId];
+		const [resultNews] = await pool.query(queryString, inserts);
 		const { newsTitle, newsInfo } = resultNews[0] !== undefined ? resultNews[0] : { newsTitle: "No More News", newsInfo: "Obviously you've been playing this game too long..." };
 		const news = {
-			// active: parseInt(this.gamePhase) === 0,
-			active: false,
+			active: parseInt(this.gamePhase) === 0,
+			// active: false,
 			newsTitle,
 			newsInfo
 		};
 
-		//fill in default values for battle object
-		// queryString = "SELECT pieceId, pieceTeamId, pieceTypeId, pieceContainerId, pieceVisible FROM eventItems NATUAL JOIN pieces WHERE ";
-		// inserts = [this.gameId];
-		// const [resultNews] = await conn.query(queryString, inserts);
-
+		//TODO: get these values from the database (potentially throw this into the event object)
 		const battle = {
-			active: true,
+			active: false,
 			selectedBattlePiece: -1,
 			selectedBattlePieceIndex: -1,
 			friendlyPieces: [
@@ -167,11 +123,6 @@ class Game {
 			active: false
 		};
 
-		conn.release();
-
-		const gamePoints = this["game" + gameTeam + "Points"];
-		const gameStatus = this["game" + gameTeam + "Status"];
-
 		const serverAction = {
 			type: CONSTANTS.INITIAL_GAMESTATE,
 			payload: {
@@ -182,8 +133,8 @@ class Game {
 					gamePhase: this.gamePhase,
 					gameRound: this.gameRound,
 					gameSlice: this.gameSlice,
-					gameStatus,
-					gamePoints
+					gameStatus: this["game" + gameTeam + "Status"],
+					gamePoints: this["game" + gameTeam + "Points"]
 				},
 				shopItems,
 				invItems,

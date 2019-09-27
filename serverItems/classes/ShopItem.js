@@ -43,6 +43,13 @@ class ShopItem {
 		const inserts = [gameId, gameTeam];
 		await pool.query(queryString, inserts);
 	}
+
+	static async all(gameId, gameTeam) {
+		const queryString = "SELECT * FROM shopItems WHERE shopItemGameId = ? AND shopItemTeamId = ?";
+		const inserts = [gameId, gameTeam];
+		const [shopItems] = await pool.query(queryString, inserts);
+		return shopItems;
+	}
 }
 
 module.exports = ShopItem;

@@ -60,6 +60,30 @@ class Plan {
 		const [results] = await pool.query(queryString, inserts);
 		return results;
 	}
+
+	static async getConfirmedPlans(gameId, gameTeam) {
+		const queryString = "SELECT * FROM plans WHERE planGameId = ? AND planTeamId = ? ORDER BY planPieceId, planMovementOrder ASC";
+		const inserts = [gameId, gameTeam];
+		const [resultPlans] = await pool.query(queryString, inserts);
+
+		//formatting for the client, needs it in this object kinda way
+		let confirmedPlans = {};
+		for (let x = 0; x < resultPlans.length; x++) {
+			let { planPieceId, planPositionId, planSpecialFlag } = resultPlans[x];
+			let type = planSpecialFlag === 0 ? "move" : planSpecialFlag === 1 ? "container" : "NULL_SPECIAL";
+
+			if (!(planPieceId in confirmedPlans)) {
+				confirmedPlans[planPieceId] = [];
+			}
+
+			confirmedPlans[planPieceId].push({
+				type,
+				positionId: planPositionId
+			});
+		}
+
+		return confirmedPlans;
+	}
 }
 
 module.exports = Plan;
