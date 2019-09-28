@@ -7,6 +7,7 @@ const InvItem = require("./InvItem");
 const ShopItem = require("./ShopItem");
 const Piece = require("./Piece");
 const Plan = require("./Plan");
+const Event = require("./Event");
 
 class Game {
 	constructor(options) {
@@ -65,56 +66,47 @@ class Game {
 		};
 
 		//TODO: get these values from the database (potentially throw this into the event object)
-		const battle = {
-			active: false,
+		const currentEvent = await Event.getNext(this.gameId, gameTeam);
+
+		let battle = {
 			selectedBattlePiece: -1,
-			selectedBattlePieceIndex: -1,
-			friendlyPieces: [
-				{
-					piece: {
-						pieceId: 6969,
-						pieceTeamId: 0,
-						pieceTypeId: 1
-					},
-					targetPiece: null,
-					targetPieceIndex: -1,
-					diceRolled: 0
-				},
-				{
-					piece: {
-						pieceId: 6970,
-						pieceTeamId: 0,
-						pieceTypeId: 2
-					},
-					targetPiece: null,
-					targetPieceIndex: -1,
-					diceRolled: 0
-				},
-				{
-					piece: {
-						pieceId: 6971,
-						pieceTeamId: 0,
-						pieceTypeId: 3
-					},
-					targetPiece: null,
-					targetPieceIndex: -1,
-					diceRolled: 0
-				}
-			],
-			enemyPieces: [
-				{
-					piece: {
-						pieceId: 420,
-						pieceTeamId: 1,
-						pieceTypeId: 2
-					},
-					targetPiece: null,
-					targetPieceIndex: -1,
-					diceRolled: 0
-				}
-			]
+			selectedBattlePieceIndex: -1
 		};
 
+		if (currentEvent) {
+			//TODO: don't assume its a battle, handle according to event type
+			let friendlyPiecesList = await currentEvent.getTeamItems(gameTeam == 0 ? 0 : 1);
+			let enemyPiecesList = await currentEvent.getTeamItems(gameTeam == 0 ? 1 : 0);
+			let friendlyPieces = [];
+			let enemyPieces = [];
+
+			//formatting for the frontend
+			for (let x = 0; x < friendlyPiecesList.length; x++) {
+				//need to transform pieces and stuff...
+				let thisFriendlyPiece = {
+					targetPiece: null,
+					targetPieceIndex: -1,
+					diceRolled: 0
+				};
+				thisFriendlyPiece.piece = friendlyPiecesList[x];
+				friendlyPieces.push(thisFriendlyPiece);
+			}
+			for (let y = 0; y < enemyPiecesList.length; y++) {
+				let thisEnemyPiece = {
+					targetPiece: null,
+					targetPieceIndex: -1,
+					diceRolled: 0
+				};
+				thisEnemyPiece.piece = enemyPiecesList[y];
+				enemyPieces.push(thisEnemyPiece);
+			}
+
+			Object.assign(battle, { active: true, friendlyPieces, enemyPieces });
+		} else {
+			Object.assign(battle, { active: false, friendlyPieces: [], enemyPieces: [] });
+		}
+
+		//TODO: throw these within the above event handler when ready to use them...
 		const container = {
 			active: false
 		};

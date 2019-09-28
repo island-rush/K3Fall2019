@@ -271,8 +271,7 @@ export const targetPieceClick = (battlePiece, battlePieceIndex) => {
 export const enemyBattlePieceClick = (battlePiece, battlePieceIndex) => {
 	return (dispatch, getState, emit) => {
 		const { gameboardMeta } = getState();
-		const { battle } = gameboardMeta;
-		const { selectedBattlePiece, selectedBattlePieceIndex } = battle;
+		const { selectedBattlePiece, selectedBattlePieceIndex } = gameboardMeta.battle;
 
 		if (selectedBattlePiece === -1 || selectedBattlePieceIndex === -1) {
 			dispatch(setUserFeedback("Must select piece to attack with.."));
@@ -291,8 +290,15 @@ export const enemyBattlePieceClick = (battlePiece, battlePieceIndex) => {
 export const confirmBattleSelections = () => {
 	return (dispatch, getState, emit) => {
 		//check the local state before sending to the server
+		const { gameboardMeta } = getState();
+		const { friendlyPieces } = gameboardMeta.battle;
 
-		alert("confirmed battle selections alert");
+		//need to send to the server what selections were made, for it to handle it...
+		const payload = {
+			friendlyPieces
+		};
+
+		emit("confirmBattleSelection", payload);
 	};
 };
 

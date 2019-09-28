@@ -795,6 +795,8 @@ const piecePlace = async (io, socket, invItemId, selectedPosition) => {
 	io.sockets.in("game" + gameId + "team" + gameTeam).emit("serverSendingAction", serverAction);
 };
 
+const confirmBattleSelection = async (io, socket, friendlyPieces) => {};
+
 //Exposed / Exported Functions
 exports.gameReset = async (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.teacher || !req.session.ir3.gameId) {
@@ -1142,6 +1144,16 @@ exports.socketSetup = async (io, socket) => {
 		try {
 			const { invItemId, selectedPosition } = payload;
 			piecePlace(io, socket, invItemId, selectedPosition);
+		} catch (error) {
+			console.log(error);
+			sendUserFeedback(socket, "INTERNAL SERVER ERROR: CHECK DATABASE");
+		}
+	});
+
+	socket.on("confirmBattleSelection", payload => {
+		try {
+			const { friendlyPieces } = payload;
+			confirmBattleSelection(io, socket, friendlyPieces);
 		} catch (error) {
 			console.log(error);
 			sendUserFeedback(socket, "INTERNAL SERVER ERROR: CHECK DATABASE");

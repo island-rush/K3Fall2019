@@ -78,7 +78,7 @@ class Event {
 		await conn.query(queryString, inserts);
 
 		queryString =
-			"INSERT INTO eventItems SELECT eventId, eventPieceId FROM eventItemsTemp NATURAL JOIN eventQueue WHERE eventItemsTemp.eventPosA = eventQueue.eventPosA AND eventItemsTemp.eventPosB = eventQueue.eventPosB AND eventItemsTemp.eventItemGameId = eventQueue.eventGameId";
+			"INSERT INTO eventItems (eventId, eventPieceId) SELECT eventId, eventPieceId FROM eventItemsTemp NATURAL JOIN eventQueue WHERE eventItemsTemp.eventPosA = eventQueue.eventPosA AND eventItemsTemp.eventPosB = eventQueue.eventPosB AND eventItemsTemp.eventItemGameId = eventQueue.eventGameId";
 		await conn.query(queryString);
 
 		queryString = "DELETE FROM eventItemsTemp WHERE eventItemGameId = ?";

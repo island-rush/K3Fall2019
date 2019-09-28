@@ -99,6 +99,7 @@ CREATE TABLE IF NOT EXISTS eventQueue(
 CREATE TABLE IF NOT EXISTS eventItems(
 	eventId INT(8) NOT NULL,
     eventPieceId INT(8) NOT NULL,
+    eventItemTarget INT(8) DEFAULT -1,
     FOREIGN KEY (eventId) REFERENCES eventQueue (eventId) ON DELETE CASCADE,
     FOREIGN KEY (eventPieceId) REFERENCES pieces (pieceId) ON DELETE CASCADE,
     PRIMARY KEY (eventId, eventPieceId)
