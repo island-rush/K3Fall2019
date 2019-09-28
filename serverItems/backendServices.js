@@ -599,29 +599,52 @@ const handleSlice2Step = async (io, thisGame) => {
 	// Note: All non-move (specialflag != 0) plans should result in events (refuel/container)...
 	// If there is now an event, send to user instead of PIECES_MOVE
 
+	//Don't really like doing it this way, but sorta clean?
 	let gameEvents = [null, null];
 	let serverActions = [{}, {}];
 
 	//TODO: remove this duplicate code, put into a function probably...(or rename variables to be part of the equation for these??
 	gameEvents[0] = await Event.getNext(gameId, 0);
-	if (!gameEvents[0]) {
-		serverActions[0] = {
-			type: CONSTANTS.PIECES_MOVE,
-			payload: {
-				gameboardPieces: await Piece.getVisiblePieces(gameId, 0),
-				gameStatus: thisGame["game" + 0 + "Status"]
-			}
-		};
-	} else {
+	if (gameEvents[0]) {
 		const type = gameEvents[0].eventTypeId;
 
 		switch (type) {
 			case 1:
 				//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
+
+				//need to transform eventItems in the battle object for the frontend to use
+				//need to create this battle object entirely? (frontend becomes easy if we do this, or just the friendly pieces and enemy pieces)
+				let friendlyPiecesList = await gameEvents[0].getTeamItems(0);
+				let enemyPiecesList = await gameEvents[0].getTeamItems(1);
+				let friendlyPieces = [];
+				let enemyPieces = [];
+
+				for (let x = 0; x < friendlyPiecesList.length; x++) {
+					//need to transform pieces and stuff...
+					let thisFriendlyPiece = {
+						targetPiece: null,
+						targetPieceIndex: -1,
+						diceRolled: 0
+					};
+					thisFriendlyPiece.piece = friendlyPiecesList[x];
+					friendlyPieces.push(thisFriendlyPiece);
+				}
+
+				for (let y = 0; y < enemyPiecesList.length; y++) {
+					let thisEnemyPiece = {
+						targetPiece: null,
+						targetPieceIndex: -1,
+						diceRolled: 0
+					};
+					thisEnemyPiece.piece = enemyPiecesList[y];
+					enemyPieces.push(thisEnemyPiece);
+				}
+
 				serverActions[0] = {
 					type: CONSTANTS.EVENT_BATTLE,
 					payload: {
-						eventItems: await nextEvent0.getItems()
+						friendlyPieces,
+						enemyPieces
 					}
 				};
 				break;
@@ -632,35 +655,73 @@ const handleSlice2Step = async (io, thisGame) => {
 	}
 
 	gameEvents[1] = await Event.getNext(gameId, 1);
-	if (!gameEvents[1]) {
-		serverActions[1] = {
-			type: CONSTANTS.PIECES_MOVE,
-			payload: {
-				gameboardPieces: await Piece.getVisiblePieces(gameId, 1),
-				gameStatus: thisGame["game" + 1 + "Status"]
-			}
-		};
-	} else {
+	if (gameEvents[1]) {
 		const type = gameEvents[1].eventTypeId;
 
 		switch (type) {
 			case 1:
 				//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
+
+				let friendlyPiecesList = await gameEvents[1].getTeamItems(1);
+				let enemyPiecesList = await gameEvents[1].getTeamItems(0);
+				let friendlyPieces = [];
+				let enemyPieces = [];
+
+				for (let x = 0; x < friendlyPiecesList.length; x++) {
+					//need to transform pieces and stuff...
+					let thisFriendlyPiece = {
+						targetPiece: null,
+						targetPieceIndex: -1,
+						diceRolled: 0
+					};
+					thisFriendlyPiece.piece = friendlyPiecesList[x];
+					friendlyPieces.push(thisFriendlyPiece);
+				}
+
+				for (let y = 0; y < enemyPiecesList.length; y++) {
+					let thisEnemyPiece = {
+						targetPiece: null,
+						targetPieceIndex: -1,
+						diceRolled: 0
+					};
+					thisEnemyPiece.piece = enemyPiecesList[y];
+					enemyPieces.push(thisEnemyPiece);
+				}
+
 				serverActions[1] = {
 					type: CONSTANTS.EVENT_BATTLE,
 					payload: {
-						eventItems: await gameEvents[1].getItems()
+						friendlyPieces,
+						enemyPieces
 					}
 				};
 				break;
 			default:
-				//this would never happen
+				//this would never happen (famous last words)
 				return;
 		}
+	} else {
+		//TODO: move pieces in here
 	}
 
 	io.sockets.in("game" + gameId + "team0").emit("serverSendingAction", serverActions[0]);
 	io.sockets.in("game" + gameId + "team1").emit("serverSendingAction", serverActions[1]);
+
+	//also send them the updated pieces anyways? //TODO: could send with first package, and avoid 2 requests (but need a special action type?)
+	io.sockets.in("game" + gameId + "team0").emit("serverSendingAction", {
+		type: CONSTANTS.PIECES_MOVE,
+		payload: {
+			gameboardPieces: await Piece.getVisiblePieces(gameId, 0),
+			gameStatus: thisGame["game" + 1 + "Status"]
+		}
+	});
+	io.sockets.in("game" + gameId + "team1").emit("serverSendingAction", {
+		type: CONSTANTS.PIECES_MOVE,
+		payload: {
+			gameboardPieces: await Piece.getVisiblePieces(gameId, 1),
+			gameStatus: thisGame["game" + 1 + "Status"]
+		}
+	});
 };
 
 const piecePlace = async (io, socket, invItemId, selectedPosition) => {

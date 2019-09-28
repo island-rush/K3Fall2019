@@ -15,7 +15,8 @@ import {
 	NEWS_PHASE,
 	BATTLE_PIECE_SELECT,
 	ENEMY_PIECE_SELECT,
-	TARGET_PIECE_SELECT
+	TARGET_PIECE_SELECT,
+	EVENT_BATTLE
 } from "../actions/types";
 
 const initialGameboardMeta = {
@@ -121,6 +122,15 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			//removing the target piece
 			stateDeepCopy.battle.friendlyPieces[payload.battlePieceIndex].targetPiece = null;
 			stateDeepCopy.battle.friendlyPieces[payload.battlePieceIndex].targetPieceIndex = -1;
+			return stateDeepCopy;
+		case EVENT_BATTLE:
+			stateDeepCopy.battle = {
+				active: true,
+				selectedBattlePiece: -1,
+				selectedBattlePieceIndex: -1,
+				friendlyPieces: payload.friendlyPieces,
+				enemyPieces: payload.enemyPieces
+			};
 			return stateDeepCopy;
 		default:
 			return state;

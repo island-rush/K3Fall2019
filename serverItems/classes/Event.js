@@ -37,6 +37,13 @@ class Event {
 		}
 	}
 
+	async getTeamItems(gameTeam) {
+		const queryString = "SELECT * FROM eventItems NATURAL JOIN pieces WHERE eventId = ? AND eventPieceId = pieceId AND pieceTeamId = ?";
+		const inserts = [this.eventId, gameTeam];
+		const [eventTeamItems] = await pool.query(queryString, inserts);
+		return eventTeamItems; //TODO: do we need to return null explicitly? (this is an empty array ^^^ see getItems for difference (not sure why needed))
+	}
+
 	static async getNext(gameId, gameTeam) {
 		const queryString = "SELECT * FROM eventQueue WHERE eventGameId = ? AND (eventTeamId = ? OR eventTeamId = 2) ORDER BY eventId ASC LIMIT 1";
 		const inserts = [gameId, gameTeam];
