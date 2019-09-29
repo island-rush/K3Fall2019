@@ -244,6 +244,13 @@ export const mainButtonClick = () => {
 
 export const battlePieceClick = (battlePiece, battlePieceIndex) => {
 	return (dispatch, getState, emit) => {
+		const { gameInfo } = getState();
+		const { gameStatus } = gameInfo;
+		if (gameStatus === 1) {
+			dispatch(setUserFeedback("can't make more selections, status == 1, already submitted probably"));
+			return;
+		}
+
 		dispatch({
 			type: BATTLE_PIECE_SELECT,
 			payload: {
@@ -258,6 +265,13 @@ export const targetPieceClick = (battlePiece, battlePieceIndex) => {
 	return (dispatch, getState, emit) => {
 		//check the local state before sending to the server
 
+		const { gameInfo } = getState();
+		const { gameStatus } = gameInfo;
+		if (gameStatus === 1) {
+			dispatch(setUserFeedback("can't undo target selection, status == 1, already submitted probably"));
+			return;
+		}
+
 		dispatch({
 			type: TARGET_PIECE_SELECT,
 			payload: {
@@ -270,7 +284,14 @@ export const targetPieceClick = (battlePiece, battlePieceIndex) => {
 
 export const enemyBattlePieceClick = (battlePiece, battlePieceIndex) => {
 	return (dispatch, getState, emit) => {
-		const { gameboardMeta } = getState();
+		const { gameboardMeta, gameInfo } = getState();
+		const { gameStatus } = gameInfo;
+
+		if (gameStatus === 1) {
+			dispatch(setUserFeedback("can't do more, already submitted (status == 1)"));
+			return;
+		}
+
 		const { selectedBattlePiece, selectedBattlePieceIndex } = gameboardMeta.battle;
 
 		if (selectedBattlePiece === -1 || selectedBattlePieceIndex === -1) {
@@ -290,9 +311,17 @@ export const enemyBattlePieceClick = (battlePiece, battlePieceIndex) => {
 export const confirmBattleSelections = () => {
 	return (dispatch, getState, emit) => {
 		//check the local state before sending to the server
-		const { gameboardMeta } = getState();
-		const { friendlyPieces } = gameboardMeta.battle;
+		const { gameboardMeta, gameInfo } = getState();
+		const { gameStatus } = gameInfo;
 
+		//TODO: could do loads more checks on current status of gameplay to prevent accidental presses? (but same checks on backend probably)
+		if (gameStatus === 1) {
+			//already waiting
+			dispatch(setUserFeedback("already waiting, client prevented something..."));
+			return;
+		}
+
+		const { friendlyPieces } = gameboardMeta.battle;
 		//need to send to the server what selections were made, for it to handle it...
 		const payload = {
 			friendlyPieces

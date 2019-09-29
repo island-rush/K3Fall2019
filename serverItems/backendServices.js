@@ -795,7 +795,84 @@ const piecePlace = async (io, socket, invItemId, selectedPosition) => {
 	io.sockets.in("game" + gameId + "team" + gameTeam).emit("serverSendingAction", serverAction);
 };
 
-const confirmBattleSelection = async (io, socket, friendlyPieces) => {};
+const confirmBattleSelection = async (io, socket, friendlyPieces) => {
+	// [ { targetPiece: null,  //or has a piece object inside of it
+	// 	   targetPieceIndex: -1,
+	// 	   diceRolled: 0,
+	// 	   piece:
+	// 	    { eventId: 2,
+	// 	      eventPieceId: 7,
+	// 	      eventItemTarget: -1,
+	// 	      pieceId: 7,
+	// 	      pieceGameId: 1,
+	// 	      pieceTeamId: 0,
+	// 	      pieceTypeId: 8,
+	// 	      piecePositionId: 4,
+	// 	      pieceContainerId: -1,
+	// 	      pieceVisible: 1,
+	// 	      pieceMoves: 5,
+	// 	      pieceFuel: 5 } } ]
+
+	//need to change the eventItemTarget within the eventItem in the database? (for the latest event for this team...)
+
+	//Does the server know this user?
+	if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
+		socket.emit("serverRedirect", CONSTANTS.BAD_SESSION);
+		return;
+	}
+
+	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+
+	//Does the game exist?
+	const thisGame = await new Game({ gameId }).init();
+	if (!thisGame) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_DOES_NOT_EXIST);
+		return;
+	}
+
+	//Is this action currently allowed to this user?
+	const { gameActive, gamePhase } = thisGame;
+	if (!gameActive) {
+		socket.emit("serverRedirect", CONSTANTS.GAME_INACTIVE_TAG);
+		return;
+	}
+
+	const thisTeamStatus = thisGame[`game${gameTeam}Status`];
+	if (thisTeamStatus == 1) {
+		sendUserFeedback(socket, "still waiting stupid...");
+		return;
+	}
+
+	//confirm the selections
+	const thisTeamsCurrentEvent = await Event.getNext(gameId, gameTeam);
+	await thisTeamsCurrentEvent.bulkUpdateTargets(friendlyPieces);
+
+	//are we waiting for the other client?
+	const otherTeamStatus = thisGame[`game${gameTeam == 0 ? 1 : 0}Status`];
+
+	if (otherTeamStatus == 0) {
+		await thisGame.setStatus(gameTeam, 1);
+		sendUserFeedback(socket, "confirmed, now waiting on other team...");
+		return;
+	}
+
+	//if get here, other team was already waiting, need to set them to 0 and handle stuff
+	await thisGame.setStatus(gameTeam == 0 ? 1 : 0, 0);
+
+	//need to do each piece->target calculation and creating the feedback for the client...
+	await thisTeamsCurrentEvent.fight();
+
+	//feedback to user
+	//what pieces failed their attack
+	//enemy attack information (and their failures/success/neutral)
+	//dice rolls
+	//color the battlePieces based on success/fail
+	//only showing my pieces that won, don't worry about showing who got deleted on my side
+	//reference enemy side to see what gets deleted...
+
+	//click ok
+	//and then those pieces delete themselves and reset back to normal... (remove dice too...)
+};
 
 //Exposed / Exported Functions
 exports.gameReset = async (req, res) => {

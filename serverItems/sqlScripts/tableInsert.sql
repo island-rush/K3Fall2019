@@ -113,3 +113,14 @@ CREATE TABLE IF NOT EXISTS eventItemsTemp(
     FOREIGN KEY (eventPieceId) REFERENCES pieces (pieceId) ON DELETE CASCADE,
     FOREIGN KEY (eventItemGameId) REFERENCES games (gameId) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS eventItemsTargetsTemp(
+	eventId INT(8) NOT NULL,
+    eventPieceId INT(8) NOT NULL,
+    eventItemTarget INT(8) DEFAULT -1,
+    eventItemGameId INT(4) NOT NULL DEFAULT -1,
+    FOREIGN KEY (eventId) REFERENCES eventQueue (eventId) ON DELETE CASCADE,
+    FOREIGN KEY (eventPieceId) REFERENCES pieces (pieceId) ON DELETE CASCADE,
+    FOREIGN KEY (eventItemGameId) REFERENCES games (gameId) ON DELETE CASCADE,
+    PRIMARY KEY (eventId, eventPieceId)
+);

@@ -84,8 +84,20 @@ class Game {
 			for (let x = 0; x < friendlyPiecesList.length; x++) {
 				//need to transform pieces and stuff...
 				let thisFriendlyPiece = {
-					targetPiece: null,
-					targetPieceIndex: -1,
+					targetPiece:
+						friendlyPiecesList[x].tpieceId === null
+							? null
+							: {
+									pieceId: friendlyPiecesList[x].tpieceId,
+									pieceGameId: friendlyPiecesList[x].tpieceGameId,
+									pieceTeamId: friendlyPiecesList[x].tpieceTeamId,
+									pieceTypeId: friendlyPiecesList[x].tpieceTypeId,
+									piecePositionId: friendlyPiecesList[x].tpiecePositionId,
+									pieceVisible: friendlyPiecesList[x].tpieceVisible,
+									pieceMoves: friendlyPiecesList[x].tpieceMoves,
+									pieceFuel: friendlyPiecesList[x].tpieceFuel
+							  },
+					targetPieceIndex: -1, //how do we get the index if it is unknown?
 					diceRolled: 0
 				};
 				thisFriendlyPiece.piece = friendlyPiecesList[x];
@@ -99,6 +111,15 @@ class Game {
 				};
 				thisEnemyPiece.piece = enemyPiecesList[y];
 				enemyPieces.push(thisEnemyPiece);
+			}
+
+			//now need to get the targetPieceIndex from the thing....
+			for (let z = 0; z < friendlyPieces.length; z++) {
+				if (friendlyPieces[z].targetPiece != null) {
+					const { pieceId } = friendlyPieces[z].targetPiece;
+
+					friendlyPieces[z].targetPieceIndex = enemyPieces.findIndex(enemyPieceThing => enemyPieceThing.piece.pieceId === pieceId);
+				}
 			}
 
 			Object.assign(battle, { active: true, friendlyPieces, enemyPieces });

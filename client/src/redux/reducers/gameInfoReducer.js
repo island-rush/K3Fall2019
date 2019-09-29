@@ -9,7 +9,8 @@ import {
 	PLACE_PHASE,
 	PIECES_MOVE,
 	NEW_ROUND,
-	NEWS_PHASE
+	NEWS_PHASE,
+	TARGET_PIECE_SELECT
 } from "../actions/types";
 
 const initialGameInfoState = {
@@ -67,6 +68,9 @@ function gameInfoReducer(state = initialGameInfoState, { type, payload }) {
 			stateDeepCopy.gameStatus = 0;
 			stateDeepCopy.gameRound = 0;
 			stateDeepCopy.gameSlice = 0;
+			return stateDeepCopy;
+		case TARGET_PIECE_SELECT:
+			stateDeepCopy.gameStatus = 1;
 			return stateDeepCopy;
 		default:
 			return state;

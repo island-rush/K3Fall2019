@@ -38,7 +38,8 @@ class Event {
 	}
 
 	async getTeamItems(gameTeam) {
-		const queryString = "SELECT * FROM eventItems NATURAL JOIN pieces WHERE eventId = ? AND eventPieceId = pieceId AND pieceTeamId = ?";
+		const queryString =
+			"SELECT * FROM (SELECT * FROM eventItems NATUAL JOIN pieces WHERE eventPieceId = pieceId AND eventId = ? AND pieceTeamId = ?) a LEFT JOIN (SELECT pieceId as tpieceId, pieceGameId as tpieceGameId, pieceTeamId as tpieceTeamId, pieceTypeId as tpieceTypeId, piecePositionId as tpiecePositionId, pieceContainerId as tpieceContainerId, pieceVisible as tpieceVisible, pieceMoves as tpieceMoves, pieceFuel as tpieceFuel FROM pieces) b ON a.eventItemTarget = b.tpieceId";
 		const inserts = [this.eventId, gameTeam];
 		const [eventTeamItems] = await pool.query(queryString, inserts);
 		return eventTeamItems; //TODO: do we need to return null explicitly? (this is an empty array ^^^ see getItems for difference (not sure why needed))
@@ -86,6 +87,32 @@ class Event {
 		await conn.query(queryString, inserts);
 
 		conn.release();
+	}
+
+	async bulkUpdateTargets(piecesWithTargets) {
+		//TODO: make sure that these piece->targets make sense (prevent bad targetting? (if possible...))
+		let allInserts = [];
+		for (let x = 0; x < piecesWithTargets.length; x++) {
+			let { piece, targetPiece } = piecesWithTargets[x];
+			let newInsert = [this.eventId, piece.pieceId, targetPiece === null ? -1 : targetPiece.pieceId, this.eventGameId];
+			allInserts.push(newInsert);
+		}
+
+		let queryString = "INSERT INTO eventItemsTargetsTemp (eventId, eventPieceId, eventItemTarget, eventItemGameId) VALUES ?";
+		let inserts = [allInserts];
+		await pool.query(queryString, inserts);
+
+		queryString =
+			"UPDATE eventItems, eventItemsTargetsTemp SET eventItems.eventItemTarget = eventItemsTargetsTemp.eventItemTarget WHERE eventItems.eventId = eventItemsTargetsTemp.eventId AND eventItems.eventPieceId = eventItemsTargetsTemp.eventPieceId";
+		await pool.query(queryString);
+
+		queryString = "DELETE FROM eventItemsTargetsTemp WHERE eventItemGameId = ?";
+		inserts = [this.eventGameId];
+		await pool.query(queryString, inserts);
+	}
+
+	async fight() {
+		//get the eventItems from the database
 	}
 }
 
