@@ -16,7 +16,8 @@ import {
 	BATTLE_PIECE_SELECT,
 	ENEMY_PIECE_SELECT,
 	TARGET_PIECE_SELECT,
-	EVENT_BATTLE
+	EVENT_BATTLE,
+	NO_MORE_EVENTS
 } from "../actions/types";
 
 const initialGameboardMeta = {
@@ -32,6 +33,7 @@ const initialGameboardMeta = {
 		active: false,
 		selectedBattlePiece: -1,
 		selectedBattlePieceIndex: -1, //helper to find the piece within the array
+		masterRecord: null,
 		friendlyPieces: [],
 		enemyPieces: []
 	},
@@ -122,15 +124,15 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			//removing the target piece
 			stateDeepCopy.battle.friendlyPieces[payload.battlePieceIndex].targetPiece = null;
 			stateDeepCopy.battle.friendlyPieces[payload.battlePieceIndex].targetPieceIndex = -1;
-			return stateDeepCopy;
+			return stateDeepCopy; //TODO: move all return statements to the bottom...
 		case EVENT_BATTLE:
-			stateDeepCopy.battle = {
-				active: true,
-				selectedBattlePiece: -1,
-				selectedBattlePieceIndex: -1,
-				friendlyPieces: payload.friendlyPieces,
-				enemyPieces: payload.enemyPieces
-			};
+			stateDeepCopy.battle = initialGameboardMeta.battle;
+			stateDeepCopy.battle.active = true;
+			stateDeepCopy.battle.friendlyPieces = payload.friendlyPieces;
+			stateDeepCopy.battle.enemyPieces = payload.enemyPieces;
+			return stateDeepCopy;
+		case NO_MORE_EVENTS:
+			stateDeepCopy = initialGameboardMeta; //gets rid of selected position/piece if there was one...
 			return stateDeepCopy;
 		default:
 			return state;
@@ -138,39 +140,3 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 }
 
 export default gameboardMetaReducer;
-
-// const planning = {
-// 	active: true,
-// 	//from position 0
-// 	moves: [
-// 		{
-// 			type: "move",
-// 			positionId: 1
-// 		},
-// 		{
-// 			type: "move",
-// 			positionId: 2
-// 		},
-// 		{
-// 			type: "container", //not sure yet if this is eventual implementation
-// 			positionId: 2
-// 		},
-// 		{
-// 			type: "move",
-// 			positionId: 3
-// 		}
-// 	]
-// };
-
-// const confirmedPlans = {
-// 	0: [
-// 		{
-// 			type: "move",
-// 			positionId: 1
-// 		},
-// 		{
-// 			type: "move",
-// 			positionId: 2
-// 		}
-// 	]
-// }

@@ -70,7 +70,8 @@ class Game {
 
 		let battle = {
 			selectedBattlePiece: -1,
-			selectedBattlePieceIndex: -1
+			selectedBattlePieceIndex: -1,
+			masterRecord: null
 		};
 
 		if (currentEvent) {
@@ -84,6 +85,16 @@ class Game {
 			for (let x = 0; x < friendlyPiecesList.length; x++) {
 				//need to transform pieces and stuff...
 				let thisFriendlyPiece = {
+					piece: {
+						pieceId: friendlyPiecesList[x].pieceId,
+						pieceGameId: friendlyPiecesList[x].pieceGameId,
+						pieceTeamId: friendlyPiecesList[x].pieceTeamId,
+						pieceTypeId: friendlyPiecesList[x].pieceTypeId,
+						piecePositionId: friendlyPiecesList[x].piecePositionId,
+						pieceVisible: friendlyPiecesList[x].pieceVisible,
+						pieceMoves: friendlyPiecesList[x].pieceMoves,
+						pieceFuel: friendlyPiecesList[x].pieceFuel
+					},
 					targetPiece:
 						friendlyPiecesList[x].tpieceId === null
 							? null
@@ -97,10 +108,8 @@ class Game {
 									pieceMoves: friendlyPiecesList[x].tpieceMoves,
 									pieceFuel: friendlyPiecesList[x].tpieceFuel
 							  },
-					targetPieceIndex: -1, //how do we get the index if it is unknown?
-					diceRolled: 0
+					diceRolled: 0 //don't need to remember last roll, it was shown temporarily to the client and then forgotten (perhaps logged?)
 				};
-				thisFriendlyPiece.piece = friendlyPiecesList[x];
 				friendlyPieces.push(thisFriendlyPiece);
 			}
 			for (let y = 0; y < enemyPiecesList.length; y++) {
@@ -113,7 +122,7 @@ class Game {
 				enemyPieces.push(thisEnemyPiece);
 			}
 
-			//now need to get the targetPieceIndex from the thing....
+			//now need to get the targetPieceIndex from the thing....if needed....
 			for (let z = 0; z < friendlyPieces.length; z++) {
 				if (friendlyPieces[z].targetPiece != null) {
 					const { pieceId } = friendlyPieces[z].targetPiece;

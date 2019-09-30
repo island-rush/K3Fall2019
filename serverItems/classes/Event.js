@@ -1,12 +1,17 @@
 const pool = require("../database");
+const { ATTACK_MATRIX } = require("../constants");
 
 class Event {
 	//TODO: we have a class for event, but multiple tables for keeping track of events, event items, and that one for temp stuff (efficient)
-	constructor(eventId) {
+	constructor(eventId, options) {
 		this.eventId = eventId;
+		if (options) {
+			Object.assign(this, options);
+		}
 	}
 
 	async init() {
+		//TODO: this may not be ever called, check since we now instantiate from static methods?
 		const queryString = "SELECT * FROM eventQueue WHERE eventId = ?";
 		const inserts = [this.eventId];
 		const [results] = await pool.query(queryString, inserts);
@@ -53,16 +58,23 @@ class Event {
 		if (events.length != 1) {
 			return null;
 		} else {
-			const thisEvent = await new Event(events[0]["eventId"]).init();
+			const thisEvent = new Event(events[0]["eventId"], events[0]); //don't need to init, already got all the info from first query
 			return thisEvent;
 		}
 	}
 
-	static async all(gameId) {
-		const queryString = "SELECT * FROM eventQueue WHERE eventGameId = ? ORDER BY eventId ASC";
+	//TODO: this function not called anymore, unlikely to need it...
+	static async getNextAnyteam(gameId) {
+		const queryString = "SELECT * FROM eventQueue WHERE eventGameId = ? ORDER BY eventId ASC LIMIT 1";
 		const inserts = [gameId];
 		const [events] = await pool.query(queryString, inserts);
-		return events;
+
+		if (events.length != 1) {
+			return null;
+		} else {
+			const thisEvent = new Event(events[0]["eventId"], events[0]);
+			return thisEvent;
+		}
 	}
 
 	static async bulkInsertEvents(allInserts) {
@@ -111,8 +123,90 @@ class Event {
 		await pool.query(queryString, inserts);
 	}
 
+	//prettier-ignore
 	async fight() {
-		//get the eventItems from the database
+		//send specific friendly/enemy stuff to each client (io.sockets.in...)
+
+		//restricted selection, could restrict more from inner tables...
+		let queryString =
+			"SELECT * FROM (SELECT * FROM eventItems NATUAL JOIN pieces WHERE eventPieceId = pieceId AND eventId = ?) a LEFT JOIN (SELECT pieceId as tpieceId, pieceGameId as tpieceGameId, pieceTeamId as tpieceTeamId, pieceTypeId as tpieceTypeId, piecePositionId as tpiecePositionId, pieceContainerId as tpieceContainerId, pieceVisible as tpieceVisible, pieceMoves as tpieceMoves, pieceFuel as tpieceFuel FROM pieces) b ON a.eventItemTarget = b.tpieceId";
+		let inserts = [this.eventId];
+		const [eventItemsWithTargets] = await pool.query(queryString, inserts);
+
+		//need to know if any battles, and if 0 battles, end the event
+		let atLeastOneBattle = false;
+		for (let t = 0; t < eventItemsWithTargets.length; t++) {
+			//assume that anything inserted into the database was legit (that piece had valid attack...etc)
+			if (eventItemsWithTargets[t].tpieceId != null) {
+				atLeastOneBattle = true;
+				break;
+			}
+		}
+
+		let fightResults = {
+			atLeastOneBattle
+		};
+
+		if (atLeastOneBattle) {
+			let piecesToDelete = [-1]; //need at least 1 value for sql to work?
+			let masterRecord = [];  //for the client to handle...(future may do more things for client in advance...)
+		
+			for (let x = 0; x < eventItemsWithTargets.length; x++) {
+				let thisEventItem = eventItemsWithTargets[x];
+				let { pieceId, pieceTypeId, tpieceId, tpieceTypeId } = thisEventItem;
+				//is there a target?
+				if (tpieceId == null) {
+					//nothing new, no dice...
+					masterRecord.push({
+						pieceId,
+						targetId: null,  //probably not needed....
+						diceRoll: 0,
+						win: false
+					});
+				} else {
+					//do a dice roll
+					//figure out needed value for success
+					let neededValue = ATTACK_MATRIX[pieceTypeId, tpieceTypeId];
+					let diceRollValue = this.diceRoll();
+	
+					//> or >=?
+					if (diceRollValue >= neededValue) {
+						//something happens!, show dice, highlight probably
+						//bulk update add? //bulk delete?
+						piecesToDelete.push(tpieceId);
+						masterRecord.push({
+							pieceId,
+							diceRoll: diceRollValue,
+							targetId: tpieceId,
+							win: true
+						});
+					} else {
+						//nothing happens, show dice, don't highlight?
+						masterRecord.push({
+							pieceId,
+							diceRoll: diceRollValue,
+							targetId: tpieceId,
+							win: false
+						});
+					}
+				}
+			}
+	
+			//delete pieces if they are in the array (BULK DELETE QUERY)
+			//TODO: move this functionality to the piece class?
+			queryString = "DELETE FROM pieces WHERE pieceId IN (?)";
+			inserts = [piecesToDelete];
+			await pool.query(queryString, inserts);
+
+			//need to return the master record? and something else?
+			fightResults.masterRecord = masterRecord;
+		}
+
+		return fightResults;
+	}
+
+	diceRoll() {
+		return -1;
 	}
 }
 

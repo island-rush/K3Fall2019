@@ -3,8 +3,11 @@ const CONSTANTS = require("../constants");
 const distanceMatrix = require("../distanceMatrix");
 
 class Piece {
-	constructor(pieceId) {
+	constructor(pieceId, options) {
 		this.pieceId = pieceId;
+		if (options) {
+			Object.assign(this, options);
+		}
 	}
 
 	async init() {

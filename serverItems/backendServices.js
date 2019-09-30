@@ -426,7 +426,7 @@ const mainButtonClick = async (io, socket) => {
 				};
 				io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
 			} else {
-				await handleSlice2Step(io, thisGame);
+				await executeStep(io, socket, thisGame);
 			}
 			break;
 		default:
@@ -434,17 +434,18 @@ const mainButtonClick = async (io, socket) => {
 	}
 };
 
-const handleSlice2Step = async (io, thisGame) => {
+const executeStep = async (io, socket, thisGame) => {
+	//inserting events here and moving pieces, or changing to new round or something...
 	const { gameId, gameRound } = thisGame;
 
-	//Slice 1 functionality
-	let events = await Event.all(gameId); //TODO: could limit this to 1 event? (but need to check events that no longer matter...)
-
-	if (events.length > 0) {
-		//deal with the event for one or both clients
-		//loop through the events until one is doable, delete any that are no longer applicable
-		//this happens when pieces get deleted (unless run script to auto delete those events...)
-	}
+	//make sure no more events are here, if events exist, need to wait for other team to do stuff
+	//UNLIKELY THIS WOULD HAPPEN, THIS WOULD MEAN THAT -> other team is in a waiting status while other team is handling its own event...
+	// const nextEvent = await Event.getNextAnyteam(gameId);
+	// if (nextEvent) {
+	// 	//need to send client that still waiting on otherevents to finish
+	// 	sendUserFeedback(socket, "still waiting on all events to finish for this step...");
+	// 	return;
+	// }
 
 	const currentMovementOrder0 = await Plan.getCurrentMovementOrder(gameId, 0);
 	const currentMovementOrder1 = await Plan.getCurrentMovementOrder(gameId, 1);
@@ -604,6 +605,8 @@ const handleSlice2Step = async (io, thisGame) => {
 	let serverActions = [{}, {}];
 
 	//TODO: remove this duplicate code, put into a function probably...(or rename variables to be part of the equation for these??
+	//event handler?
+	//FUNCTION: GIVE THE CLIENT NEXT THING THAT HAPPENS (EVENT OR PIECE MOVE....(client specific...))
 	gameEvents[0] = await Event.getNext(gameId, 0);
 	if (gameEvents[0]) {
 		const type = gameEvents[0].eventTypeId;
@@ -796,25 +799,6 @@ const piecePlace = async (io, socket, invItemId, selectedPosition) => {
 };
 
 const confirmBattleSelection = async (io, socket, friendlyPieces) => {
-	// [ { targetPiece: null,  //or has a piece object inside of it
-	// 	   targetPieceIndex: -1,
-	// 	   diceRolled: 0,
-	// 	   piece:
-	// 	    { eventId: 2,
-	// 	      eventPieceId: 7,
-	// 	      eventItemTarget: -1,
-	// 	      pieceId: 7,
-	// 	      pieceGameId: 1,
-	// 	      pieceTeamId: 0,
-	// 	      pieceTypeId: 8,
-	// 	      piecePositionId: 4,
-	// 	      pieceContainerId: -1,
-	// 	      pieceVisible: 1,
-	// 	      pieceMoves: 5,
-	// 	      pieceFuel: 5 } } ]
-
-	//need to change the eventItemTarget within the eventItem in the database? (for the latest event for this team...)
-
 	//Does the server know this user?
 	if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
 		socket.emit("serverRedirect", CONSTANTS.BAD_SESSION);
@@ -845,10 +829,11 @@ const confirmBattleSelection = async (io, socket, friendlyPieces) => {
 
 	//confirm the selections
 	const thisTeamsCurrentEvent = await Event.getNext(gameId, gameTeam);
-	await thisTeamsCurrentEvent.bulkUpdateTargets(friendlyPieces);
+	await thisTeamsCurrentEvent.bulkUpdateTargets(friendlyPieces); //TODO: since already have friendly pieces, could in theory only request enemy pieces from database for efficiency, but likely too much work for too little reward
 
 	//are we waiting for the other client?
-	const otherTeamStatus = thisGame[`game${gameTeam == 0 ? 1 : 0}Status`];
+	const otherTeam = gameTeam == 0 ? 1 : 0;
+	const otherTeamStatus = thisGame[`game${otherTeam}Status`];
 
 	if (otherTeamStatus == 0) {
 		await thisGame.setStatus(gameTeam, 1);
@@ -857,21 +842,150 @@ const confirmBattleSelection = async (io, socket, friendlyPieces) => {
 	}
 
 	//if get here, other team was already waiting, need to set them to 0 and handle stuff
-	await thisGame.setStatus(gameTeam == 0 ? 1 : 0, 0);
+	await thisGame.setStatus(otherTeam, 0);
 
-	//need to do each piece->target calculation and creating the feedback for the client...
-	await thisTeamsCurrentEvent.fight();
+	//Do the fight!
+	const fightResults = await thisTeamsCurrentEvent.fight();
 
-	//feedback to user
-	//what pieces failed their attack
-	//enemy attack information (and their failures/success/neutral)
-	//dice rolls
-	//color the battlePieces based on success/fail
-	//only showing my pieces that won, don't worry about showing who got deleted on my side
-	//reference enemy side to see what gets deleted...
+	if (fightResults.atLeastOneBattle) {
+		//send the fightResults (masterrecord to client, let them click confirm again for this battle)
+		//sending to both clients the same results, they will handle showing them in their own way...(different indexes and stuff)
+		const serverAction = {
+			type: CONSTANTS.BATTLE_FIGHT_RESULTS,
+			payload: {
+				masterRecord: fightResults.masterRecord
+			}
+		};
 
-	//click ok
-	//and then those pieces delete themselves and reset back to normal... (remove dice too...)
+		io.sockets.in("game" + gameId).emit("serverSendingAction", serverAction);
+	} else {
+		//delete this event, try to send next event to client (battle.active = false? (stuff like that...))
+		await thisTeamsCurrentEvent.delete();
+
+		//get next?
+		//send to individual clients?
+		//same as the end of execute step?
+
+		//Don't really like doing it this way, but sorta clean?
+		let gameEvents = [null, null];
+		let serverActions = [{}, {}];
+
+		//TODO: remove this duplicate code, put into a function probably...(or rename variables to be part of the equation for these??
+		//event handler?
+		//FUNCTION: GIVE THE CLIENT NEXT THING THAT HAPPENS (EVENT OR NOTHING), they need to click for next execute anyways...
+		gameEvents[0] = await Event.getNext(gameId, 0);
+		if (gameEvents[0]) {
+			const type = gameEvents[0].eventTypeId;
+
+			switch (type) {
+				case 1:
+					//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
+
+					//need to transform eventItems in the battle object for the frontend to use
+					//need to create this battle object entirely? (frontend becomes easy if we do this, or just the friendly pieces and enemy pieces)
+					let friendlyPiecesList = await gameEvents[0].getTeamItems(0);
+					let enemyPiecesList = await gameEvents[0].getTeamItems(1);
+					let friendlyPieces = [];
+					let enemyPieces = [];
+
+					for (let x = 0; x < friendlyPiecesList.length; x++) {
+						//need to transform pieces and stuff... (not necessarily, could let client do more work...)(would also get rid of duplicate code if there was some (maybe))
+						let thisFriendlyPiece = {
+							targetPiece: null,
+							targetPieceIndex: -1,
+							diceRolled: 0
+						};
+						thisFriendlyPiece.piece = friendlyPiecesList[x];
+						friendlyPieces.push(thisFriendlyPiece);
+					}
+
+					for (let y = 0; y < enemyPiecesList.length; y++) {
+						let thisEnemyPiece = {
+							targetPiece: null,
+							targetPieceIndex: -1,
+							diceRolled: 0
+						};
+						thisEnemyPiece.piece = enemyPiecesList[y];
+						enemyPieces.push(thisEnemyPiece);
+					}
+
+					serverActions[0] = {
+						type: CONSTANTS.EVENT_BATTLE,
+						payload: {
+							friendlyPieces,
+							enemyPieces
+						}
+					};
+					break;
+				default:
+					//this would never happen
+					return;
+			}
+		} else {
+			//send the client that they are waiting for the next move? (need to change status?)
+			serverActions[0] = {
+				type: CONSTANTS.NO_MORE_EVENTS,
+				payload: {} //don't need this...
+			};
+		}
+
+		gameEvents[1] = await Event.getNext(gameId, 1);
+		if (gameEvents[1]) {
+			const type = gameEvents[1].eventTypeId;
+
+			//TODO: duplicate code everywhere, refactor this (DRY)
+			switch (type) {
+				case 1:
+					//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
+
+					let friendlyPiecesList = await gameEvents[1].getTeamItems(1);
+					let enemyPiecesList = await gameEvents[1].getTeamItems(0);
+					let friendlyPieces = [];
+					let enemyPieces = [];
+
+					for (let x = 0; x < friendlyPiecesList.length; x++) {
+						//need to transform pieces and stuff...
+						let thisFriendlyPiece = {
+							targetPiece: null,
+							targetPieceIndex: -1,
+							diceRolled: 0
+						};
+						thisFriendlyPiece.piece = friendlyPiecesList[x];
+						friendlyPieces.push(thisFriendlyPiece);
+					}
+
+					for (let y = 0; y < enemyPiecesList.length; y++) {
+						let thisEnemyPiece = {
+							targetPiece: null,
+							targetPieceIndex: -1,
+							diceRolled: 0
+						};
+						thisEnemyPiece.piece = enemyPiecesList[y];
+						enemyPieces.push(thisEnemyPiece);
+					}
+
+					serverActions[1] = {
+						type: CONSTANTS.EVENT_BATTLE,
+						payload: {
+							friendlyPieces,
+							enemyPieces
+						}
+					};
+					break;
+				default:
+					//this would never happen (famous last words)
+					return;
+			}
+		} else {
+			serverActions[0] = {
+				type: CONSTANTS.NO_MORE_EVENTS,
+				payload: {} //don't need this...
+			};
+		}
+
+		io.sockets.in("game" + gameId + "team0").emit("serverSendingAction", serverActions[0]);
+		io.sockets.in("game" + gameId + "team1").emit("serverSendingAction", serverActions[1]);
+	}
 };
 
 //Exposed / Exported Functions
