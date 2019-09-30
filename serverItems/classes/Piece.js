@@ -5,6 +5,7 @@ const distanceMatrix = require("../distanceMatrix");
 class Piece {
 	constructor(pieceId, options) {
 		this.pieceId = pieceId;
+		//TODO: did these options come from the client? (if so, more secure to not accept them...but unlikely would actually get hacked...)
 		if (options) {
 			Object.assign(this, options);
 		}

@@ -56,6 +56,7 @@ class Event {
 		const [events] = await pool.query(queryString, inserts);
 
 		if (events.length != 1) {
+			//was limiting 1 from query, so should be 1 or 0
 			return null;
 		} else {
 			const thisEvent = new Event(events[0]["eventId"], events[0]); //don't need to init, already got all the info from first query
