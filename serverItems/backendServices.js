@@ -605,29 +605,32 @@ const executeStep = async (io, socket, thisGame) => {
 	let gameEvents = [null, null];
 	let serverActions = [{}, {}];
 
-	//TODO: remove this duplicate code, put into a function probably...(or rename variables to be part of the equation for these??
-	//event handler?
-	//FUNCTION: GIVE THE CLIENT NEXT THING THAT HAPPENS (EVENT OR PIECE MOVE....(client specific...))
+	let friendlyPiecesList;
+	let enemyPiecesList;
+	let friendlyPieces;
+	let enemyPieces;
+
 	gameEvents[0] = await Event.getNext(gameId, 0);
 	if (gameEvents[0]) {
 		const type = gameEvents[0].eventTypeId;
 
 		switch (type) {
-			case 1:
+			case 0: //collision and position (TODO: make these constants, refactor how events are handled? (move this code out somewhere...))
 				//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
 
 				//need to transform eventItems in the battle object for the frontend to use
 				//need to create this battle object entirely? (frontend becomes easy if we do this, or just the friendly pieces and enemy pieces)
-				let friendlyPiecesList = await gameEvents[0].getTeamItems(0);
-				let enemyPiecesList = await gameEvents[0].getTeamItems(1);
-				let friendlyPieces = [];
-				let enemyPieces = [];
+				friendlyPiecesList = await gameEvents[0].getTeamItems(0);
+				enemyPiecesList = await gameEvents[0].getTeamItems(1);
+				friendlyPieces = [];
+				enemyPieces = [];
 
 				for (let x = 0; x < friendlyPiecesList.length; x++) {
-					//need to transform pieces and stuff...
+					//need to transform pieces and stuff... (not necessarily, could let client do more work...)(would also get rid of duplicate code if there was some (maybe))
 					let thisFriendlyPiece = {
 						targetPiece: null,
-						targetPieceIndex: -1
+						targetPieceIndex: -1,
+						diceRolled: 0
 					};
 					thisFriendlyPiece.piece = friendlyPiecesList[x];
 					friendlyPieces.push(thisFriendlyPiece);
@@ -636,7 +639,47 @@ const executeStep = async (io, socket, thisGame) => {
 				for (let y = 0; y < enemyPiecesList.length; y++) {
 					let thisEnemyPiece = {
 						targetPiece: null,
-						targetPieceIndex: -1
+						targetPieceIndex: -1,
+						diceRolled: 0
+					};
+					thisEnemyPiece.piece = enemyPiecesList[y];
+					enemyPieces.push(thisEnemyPiece);
+				}
+
+				serverActions[0] = {
+					type: CONSTANTS.EVENT_BATTLE,
+					payload: {
+						friendlyPieces,
+						enemyPieces
+					}
+				};
+				break;
+			case 1: //collision and position (TODO: make these constants, refactor how events are handled? (move this code out somewhere...))
+				//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
+
+				//need to transform eventItems in the battle object for the frontend to use
+				//need to create this battle object entirely? (frontend becomes easy if we do this, or just the friendly pieces and enemy pieces)
+				friendlyPiecesList = await gameEvents[0].getTeamItems(0);
+				enemyPiecesList = await gameEvents[0].getTeamItems(1);
+				friendlyPieces = [];
+				enemyPieces = [];
+
+				for (let x = 0; x < friendlyPiecesList.length; x++) {
+					//need to transform pieces and stuff... (not necessarily, could let client do more work...)(would also get rid of duplicate code if there was some (maybe))
+					let thisFriendlyPiece = {
+						targetPiece: null,
+						targetPieceIndex: -1,
+						diceRolled: 0
+					};
+					thisFriendlyPiece.piece = friendlyPiecesList[x];
+					friendlyPieces.push(thisFriendlyPiece);
+				}
+
+				for (let y = 0; y < enemyPiecesList.length; y++) {
+					let thisEnemyPiece = {
+						targetPiece: null,
+						targetPieceIndex: -1,
+						diceRolled: 0
 					};
 					thisEnemyPiece.piece = enemyPiecesList[y];
 					enemyPieces.push(thisEnemyPiece);
@@ -651,23 +694,68 @@ const executeStep = async (io, socket, thisGame) => {
 				};
 				break;
 			default:
-				//this would never happen
+				//this would never happen (hopefully)
+				console.log("default unknown event type! (this should not have happened...)");
 				return;
 		}
+	} else {
+		//send the client that they are waiting for the next move? (need to change status?)
+		serverActions[0] = {
+			type: CONSTANTS.NO_MORE_EVENTS,
+			payload: {} //don't need this...
+		};
 	}
 
 	gameEvents[1] = await Event.getNext(gameId, 1);
 	if (gameEvents[1]) {
 		const type = gameEvents[1].eventTypeId;
 
+		//TODO: duplicate code everywhere, refactor this (DRY)
 		switch (type) {
+			case 0:
+				//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
+
+				friendlyPiecesList = await gameEvents[1].getTeamItems(1);
+				enemyPiecesList = await gameEvents[1].getTeamItems(0);
+				friendlyPieces = [];
+				enemyPieces = [];
+
+				for (let x = 0; x < friendlyPiecesList.length; x++) {
+					//need to transform pieces and stuff...
+					let thisFriendlyPiece = {
+						targetPiece: null,
+						targetPieceIndex: -1,
+						diceRolled: 0
+					};
+					thisFriendlyPiece.piece = friendlyPiecesList[x];
+					friendlyPieces.push(thisFriendlyPiece);
+				}
+
+				for (let y = 0; y < enemyPiecesList.length; y++) {
+					let thisEnemyPiece = {
+						targetPiece: null,
+						targetPieceIndex: -1,
+						diceRolled: 0
+					};
+					thisEnemyPiece.piece = enemyPiecesList[y];
+					enemyPieces.push(thisEnemyPiece);
+				}
+
+				serverActions[1] = {
+					type: CONSTANTS.EVENT_BATTLE,
+					payload: {
+						friendlyPieces,
+						enemyPieces
+					}
+				};
+				break;
 			case 1:
 				//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
 
-				let friendlyPiecesList = await gameEvents[1].getTeamItems(1);
-				let enemyPiecesList = await gameEvents[1].getTeamItems(0);
-				let friendlyPieces = [];
-				let enemyPieces = [];
+				friendlyPiecesList = await gameEvents[1].getTeamItems(1);
+				enemyPiecesList = await gameEvents[1].getTeamItems(0);
+				friendlyPieces = [];
+				enemyPieces = [];
 
 				for (let x = 0; x < friendlyPiecesList.length; x++) {
 					//need to transform pieces and stuff...
@@ -703,9 +791,13 @@ const executeStep = async (io, socket, thisGame) => {
 				return;
 		}
 	} else {
-		//TODO: move pieces in here
+		serverActions[1] = {
+			type: CONSTANTS.NO_MORE_EVENTS,
+			payload: {} //don't need this...
+		};
 	}
 
+	//sending the events that we got, or "no more events"? (but also sending piece moves after this...should combine...)
 	io.sockets.in("game" + gameId + "team0").emit("serverSendingAction", serverActions[0]);
 	io.sockets.in("game" + gameId + "team1").emit("serverSendingAction", serverActions[1]);
 
@@ -872,20 +964,65 @@ const confirmBattleSelection = async (io, socket, friendlyPieces) => {
 		//TODO: remove this duplicate code, put into a function probably...(or rename variables to be part of the equation for these??
 		//event handler?
 		//FUNCTION: GIVE THE CLIENT NEXT THING THAT HAPPENS (EVENT OR NOTHING), they need to click for next execute anyways...
+
+		let friendlyPiecesList;
+		let enemyPiecesList;
+		let friendlyPieces;
+		let enemyPieces;
+
 		gameEvents[0] = await Event.getNext(gameId, 0);
 		if (gameEvents[0]) {
 			const type = gameEvents[0].eventTypeId;
 
 			switch (type) {
-				case 1:
+				case 0: //collision and position (TODO: make these constants, refactor how events are handled? (move this code out somewhere...))
 					//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
 
 					//need to transform eventItems in the battle object for the frontend to use
 					//need to create this battle object entirely? (frontend becomes easy if we do this, or just the friendly pieces and enemy pieces)
-					let friendlyPiecesList = await gameEvents[0].getTeamItems(0);
-					let enemyPiecesList = await gameEvents[0].getTeamItems(1);
-					let friendlyPieces = [];
-					let enemyPieces = [];
+					friendlyPiecesList = await gameEvents[0].getTeamItems(0);
+					enemyPiecesList = await gameEvents[0].getTeamItems(1);
+					friendlyPieces = [];
+					enemyPieces = [];
+
+					for (let x = 0; x < friendlyPiecesList.length; x++) {
+						//need to transform pieces and stuff... (not necessarily, could let client do more work...)(would also get rid of duplicate code if there was some (maybe))
+						let thisFriendlyPiece = {
+							targetPiece: null,
+							targetPieceIndex: -1,
+							diceRolled: 0
+						};
+						thisFriendlyPiece.piece = friendlyPiecesList[x];
+						friendlyPieces.push(thisFriendlyPiece);
+					}
+
+					for (let y = 0; y < enemyPiecesList.length; y++) {
+						let thisEnemyPiece = {
+							targetPiece: null,
+							targetPieceIndex: -1,
+							diceRolled: 0
+						};
+						thisEnemyPiece.piece = enemyPiecesList[y];
+						enemyPieces.push(thisEnemyPiece);
+					}
+
+					serverActions[0] = {
+						type: CONSTANTS.EVENT_BATTLE,
+						payload: {
+							friendlyPieces,
+							enemyPieces
+						}
+					};
+					break;
+				case 1: //collision and position (TODO: make these constants, refactor how events are handled? (move this code out somewhere...))
+					//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
+
+					//need to transform eventItems in the battle object for the frontend to use
+					//need to create this battle object entirely? (frontend becomes easy if we do this, or just the friendly pieces and enemy pieces)
+					friendlyPiecesList = await gameEvents[0].getTeamItems(0);
+					enemyPiecesList = await gameEvents[0].getTeamItems(1);
+					friendlyPieces = [];
+					enemyPieces = [];
 
 					for (let x = 0; x < friendlyPiecesList.length; x++) {
 						//need to transform pieces and stuff... (not necessarily, could let client do more work...)(would also get rid of duplicate code if there was some (maybe))
@@ -917,7 +1054,8 @@ const confirmBattleSelection = async (io, socket, friendlyPieces) => {
 					};
 					break;
 				default:
-					//this would never happen
+					//this would never happen (hopefully)
+					console.log("default unknown event type! (this should not have happened...)");
 					return;
 			}
 		} else {
@@ -934,13 +1072,50 @@ const confirmBattleSelection = async (io, socket, friendlyPieces) => {
 
 			//TODO: duplicate code everywhere, refactor this (DRY)
 			switch (type) {
+				case 0:
+					//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
+
+					friendlyPiecesList = await gameEvents[1].getTeamItems(1);
+					enemyPiecesList = await gameEvents[1].getTeamItems(0);
+					friendlyPieces = [];
+					enemyPieces = [];
+
+					for (let x = 0; x < friendlyPiecesList.length; x++) {
+						//need to transform pieces and stuff...
+						let thisFriendlyPiece = {
+							targetPiece: null,
+							targetPieceIndex: -1,
+							diceRolled: 0
+						};
+						thisFriendlyPiece.piece = friendlyPiecesList[x];
+						friendlyPieces.push(thisFriendlyPiece);
+					}
+
+					for (let y = 0; y < enemyPiecesList.length; y++) {
+						let thisEnemyPiece = {
+							targetPiece: null,
+							targetPieceIndex: -1,
+							diceRolled: 0
+						};
+						thisEnemyPiece.piece = enemyPiecesList[y];
+						enemyPieces.push(thisEnemyPiece);
+					}
+
+					serverActions[1] = {
+						type: CONSTANTS.EVENT_BATTLE,
+						payload: {
+							friendlyPieces,
+							enemyPieces
+						}
+					};
+					break;
 				case 1:
 					//TODO: make the type part of a constant array and access it from there...(and keep the eventItems standard...and let client figure out what to do next...)
 
-					let friendlyPiecesList = await gameEvents[1].getTeamItems(1);
-					let enemyPiecesList = await gameEvents[1].getTeamItems(0);
-					let friendlyPieces = [];
-					let enemyPieces = [];
+					friendlyPiecesList = await gameEvents[1].getTeamItems(1);
+					enemyPiecesList = await gameEvents[1].getTeamItems(0);
+					friendlyPieces = [];
+					enemyPieces = [];
 
 					for (let x = 0; x < friendlyPiecesList.length; x++) {
 						//need to transform pieces and stuff...
