@@ -27,8 +27,8 @@ export const typeImages = {
 export const diceImages = {
 	//TODO: use actual dice images instead of unit images
 	// 0 => no dice roll yet
-	0: { backgroundImage: `url("${relativePath}bomber.png")` },
-	1: { backgroundImage: `url("${relativePath}stealthBomber.png")` },
+	0: { backgroundImage: `url("${relativePath}bomber.png")` }, //impossible (used, but wouldn't get called...(prevented))
+	1: { backgroundImage: `url("${relativePath}stealthBomber.png")` }, //impossible, but used for testing (force a loss)
 	2: { backgroundImage: `url("${relativePath}fighter.png")` },
 	3: { backgroundImage: `url("${relativePath}tanker.png")` },
 	4: { backgroundImage: `url("${relativePath}c17.png")` },

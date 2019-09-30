@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import BattlePiece from "./BattlePiece";
-import { battlePieceClick, enemyBattlePieceClick, targetPieceClick, confirmBattleSelections } from "../../redux/actions/userActions";
+import { battlePieceClick, enemyBattlePieceClick, targetPieceClick, confirmBattleSelections, clearOldBattle } from "../../redux/actions/userActions";
 
 const battlePopupStyle = {
 	position: "absolute",
@@ -48,7 +48,7 @@ const invisibleStyle = {
 
 class BattlePopup extends Component {
 	render() {
-		const { battlePieceClick, enemyBattlePieceClick, targetPieceClick, confirmBattleSelections, battle } = this.props;
+		const { battlePieceClick, enemyBattlePieceClick, targetPieceClick, confirmBattleSelections, battle, clearOldBattle } = this.props;
 		const { selectedBattlePiece, friendlyPieces, enemyPieces } = battle;
 
 		const friendlyBattlePieces = friendlyPieces.map((battlePiece, index) => (
@@ -70,7 +70,7 @@ class BattlePopup extends Component {
 				battlePieceClick={battlePieceClick}
 				targetPieceClick={targetPieceClick}
 				enemyBattlePieceClick={enemyBattlePieceClick}
-				isSelected={false}
+				isSelected={false} //never selected
 				key={index}
 				battlePiece={battlePiece}
 				battlePieceIndex={index}
@@ -84,12 +84,16 @@ class BattlePopup extends Component {
 				<button
 					onClick={event => {
 						event.preventDefault();
-						confirmBattleSelections();
+						if (battle.masterRecord != null) {
+							clearOldBattle();
+						} else {
+							confirmBattleSelections();
+						}
 						event.stopPropagation();
 					}}
 					style={battleButtonStyle}
 				>
-					Confirm Selections
+					{battle.masterRecord == null ? "Confirm Selections" : "ack"}
 				</button>
 			</div>
 		);
@@ -101,7 +105,8 @@ BattlePopup.propTypes = {
 	battlePieceClick: PropTypes.func.isRequired,
 	enemyBattlePieceClick: PropTypes.func.isRequired,
 	targetPieceClick: PropTypes.func.isRequired,
-	confirmBattleSelections: PropTypes.func.isRequired
+	confirmBattleSelections: PropTypes.func.isRequired,
+	clearOldBattle: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ gameboardMeta }) => ({
@@ -112,7 +117,8 @@ const mapActionsToProps = {
 	battlePieceClick,
 	enemyBattlePieceClick,
 	targetPieceClick,
-	confirmBattleSelections
+	confirmBattleSelections,
+	clearOldBattle
 };
 
 export default connect(

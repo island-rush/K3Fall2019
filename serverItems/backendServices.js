@@ -214,7 +214,7 @@ const confirmPlan = async (socket, pieceId, plan) => {
 		return;
 	}
 	const { piecePositionId, pieceTypeId, pieceGameId, pieceTeamId } = thisPiece;
-	if (pieceGameId != gameId && pieceTeamId != gameTeam) {
+	if (pieceGameId != gameId || pieceTeamId != gameTeam) {
 		sendUserFeedback(socket, "Piece did not belong to your team...(or this game)");
 		return;
 	}
@@ -451,6 +451,7 @@ const executeStep = async (io, socket, thisGame) => {
 	const currentMovementOrder1 = await Plan.getCurrentMovementOrder(gameId, 1);
 
 	//No More Plans for either team
+	//DOESN'T MAKE PLANS FOR PIECES STILL IN THE SAME POSITION...NEED TO HAVE AT LEAST 1 PLAN FOR ANYTHING TO HAPPEN (pieces in same postion would battle (again?) if there was 1 plan elsewhere...)
 	if (currentMovementOrder0 == null && currentMovementOrder1 == null) {
 		if (gameRound == 2) {
 			await thisGame.setRound(0);
@@ -626,8 +627,7 @@ const executeStep = async (io, socket, thisGame) => {
 					//need to transform pieces and stuff...
 					let thisFriendlyPiece = {
 						targetPiece: null,
-						targetPieceIndex: -1,
-						diceRolled: 0
+						targetPieceIndex: -1
 					};
 					thisFriendlyPiece.piece = friendlyPiecesList[x];
 					friendlyPieces.push(thisFriendlyPiece);
@@ -636,8 +636,7 @@ const executeStep = async (io, socket, thisGame) => {
 				for (let y = 0; y < enemyPiecesList.length; y++) {
 					let thisEnemyPiece = {
 						targetPiece: null,
-						targetPieceIndex: -1,
-						diceRolled: 0
+						targetPieceIndex: -1
 					};
 					thisEnemyPiece.piece = enemyPiecesList[y];
 					enemyPieces.push(thisEnemyPiece);
@@ -977,7 +976,7 @@ const confirmBattleSelection = async (io, socket, friendlyPieces) => {
 					return;
 			}
 		} else {
-			serverActions[0] = {
+			serverActions[1] = {
 				type: CONSTANTS.NO_MORE_EVENTS,
 				payload: {} //don't need this...
 			};

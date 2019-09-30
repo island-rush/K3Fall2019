@@ -11,7 +11,8 @@ import {
 	CONTAINER_MOVE,
 	BATTLE_PIECE_SELECT,
 	ENEMY_PIECE_SELECT,
-	TARGET_PIECE_SELECT
+	TARGET_PIECE_SELECT,
+	CLEAR_BATTLE
 } from "./types";
 
 import { distanceMatrix } from "./distanceMatrix";
@@ -328,6 +329,13 @@ export const confirmBattleSelections = () => {
 		};
 
 		emit("confirmBattleSelection", payload);
+	};
+};
+
+export const clearOldBattle = () => {
+	return {
+		type: CLEAR_BATTLE,
+		payload: {}
 	};
 };
 

@@ -17,7 +17,9 @@ import {
 	ENEMY_PIECE_SELECT,
 	TARGET_PIECE_SELECT,
 	EVENT_BATTLE,
-	NO_MORE_EVENTS
+	BATTLE_FIGHT_RESULTS,
+	NO_MORE_EVENTS,
+	CLEAR_BATTLE
 } from "../actions/types";
 
 const initialGameboardMeta = {
@@ -33,7 +35,6 @@ const initialGameboardMeta = {
 		active: false,
 		selectedBattlePiece: -1,
 		selectedBattlePieceIndex: -1, //helper to find the piece within the array
-		masterRecord: null,
 		friendlyPieces: [],
 		enemyPieces: []
 	},
@@ -132,7 +133,82 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.battle.enemyPieces = payload.enemyPieces;
 			return stateDeepCopy;
 		case NO_MORE_EVENTS:
-			stateDeepCopy = initialGameboardMeta; //gets rid of selected position/piece if there was one...
+			// stateDeepCopy = initialGameboardMeta; //gets rid of selected position/piece if there was one...
+			// stateDeepCopy.battle = initialGameboardMeta.battle;
+			// stateDeepCopy.refuel = initialGameboardMeta.refuel;  //these don't seem to work
+			// stateDeepCopy.container = initialGameboardMeta.container;
+			stateDeepCopy.battle = {
+				active: false,
+				selectedBattlePiece: -1,
+				selectedBattlePieceIndex: -1, //helper to find the piece within the array
+				friendlyPieces: [],
+				enemyPieces: []
+			};
+			stateDeepCopy.refuel = { active: false };
+			stateDeepCopy.container = { active: false };
+			return stateDeepCopy;
+		case BATTLE_FIGHT_RESULTS:
+			stateDeepCopy.battle.masterRecord = payload.masterRecord;
+
+			//now need more stuff handled for things...
+			for (let x = 0; x < stateDeepCopy.battle.friendlyPieces.length; x++) {
+				//already knew the targets...
+				//which ones win or not gets handled
+
+				let currentRecord = payload.masterRecord.find((record, index) => {
+					return record.pieceId === stateDeepCopy.battle.friendlyPieces[x].piece.pieceId;
+				});
+
+				let { targetId, diceRoll, win } = currentRecord;
+
+				if (targetId) {
+					stateDeepCopy.battle.friendlyPieces[x].diceRoll = diceRoll;
+					stateDeepCopy.battle.friendlyPieces[x].win = win;
+				}
+			}
+
+			for (let z = 0; z < stateDeepCopy.battle.enemyPieces.length; z++) {
+				//for each enemy piece that know (from battle.enemyPieces)
+				//add their target/dice information?
+
+				//every piece should have a record from the battle, even if it didn't do anything... (things will be null...(reference Event.js))
+				let currentRecord = payload.masterRecord.find((record, index) => {
+					return record.pieceId === stateDeepCopy.battle.enemyPieces[z].piece.pieceId;
+				});
+
+				let { pieceId, targetId, diceRoll, win } = currentRecord;
+
+				if (targetId) {
+					//get the target information from the friendlyPieces
+					//TODO: could refactor this to be better, lots of lookups probably not good
+					let friendlyPieceIndex = stateDeepCopy.battle.friendlyPieces.findIndex(friendlyBattlePiece => friendlyBattlePiece.piece.pieceId === targetId);
+					let friendlyPiece = stateDeepCopy.battle.friendlyPieces[friendlyPieceIndex];
+					let enemyPieceIndex = stateDeepCopy.battle.enemyPieces.findIndex(enemyBattlePiece => enemyBattlePiece.piece.pieceId === pieceId);
+					stateDeepCopy.battle.enemyPieces[enemyPieceIndex].targetPiece = friendlyPiece.piece;
+					stateDeepCopy.battle.enemyPieces[enemyPieceIndex].targetPieceIndex = friendlyPieceIndex;
+					stateDeepCopy.battle.enemyPieces[enemyPieceIndex].win = win;
+					stateDeepCopy.battle.enemyPieces[enemyPieceIndex].diceRoll = diceRoll;
+				}
+			}
+
+			return stateDeepCopy;
+		case CLEAR_BATTLE:
+			delete stateDeepCopy.battle.masterRecord;
+			for (let x = 0; x < stateDeepCopy.battle.friendlyPieces.length; x++) {
+				//for each friendly piece, clear the dice roll and other stuff
+				stateDeepCopy.battle.friendlyPieces[x].targetPiece = null;
+				stateDeepCopy.battle.friendlyPieces[x].targetPieceIndex = -1;
+				delete stateDeepCopy.battle.friendlyPieces[x].diceRoll;
+				delete stateDeepCopy.battle.friendlyPieces[x].win;
+			}
+			for (let x = 0; x < stateDeepCopy.battle.enemyPieces.length; x++) {
+				//for each friendly piece, clear the dice roll and other stuff
+				stateDeepCopy.battle.enemyPieces[x].targetPiece = null;
+				stateDeepCopy.battle.enemyPieces[x].targetPieceIndex = -1;
+				delete stateDeepCopy.battle.enemyPieces[x].diceRoll;
+				delete stateDeepCopy.battle.enemyPieces[x].win;
+			}
+
 			return stateDeepCopy;
 		default:
 			return state;

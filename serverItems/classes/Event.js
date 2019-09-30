@@ -160,7 +160,7 @@ class Event {
 					masterRecord.push({
 						pieceId,
 						targetId: null,  //probably not needed....
-						diceRoll: 0,
+						diceRoll: null,
 						win: false
 					});
 				} else {
@@ -206,7 +206,7 @@ class Event {
 	}
 
 	diceRoll() {
-		return -1;
+		return 1;
 	}
 }
 

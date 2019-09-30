@@ -11,6 +11,14 @@ const battlePieceStyle = {
 	borderRadius: "2%"
 };
 
+//TODO: could probably refactor how this is called to a cleaner way...
+const battlePieceWonStyle = [
+	{},
+	{
+		border: "2px solid red"
+	}
+];
+
 const boxStyle = {
 	backgroundRepeat: "no-repeat",
 	backgroundSize: "90% 90%",
@@ -66,10 +74,10 @@ class BattlePiece extends Component {
 				</div>
 			);
 
-		const diceBox = battlePiece.diceRolled === 0 ? null : <div style={{ ...boxStyle, ...diceImages[battlePiece.piece.pieceTypeId] }} />;
+		const diceBox = battlePiece.diceRoll == null ? null : <div style={{ ...boxStyle, ...diceImages[battlePiece.diceRoll] }} />;
 
 		return (
-			<div style={battlePieceStyle}>
+			<div style={{ ...battlePieceStyle, ...battlePieceWonStyle[battlePiece.won != null && battlePiece.won ? 1 : 0] }}>
 				{battlePieceBox}
 				{arrowBox}
 				{targetBox}

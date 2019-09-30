@@ -107,16 +107,14 @@ class Game {
 									pieceVisible: friendlyPiecesList[x].tpieceVisible,
 									pieceMoves: friendlyPiecesList[x].tpieceMoves,
 									pieceFuel: friendlyPiecesList[x].tpieceFuel
-							  },
-					diceRolled: 0 //don't need to remember last roll, it was shown temporarily to the client and then forgotten (perhaps logged?)
+							  }
 				};
 				friendlyPieces.push(thisFriendlyPiece);
 			}
 			for (let y = 0; y < enemyPiecesList.length; y++) {
 				let thisEnemyPiece = {
 					targetPiece: null,
-					targetPieceIndex: -1,
-					diceRolled: 0
+					targetPieceIndex: -1
 				};
 				thisEnemyPiece.piece = enemyPiecesList[y];
 				enemyPieces.push(thisEnemyPiece);
