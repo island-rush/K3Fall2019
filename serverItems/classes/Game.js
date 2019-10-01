@@ -207,10 +207,6 @@ class Game {
 	async reset() {
 		await this.delete();
 		await Game.add(this.gameSection, this.gameInstructor, this.gameAdminPassword, { gameId: this.gameId });
-		const conn = await pool.getConnection();
-		await gameInitialPieces(conn, this.gameId);
-		await gameInitialNews(conn, this.gameId);
-		conn.release();
 	}
 
 	async setPoints(gameTeam, newPoints) {
@@ -265,6 +261,13 @@ class Game {
 		await pool.query(queryString, inserts);
 
 		const thisGame = await new Game({ gameSection, gameInstructor }).init();
+
+		//reset the game when its created, now only need to activate, reset is more in tune with the name (instead of initialize?)
+		const conn = await pool.getConnection();
+		await gameInitialPieces(conn, thisGame.gameId);
+		await gameInitialNews(conn, thisGame.gameId);
+		conn.release();
+
 		return thisGame;
 	}
 

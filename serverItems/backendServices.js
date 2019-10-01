@@ -629,8 +629,7 @@ const executeStep = async (io, socket, thisGame) => {
 					//need to transform pieces and stuff... (not necessarily, could let client do more work...)(would also get rid of duplicate code if there was some (maybe))
 					let thisFriendlyPiece = {
 						targetPiece: null,
-						targetPieceIndex: -1,
-						diceRolled: 0
+						targetPieceIndex: -1
 					};
 					thisFriendlyPiece.piece = friendlyPiecesList[x];
 					friendlyPieces.push(thisFriendlyPiece);
@@ -639,8 +638,7 @@ const executeStep = async (io, socket, thisGame) => {
 				for (let y = 0; y < enemyPiecesList.length; y++) {
 					let thisEnemyPiece = {
 						targetPiece: null,
-						targetPieceIndex: -1,
-						diceRolled: 0
+						targetPieceIndex: -1
 					};
 					thisEnemyPiece.piece = enemyPiecesList[y];
 					enemyPieces.push(thisEnemyPiece);
@@ -668,8 +666,7 @@ const executeStep = async (io, socket, thisGame) => {
 					//need to transform pieces and stuff... (not necessarily, could let client do more work...)(would also get rid of duplicate code if there was some (maybe))
 					let thisFriendlyPiece = {
 						targetPiece: null,
-						targetPieceIndex: -1,
-						diceRolled: 0
+						targetPieceIndex: -1
 					};
 					thisFriendlyPiece.piece = friendlyPiecesList[x];
 					friendlyPieces.push(thisFriendlyPiece);
@@ -678,8 +675,7 @@ const executeStep = async (io, socket, thisGame) => {
 				for (let y = 0; y < enemyPiecesList.length; y++) {
 					let thisEnemyPiece = {
 						targetPiece: null,
-						targetPieceIndex: -1,
-						diceRolled: 0
+						targetPieceIndex: -1
 					};
 					thisEnemyPiece.piece = enemyPiecesList[y];
 					enemyPieces.push(thisEnemyPiece);
@@ -724,8 +720,7 @@ const executeStep = async (io, socket, thisGame) => {
 					//need to transform pieces and stuff...
 					let thisFriendlyPiece = {
 						targetPiece: null,
-						targetPieceIndex: -1,
-						diceRolled: 0
+						targetPieceIndex: -1
 					};
 					thisFriendlyPiece.piece = friendlyPiecesList[x];
 					friendlyPieces.push(thisFriendlyPiece);
@@ -734,8 +729,7 @@ const executeStep = async (io, socket, thisGame) => {
 				for (let y = 0; y < enemyPiecesList.length; y++) {
 					let thisEnemyPiece = {
 						targetPiece: null,
-						targetPieceIndex: -1,
-						diceRolled: 0
+						targetPieceIndex: -1
 					};
 					thisEnemyPiece.piece = enemyPiecesList[y];
 					enemyPieces.push(thisEnemyPiece);
@@ -761,8 +755,7 @@ const executeStep = async (io, socket, thisGame) => {
 					//need to transform pieces and stuff...
 					let thisFriendlyPiece = {
 						targetPiece: null,
-						targetPieceIndex: -1,
-						diceRolled: 0
+						targetPieceIndex: -1
 					};
 					thisFriendlyPiece.piece = friendlyPiecesList[x];
 					friendlyPieces.push(thisFriendlyPiece);
@@ -771,8 +764,7 @@ const executeStep = async (io, socket, thisGame) => {
 				for (let y = 0; y < enemyPiecesList.length; y++) {
 					let thisEnemyPiece = {
 						targetPiece: null,
-						targetPieceIndex: -1,
-						diceRolled: 0
+						targetPieceIndex: -1
 					};
 					thisEnemyPiece.piece = enemyPiecesList[y];
 					enemyPieces.push(thisEnemyPiece);
@@ -989,8 +981,7 @@ const confirmBattleSelection = async (io, socket, friendlyPieces) => {
 						//need to transform pieces and stuff... (not necessarily, could let client do more work...)(would also get rid of duplicate code if there was some (maybe))
 						let thisFriendlyPiece = {
 							targetPiece: null,
-							targetPieceIndex: -1,
-							diceRolled: 0
+							targetPieceIndex: -1
 						};
 						thisFriendlyPiece.piece = friendlyPiecesList[x];
 						friendlyPieces.push(thisFriendlyPiece);
@@ -999,8 +990,7 @@ const confirmBattleSelection = async (io, socket, friendlyPieces) => {
 					for (let y = 0; y < enemyPiecesList.length; y++) {
 						let thisEnemyPiece = {
 							targetPiece: null,
-							targetPieceIndex: -1,
-							diceRolled: 0
+							targetPieceIndex: -1
 						};
 						thisEnemyPiece.piece = enemyPiecesList[y];
 						enemyPieces.push(thisEnemyPiece);
@@ -1028,8 +1018,7 @@ const confirmBattleSelection = async (io, socket, friendlyPieces) => {
 						//need to transform pieces and stuff... (not necessarily, could let client do more work...)(would also get rid of duplicate code if there was some (maybe))
 						let thisFriendlyPiece = {
 							targetPiece: null,
-							targetPieceIndex: -1,
-							diceRolled: 0
+							targetPieceIndex: -1
 						};
 						thisFriendlyPiece.piece = friendlyPiecesList[x];
 						friendlyPieces.push(thisFriendlyPiece);
@@ -1038,8 +1027,7 @@ const confirmBattleSelection = async (io, socket, friendlyPieces) => {
 					for (let y = 0; y < enemyPiecesList.length; y++) {
 						let thisEnemyPiece = {
 							targetPiece: null,
-							targetPieceIndex: -1,
-							diceRolled: 0
+							targetPieceIndex: -1
 						};
 						thisEnemyPiece.piece = enemyPiecesList[y];
 						enemyPieces.push(thisEnemyPiece);
@@ -1084,8 +1072,7 @@ const confirmBattleSelection = async (io, socket, friendlyPieces) => {
 						//need to transform pieces and stuff...
 						let thisFriendlyPiece = {
 							targetPiece: null,
-							targetPieceIndex: -1,
-							diceRolled: 0
+							targetPieceIndex: -1
 						};
 						thisFriendlyPiece.piece = friendlyPiecesList[x];
 						friendlyPieces.push(thisFriendlyPiece);
@@ -1094,8 +1081,7 @@ const confirmBattleSelection = async (io, socket, friendlyPieces) => {
 					for (let y = 0; y < enemyPiecesList.length; y++) {
 						let thisEnemyPiece = {
 							targetPiece: null,
-							targetPieceIndex: -1,
-							diceRolled: 0
+							targetPieceIndex: -1
 						};
 						thisEnemyPiece.piece = enemyPiecesList[y];
 						enemyPieces.push(thisEnemyPiece);
@@ -1121,8 +1107,7 @@ const confirmBattleSelection = async (io, socket, friendlyPieces) => {
 						//need to transform pieces and stuff...
 						let thisFriendlyPiece = {
 							targetPiece: null,
-							targetPieceIndex: -1,
-							diceRolled: 0
+							targetPieceIndex: -1
 						};
 						thisFriendlyPiece.piece = friendlyPiecesList[x];
 						friendlyPieces.push(thisFriendlyPiece);
@@ -1131,8 +1116,7 @@ const confirmBattleSelection = async (io, socket, friendlyPieces) => {
 					for (let y = 0; y < enemyPiecesList.length; y++) {
 						let thisEnemyPiece = {
 							targetPiece: null,
-							targetPieceIndex: -1,
-							diceRolled: 0
+							targetPieceIndex: -1
 						};
 						thisEnemyPiece.piece = enemyPiecesList[y];
 						enemyPieces.push(thisEnemyPiece);

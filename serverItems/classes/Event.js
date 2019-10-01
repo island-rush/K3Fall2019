@@ -104,24 +104,26 @@ class Event {
 
 	async bulkUpdateTargets(piecesWithTargets) {
 		//TODO: make sure that these piece->targets make sense (prevent bad targetting? (if possible...))
-		let allInserts = [];
-		for (let x = 0; x < piecesWithTargets.length; x++) {
-			let { piece, targetPiece } = piecesWithTargets[x];
-			let newInsert = [this.eventId, piece.pieceId, targetPiece === null ? -1 : targetPiece.pieceId, this.eventGameId];
-			allInserts.push(newInsert);
+		if (piecesWithTargets.length > 0) {
+			let allInserts = [];
+			for (let x = 0; x < piecesWithTargets.length; x++) {
+				let { piece, targetPiece } = piecesWithTargets[x];
+				let newInsert = [this.eventId, piece.pieceId, targetPiece === null ? -1 : targetPiece.pieceId, this.eventGameId];
+				allInserts.push(newInsert);
+			}
+
+			let queryString = "INSERT INTO eventItemsTargetsTemp (eventId, eventPieceId, eventItemTarget, eventItemGameId) VALUES ?";
+			let inserts = [allInserts];
+			await pool.query(queryString, inserts);
+
+			queryString =
+				"UPDATE eventItems, eventItemsTargetsTemp SET eventItems.eventItemTarget = eventItemsTargetsTemp.eventItemTarget WHERE eventItems.eventId = eventItemsTargetsTemp.eventId AND eventItems.eventPieceId = eventItemsTargetsTemp.eventPieceId";
+			await pool.query(queryString);
+
+			queryString = "DELETE FROM eventItemsTargetsTemp WHERE eventItemGameId = ?";
+			inserts = [this.eventGameId];
+			await pool.query(queryString, inserts);
 		}
-
-		let queryString = "INSERT INTO eventItemsTargetsTemp (eventId, eventPieceId, eventItemTarget, eventItemGameId) VALUES ?";
-		let inserts = [allInserts];
-		await pool.query(queryString, inserts);
-
-		queryString =
-			"UPDATE eventItems, eventItemsTargetsTemp SET eventItems.eventItemTarget = eventItemsTargetsTemp.eventItemTarget WHERE eventItems.eventId = eventItemsTargetsTemp.eventId AND eventItems.eventPieceId = eventItemsTargetsTemp.eventPieceId";
-		await pool.query(queryString);
-
-		queryString = "DELETE FROM eventItemsTargetsTemp WHERE eventItemGameId = ?";
-		inserts = [this.eventGameId];
-		await pool.query(queryString, inserts);
 	}
 
 	//prettier-ignore
@@ -167,8 +169,10 @@ class Event {
 				} else {
 					//do a dice roll
 					//figure out needed value for success
-					let neededValue = ATTACK_MATRIX[pieceTypeId, tpieceTypeId];
+					let neededValue = ATTACK_MATRIX[pieceTypeId][tpieceTypeId];
 					let diceRollValue = this.diceRoll();
+
+					// console.log(`just had ${diceRollValue} and needed ${neededValue}`);
 	
 					//> or >=?
 					if (diceRollValue >= neededValue) {
@@ -199,6 +203,11 @@ class Event {
 			inserts = [piecesToDelete];
 			await pool.query(queryString, inserts);
 
+			//prevents seeing previous attack from refresh*
+			queryString = "UPDATE eventItems SET eventItemTarget = -1 WHERE eventId = ?";
+			inserts = [this.eventId];
+			await pool.query(queryString, inserts);
+
 			//need to return the master record? and something else?
 			fightResults.masterRecord = masterRecord;
 		}
@@ -207,7 +216,9 @@ class Event {
 	}
 
 	diceRoll() {
-		return 1;
+		let firstDice = Math.floor(Math.random() * 6) + 1;
+		let secondDice = Math.floor(Math.random() * 6) + 1;
+		return firstDice + secondDice;
 	}
 }
 

@@ -193,7 +193,20 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 
 			return stateDeepCopy;
 		case CLEAR_BATTLE:
-			delete stateDeepCopy.battle.masterRecord;
+			//probably a more efficient way of removing elements from the master record/friendlyPieces/enemyPieces
+			for (let z = 0; z < stateDeepCopy.battle.masterRecord.length; z++) {
+				let thisRecord = stateDeepCopy.battle.masterRecord[z];
+				if (thisRecord.targetId && thisRecord.win) {
+					//need to delete that targetId from friendlyList or enemyList
+					stateDeepCopy.battle.friendlyPieces = stateDeepCopy.battle.friendlyPieces.filter(battlePiece => {
+						return battlePiece.piece.pieceId !== thisRecord.targetId;
+					});
+					stateDeepCopy.battle.enemyPieces = stateDeepCopy.battle.enemyPieces.filter(battlePiece => {
+						return battlePiece.piece.pieceId !== thisRecord.targetId;
+					});
+				}
+			}
+
 			for (let x = 0; x < stateDeepCopy.battle.friendlyPieces.length; x++) {
 				//for each friendly piece, clear the dice roll and other stuff
 				stateDeepCopy.battle.friendlyPieces[x].targetPiece = null;
@@ -208,6 +221,8 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 				delete stateDeepCopy.battle.enemyPieces[x].diceRoll;
 				delete stateDeepCopy.battle.enemyPieces[x].win;
 			}
+
+			delete stateDeepCopy.battle.masterRecord;
 
 			return stateDeepCopy;
 		default:

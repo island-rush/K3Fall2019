@@ -333,9 +333,16 @@ export const confirmBattleSelections = () => {
 };
 
 export const clearOldBattle = () => {
-	return {
-		type: CLEAR_BATTLE,
-		payload: {}
+	return (dispatch, getState, emit) => {
+		const { gameboardMeta } = getState();
+		const { battle } = gameboardMeta;
+
+		dispatch({
+			type: CLEAR_BATTLE,
+			payload: {
+				battle
+			}
+		});
 	};
 };
 

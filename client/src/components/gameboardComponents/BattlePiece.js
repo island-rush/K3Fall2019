@@ -74,10 +74,10 @@ class BattlePiece extends Component {
 				</div>
 			);
 
-		const diceBox = battlePiece.diceRoll == null ? null : <div style={{ ...boxStyle, ...diceImages[battlePiece.diceRoll] }} />;
+		const diceBox = battlePiece.diceRoll == null ? null : <div style={{ ...boxStyle, ...diceImages[battlePiece.diceRoll] }}>{battlePiece.diceRoll}</div>;
 
 		return (
-			<div style={{ ...battlePieceStyle, ...battlePieceWonStyle[battlePiece.won != null && battlePiece.won ? 1 : 0] }}>
+			<div style={{ ...battlePieceStyle, ...battlePieceWonStyle[battlePiece.win != null && battlePiece.win ? 1 : 0] }}>
 				{battlePieceBox}
 				{arrowBox}
 				{targetBox}
