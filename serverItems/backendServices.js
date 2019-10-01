@@ -480,14 +480,17 @@ const executeStep = async (io, socket, thisGame) => {
 	}
 
 	//One of the teams may be without plans, keep them waiting
+	let currentMovementOrder;
 	if (currentMovementOrder0 == null) {
 		await thisGame.setStatus(0, 1);
+	} else {
+		currentMovementOrder = currentMovementOrder0;
 	}
 	if (currentMovementOrder1 == null) {
 		await thisGame.setStatus(1, 1);
+	} else {
+		currentMovementOrder = currentMovementOrder1;
 	}
-
-	const currentMovementOrder = currentMovementOrder0 || currentMovementOrder1;
 
 	const allCollisionBattles = await Plan.getCollisionBattles(gameId, currentMovementOrder);
 	if (allCollisionBattles.length > 0) {
