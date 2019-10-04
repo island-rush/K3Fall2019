@@ -126,6 +126,6 @@ Version 3.1.0
 - Testing
   - Set up testing early and use test-driven development
 
-Please [report](https://gitreports.com/issue/island-rush/K3.1) any issues.
+Please [report](https://gitreports.com/issue/island-rush/K3) any issues.
 
 adding stuff by Jack
