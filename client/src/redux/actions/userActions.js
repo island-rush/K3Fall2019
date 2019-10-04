@@ -269,7 +269,6 @@ export const targetPieceClick = (battlePiece, battlePieceIndex) => {
 		const { gameInfo } = getState();
 		const { gameStatus } = gameInfo;
 		if (gameStatus === 1) {
-			dispatch(setUserFeedback("can't undo target selection, status == 1, already submitted probably"));
 			return;
 		}
 

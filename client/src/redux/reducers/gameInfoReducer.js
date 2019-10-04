@@ -69,9 +69,6 @@ function gameInfoReducer(state = initialGameInfoState, { type, payload }) {
 			stateDeepCopy.gameRound = 0;
 			stateDeepCopy.gameSlice = 0;
 			return stateDeepCopy;
-		case TARGET_PIECE_SELECT:
-			stateDeepCopy.gameStatus = 1;
-			return stateDeepCopy;
 		default:
 			return state;
 	}
