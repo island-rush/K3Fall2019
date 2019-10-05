@@ -157,7 +157,7 @@
 
 			let getGameActive = new XMLHttpRequest();
 			getGameActive.onreadystatechange = function() {
-				if (this.readyState === 4) {
+				if (this.readyState == 4) {
 					if (this.response == 1) {
 						document.getElementById("activeToggle").checked = true;
 					}

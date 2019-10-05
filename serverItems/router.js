@@ -1,11 +1,26 @@
 const path = require("path");
-const backendServices = require("./backendServices");
-const CONSTANTS = require("./constants");
+const { DATABASE_TAG, LOGIN_TAG } = require("./constants");
+const {
+	gameReset,
+	toggleGameActive,
+	getGameActive,
+	getGames,
+	insertDatabaseTables,
+	gameDelete,
+	gameAdd,
+	gameLoginVerify,
+	adminLoginVerify,
+	databaseStatus
+} = require("./adminFunctions");
 
 const router = require("express").Router();
 
+// --------------------------------------
+// Sending Files
+// --------------------------------------
+
 router.get("/", (req, res) => {
-	delete req.session.ir3;
+	delete req.session.ir3; //anyone on the homepage is considered un-authenticated (doesn't maintain session) (could cause errors when they visit, with another game tab open?)
 	res.sendFile(__dirname + "/routes/index.html");
 });
 
@@ -26,7 +41,7 @@ router.get("/credits.html", (req, res) => {
 
 router.get("/teacher.html", (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.teacher || !req.session.ir3.gameId) {
-		res.redirect(`/index.html?error=${CONSTANTS.LOGIN_TAG}`);
+		res.redirect(`/index.html?error=${LOGIN_TAG}`);
 		return;
 	}
 
@@ -35,7 +50,7 @@ router.get("/teacher.html", (req, res) => {
 
 router.get("/courseDirector.html", (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.courseDirector) {
-		res.redirect(`/index.html?error=${CONSTANTS.LOGIN_TAG}`);
+		res.redirect(`/index.html?error=${LOGIN_TAG}`);
 		return;
 	}
 
@@ -44,56 +59,104 @@ router.get("/courseDirector.html", (req, res) => {
 
 router.get("/game.html", (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.gameId || !req.session.ir3.gameTeam || !req.session.ir3.gameController) {
-		res.redirect(`/index.html?error=${CONSTANTS.LOGIN_TAG}`);
+		res.redirect(`/index.html?error=${LOGIN_TAG}`);
 		return;
 	}
 
-	if (process.env.NODE_ENV === "production") {
+	if (process.env.NODE_ENV == "production") {
 		res.sendFile(path.join(__dirname, "/../client/build/index.html"));
 	} else {
 		res.redirect("http://localhost:3000"); // Use this redirect while working on react frontend
 	}
 });
 
-//Best practice is to not pass web layer (express) to business logic, and instead use custom context object...but this is simple enough for our use
+// --------------------------------------
+// Admin Functions
+// --------------------------------------
+
 router.get("/databaseStatus", (req, res) => {
-	backendServices.databaseStatus(req, res);
+	try {
+		databaseStatus(req, res);
+	} catch (error) {
+		console.error(error);
+		res.status(500).send(error.code);
+	}
 });
 
 router.post("/adminLoginVerify", async (req, res) => {
-	backendServices.adminLoginVerify(req, res);
+	try {
+		adminLoginVerify(req, res);
+	} catch (error) {
+		console.error(error);
+		res.status(500).redirect(`/index.html?error=${DATABASE_TAG}`);
+	}
 });
 
 router.post("/gameLoginVerify", (req, res) => {
-	backendServices.gameLoginVerify(req, res);
+	try {
+		gameLoginVerify(req, res);
+	} catch (error) {
+		console.error(error);
+		res.status(500).redirect(`./index.html?error=${DATABASE_TAG}`);
+	}
 });
 
 router.post("/gameAdd", (req, res) => {
-	backendServices.gameAdd(req, res);
+	try {
+		gameAdd(req, res);
+	} catch (error) {
+		console.error(error);
+		res.redirect(500, "/courseDirector.html?gameAdd=failed");
+	}
 });
 
 router.post("/gameDelete", (req, res) => {
-	backendServices.gameDelete(req, res);
+	try {
+		gameDelete(req, res);
+	} catch (error) {
+		console.error(error);
+		res.status(500).redirect("/courseDirector.html?gameDelete=failed");
+	}
 });
 
 router.post("/insertDatabaseTables", (req, res) => {
-	backendServices.insertDatabaseTables(req, res);
+	try {
+		insertDatabaseTables(req, res);
+	} catch (error) {
+		console.error(error);
+		res.redirect("/courseDirector.html?initializeDatabase=failed");
+	}
 });
 
 router.get("/getGames", (req, res) => {
-	backendServices.getGames(req, res);
+	getGames(req, res); //try / catch is within this function, higher level catch didn't catch :(
 });
 
 router.get("/getGameActive", (req, res) => {
-	backendServices.getGameActive(req, res);
+	try {
+		getGameActive(req, res);
+	} catch (error) {
+		console.error(error);
+		res.sendStatus(500); //TODO: should probably redirect if this fails...(custom 500 page?)
+	}
 });
 
 router.post("/toggleGameActive", (req, res) => {
-	backendServices.toggleGameActive(req, res);
+	try {
+		toggleGameActive(req, res);
+	} catch (error) {
+		console.error(error);
+		res.status(500).redirect("/teacher.html?gameReset=failed");
+	}
 });
 
 router.post("/gameReset", (req, res) => {
-	backendServices.gameReset(req, res);
+	try {
+		gameReset(req, res);
+	} catch (error) {
+		console.error(error);
+		res.status(500).redirect("/teacher.html?gameReset=failed");
+	}
 });
 
 module.exports = router;

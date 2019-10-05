@@ -149,7 +149,7 @@
 		<script>
 			let getGamesXMLHttp = new XMLHttpRequest();
 			getGamesXMLHttp.onreadystatechange = function() {
-				if (this.readyState === 4) {
+				if (this.readyState == 4) {
 					const games = JSON.parse(this.response);
 					const table = document.getElementById("gamesTable");
 					for (let x = 0; x < games.length; x++) {
@@ -170,7 +170,7 @@
 
 			let getDatabaseStatusXMLHttp = new XMLHttpRequest();
 			getDatabaseStatusXMLHttp.onreadystatechange = function() {
-				if (this.readyState === 4) {
+				if (this.readyState == 4) {
 					document.getElementById("DatabaseConnectionTag").innerHTML = "Database:" + this.response;
 				}
 			};

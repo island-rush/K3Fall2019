@@ -59,7 +59,7 @@ class Game {
 		const [resultNews] = await pool.query(queryString, inserts);
 		const { newsTitle, newsInfo } = resultNews[0] !== undefined ? resultNews[0] : { newsTitle: "No More News", newsInfo: "Obviously you've been playing this game too long..." };
 		const news = {
-			active: parseInt(this.gamePhase) === 0,
+			active: parseInt(this.gamePhase) == 0,
 			// active: false,
 			newsTitle,
 			newsInfo
@@ -96,7 +96,7 @@ class Game {
 						pieceFuel: friendlyPiecesList[x].pieceFuel
 					},
 					targetPiece:
-						friendlyPiecesList[x].tpieceId === null
+						friendlyPiecesList[x].tpieceId == null
 							? null
 							: {
 									pieceId: friendlyPiecesList[x].tpieceId,
@@ -125,7 +125,7 @@ class Game {
 				if (friendlyPieces[z].targetPiece != null) {
 					const { pieceId } = friendlyPieces[z].targetPiece;
 
-					friendlyPieces[z].targetPieceIndex = enemyPieces.findIndex(enemyPieceThing => enemyPieceThing.piece.pieceId === pieceId);
+					friendlyPieces[z].targetPieceIndex = enemyPieces.findIndex(enemyPieceThing => enemyPieceThing.piece.pieceId == pieceId);
 				}
 			}
 
@@ -260,7 +260,7 @@ class Game {
 
 		await pool.query(queryString, inserts);
 
-		const thisGame = await new Game({ gameSection, gameInstructor }).init();
+		const thisGame = await new Game({ gameSection, gameInstructor }).init(); //could not init, but since we don't know who is using this function, return the full game
 
 		//reset the game when its created, now only need to activate, reset is more in tune with the name (instead of initialize?)
 		const conn = await pool.getConnection();

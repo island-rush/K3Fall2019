@@ -70,7 +70,7 @@ class Plan {
 		let confirmedPlans = {};
 		for (let x = 0; x < resultPlans.length; x++) {
 			let { planPieceId, planPositionId, planSpecialFlag } = resultPlans[x];
-			let type = planSpecialFlag === 0 ? "move" : planSpecialFlag === 1 ? "container" : "NULL_SPECIAL";
+			let type = planSpecialFlag == 0 ? "move" : planSpecialFlag == 1 ? "container" : "NULL_SPECIAL";
 
 			if (!(planPieceId in confirmedPlans)) {
 				confirmedPlans[planPieceId] = [];

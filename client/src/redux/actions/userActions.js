@@ -19,19 +19,35 @@ import { distanceMatrix } from "./distanceMatrix";
 
 export const shopPurchaseRequest = shopItemTypeId => {
 	return (dispatch, getState, emit) => {
-		emit("shopPurchaseRequest", shopItemTypeId);
+		const clientAction = {
+			type: "shopPurchaseRequest",
+			payload: {
+				shopItemTypeId
+			}
+		};
+		emit("clientSendingAction", clientAction);
 	};
 };
 
-export const shopRefundRequest = shopItemId => {
+export const shopRefundRequest = shopItem => {
 	return (dispatch, getState, emit) => {
-		emit("shopRefundRequest", shopItemId);
+		const clientAction = {
+			type: "shopRefundRequest",
+			payload: {
+				shopItem
+			}
+		};
+		emit("clientSendingAction", clientAction);
 	};
 };
 
 export const shopConfirmPurchase = () => {
 	return (dispatch, getState, emit) => {
-		emit("shopConfirmPurchase");
+		const clientAction = {
+			type: "shopConfirmPurchase",
+			payload: {}
+		};
+		emit("clientSendingAction", clientAction);
 	};
 };
 
@@ -104,12 +120,15 @@ export const confirmPlan = () => {
 		if (gameboardMeta.planning.moves.length === 0) {
 			dispatch(setUserFeedback("Can't submit an empty plan..."));
 		} else {
-			const payload = {
-				pieceId: gameboardMeta.selectedPiece,
-				plan: gameboardMeta.planning.moves
+			const clientAction = {
+				type: "confirmPlan",
+				payload: {
+					pieceId: gameboardMeta.selectedPiece,
+					plan: gameboardMeta.planning.moves
+				}
 			};
 
-			emit("confirmPlan", payload);
+			emit("clientSendingAction", clientAction);
 		}
 	};
 };
@@ -141,10 +160,13 @@ export const cancelPlan = () => {
 			//check to see if there is a piece selected and if that piece has a confirmed plan
 			if (gameboardMeta.selectedPiece !== -1 && gameboardMeta.selectedPiece in gameboardMeta.confirmedPlans) {
 				//delete the plans from the database request
-				const payload = {
-					pieceId: gameboardMeta.selectedPiece
+				const clientAction = {
+					type: "deletePlan",
+					payload: {
+						pieceId: gameboardMeta.selectedPiece
+					}
 				};
-				emit("deletePlan", payload);
+				emit("clientSendingAction", clientAction);
 			} else {
 				dispatch(setUserFeedback("Must select a piece to delete + already have a plan for it to cancel/delete"));
 			}
@@ -238,8 +260,11 @@ export const menuSelect = selectedMenuId => {
 export const mainButtonClick = () => {
 	return (dispatch, getState, emit) => {
 		//check the local state before sending to the server
-
-		emit("mainButtonClick");
+		const clientAction = {
+			type: "mainButtonClick",
+			payload: {}
+		};
+		emit("clientSendingAction", clientAction);
 	};
 };
 
@@ -323,11 +348,15 @@ export const confirmBattleSelections = () => {
 
 		const { friendlyPieces } = gameboardMeta.battle;
 		//need to send to the server what selections were made, for it to handle it...
-		const payload = {
-			friendlyPieces
+
+		const clientAction = {
+			type: "confirmBattleSelection",
+			payload: {
+				friendlyPieces
+			}
 		};
 
-		emit("confirmBattleSelection", payload);
+		emit("clientSendingAction", clientAction);
 	};
 };
 
@@ -369,12 +398,15 @@ export const invItemClick = invItem => {
 				//need to create the piece
 				//need to place the piece on the board at the spot
 
-				const payload = {
-					invItemId,
-					selectedPosition
+				const clientAction = {
+					type: "piecePlace",
+					payload: {
+						invItemId,
+						selectedPosition
+					}
 				};
 
-				emit("piecePlace", payload);
+				emit("clientSendingAction", clientAction);
 			}
 		}
 	};

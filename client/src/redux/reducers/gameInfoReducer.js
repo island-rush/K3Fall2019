@@ -9,8 +9,7 @@ import {
 	PLACE_PHASE,
 	PIECES_MOVE,
 	NEW_ROUND,
-	NEWS_PHASE,
-	TARGET_PIECE_SELECT
+	NEWS_PHASE
 } from "../actions/types";
 
 const initialGameInfoState = {

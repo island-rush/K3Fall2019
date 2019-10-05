@@ -65,7 +65,7 @@ class Piece {
 				if (CONSTANTS.VISIBILITY_MATRIX[pieceTypeId][type] !== -1) { //could it ever see this type?
 					for (let position = 0; position < distanceMatrix[piecePositionId].length; position++) { //for all positions
 						if (distanceMatrix[piecePositionId][position] <= CONSTANTS.VISIBILITY_MATRIX[pieceTypeId][type]) { //is this position in range for that type?
-							otherTeam = parseInt(pieceTeamId) === 0 ? 1 : 0;
+							otherTeam = parseInt(pieceTeamId) == 0 ? 1 : 0;
 
 							if (!posTypesVisible[otherTeam][type].includes(position)) { //add this position if not already added by another piece somewhere else
 								posTypesVisible[otherTeam][type].push(position);
@@ -113,11 +113,11 @@ class Piece {
 			if (!allPieces[currentPiece.piecePositionId]) {
 				allPieces[currentPiece.piecePositionId] = [];
 			}
-			if (currentPiece.pieceContainerId === -1) {
+			if (currentPiece.pieceContainerId == -1) {
 				allPieces[currentPiece.piecePositionId].push(currentPiece);
 			} else {
 				let indexOfParent = allPieces[currentPiece.piecePositionId].findIndex(piece => {
-					return piece.pieceId === currentPiece.pieceContainerId;
+					return piece.pieceId == currentPiece.pieceContainerId;
 				});
 				allPieces[currentPiece.piecePositionId][indexOfParent].pieceContents.push(currentPiece);
 			}

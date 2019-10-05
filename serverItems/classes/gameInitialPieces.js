@@ -3,10 +3,10 @@ const CONSTANTS = require("../constants");
 // prettier-ignore
 const piece = (pieceGameId, pieceTeamName, pieceTypeName, piecePositionId, options) => {
 	const pieceOptions = options || {};
-	const pieceContainerId = pieceOptions.pieceContainerId === undefined ? -1 : pieceOptions.pieceContainerId;
-	const pieceVisible = pieceOptions.pieceVisible === undefined ? 0 : pieceOptions.pieceVisible;
+	const pieceContainerId = pieceOptions.pieceContainerId == undefined ? -1 : pieceOptions.pieceContainerId;
+	const pieceVisible = pieceOptions.pieceVisible == undefined ? 0 : pieceOptions.pieceVisible;
 
-	const pieceTeamId = pieceTeamName === "Blue" ? 0 : 1;
+	const pieceTeamId = pieceTeamName == "Blue" ? 0 : 1;
 	const pieceTypeId = CONSTANTS.TYPE_NAME_IDS[pieceTypeName];
 	const pieceMoves = CONSTANTS.TYPE_MOVES[pieceTypeId];
 	const pieceFuel = CONSTANTS.TYPE_FUEL[pieceTypeId];

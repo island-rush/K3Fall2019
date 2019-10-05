@@ -1,14 +1,14 @@
 // prettier-ignore
 const news = (gameId, newsOrder, newsOptions) => {
-	const newsTeam = newsOptions.newsTeam === undefined ? -1 : newsOptions.newsTeam;
-	const newsPieces = newsOptions.newsPieces === undefined ? -1 : newsOptions.newsPieces;
-	const newsEffect = newsOptions.newsEffect === undefined ? -1 : newsOptions.newsEffect;
-	const newsRoll = newsOptions.newsRoll === undefined ? -1 : newsOptions.newsRoll;
-	const newsLength = newsOptions.newsLength === undefined ? -1 : newsOptions.newsLength;
-	const newsZone = newsOptions.newsZone === undefined ? -1 : newsOptions.newsZone;
-	const newsTitle = newsOptions.newsTitle === undefined ? "Default Title" : newsOptions.newsTitle;
-	const newsInfo = newsOptions.newsInfo === undefined ? "Default Info" : newsOptions.newsInfo;
-	const newsActivated = newsOptions.newsActivated === undefined ? 0 : newsOptions.newsActivated;
+	const newsTeam = newsOptions.newsTeam == undefined ? -1 : newsOptions.newsTeam;
+	const newsPieces = newsOptions.newsPieces == undefined ? -1 : newsOptions.newsPieces;
+	const newsEffect = newsOptions.newsEffect == undefined ? -1 : newsOptions.newsEffect;
+	const newsRoll = newsOptions.newsRoll == undefined ? -1 : newsOptions.newsRoll;
+	const newsLength = newsOptions.newsLength == undefined ? -1 : newsOptions.newsLength;
+	const newsZone = newsOptions.newsZone == undefined ? -1 : newsOptions.newsZone;
+	const newsTitle = newsOptions.newsTitle == undefined ? "Default Title" : newsOptions.newsTitle;
+	const newsInfo = newsOptions.newsInfo == undefined ? "Default Info" : newsOptions.newsInfo;
+	const newsActivated = newsOptions.newsActivated == undefined ? 0 : newsOptions.newsActivated;
 
 	return [gameId, newsTeam, newsOrder, newsPieces, newsEffect, newsRoll, newsLength, newsZone, newsTitle, newsInfo, newsActivated];
 };

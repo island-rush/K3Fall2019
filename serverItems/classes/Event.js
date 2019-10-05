@@ -108,7 +108,7 @@ class Event {
 			let allInserts = [];
 			for (let x = 0; x < piecesWithTargets.length; x++) {
 				let { piece, targetPiece } = piecesWithTargets[x];
-				let newInsert = [this.eventId, piece.pieceId, targetPiece === null ? -1 : targetPiece.pieceId, this.eventGameId];
+				let newInsert = [this.eventId, piece.pieceId, targetPiece == null ? -1 : targetPiece.pieceId, this.eventGameId];
 				allInserts.push(newInsert);
 			}
 

@@ -58,10 +58,10 @@ class BattlePiece extends Component {
 		);
 
 		//TODO: need actual arrow images instead of piece images
-		const arrowBox = battlePiece.targetPiece === null ? null : <div style={{ ...boxStyle }}>-----></div>;
+		const arrowBox = battlePiece.targetPiece == null ? null : <div style={{ ...boxStyle }}>-----></div>;
 
 		const targetBox =
-			battlePiece.targetPiece === null ? null : (
+			battlePiece.targetPiece == null ? null : (
 				<div
 					onClick={event => {
 						event.preventDefault();

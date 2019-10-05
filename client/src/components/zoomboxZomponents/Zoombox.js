@@ -3,10 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { zoomboxBackgrounds } from "../constants";
 import Piece from "./Piece";
-import {
-	selectPiece,
-	clearPieceSelection
-} from "../../redux/actions/userActions";
+import { selectPiece, clearPieceSelection } from "../../redux/actions/userActions";
 
 const zoomboxStyle = {
 	position: "absolute",
@@ -27,17 +24,9 @@ class Zoombox extends Component {
 
 		const pieces = !isVisible
 			? null
-			: this.props.gameboard[this.props.selectedPos].pieces.map(
-					(piece, index) => (
-						<Piece
-							pieceClick={this.props.selectPiece}
-							selected={this.props.selectedPiece === piece.pieceId}
-							topLevel={true}
-							key={index}
-							piece={piece}
-						/>
-					)
-			  );
+			: this.props.gameboard[this.props.selectedPos].pieces.map((piece, index) => (
+					<Piece pieceClick={this.props.selectPiece} selected={this.props.selectedPiece === piece.pieceId} topLevel={true} key={index} piece={piece} />
+			  ));
 
 		return (
 			<div
@@ -45,9 +34,7 @@ class Zoombox extends Component {
 					isVisible
 						? {
 								...zoomboxStyle,
-								...zoomboxBackgrounds[
-									this.props.gameboard[this.props.selectedPos].type
-								]
+								...zoomboxBackgrounds[this.props.gameboard[this.props.selectedPos].type]
 						  }
 						: invisibleStyle
 				}

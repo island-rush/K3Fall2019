@@ -258,7 +258,7 @@ const confirmPlan = async (socket, pieceId, plan) => {
 	let plansToInsert = [];
 	for (let movementOrder = 0; movementOrder < plan.length; movementOrder++) {
 		let { positionId, type } = plan[movementOrder];
-		let specialFlag = type === "move" ? 0 : 1; // 1 = container, use other numbers for future special flags...
+		let specialFlag = type == "move" ? 0 : 1; // 1 = container, use other numbers for future special flags...
 		plansToInsert.push([pieceGameId, pieceTeamId, pieceId, movementOrder, positionId, specialFlag]);
 	}
 
@@ -1241,7 +1241,7 @@ exports.gameLoginVerify = async (req, res) => {
 		} else if (inputPasswordHash != thisGame[passwordHashToCheck]) {
 			res.redirect(`/index.html?error=${CONSTANTS.LOGIN_TAG}`);
 		} else {
-			await thisGame.setLoggedIn(gameTeam, gameController, 1);
+			// await thisGame.setLoggedIn(gameTeam, gameController, 1); //TODO: ACTUALLY LOG THEM IN
 
 			const { gameId } = thisGame;
 
