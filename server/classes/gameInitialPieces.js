@@ -23,8 +23,8 @@ const piece = (pieceGameId, pieceTeamName, pieceTypeName, piecePositionId, optio
 	];
 };
 
-// prettier-ignore
-module.exports = async (conn, gameId) => {
+//prettier-ignore
+const gameInitialPieces = async (conn, gameId) => {
 	const firstPieces = [
 		// piece(gameId, "Blue", "Tank", 0, {pieceVisible: 1, pieceContainerId: 23}),
 		piece(gameId, "Blue", "Tank", 0),
@@ -47,3 +47,5 @@ module.exports = async (conn, gameId) => {
 	const inserts = [firstPieces];
 	await conn.query(queryString, inserts);
 };
+
+module.exports = gameInitialPieces;

@@ -17,15 +17,14 @@ app.use(express.urlencoded()); //parses data and puts into req.body
 
 //Server Routing
 //TODO: Use middleware or reverse proxy to serve static files -> aka, anything with res.sendFile()
-app.use("/", require("./serverItems/router"));
+app.use("/", require("./server/router"));
 app.use(express.static(__dirname + "/client/build"));
 
 //Socket Setup
 const io = require("socket.io")(server);
 io.use(require("express-socket.io-session")(session)); //Socket has access to sessions
-const socketSetup = require("./serverItems/socketSetup");
+const socketSetup = require("./server/socketSetup");
 io.sockets.on("connection", socket => {
-	// require("./serverItems/backendServices").socketSetup(io, socket);
 	socketSetup(socket);
 });
 

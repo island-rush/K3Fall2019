@@ -13,7 +13,7 @@ const news = (gameId, newsOrder, newsOptions) => {
 	return [gameId, newsTeam, newsOrder, newsPieces, newsEffect, newsRoll, newsLength, newsZone, newsTitle, newsInfo, newsActivated];
 };
 
-module.exports = async (conn, gameId) => {
+const gameInitialNews = async (conn, gameId) => {
 	let newsOrder = 0;
 
 	const allInserts = [
@@ -36,3 +36,5 @@ module.exports = async (conn, gameId) => {
 	const inserts = [allInserts];
 	await conn.query(queryString, inserts);
 };
+
+module.exports = gameInitialNews;

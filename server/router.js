@@ -21,22 +21,22 @@ const router = require("express").Router();
 
 router.get("/", (req, res) => {
 	delete req.session.ir3; //anyone on the homepage is considered un-authenticated (doesn't maintain session) (could cause errors when they visit, with another game tab open?)
-	res.sendFile(__dirname + "/routes/index.html");
+	res.sendFile(__dirname + "/pages/index.html");
 });
 
 router.get("/index.html", (req, res) => {
 	delete req.session.ir3;
-	res.sendFile(__dirname + "/routes/index.html");
+	res.sendFile(__dirname + "/pages/index.html");
 });
 
 router.get("/troubleshoot.html", (req, res) => {
 	delete req.session.ir3;
-	res.sendFile(__dirname + "/routes/troubleshoot.html");
+	res.sendFile(__dirname + "/pages/troubleshoot.html");
 });
 
 router.get("/credits.html", (req, res) => {
 	delete req.session.ir3;
-	res.sendFile(__dirname + "/routes/credits.html");
+	res.sendFile(__dirname + "/pages/credits.html");
 });
 
 router.get("/teacher.html", (req, res) => {
@@ -45,7 +45,7 @@ router.get("/teacher.html", (req, res) => {
 		return;
 	}
 
-	res.sendFile(__dirname + "/routes/teacher.html");
+	res.sendFile(__dirname + "/pages/teacher.html");
 });
 
 router.get("/courseDirector.html", (req, res) => {
@@ -54,7 +54,7 @@ router.get("/courseDirector.html", (req, res) => {
 		return;
 	}
 
-	res.sendFile(__dirname + "/routes/courseDirector.html");
+	res.sendFile(__dirname + "/pages/courseDirector.html");
 });
 
 router.get("/game.html", (req, res) => {

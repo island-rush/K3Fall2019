@@ -8,7 +8,7 @@ const insertDatabaseTables = async (req, res) => {
 		return;
 	}
 
-	const queryString = fs.readFileSync("./serverItems/sqlScripts/tableInsert.sql").toString();
+	const queryString = fs.readFileSync("./server/sqlScripts/tableInsert.sql").toString();
 	await pool.query(queryString);
 	res.redirect("/courseDirector.html?initializeDatabase=success");
 };
