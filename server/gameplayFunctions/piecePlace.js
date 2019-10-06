@@ -1,6 +1,6 @@
 const { Game, InvItem } = require("../classes");
 const sendUserFeedback = require("./sendUserFeedback");
-const { GAME_INACTIVE_TAG, BAD_REQUEST_TAG, PIECE_PLACE } = require("../constants");
+import { GAME_INACTIVE_TAG, BAD_REQUEST_TAG, PIECE_PLACE } from "../../client/src/redux/actions/types";
 
 const piecePlace = async (socket, payload) => {
 	//TODO: need a way of undoing piece places

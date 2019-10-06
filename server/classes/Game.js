@@ -1,7 +1,7 @@
 const pool = require("../database");
 const gameInitialPieces = require("./gameInitialPieces"); //script to insert pieces
 const gameInitialNews = require("./gameInitialNews"); //script to insert news
-const CONSTANTS = require("../constants");
+import { INITIAL_GAMESTATE } from "../../client/src/redux/actions/types";
 
 const InvItem = require("./InvItem");
 const ShopItem = require("./ShopItem");
@@ -144,7 +144,7 @@ class Game {
 		};
 
 		const serverAction = {
-			type: CONSTANTS.INITIAL_GAMESTATE,
+			type: INITIAL_GAMESTATE,
 			payload: {
 				gameInfo: {
 					gameSection: this.gameSection,

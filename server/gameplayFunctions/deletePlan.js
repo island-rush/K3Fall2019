@@ -1,6 +1,6 @@
 const { Game, Piece } = require("../classes");
 const sendUserFeedback = require("./sendUserFeedback");
-const { GAME_INACTIVE_TAG, DELETE_PLAN } = require("../constants");
+import { GAME_INACTIVE_TAG, DELETE_PLAN } from "../../client/src/redux/actions/types";
 
 const deletePlan = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;

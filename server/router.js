@@ -1,5 +1,5 @@
 const path = require("path");
-const { DATABASE_TAG, LOGIN_TAG } = require("./constants");
+import { DATABASE_TAG, LOGIN_TAG } from "../client/src/redux/actions/types";
 const {
 	gameReset,
 	toggleGameActive,

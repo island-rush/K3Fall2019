@@ -1,6 +1,6 @@
 const pool = require("../database");
 const fs = require("fs");
-const { BAD_SESSION } = require("../constants");
+import { BAD_SESSION } from "../../client/src/redux/actions/types";
 
 const insertDatabaseTables = async (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.courseDirector) {
@@ -8,7 +8,7 @@ const insertDatabaseTables = async (req, res) => {
 		return;
 	}
 
-	const queryString = fs.readFileSync("./server/sqlScripts/tableInsert.sql").toString();
+	const queryString = fs.readFileSync("./server/sql/tableInsert.sql").toString();
 	await pool.query(queryString);
 	res.redirect("/courseDirector.html?initializeDatabase=success");
 };

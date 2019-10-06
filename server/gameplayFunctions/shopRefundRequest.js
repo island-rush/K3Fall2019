@@ -1,6 +1,6 @@
 const { Game, ShopItem } = require("../classes");
 const sendUserFeedback = require("./sendUserFeedback");
-const { GAME_INACTIVE_TAG, BAD_REQUEST_TAG, SHOP_ITEM_TYPE_COSTS, SHOP_REFUND } = require("../constants");
+import { GAME_INACTIVE_TAG, BAD_REQUEST_TAG, SHOP_ITEM_TYPE_COSTS, SHOP_REFUND } from "../../client/src/redux/actions/types";
 
 const shopRefundRequest = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;

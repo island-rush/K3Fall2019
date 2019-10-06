@@ -1,5 +1,5 @@
 const pool = require("../database");
-const CONSTANTS = require("../constants");
+import { TYPE_MOVES, TYPE_FUEL } from "../../client/src/redux/actions/types";
 const Piece = require("./Piece");
 
 class InvItem {
@@ -34,8 +34,8 @@ class InvItem {
 			selectedPosition,
 			-1,
 			0,
-			CONSTANTS.TYPE_MOVES[this.invItemTypeId],
-			CONSTANTS.TYPE_FUEL[this.invItemTypeId]
+			TYPE_MOVES[this.invItemTypeId],
+			TYPE_FUEL[this.invItemTypeId]
 		);
 
 		await this.delete();

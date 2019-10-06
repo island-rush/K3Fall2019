@@ -1,5 +1,5 @@
 const { Game, ShopItem } = require("../classes");
-const { GAME_INACTIVE_TAG, SHOP_ITEM_TYPE_COSTS, SHOP_PURCHASE } = require("../constants");
+import { GAME_INACTIVE_TAG, SHOP_ITEM_TYPE_COSTS, SHOP_PURCHASE } from "../../client/src/redux/actions/types";
 const sendUserFeedback = require("./sendUserFeedback");
 
 const shopPurchaseRequest = async (socket, payload) => {

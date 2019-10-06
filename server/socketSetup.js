@@ -1,5 +1,5 @@
 const { Game } = require("./classes");
-const { BAD_SESSION } = require("./constants");
+import { BAD_SESSION } from "../client/src/redux/actions/types";
 const {
 	sendUserFeedback,
 	shopPurchaseRequest,
