@@ -26,6 +26,7 @@ const mainButtonClick = async (socket, payload) => {
 
 	//Still Waiting
 	if (thisTeamStatus == 1) {
+		//might fail with race condition (they press at the same time...but they just need to keep pressing...)
 		sendUserFeedback(socket, "Still waiting on other team...");
 		return;
 	}
@@ -41,66 +42,61 @@ const mainButtonClick = async (socket, payload) => {
 		return;
 	}
 
-	await thisGame.setStatus(otherTeam, 0); //Could skip awaiting since not used later in this function...
+	await thisGame.setStatus(otherTeam, 0); //Could skip awaiting since not used later in this function...(but can't assume it's gunna happen before we need to use it again...)
+	await thisGame.setStatus(gameTeam, 0); //TODO: make this a single call, only using 2 to prevent race condition stuff, should set both to 0 to be safe...
 
 	let serverAction;
 
-	//TODO: could refactor with less socket emits (only 1 at the end...)
 	switch (gamePhase) {
 		//News -> Purchase
 		case 0:
 			await thisGame.setPhase(1);
-
 			serverAction = {
 				type: PURCHASE_PHASE,
 				payload: {}
 			};
-			socket.to("game" + gameId).emit("serverSendingAction", serverAction);
-			socket.emit("serverSendingAction", serverAction);
 			break;
 
 		//Purchase -> Combat
 		case 1:
 			await thisGame.setPhase(2);
-
 			serverAction = {
 				type: COMBAT_PHASE,
 				payload: {}
 			};
-			socket.to("game" + gameId).emit("serverSendingAction", serverAction);
-			socket.emit("serverSendingAction", serverAction);
-			break;
-
-		//Place Troops -> News
-		case 3:
-			await thisGame.setPhase(0);
-
-			serverAction = {
-				type: NEWS_PHASE,
-				payload: {}
-			};
-			socket.to("game" + gameId).emit("serverSendingAction", serverAction);
-			socket.emit("serverSendingAction", serverAction);
 			break;
 
 		//Combat Phase -> Slice, Round, Place Troops... (stepping through)
 		case 2:
 			if (gameSlice == 0) {
 				await thisGame.setSlice(1);
-
 				serverAction = {
 					type: SLICE_CHANGE,
 					payload: {}
 				};
-				socket.to("game" + gameId).emit("serverSendingAction", serverAction);
-				socket.emit("serverSendingAction", serverAction);
 			} else {
 				await executeStep(socket, thisGame);
+				return; //executeStep will handle sending socket stuff, most likely separate for each client
 			}
 			break;
+
+		//Place Troops -> News
+		case 3:
+			await thisGame.setPhase(0);
+			serverAction = {
+				type: NEWS_PHASE,
+				payload: {}
+			};
+			break;
+
 		default:
 			sendUserFeedback(socket, "Backend Failure, unkown gamePhase...");
+			return;
 	}
+
+	//Send to all clients
+	socket.to("game" + gameId).emit("serverSendingAction", serverAction);
+	socket.emit("serverSendingAction", serverAction);
 };
 
 module.exports = mainButtonClick;

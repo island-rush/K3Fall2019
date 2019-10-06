@@ -1,8 +1,9 @@
-import { INITIAL_GAMESTATE, PIECES_MOVE, PIECE_PLACE, CLEAR_BATTLE } from "../actions/types";
+import { INITIAL_GAMESTATE, PIECES_MOVE, PIECE_PLACE, CLEAR_BATTLE, EVENT_BATTLE, NO_MORE_EVENTS } from "../actions/types";
 import { initialGameboardEmpty } from "./initialGameboardEmpty";
 
 function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
 	let stateDeepCopy = JSON.parse(JSON.stringify(state));
+	let freshBoard;
 	let positions;
 	switch (type) {
 		case INITIAL_GAMESTATE:
@@ -13,12 +14,36 @@ function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
 			return stateDeepCopy;
 		case PIECES_MOVE:
 			//TODO: consolidate this with initial gamestate (or change)
-			let freshBoard = JSON.parse(JSON.stringify(initialGameboardEmpty));
+			freshBoard = JSON.parse(JSON.stringify(initialGameboardEmpty));
 			positions = Object.keys(payload.gameboardPieces);
 			for (let x = 0; x < positions.length; x++) {
 				freshBoard[positions[x]].pieces = payload.gameboardPieces[positions[x]];
 			}
 			return freshBoard;
+		case NO_MORE_EVENTS:
+			if (payload.gameboardPieces) {
+				//this would happen on the 1st event (from executeStep)
+				freshBoard = JSON.parse(JSON.stringify(initialGameboardEmpty));
+				positions = Object.keys(payload.gameboardPieces);
+				for (let x = 0; x < positions.length; x++) {
+					freshBoard[positions[x]].pieces = payload.gameboardPieces[positions[x]];
+				}
+				return freshBoard;
+			} else {
+				return stateDeepCopy;
+			}
+		case EVENT_BATTLE:
+			if (payload.gameboardPieces) {
+				//this would happen on the 1st event (from executeStep)
+				freshBoard = JSON.parse(JSON.stringify(initialGameboardEmpty));
+				positions = Object.keys(payload.gameboardPieces);
+				for (let x = 0; x < positions.length; x++) {
+					freshBoard[positions[x]].pieces = payload.gameboardPieces[positions[x]];
+				}
+				return freshBoard;
+			} else {
+				return stateDeepCopy;
+			}
 		case PIECE_PLACE:
 			stateDeepCopy[payload.positionId].pieces.push(payload.newPiece);
 			return stateDeepCopy;

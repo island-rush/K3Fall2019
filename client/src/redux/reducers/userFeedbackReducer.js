@@ -21,7 +21,8 @@ import {
 	ENEMY_PIECE_SELECT,
 	MENU_SELECT,
 	NO_MORE_EVENTS,
-	BATTLE_FIGHT_RESULTS
+	BATTLE_FIGHT_RESULTS,
+	EVENT_BATTLE
 } from "../actions/types";
 
 const initialUserFeedback = "Loading...";
@@ -74,6 +75,8 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "ready to execute next step!";
 		case BATTLE_FIGHT_RESULTS:
 			return "got results of the battle...";
+		case EVENT_BATTLE:
+			return "battle has started!";
 		default:
 			return state;
 	}

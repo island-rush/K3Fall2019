@@ -9,7 +9,8 @@ import {
 	PLACE_PHASE,
 	PIECES_MOVE,
 	NEW_ROUND,
-	NEWS_PHASE
+	NEWS_PHASE,
+	EVENT_BATTLE
 } from "../actions/types";
 
 const initialGameInfoState = {
@@ -56,6 +57,11 @@ function gameInfoReducer(state = initialGameInfoState, { type, payload }) {
 			return stateDeepCopy;
 		case PIECES_MOVE:
 			stateDeepCopy.gameStatus = payload.gameStatus;
+			return stateDeepCopy;
+		case EVENT_BATTLE:
+			if (payload.gameStatus !== null) {
+				stateDeepCopy.gameStatus = payload.gameStatus;
+			}
 			return stateDeepCopy;
 		case NEW_ROUND:
 			stateDeepCopy.gameRound = payload.gameRound;
