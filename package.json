@@ -4,9 +4,9 @@
 	"description": "Island Rush V3.1 is a Military Strategy Teaching Tool/Game.",
 	"main": "index.js",
 	"scripts": {
-		"start": "node -r esm --experimental-modules server.js",
+		"start": "node -r esm server.js",
 		"fullInstall": "npm install && cd client && npm install && cd ..",
-		"devBackend": "nodemon -r esm --experimental-modules server.js",
+		"devBackend": "nodemon -r esm server.js",
 		"devFrontend": "cd client && npm start",
 		"dev": "concurrently \"npm:devBackend\" \"npm:devFrontend\"",
 		"buildClient": "cd client && npm run build && cd .."
