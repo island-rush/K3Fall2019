@@ -1,3 +1,5 @@
+const pool = require("../database");
+
 // prettier-ignore
 const news = (gameId, newsOrder, newsOptions) => {
 	const newsTeam = newsOptions.newsTeam == undefined ? -1 : newsOptions.newsTeam;
@@ -13,7 +15,7 @@ const news = (gameId, newsOrder, newsOptions) => {
 	return [gameId, newsTeam, newsOrder, newsPieces, newsEffect, newsRoll, newsLength, newsZone, newsTitle, newsInfo, newsActivated];
 };
 
-const gameInitialNews = async (conn, gameId) => {
+const gameInitialNews = async gameId => {
 	let newsOrder = 0;
 
 	const allInserts = [
@@ -34,7 +36,7 @@ const gameInitialNews = async (conn, gameId) => {
 
 	const queryString = "INSERT INTO news (newsGameId, newsTeam, newsOrder, newsPieces, newsEffect, newsRoll, newsLength, newsZone, newsTitle, newsInfo, newsActivated) VALUES ?";
 	const inserts = [allInserts];
-	await conn.query(queryString, inserts);
+	await pool.query(queryString, inserts);
 };
 
 module.exports = gameInitialNews;

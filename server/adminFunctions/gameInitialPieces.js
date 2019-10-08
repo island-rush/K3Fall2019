@@ -1,4 +1,5 @@
 import { TYPE_NAME_IDS, TYPE_MOVES, TYPE_FUEL } from "../../client/src/gameData/GameConstants";
+const pool = require("../database");
 
 // prettier-ignore
 const piece = (pieceGameId, pieceTeamName, pieceTypeName, piecePositionId, options) => {
@@ -24,7 +25,7 @@ const piece = (pieceGameId, pieceTeamName, pieceTypeName, piecePositionId, optio
 };
 
 //prettier-ignore
-const gameInitialPieces = async (conn, gameId) => {
+const gameInitialPieces = async gameId => {
 	const firstPieces = [
 		// piece(gameId, "Blue", "Tank", 0, {pieceVisible: 1, pieceContainerId: 23}),
 		piece(gameId, "Blue", "Tank", 0),
@@ -45,7 +46,7 @@ const gameInitialPieces = async (conn, gameId) => {
 
 	const queryString = "INSERT INTO pieces (pieceGameId, pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId, pieceVisible, pieceMoves, pieceFuel) VALUES ?";
 	const inserts = [firstPieces];
-	await conn.query(queryString, inserts);
+	await pool.query(queryString, inserts);
 };
 
 module.exports = gameInitialPieces;
