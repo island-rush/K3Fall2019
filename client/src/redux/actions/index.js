@@ -1,4 +1,5 @@
 //puts all userActions into the same file for importing / exporting
+//TODO: put these into a better organized structure (the function files) for easier access
 
 import shopRefundRequest from "./shopRefundRequest";
 import shopPurchaseRequest from "./shopPurchaseRequest";

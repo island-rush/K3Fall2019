@@ -16,4 +16,4 @@ export const init = store => {
 	});
 };
 
-export const emit = (type, payload) => socket.emit(type, payload);
+export const emit = (type, payload) => socket.emit(type, payload); //TODO: refactor the emit (client-side), since we always know this is CLIENT_SENDING_ACTION
