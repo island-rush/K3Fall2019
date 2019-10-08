@@ -1,6 +1,6 @@
-import { CANCEL_PLAN } from "./actionTypes";
-import setUserfeedbackAction from "./setUserfeedbackAction";
-import { CLIENT_SENDING_ACTION } from "../socketEmits";
+import { CANCEL_PLAN } from "../actionTypes";
+import setUserfeedbackAction from "../setUserfeedbackAction";
+import { CLIENT_SENDING_ACTION } from "../../socketEmits";
 
 const cancelPlan = () => {
 	return (dispatch, getState, emit) => {
@@ -13,7 +13,7 @@ const cancelPlan = () => {
 			if (gameboardMeta.selectedPiece !== -1 && gameboardMeta.selectedPiece in gameboardMeta.confirmedPlans) {
 				//delete the plans from the database request
 				const clientAction = {
-					type: "deletePlan",
+					type: "deletePlan", //TODO: should use constants for these (even though probably only used twice...)
 					payload: {
 						pieceId: gameboardMeta.selectedPiece
 					}

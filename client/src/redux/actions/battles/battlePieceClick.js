@@ -1,5 +1,5 @@
-import setUserfeedbackAction from "./setUserfeedbackAction";
-import { BATTLE_PIECE_SELECT } from "./actionTypes";
+import setUserfeedbackAction from "../setUserfeedbackAction";
+import { BATTLE_PIECE_SELECT } from "../actionTypes";
 
 const battlePieceClick = (battlePiece, battlePieceIndex) => {
 	return (dispatch, getState, emit) => {

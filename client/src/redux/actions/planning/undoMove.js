@@ -1,5 +1,5 @@
-import setUserfeedbackAction from "./setUserfeedbackAction";
-import { UNDO_MOVE } from "./actionTypes";
+import setUserfeedbackAction from "../setUserfeedbackAction";
+import { UNDO_MOVE } from "../actionTypes";
 
 const undoMove = () => {
 	return (dispatch, getState, emit) => {

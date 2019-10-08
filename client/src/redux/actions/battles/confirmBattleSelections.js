@@ -1,5 +1,5 @@
-import setUserfeedbackAction from "./setUserfeedbackAction";
-import { CLIENT_SENDING_ACTION } from "../socketEmits";
+import setUserfeedbackAction from "../setUserfeedbackAction";
+import { CLIENT_SENDING_ACTION } from "../../socketEmits";
 
 const confirmBattleSelections = () => {
 	return (dispatch, getState, emit) => {

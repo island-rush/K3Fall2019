@@ -1,4 +1,4 @@
-import { TARGET_PIECE_SELECT } from "./actionTypes";
+import { TARGET_PIECE_SELECT } from "../actionTypes";
 
 const targetPieceClick = (battlePiece, battlePieceIndex) => {
 	return (dispatch, getState, emit) => {
