@@ -1,6 +1,4 @@
 const pool = require("../database");
-const gameInitialPieces = require("../adminFunctions/gameInitialPieces"); //script to insert pieces
-const gameInitialNews = require("../adminFunctions/gameInitialNews"); //script to insert news
 import { INITIAL_GAMESTATE } from "../../client/src/redux/actions/actionTypes";
 
 const InvItem = require("./InvItem");
@@ -8,6 +6,9 @@ const ShopItem = require("./ShopItem");
 const Piece = require("./Piece");
 const Plan = require("./Plan");
 const Event = require("./Event");
+
+const gameInitialPieces = require("../adminFunctions/gameInitialPieces");
+const gameInitialNews = require("../adminFunctions/gameInitialNews");
 
 class Game {
 	constructor(options) {
@@ -257,10 +258,8 @@ class Game {
 		const thisGame = await new Game({ gameSection, gameInstructor }).init(); //could not init, but since we don't know who is using this function, return the full game
 
 		//reset the game when its created, now only need to activate, reset is more in tune with the name (instead of initialize?)
-		const conn = await pool.getConnection();
 		await gameInitialPieces(thisGame.gameId);
 		await gameInitialNews(thisGame.gameId);
-		conn.release();
 
 		return thisGame;
 	}

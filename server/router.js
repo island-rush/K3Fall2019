@@ -83,7 +83,7 @@ router.get("/databaseStatus", (req, res) => {
 	}
 });
 
-router.post("/adminLoginVerify", async (req, res) => {
+router.post("/adminLoginVerify", (req, res) => {
 	try {
 		adminLoginVerify(req, res);
 	} catch (error) {
