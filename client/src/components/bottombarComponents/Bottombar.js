@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import LeftControls from "./Leftcontrols";
 import UserFeedback from "./Userfeedback";
 import MainButton from "./MainButton";
-import { mainButtonClick } from "../../redux/actions/userActions";
+import { mainButtonClick } from "../../redux/actions";
 
 const bottombarStyle = {
 	backgroundColor: "Green",

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import ShopCartArea from "./ShopCartArea";
 import PurchaseableItemsContainer from "./PurchaseableItemsContainer";
-import { shopPurchaseRequest, shopRefundRequest, shopConfirmPurchase } from "../../redux/actions/userActions";
+import { shopRefundRequest, shopPurchaseRequest, shopConfirmPurchase } from "../../redux/actions";
 
 const shopStyle = {
 	backgroundColor: "Yellow",

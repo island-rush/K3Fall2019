@@ -7,7 +7,7 @@ import NewsPopup from "./NewsPopup";
 import ContainerPopup from "./ContainerPopup";
 import RefuelPopup from "./RefuelPopup";
 import Patterns from "./Patterns";
-import { selectPosition } from "../../redux/actions/userActions";
+import { selectPosition } from "../../redux/actions";
 import { TYPE_HIGH_LOW } from "../../gameData/gameConstants";
 
 const gameboardStyle = {

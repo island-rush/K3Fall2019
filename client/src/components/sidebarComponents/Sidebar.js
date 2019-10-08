@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import ShopMenu from "./ShopMenu";
 import InvMenu from "./InvMenu";
 import Gameinfo from "./Gameinfo";
-import { menuSelect } from "../../redux/actions/userActions";
+import { menuSelect } from "../../redux/actions";
 
 const sidebarStyle = {
 	backgroundColor: "Red",

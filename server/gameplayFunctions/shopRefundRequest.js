@@ -55,7 +55,7 @@ const shopRefundRequest = async (socket, payload) => {
 	const serverAction = {
 		type: SHOP_REFUND,
 		payload: {
-			shopItem: thisShopItem, //is this used on the frontend?
+			shopItemId, //is this used on the frontend?
 			pointsAdded: itemCost
 		}
 	};

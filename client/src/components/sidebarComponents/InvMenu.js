@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import InvItem from "./InvItem";
-import { invItemClick } from "../../redux/actions/userActions";
+import { invItemClick } from "../../redux/actions";
 
 const inventoryStyle = {
 	backgroundColor: "Yellow",

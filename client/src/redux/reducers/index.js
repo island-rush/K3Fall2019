@@ -7,7 +7,7 @@ import gameboardReducer from "./gameboardReducer";
 import gameboardMetaReducer from "./gameboardMetaReducer";
 
 const rootReducer = combineReducers({
-	//TODO: standardize these, along with types, and use same with backend
+	//each of these represents a part of the global state
 	userFeedback: userFeedbackReducer,
 	gameInfo: gameInfoReducer, //phase / round / status...
 	shopItems: shopReducer,

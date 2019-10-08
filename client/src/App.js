@@ -5,7 +5,7 @@ import Zoombox from "./components/zoomboxZomponents/Zoombox";
 import Sidebar from "./components/sidebarComponents/Sidebar";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { selectPosition, menuSelect, clearPieceSelection } from "./redux/actions/userActions";
+import { selectPosition, menuSelect, clearPieceSelection } from "./redux/actions";
 
 const appStyle = {
 	position: "relative",

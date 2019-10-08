@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { startPlan, cancelPlan, confirmPlan, undoMove, containerMove } from "../../redux/actions/userActions";
+import { confirmPlan, startPlan, cancelPlan, undoMove, containerMove } from "../../redux/actions";
 import { LEFT_CONTROLS_IMAGES } from "../styleConstants";
 
 const leftcontrolsStyle = {

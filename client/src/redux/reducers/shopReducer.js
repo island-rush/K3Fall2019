@@ -5,21 +5,27 @@ const initialShopState = [];
 function shopReducer(state = initialShopState, { type, payload }) {
 	switch (type) {
 		case INITIAL_GAMESTATE:
-			return payload.shopItems;
+			state = payload.shopItems;
+			break;
 		case SHOP_PURCHASE:
-			return state.concat([payload.shopItem]); //need to append the payload to the state
+			state = state.concat([payload.shopItem]); //need to append the payload to the state
+			break;
 		case SHOP_CLEAR:
-			return [];
+			state = [];
+			break;
 		case SHOP_REFUND:
-			//TODO: sending back the entire item when refunding, could send only the id
-			return state.filter(function(shopItem, index, arr) {
-				return shopItem.shopItemId !== payload.shopItem.shopItemId;
+			state = state.filter(function(shopItem, index, arr) {
+				return shopItem.shopItemId !== payload.shopItemId;
 			});
+			break;
 		case SHOP_TRANSFER:
-			return [];
+			state = [];
+			break;
 		default:
-			return state;
+		//don't change anything...
 	}
+
+	return state;
 }
 
 export default shopReducer;

@@ -55,89 +55,90 @@ const initialGameboardMeta = {
 
 function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 	let stateDeepCopy = JSON.parse(JSON.stringify(state));
+
 	switch (type) {
 		case MENU_SELECT:
 			stateDeepCopy.selectedMenuId = payload.selectedMenuId !== stateDeepCopy.selectedMenuId ? payload.selectedMenuId : 0;
-			return stateDeepCopy;
+			break;
 		case POSITION_SELECT:
 			stateDeepCopy.selectedPosition = parseInt(payload.selectedPositionId);
-			return stateDeepCopy;
+			break;
 		case PURCHASE_PHASE:
 			stateDeepCopy.news.active = false; //hide the popup
-			return stateDeepCopy;
+			break;
 		case NEWS_PHASE:
 			stateDeepCopy.news.active = true; //TODO: get the actual news from the database payload
-			return stateDeepCopy;
+			break;
 		case PIECE_CLICK:
 			stateDeepCopy.selectedPiece = parseInt(payload.selectedPieceId);
-			return stateDeepCopy;
+			break;
 		case PIECE_CLEAR_SELECTION:
 			stateDeepCopy.selectedPiece = -1;
-			return stateDeepCopy;
+			break;
 		case START_PLAN:
 			stateDeepCopy.planning.active = true;
-			return stateDeepCopy;
+			break;
 		case CANCEL_PLAN:
 			stateDeepCopy.planning.active = false;
 			stateDeepCopy.planning.moves = [];
 			stateDeepCopy.selectedPiece = -1;
-			return stateDeepCopy;
+			break;
 		case UNDO_MOVE:
 			stateDeepCopy.planning.moves.pop();
-			return stateDeepCopy;
+			break;
 		case CONTAINER_MOVE:
 			stateDeepCopy.planning.moves.push({
 				type: "container",
 				positionId: payload.selectedPositionId
 			});
-			return stateDeepCopy;
+			break;
 		case PLANNING_SELECT:
 			//TODO: move this to userActions to have more checks there within the thunk
 			stateDeepCopy.planning.moves.push({
 				type: "move",
 				positionId: payload.selectedPositionId
 			});
-			return stateDeepCopy;
+			break;
 		case PLAN_WAS_CONFIRMED:
 			const { pieceId, plan } = payload;
 			stateDeepCopy.confirmedPlans[pieceId] = plan;
 			stateDeepCopy.planning.active = false;
 			stateDeepCopy.planning.moves = [];
 			stateDeepCopy.selectedPiece = -1;
-			return stateDeepCopy;
+			break;
 		case DELETE_PLAN:
 			delete stateDeepCopy.confirmedPlans[payload.pieceId];
 			stateDeepCopy.selectedPiece = -1;
-			return stateDeepCopy;
+			break;
 		case INITIAL_GAMESTATE:
 			Object.assign(stateDeepCopy, payload.gameboardMeta);
-			return stateDeepCopy;
+			break;
 		case SLICE_CHANGE:
 			stateDeepCopy.confirmedPlans = {};
-			return stateDeepCopy;
+			break;
 		case BATTLE_PIECE_SELECT:
 			//select if different, unselect if was the same
 			let lastSelectedBattlePiece = stateDeepCopy.battle.selectedBattlePiece;
 			stateDeepCopy.battle.selectedBattlePiece = payload.battlePiece.piece.pieceId === lastSelectedBattlePiece ? -1 : payload.battlePiece.piece.pieceId;
 			stateDeepCopy.battle.selectedBattlePieceIndex = payload.battlePiece.piece.pieceId === lastSelectedBattlePiece ? -1 : payload.battlePieceIndex;
-			return stateDeepCopy;
+			break;
 		case ENEMY_PIECE_SELECT:
 			//need to get the piece that was selected, and put it into the target for the thing
 			stateDeepCopy.battle.friendlyPieces[stateDeepCopy.battle.selectedBattlePieceIndex].targetPiece = payload.battlePiece.piece;
 			stateDeepCopy.battle.friendlyPieces[stateDeepCopy.battle.selectedBattlePieceIndex].targetPieceIndex = payload.battlePieceIndex;
 
-			return stateDeepCopy;
+			break;
 		case TARGET_PIECE_SELECT:
 			//removing the target piece
 			stateDeepCopy.battle.friendlyPieces[payload.battlePieceIndex].targetPiece = null;
 			stateDeepCopy.battle.friendlyPieces[payload.battlePieceIndex].targetPieceIndex = -1;
-			return stateDeepCopy; //TODO: move all return statements to the bottom...
+			break;
 		case EVENT_BATTLE:
 			stateDeepCopy.battle = initialGameboardMeta.battle;
 			stateDeepCopy.battle.active = true;
 			stateDeepCopy.battle.friendlyPieces = payload.friendlyPieces;
 			stateDeepCopy.battle.enemyPieces = payload.enemyPieces;
-			return stateDeepCopy;
+			break;
 		case NO_MORE_EVENTS:
 			// stateDeepCopy = initialGameboardMeta; //gets rid of selected position/piece if there was one...
 			// stateDeepCopy.battle = initialGameboardMeta.battle;
@@ -152,7 +153,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			};
 			stateDeepCopy.refuel = { active: false };
 			stateDeepCopy.container = { active: false };
-			return stateDeepCopy;
+			break;
 		case BATTLE_FIGHT_RESULTS:
 			stateDeepCopy.battle.masterRecord = payload.masterRecord;
 
@@ -197,7 +198,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 				}
 			}
 
-			return stateDeepCopy;
+			break;
 		case CLEAR_BATTLE:
 			//probably a more efficient way of removing elements from the master record/friendlyPieces/enemyPieces
 			for (let z = 0; z < stateDeepCopy.battle.masterRecord.length; z++) {
@@ -230,10 +231,12 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 
 			delete stateDeepCopy.battle.masterRecord;
 
-			return stateDeepCopy;
+			break;
 		default:
 			return state;
 	}
+
+	return stateDeepCopy;
 }
 
 export default gameboardMetaReducer;
