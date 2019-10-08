@@ -1,7 +1,7 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import InvItem from "./InvItem";
-import { connect } from "react-redux";
 import { invItemClick } from "../../redux/actions/userActions";
 
 const inventoryStyle = {
@@ -38,20 +38,22 @@ const pieceItemsContainerStyle = {
 
 class InvMenu extends Component {
 	render() {
-		const warfareInvItems = this.props.invItems.filter(item => {
+		const { selected, invItems, invItemClick } = this.props;
+
+		const warfareInvItems = invItems.filter(item => {
 			return item.invItemTypeId > 19;
 		});
 
-		const warefareInvItemComponents = warfareInvItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={this.props.invItemClick} />);
+		const warefareInvItemComponents = warfareInvItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
 
-		const pieceInvItems = this.props.invItems.filter(item => {
+		const pieceInvItems = invItems.filter(item => {
 			return item.invItemTypeId <= 19;
 		});
 
-		const pieceInvItemComponents = pieceInvItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={this.props.invItemClick} />);
+		const pieceInvItemComponents = pieceInvItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
 
 		return (
-			<div style={this.props.selected ? inventoryStyle : invisibleStyle}>
+			<div style={selected ? inventoryStyle : invisibleStyle}>
 				<div style={warfareItemsContainerStyle}>
 					<div>Warefare Items</div>
 					{warefareInvItemComponents}
@@ -67,7 +69,8 @@ class InvMenu extends Component {
 
 InvMenu.propTypes = {
 	selected: PropTypes.bool.isRequired,
-	invItems: PropTypes.array.isRequired
+	invItems: PropTypes.array.isRequired,
+	invItemClick: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ invItems }) => ({

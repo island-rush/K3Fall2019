@@ -12,7 +12,9 @@ const userfeedbackStyle = {
 
 class Userfeedback extends Component {
 	render() {
-		return <div style={userfeedbackStyle}>{this.props.userFeedback}</div>;
+		const { userFeedback } = this.props;
+
+		return <div style={userfeedbackStyle}>{userFeedback}</div>;
 	}
 }
 

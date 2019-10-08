@@ -16,7 +16,9 @@ const invisibleStyle = {
 
 class ContainerPopup extends Component {
 	render() {
-		return <div style={this.props.container.active ? containerPopupStyle : invisibleStyle}>Container Popup</div>;
+		const { container } = this.props;
+
+		return <div style={container.active ? containerPopupStyle : invisibleStyle}>Container Popup</div>;
 	}
 }
 

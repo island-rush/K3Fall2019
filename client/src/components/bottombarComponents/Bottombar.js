@@ -1,8 +1,9 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import LeftControls from "./Leftcontrols";
 import UserFeedback from "./Userfeedback";
 import MainButton from "./MainButton";
-import { connect } from "react-redux";
 import { mainButtonClick } from "../../redux/actions/userActions";
 
 const bottombarStyle = {
@@ -16,6 +17,8 @@ const bottombarStyle = {
 
 class Bottombar extends Component {
 	render() {
+		const { userFeedback, gameInfo, mainButtonClick } = this.props;
+
 		return (
 			<div
 				style={bottombarStyle}
@@ -24,15 +27,18 @@ class Bottombar extends Component {
 				}}
 			>
 				<LeftControls />
-				<UserFeedback userFeedback={this.props.userFeedback} />
-				<MainButton
-					gameInfo={this.props.gameInfo}
-					mainButtonClick={this.props.mainButtonClick}
-				/>
+				<UserFeedback userFeedback={userFeedback} />
+				<MainButton gameInfo={gameInfo} mainButtonClick={mainButtonClick} />
 			</div>
 		);
 	}
 }
+
+Bottombar.propTypes = {
+	userFeedback: PropTypes.string.isRequired,
+	gameInfo: PropTypes.object.isRequired,
+	mainButtonClick: PropTypes.func.isRequired
+};
 
 const mapStateToProps = ({ userFeedback, gameInfo }) => ({
 	userFeedback,

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { startPlan, cancelPlan, confirmPlan, undoMove, containerMove } from "../../redux/actions/userActions";
+import { LEFT_CONTROLS_IMAGES } from "../styleConstants";
 
 const leftcontrolsStyle = {
 	background: "grey",
@@ -23,16 +24,6 @@ const buttonStyle = {
 	backgroundRepeat: "no-repeat"
 };
 
-const buttonImages = {
-	start: { backgroundImage: 'url("./images/buttonImages/iconPlanning.png")' },
-	undo: { backgroundImage: 'url("./images/buttonImages/iconUndo.png")' },
-	cancel: { backgroundImage: 'url("./images/buttonImages/iconCancel.png")' },
-	confirm: { backgroundImage: 'url("./images/buttonImages/iconConfirm.png")' },
-	container: {
-		backgroundImage: 'url("./images/buttonImages/iconContainer.png")'
-	}
-};
-
 const buttonTitles = {
 	start: "Start Planning a Move for a Piece",
 	undo: "Undo a Planned Move",
@@ -43,50 +34,52 @@ const buttonTitles = {
 
 class Leftcontrols extends Component {
 	render() {
+		const { startPlan, cancelPlan, undoMove, containerMove, confirmPlan } = this.props;
+
 		return (
 			<div style={leftcontrolsStyle}>
 				<div
 					title={buttonTitles.start}
-					style={{ ...buttonStyle, ...buttonImages.start }}
+					style={{ ...buttonStyle, ...LEFT_CONTROLS_IMAGES.start }}
 					onClick={event => {
 						event.preventDefault();
-						this.props.startPlan();
+						startPlan();
 						event.stopPropagation();
 					}}
 				/>
 				<div
 					title={buttonTitles.cancel}
-					style={{ ...buttonStyle, ...buttonImages.cancel }}
+					style={{ ...buttonStyle, ...LEFT_CONTROLS_IMAGES.cancel }}
 					onClick={event => {
 						event.preventDefault();
-						this.props.cancelPlan();
+						cancelPlan();
 						event.stopPropagation();
 					}}
 				/>
 				<div
 					title={buttonTitles.undo}
-					style={{ ...buttonStyle, ...buttonImages.undo }}
+					style={{ ...buttonStyle, ...LEFT_CONTROLS_IMAGES.undo }}
 					onClick={event => {
 						event.preventDefault();
-						this.props.undoMove();
+						undoMove();
 						event.stopPropagation();
 					}}
 				/>
 				<div
 					title={buttonTitles.container}
-					style={{ ...buttonStyle, ...buttonImages.container }}
+					style={{ ...buttonStyle, ...LEFT_CONTROLS_IMAGES.container }}
 					onClick={event => {
 						event.preventDefault();
-						this.props.containerMove();
+						containerMove();
 						event.stopPropagation();
 					}}
 				/>
 				<div
 					title={buttonTitles.confirm}
-					style={{ ...buttonStyle, ...buttonImages.confirm }}
+					style={{ ...buttonStyle, ...LEFT_CONTROLS_IMAGES.confirm }}
 					onClick={event => {
 						event.preventDefault();
-						this.props.confirmPlan();
+						confirmPlan();
 						event.stopPropagation();
 					}}
 				/>
@@ -98,15 +91,10 @@ class Leftcontrols extends Component {
 Leftcontrols.propTypes = {
 	startPlan: PropTypes.func.isRequired,
 	cancelPlan: PropTypes.func.isRequired,
-	planning: PropTypes.object.isRequired,
 	confirmPlan: PropTypes.func.isRequired,
 	undoMove: PropTypes.func.isRequired,
 	containerMove: PropTypes.func.isRequired
 };
-
-const mapStateToProps = ({ gameboardMeta }) => ({
-	planning: gameboardMeta.planning
-});
 
 const mapActionsToProps = {
 	startPlan,
@@ -116,7 +104,8 @@ const mapActionsToProps = {
 	containerMove
 };
 
+//Null for mapStateToProps since we aren't using any game state
 export default connect(
-	mapStateToProps,
+	null,
 	mapActionsToProps
 )(Leftcontrols);

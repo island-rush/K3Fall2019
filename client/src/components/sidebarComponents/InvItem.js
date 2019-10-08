@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { typeImages } from "../styleConstants";
 import { TYPE_NAMES, TYPE_MOVES, TYPE_FUEL } from "../../gameData/gameConstants";
+import { TYPE_IMAGES } from "../styleConstants";
 
 const invItemStyle = {
 	position: "relative",
@@ -16,18 +16,19 @@ const invItemStyle = {
 
 class InvItem extends Component {
 	render() {
-		const itemTypeId = this.props.invItem.invItemTypeId;
+		const { invItem, invItemClick } = this.props;
+		const { invItemTypeId } = invItem;
 
 		return (
 			<div
 				style={{
 					...invItemStyle,
-					...typeImages[itemTypeId]
+					...TYPE_IMAGES[invItemTypeId]
 				}}
-				title={`${TYPE_NAMES[itemTypeId]}\nMoves: ${TYPE_MOVES[itemTypeId]}\nFuel: ${TYPE_FUEL[itemTypeId]}`}
+				title={`${TYPE_NAMES[invItemTypeId]}\nMoves: ${TYPE_MOVES[invItemTypeId]}\nFuel: ${TYPE_FUEL[invItemTypeId]}`}
 				onClick={event => {
 					event.preventDefault();
-					this.props.invItemClick(this.props.invItem);
+					invItemClick(invItem);
 					event.stopPropagation();
 				}}
 			/>

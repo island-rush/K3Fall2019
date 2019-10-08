@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import BattlePiece from "./BattlePiece";
 import { battlePieceClick, enemyBattlePieceClick, targetPieceClick, confirmBattleSelections, clearOldBattle } from "../../redux/actions/userActions";
 

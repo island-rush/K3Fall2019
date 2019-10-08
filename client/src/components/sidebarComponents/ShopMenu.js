@@ -1,13 +1,9 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
-import {
-	shopPurchaseRequest,
-	shopRefundRequest,
-	shopConfirmPurchase
-} from "../../redux/actions/userActions";
-import ShopCartArea from "./ShopCartArea";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import ShopCartArea from "./ShopCartArea";
 import PurchaseableItemsContainer from "./PurchaseableItemsContainer";
+import { shopPurchaseRequest, shopRefundRequest, shopConfirmPurchase } from "../../redux/actions/userActions";
 
 const shopStyle = {
 	backgroundColor: "Yellow",
@@ -33,21 +29,17 @@ const purchaseButtonStyle = {
 
 class ShopMenu extends Component {
 	render() {
+		const { shopItems, selected, purchase, refund, points, confirmPurchase } = this.props;
+
 		return (
-			<div style={this.props.selected ? shopStyle : invisibleStyle}>
-				<ShopCartArea
-					refund={this.props.refund}
-					shopItems={this.props.shopItems}
-				/>
-				<PurchaseableItemsContainer
-					points={this.props.points}
-					purchase={this.props.purchase}
-				/>
+			<div style={selected ? shopStyle : invisibleStyle}>
+				<ShopCartArea refund={refund} shopItems={shopItems} />
+				<PurchaseableItemsContainer points={points} purchase={purchase} />
 				<div
 					style={purchaseButtonStyle}
 					onClick={event => {
 						event.preventDefault();
-						this.props.confirmPurchase();
+						confirmPurchase();
 						event.stopPropagation();
 					}}
 				>

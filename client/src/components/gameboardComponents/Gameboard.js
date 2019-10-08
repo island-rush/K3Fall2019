@@ -1,14 +1,14 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { selectPosition } from "../../redux/actions/userActions";
+import { connect } from "react-redux";
 import { HexGrid, Layout, Hexagon } from "react-hexgrid";
-import { TYPE_HIGH_LOW } from "../../gameData/gameConstants";
-import Patterns from "./Patterns";
 import BattlePopup from "./BattlePopup";
 import NewsPopup from "./NewsPopup";
 import ContainerPopup from "./ContainerPopup";
 import RefuelPopup from "./RefuelPopup";
+import Patterns from "./Patterns";
+import { selectPosition } from "../../redux/actions/userActions";
+import { TYPE_HIGH_LOW } from "../../gameData/gameConstants";
 
 const gameboardStyle = {
 	backgroundColor: "blue",
@@ -19,6 +19,7 @@ const gameboardStyle = {
 	position: "absolute"
 };
 
+//These functions organize the hexagons into the proper rows/columns to make the shape of the board (based on the index of the position (0->726))
 const qIndexSolver = index => {
 	if (index < 81) {
 		//above zoombox
@@ -55,7 +56,7 @@ const rIndexSolver = index => {
 };
 
 const patternSolver = position => {
-	const { type, pieces } = position;
+	const { type, pieces } = position; //position comes from the gameboard state
 	const { highPieces, lowPieces } = TYPE_HIGH_LOW;
 	let redHigh = 0,
 		redLow = 0,
@@ -78,16 +79,18 @@ const patternSolver = position => {
 			}
 		}
 	}
-	return type + redHigh + redLow + blueHigh + blueLow;
+	return type + redHigh + redLow + blueHigh + blueLow; //This resolves what image is shown on the board (see ./images/positionImages)
 };
 
 class Gameboard extends Component {
 	render() {
+		const { gameboard, selectedPosition, selectPosition, news, battle, container, refuel, planning, selectedPiece, confirmedPlans } = this.props;
+
 		let planningPositions = []; //all of the positions part of a plan
 		let containerPositions = []; //specific positions part of a plan of type container
 
-		for (let x = 0; x < this.props.planning.moves.length; x++) {
-			const { type, positionId } = this.props.planning.moves[x];
+		for (let x = 0; x < planning.moves.length; x++) {
+			const { type, positionId } = planning.moves[x];
 
 			if (!planningPositions.includes(parseInt(positionId))) {
 				planningPositions.push(parseInt(positionId));
@@ -98,10 +101,10 @@ class Gameboard extends Component {
 			}
 		}
 
-		if (this.props.selectedPiece !== -1) {
-			if (this.props.selectedPiece in this.props.confirmedPlans) {
-				for (let z = 0; z < this.props.confirmedPlans[this.props.selectedPiece].length; z++) {
-					const { type, positionId } = this.props.confirmedPlans[this.props.selectedPiece][z];
+		if (selectedPiece !== -1) {
+			if (selectedPiece in confirmedPlans) {
+				for (let z = 0; z < confirmedPlans[selectedPiece].length; z++) {
+					const { type, positionId } = confirmedPlans[selectedPiece][z];
 					if (type === "move") {
 						planningPositions.push(parseInt(positionId));
 					}
@@ -112,25 +115,26 @@ class Gameboard extends Component {
 			}
 		}
 
-		const positions = Object.keys(this.props.gameboard).map(positionIndex => (
+		const positions = Object.keys(gameboard).map(positionIndex => (
 			<Hexagon
 				key={positionIndex}
 				posId={0}
 				q={qIndexSolver(positionIndex)}
 				r={rIndexSolver(positionIndex)}
 				s={-999}
-				fill={patternSolver(this.props.gameboard[positionIndex])}
+				fill={patternSolver(gameboard[positionIndex])}
 				onClick={event => {
 					event.preventDefault();
-					if (parseInt(positionIndex) === parseInt(this.props.selectedPosition)) {
-						this.props.selectPosition(-1);
+					if (parseInt(positionIndex) === parseInt(selectedPosition)) {
+						selectPosition(-1);
 					} else {
-						this.props.selectPosition(positionIndex);
+						selectPosition(positionIndex);
 					}
 					event.stopPropagation();
 				}}
+				//These are found in the Game.css
 				className={
-					parseInt(this.props.selectedPosition) === parseInt(positionIndex)
+					parseInt(selectedPosition) === parseInt(positionIndex)
 						? "selectedPos"
 						: containerPositions.includes(parseInt(positionIndex))
 						? "containerPos"
@@ -149,10 +153,10 @@ class Gameboard extends Component {
 					</Layout>
 					<Patterns />
 				</HexGrid>
-				<NewsPopup news={this.props.news} />
-				<BattlePopup battle={this.props.battle} />
-				<RefuelPopup refuel={this.props.refuel} />
-				<ContainerPopup container={this.props.container} />
+				<NewsPopup news={news} />
+				<BattlePopup battle={battle} />
+				<RefuelPopup refuel={refuel} />
+				<ContainerPopup container={container} />
 			</div>
 		);
 	}

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { typeImages, diceImages } from "../styleConstants";
+import { TYPE_IMAGES, DICE_IMAGES } from "../styleConstants";
 
 const battlePieceStyle = {
 	backgroundColor: "white",
@@ -49,7 +49,7 @@ class BattlePiece extends Component {
 				}}
 				style={{
 					...boxStyle,
-					...typeImages[battlePiece.piece.pieceTypeId],
+					...TYPE_IMAGES[battlePiece.piece.pieceTypeId],
 					...selected[isSelected ? 0 : 1]
 				}}
 			>
@@ -68,13 +68,13 @@ class BattlePiece extends Component {
 						targetPieceClick(battlePiece, battlePieceIndex);
 						event.stopPropagation();
 					}}
-					style={{ ...boxStyle, ...typeImages[battlePiece.targetPiece.pieceTypeId] }}
+					style={{ ...boxStyle, ...TYPE_IMAGES[battlePiece.targetPiece.pieceTypeId] }}
 				>
 					{battlePiece.targetPieceIndex}
 				</div>
 			);
 
-		const diceBox = battlePiece.diceRoll == null ? null : <div style={{ ...boxStyle, ...diceImages[battlePiece.diceRoll] }}>{battlePiece.diceRoll}</div>;
+		const diceBox = battlePiece.diceRoll == null ? null : <div style={{ ...boxStyle, ...DICE_IMAGES[battlePiece.diceRoll] }}>{battlePiece.diceRoll}</div>;
 
 		return (
 			<div style={{ ...battlePieceStyle, ...battlePieceWonStyle[battlePiece.win != null && battlePiece.win ? 1 : 0] }}>

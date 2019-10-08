@@ -1,7 +1,7 @@
 import React from "react";
-import { typeImages } from "../styleConstants";
-import { TYPE_COSTS, TYPE_MOVES, TYPE_FUEL, TYPE_NAMES } from "../../gameData/gameConstants";
 import PropTypes from "prop-types";
+import { TYPE_IMAGES } from "../styleConstants";
+import { TYPE_COSTS, TYPE_MOVES, TYPE_FUEL, TYPE_NAMES } from "../../gameData/gameConstants";
 
 const purchaseableItemStyle = {
 	backgroundColor: "grey",
@@ -17,7 +17,7 @@ const purchaseableItemStyle = {
 const PurchaseableItem = ({ typeId, purchase }) => {
 	return (
 		<div
-			style={{ ...purchaseableItemStyle, ...typeImages[typeId] }}
+			style={{ ...purchaseableItemStyle, ...TYPE_IMAGES[typeId] }}
 			onClick={event => {
 				event.preventDefault();
 				purchase(typeId);

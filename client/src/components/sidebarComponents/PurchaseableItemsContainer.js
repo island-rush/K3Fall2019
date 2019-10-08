@@ -1,6 +1,6 @@
 import React from "react";
-import PurchaseableItem from "./PurchaseableItem";
 import PropTypes from "prop-types";
+import PurchaseableItem from "./PurchaseableItem";
 
 const purchaseableItemsContainerStyle = {
 	backgroundColor: "red",

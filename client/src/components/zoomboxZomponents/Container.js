@@ -14,9 +14,11 @@ const invisibleStyle = {
 
 class Container extends Component {
 	render() {
-		const pieces = this.props.pieces.map((piece, index) => (
+		const { pieces, selected, pieceClick } = this.props;
+
+		const containedPieces = pieces.map((piece, index) => (
 			<Piece
-				pieceClick={this.props.pieceClick}
+				pieceClick={pieceClick}
 				topLevel={false}
 				key={index}
 				piece={piece}
@@ -25,11 +27,8 @@ class Container extends Component {
 		));
 
 		return (
-			<div
-				style={this.props.selected ? containerStyle : invisibleStyle}
-				title={""}
-			>
-				{pieces}
+			<div style={selected ? containerStyle : invisibleStyle} title={""}>
+				{containedPieces}
 			</div>
 		);
 	}

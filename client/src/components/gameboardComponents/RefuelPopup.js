@@ -16,7 +16,9 @@ const invisibleStyle = {
 
 class RefuelPopup extends Component {
 	render() {
-		return <div style={this.props.refuel.active ? refuelPopupStyle : invisibleStyle}>Refuel Popup</div>;
+		const { refuel } = this.props;
+
+		return <div style={refuel.active ? refuelPopupStyle : invisibleStyle}>Refuel Popup</div>;
 	}
 }
 

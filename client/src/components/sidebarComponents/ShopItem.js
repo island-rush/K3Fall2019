@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { typeImages } from "../styleConstants";
+import { TYPE_IMAGES } from "../styleConstants";
 
 const shopItemStyle = {
 	backgroundColor: "green",
@@ -15,15 +15,17 @@ const shopItemStyle = {
 
 class ShopItem extends Component {
 	render() {
+		const { refund, shopItem } = this.props;
+
 		return (
 			<div
 				style={{
 					...shopItemStyle,
-					...typeImages[this.props.shopItem.shopItemTypeId]
+					...TYPE_IMAGES[shopItem.shopItemTypeId]
 				}}
 				onClick={event => {
 					event.preventDefault();
-					this.props.refund(this.props.shopItem);
+					refund(shopItem);
 					event.stopPropagation();
 				}}
 			/>

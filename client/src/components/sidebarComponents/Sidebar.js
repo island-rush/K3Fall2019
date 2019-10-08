@@ -1,10 +1,10 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import ShopMenu from "./ShopMenu";
 import InvMenu from "./InvMenu";
 import Gameinfo from "./Gameinfo";
 import { menuSelect } from "../../redux/actions/userActions";
-import PropTypes from "prop-types";
 
 const sidebarStyle = {
 	backgroundColor: "Red",
@@ -44,6 +44,8 @@ const selectedButtonStyle = {
 
 class Sidebar extends Component {
 	render() {
+		const { gameInfo, selectedMenu, menuSelect } = this.props;
+
 		return (
 			<div
 				style={sidebarStyle}
@@ -51,43 +53,43 @@ class Sidebar extends Component {
 					event.stopPropagation();
 				}}
 			>
-				<ShopMenu selected={this.props.selectedMenu === 1} />
-				<InvMenu selected={this.props.selectedMenu === 2} />
-				<Gameinfo gameInfo={this.props.gameInfo} selected={this.props.selectedMenu === 3} />
+				<ShopMenu selected={selectedMenu === 1} />
+				<InvMenu selected={selectedMenu === 2} />
+				<Gameinfo gameInfo={gameInfo} selected={selectedMenu === 3} />
 				<div
 					onClick={event => {
 						event.preventDefault();
-						this.props.menuSelect(1);
+						menuSelect(1);
 						event.stopPropagation();
 					}}
 					style={{
 						...buttonStyle,
 						...shopButtonStyle,
-						...(this.props.selectedMenu === 1 ? selectedButtonStyle : "")
+						...(selectedMenu === 1 ? selectedButtonStyle : "")
 					}}
 				/>
 				<div
 					onClick={event => {
 						event.preventDefault();
-						this.props.menuSelect(2);
+						menuSelect(2);
 						event.stopPropagation();
 					}}
 					style={{
 						...buttonStyle,
 						...invButtonStyle,
-						...(this.props.selectedMenu === 2 ? selectedButtonStyle : "")
+						...(selectedMenu === 2 ? selectedButtonStyle : "")
 					}}
 				/>
 				<div
 					onClick={event => {
 						event.preventDefault();
-						this.props.menuSelect(3);
+						menuSelect(3);
 						event.stopPropagation();
 					}}
 					style={{
 						...buttonStyle,
 						...infoButtonStyle,
-						...(this.props.selectedMenu === 3 ? selectedButtonStyle : "")
+						...(selectedMenu === 3 ? selectedButtonStyle : "")
 					}}
 				/>
 			</div>

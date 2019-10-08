@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { typeImages, typeTeamBorders } from "../styleConstants";
-import { TYPE_NAMES } from "../../gameData/gameConstants";
 import Container from "./Container";
+import { TYPE_IMAGES, TYPE_TEAM_BORDERS } from "../styleConstants";
+import { TYPE_NAMES } from "../../gameData/gameConstants";
 
 const pieceStyle = {
 	backgroundColor: "grey",
@@ -31,21 +31,20 @@ const zIndexLevels = [{ zIndex: 5 }, { zIndex: 10 }];
 
 class Piece extends Component {
 	render() {
-		const contents =
-			this.props.piece.pieceContents.pieces.length === 0 ? null : (
-				<Container selected={this.props.selected} pieces={this.props.piece.pieceContents.pieces} pieceClick={this.props.pieceClick} />
-			);
+		const { piece, topLevel, selected, pieceClick } = this.props;
+
+		const contents = piece.pieceContents.pieces.length === 0 ? null : <Container selected={selected} pieces={piece.pieceContents.pieces} pieceClick={pieceClick} />;
 
 		const pieceCombinedStyle = {
 			...pieceStyle,
-			...(this.props.topLevel ? topLevelStyle : bottomLevelStyle),
-			...zIndexLevels[this.props.selected ? 1 : 0],
-			...typeImages[this.props.piece.pieceTypeId],
-			...typeTeamBorders[this.props.piece.pieceTeamId],
-			...(this.props.selected ? selectedStyle : "")
+			...(topLevel ? topLevelStyle : bottomLevelStyle),
+			...zIndexLevels[selected ? 1 : 0],
+			...TYPE_IMAGES[piece.pieceTypeId],
+			...TYPE_TEAM_BORDERS[piece.pieceTeamId],
+			...(selected ? selectedStyle : "")
 		};
 
-		const title = `${TYPE_NAMES[this.props.piece.pieceTypeId]}\nMoves: ${this.props.piece.pieceMoves}\nFuel: ${this.props.piece.pieceFuel}`;
+		const title = `${TYPE_NAMES[piece.pieceTypeId]}\nMoves: ${piece.pieceMoves}\nFuel: ${piece.pieceFuel}`;
 
 		return (
 			<div
@@ -53,7 +52,7 @@ class Piece extends Component {
 				title={title}
 				onClick={event => {
 					event.preventDefault();
-					this.props.pieceClick(this.props.piece);
+					pieceClick(piece);
 					event.stopPropagation();
 				}}
 			>

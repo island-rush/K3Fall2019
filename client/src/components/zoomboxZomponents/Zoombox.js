@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { zoomboxBackgrounds } from "../styleConstants";
 import Piece from "./Piece";
 import { selectPiece, clearPieceSelection } from "../../redux/actions/userActions";
+import { ZOOMBOX_BACKGROUNDS } from "../styleConstants";
 
 const zoomboxStyle = {
 	position: "absolute",
@@ -20,12 +20,14 @@ const invisibleStyle = {
 
 class Zoombox extends Component {
 	render() {
-		const isVisible = this.props.selectedPos !== -1;
+		const { selectedPos, selectedPiece, gameboard, selectPiece, clearPieceSelection } = this.props;
+
+		const isVisible = selectedPos !== -1;
 
 		const pieces = !isVisible
 			? null
-			: this.props.gameboard[this.props.selectedPos].pieces.map((piece, index) => (
-					<Piece pieceClick={this.props.selectPiece} selected={this.props.selectedPiece === piece.pieceId} topLevel={true} key={index} piece={piece} />
+			: gameboard[selectedPos].pieces.map((piece, index) => (
+					<Piece pieceClick={selectPiece} selected={selectedPiece === piece.pieceId} topLevel={true} key={index} piece={piece} />
 			  ));
 
 		return (
@@ -34,7 +36,7 @@ class Zoombox extends Component {
 					isVisible
 						? {
 								...zoomboxStyle,
-								...zoomboxBackgrounds[this.props.gameboard[this.props.selectedPos].type]
+								...ZOOMBOX_BACKGROUNDS[gameboard[selectedPos].type]
 						  }
 						: invisibleStyle
 				}
@@ -42,7 +44,7 @@ class Zoombox extends Component {
 					event.preventDefault();
 					//close current selected piece?
 					//close any open pieces
-					this.props.clearPieceSelection();
+					clearPieceSelection();
 					event.stopPropagation();
 				}}
 			>
@@ -54,7 +56,10 @@ class Zoombox extends Component {
 
 Zoombox.propTypes = {
 	selectedPos: PropTypes.number.isRequired,
-	gameboard: PropTypes.array.isRequired
+	selectedPiece: PropTypes.number.isRequired,
+	gameboard: PropTypes.array.isRequired,
+	selectPiece: PropTypes.func.isRequired,
+	clearPieceSelection: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({

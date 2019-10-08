@@ -13,13 +13,9 @@ const shopCartAreaStyle = {
 
 class ShopCartArea extends Component {
 	render() {
-		const shopItemComponents = this.props.shopItems.map((shopItem, index) => (
-			<ShopItem
-				key={index}
-				shopItem={shopItem}
-				refund={shopItemId => this.props.refund(shopItemId)}
-			/>
-		));
+		const { shopItems, refund } = this.props;
+
+		const shopItemComponents = shopItems.map((shopItem, index) => <ShopItem key={index} shopItem={shopItem} refund={shopItemId => refund(shopItemId)} />);
 
 		return (
 			<div style={shopCartAreaStyle}>

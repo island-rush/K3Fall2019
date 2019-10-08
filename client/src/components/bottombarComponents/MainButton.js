@@ -11,10 +11,10 @@ const mainButtonStyle = {
 
 class MainButton extends Component {
 	render() {
+		const { mainButtonClick, gameInfo } = this.props;
+		const { gameStatus, gamePhase, gameSlice } = gameInfo;
+
 		let buttonText;
-
-		let { gameStatus, gamePhase, gameSlice } = this.props.gameInfo;
-
 		if (gameStatus === 1) {
 			buttonText = "Waiting on other Team...";
 		} else {
@@ -45,7 +45,7 @@ class MainButton extends Component {
 					// 	this.props.mainButtonClick();
 					// }
 					event.preventDefault();
-					this.props.mainButtonClick();
+					mainButtonClick();
 					event.stopPropagation();
 				}}
 			>
