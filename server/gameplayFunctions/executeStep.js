@@ -1,5 +1,6 @@
 const { Plan, Piece, Event } = require("../classes");
 import { PLACE_PHASE, NEW_ROUND } from "../../client/src/redux/actions/actionTypes";
+import { SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
 const giveNextEvent = require("./giveNextEvent");
 
 const executeStep = async (socket, thisGame) => {
@@ -35,8 +36,8 @@ const executeStep = async (socket, thisGame) => {
 			};
 		}
 
-		socket.to("game" + gameId).emit("serverSendingAction", serverAction);
-		socket.emit("serverSendingAction", serverAction);
+		socket.to("game" + gameId).emit(SERVER_SENDING_ACTION, serverAction);
+		socket.emit(SERVER_SENDING_ACTION, serverAction);
 		return;
 	}
 

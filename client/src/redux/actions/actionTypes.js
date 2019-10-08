@@ -1,3 +1,5 @@
+//redux actions
+
 export const INITIAL_GAMESTATE = "INITIAL_GAMESTATE";
 export const SET_USERFEEDBACK = "SET_USERFEEDBACK";
 export const START_PLAN = "START_PLAN";

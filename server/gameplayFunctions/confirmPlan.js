@@ -1,6 +1,7 @@
 const { Game, Piece, Plan } = require("../classes");
 const sendUserFeedback = require("./sendUserFeedback");
 import { PLAN_WAS_CONFIRMED } from "../../client/src/redux/actions/actionTypes";
+import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
 import { CONTAINER_TYPES } from "../../client/src/gameData/gameConstants";
 import { distanceMatrix } from "../../client/src/gameData/distanceMatrix";
@@ -13,7 +14,7 @@ const confirmPlan = async (socket, payload) => {
 	const { gameActive, gamePhase, gameSlice } = thisGame;
 
 	if (!gameActive) {
-		socket.emit("serverRedirect", GAME_INACTIVE_TAG);
+		socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
 		return;
 	}
 
@@ -91,7 +92,7 @@ const confirmPlan = async (socket, payload) => {
 			plan
 		}
 	};
-	socket.emit("serverSendingAction", serverAction);
+	socket.emit(SERVER_SENDING_ACTION, serverAction);
 };
 
 module.exports = confirmPlan;

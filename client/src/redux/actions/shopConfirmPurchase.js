@@ -1,10 +1,12 @@
+import { CLIENT_SENDING_ACTION } from "../socketEmits";
+
 const shopConfirmPurchase = () => {
 	return (dispatch, getState, emit) => {
 		const clientAction = {
 			type: "shopConfirmPurchase",
 			payload: {}
 		};
-		emit("clientSendingAction", clientAction);
+		emit(CLIENT_SENDING_ACTION, clientAction);
 	};
 };
 

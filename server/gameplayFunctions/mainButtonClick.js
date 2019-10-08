@@ -1,6 +1,7 @@
 const sendUserFeedback = require("./sendUserFeedback");
 const { Game } = require("../classes");
 import { MAIN_BUTTON_CLICK, PURCHASE_PHASE, COMBAT_PHASE, NEWS_PHASE, SLICE_CHANGE } from "../../client/src/redux/actions/actionTypes";
+import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
 const executeStep = require("./executeStep"); //big function
 
@@ -11,7 +12,7 @@ const mainButtonClick = async (socket, payload) => {
 	const { gameActive, gamePhase, gameRound, gameSlice, game0Status, game1Status } = thisGame;
 
 	if (!gameActive) {
-		socket.emit("serverRedirect", GAME_INACTIVE_TAG);
+		socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
 		return;
 	}
 
@@ -39,7 +40,7 @@ const mainButtonClick = async (socket, payload) => {
 			type: MAIN_BUTTON_CLICK,
 			payload: {}
 		};
-		socket.emit("serverSendingAction", serverAction);
+		socket.emit(SERVER_SENDING_ACTION, serverAction);
 		return;
 	}
 
@@ -96,8 +97,8 @@ const mainButtonClick = async (socket, payload) => {
 	}
 
 	//Send to all clients
-	socket.to("game" + gameId).emit("serverSendingAction", serverAction);
-	socket.emit("serverSendingAction", serverAction);
+	socket.to("game" + gameId).emit(SERVER_SENDING_ACTION, serverAction);
+	socket.emit(SERVER_SENDING_ACTION, serverAction);
 };
 
 module.exports = mainButtonClick;

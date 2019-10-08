@@ -1,5 +1,6 @@
 const { Game } = require("./classes");
 import { BAD_SESSION } from "./pages/errorTypes";
+import { SERVER_REDIRECT, SERVER_SENDING_ACTION, CLIENT_SENDING_ACTION } from "../client/src/redux/socketEmits";
 const {
 	sendUserFeedback,
 	shopPurchaseRequest,
@@ -15,7 +16,7 @@ const {
 const socketSetup = async socket => {
 	//Verify that this user is authenticated / known
 	if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
-		socket.emit("serverRedirect", BAD_SESSION);
+		socket.emit(SERVER_REDIRECT, BAD_SESSION);
 		return;
 	}
 
@@ -34,10 +35,10 @@ const socketSetup = async socket => {
 	const thisGame = await new Game({ gameId }).init(); //get the Game
 	//Assume the game exists, since we just came with a freshly authenticated session (might fail if game is deleted mid-login)
 	const serverAction = await thisGame.initialStateAction(gameTeam, gameController);
-	socket.emit("serverSendingAction", serverAction); //sends the data
+	socket.emit(SERVER_SENDING_ACTION, serverAction); //sends the data
 
 	//Setup the socket functions to respond to client requests
-	socket.on("clientSendingAction", ({ type, payload }) => {
+	socket.on(CLIENT_SENDING_ACTION, ({ type, payload }) => {
 		try {
 			switch (type) {
 				case "shopPurchaseRequest":

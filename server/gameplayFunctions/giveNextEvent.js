@@ -1,5 +1,6 @@
 const { Event, Piece } = require("../classes");
 import { EVENT_BATTLE, NO_MORE_EVENTS } from "../../client/src/redux/actions/actionTypes";
+import { SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
 const sendUserFeedback = require("./sendUserFeedback");
 
 //This function does a lot of formatting for the client, could let the client format the data itself //TODO: consistent in this?
@@ -119,9 +120,9 @@ const giveNextEvent = async (socket, options) => {
 	}
 
 	//sending the events that we got, or "no more events"? (but also sending piece moves after this...should combine...)
-	socket.to("game" + gameId + "team0").emit("serverSendingAction", serverActions[0]);
-	socket.to("game" + gameId + "team1").emit("serverSendingAction", serverActions[1]);
-	socket.emit("serverSendingAction", serverActions[socket.handshake.session.ir3.gameTeam]);
+	socket.to("game" + gameId + "team0").emit(SERVER_SENDING_ACTION, serverActions[0]);
+	socket.to("game" + gameId + "team1").emit(SERVER_SENDING_ACTION, serverActions[1]);
+	socket.emit(SERVER_SENDING_ACTION, serverActions[socket.handshake.session.ir3.gameTeam]);
 };
 
 module.exports = giveNextEvent;

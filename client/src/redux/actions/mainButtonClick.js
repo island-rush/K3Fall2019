@@ -1,3 +1,5 @@
+import { CLIENT_SENDING_ACTION } from "../socketEmits";
+
 const mainButtonClick = () => {
 	return (dispatch, getState, emit) => {
 		//check the local state before sending to the server
@@ -5,7 +7,7 @@ const mainButtonClick = () => {
 			type: "mainButtonClick",
 			payload: {}
 		};
-		emit("clientSendingAction", clientAction);
+		emit(CLIENT_SENDING_ACTION, clientAction);
 	};
 };
 

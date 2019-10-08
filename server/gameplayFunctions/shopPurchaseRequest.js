@@ -1,5 +1,6 @@
 const { Game, ShopItem } = require("../classes");
 import { SHOP_PURCHASE } from "../../client/src/redux/actions/actionTypes";
+import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
 import { TYPE_COSTS } from "../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("./sendUserFeedback");
@@ -12,7 +13,7 @@ const shopPurchaseRequest = async (socket, payload) => {
 	const { gameActive, gamePhase, game0Points, game1Points } = thisGame;
 
 	if (!gameActive) {
-		socket.emit("serverRedirect", GAME_INACTIVE_TAG);
+		socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
 		return;
 	}
 
@@ -49,7 +50,7 @@ const shopPurchaseRequest = async (socket, payload) => {
 			points: newPoints
 		}
 	};
-	socket.emit("serverSendingAction", serverAction);
+	socket.emit(SERVER_SENDING_ACTION, serverAction);
 };
 
 module.exports = shopPurchaseRequest;

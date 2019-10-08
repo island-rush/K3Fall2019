@@ -1,3 +1,5 @@
+//puts all userActions into the same file for importing / exporting
+
 import shopRefundRequest from "./shopRefundRequest";
 import shopPurchaseRequest from "./shopPurchaseRequest";
 import shopConfirmPurchase from "./shopConfirmPurchase";

@@ -1,6 +1,7 @@
 const { Game, Piece } = require("../classes");
 const sendUserFeedback = require("./sendUserFeedback");
 import { DELETE_PLAN } from "../../client/src/redux/actions/actionTypes";
+import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
 
 const deletePlan = async (socket, payload) => {
@@ -11,7 +12,7 @@ const deletePlan = async (socket, payload) => {
 	const { gameActive, gamePhase, gameSlice } = thisGame;
 
 	if (!gameActive) {
-		socket.emit("serverRedirect", GAME_INACTIVE_TAG); //TODO: serverRedirect should be a constant too
+		socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
 		return;
 	}
 
@@ -43,7 +44,7 @@ const deletePlan = async (socket, payload) => {
 			pieceId
 		}
 	};
-	socket.emit("serverSendingAction", serverAction); //TODO: should the other sockets for this team get the update? (in the background?)
+	socket.emit(SERVER_SENDING_ACTION, serverAction); //TODO: should the other sockets for this team get the update? (in the background?)
 };
 
 module.exports = deletePlan;

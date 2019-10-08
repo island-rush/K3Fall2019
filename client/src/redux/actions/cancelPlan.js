@@ -1,5 +1,6 @@
 import { CANCEL_PLAN } from "./actionTypes";
 import setUserfeedbackAction from "./setUserfeedbackAction";
+import { CLIENT_SENDING_ACTION } from "../socketEmits";
 
 const cancelPlan = () => {
 	return (dispatch, getState, emit) => {
@@ -17,7 +18,7 @@ const cancelPlan = () => {
 						pieceId: gameboardMeta.selectedPiece
 					}
 				};
-				emit("clientSendingAction", clientAction);
+				emit(CLIENT_SENDING_ACTION, clientAction);
 			} else {
 				dispatch(setUserfeedbackAction("Must select a piece to delete + already have a plan for it to cancel/delete"));
 			}

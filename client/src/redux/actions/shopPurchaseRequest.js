@@ -1,3 +1,5 @@
+import { CLIENT_SENDING_ACTION } from "../socketEmits";
+
 const shopPurchaseRequest = shopItemTypeId => {
 	return (dispatch, getState, emit) => {
 		const clientAction = {
@@ -6,7 +8,7 @@ const shopPurchaseRequest = shopItemTypeId => {
 				shopItemTypeId
 			}
 		};
-		emit("clientSendingAction", clientAction);
+		emit(CLIENT_SENDING_ACTION, clientAction);
 	};
 };
 

@@ -1,4 +1,5 @@
 import setUserfeedbackAction from "./setUserfeedbackAction";
+import { CLIENT_SENDING_ACTION } from "../socketEmits";
 
 const invItemClick = invItem => {
 	return (dispatch, getState, emit) => {
@@ -32,7 +33,7 @@ const invItemClick = invItem => {
 					}
 				};
 
-				emit("clientSendingAction", clientAction);
+				emit(CLIENT_SENDING_ACTION, clientAction);
 			}
 		}
 	};

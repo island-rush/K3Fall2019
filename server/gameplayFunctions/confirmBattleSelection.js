@@ -1,5 +1,6 @@
 const { Game, Event } = require("../classes");
 import { BATTLE_FIGHT_RESULTS } from "../../client/src/redux/actions/actionTypes";
+import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
 const sendUserFeedback = require("./sendUserFeedback");
 const giveNextEvent = require("./giveNextEvent");
@@ -12,7 +13,7 @@ const confirmBattleSelection = async (socket, payload) => {
 	const { gameActive, gamePhase, game0Status, game1Status } = thisGame;
 
 	if (!gameActive) {
-		socket.emit("serverRedirect", GAME_INACTIVE_TAG);
+		socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
 		return;
 	}
 
@@ -51,8 +52,8 @@ const confirmBattleSelection = async (socket, payload) => {
 			}
 		};
 
-		socket.to("game" + gameId).emit("serverSendingAction", serverAction);
-		socket.emit("serverSendingAction", serverAction);
+		socket.to("game" + gameId).emit(SERVER_SENDING_ACTION, serverAction);
+		socket.emit(SERVER_SENDING_ACTION, serverAction);
 		return;
 	}
 

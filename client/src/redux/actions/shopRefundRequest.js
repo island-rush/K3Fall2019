@@ -1,3 +1,5 @@
+import { CLIENT_SENDING_ACTION } from "../socketEmits";
+
 const shopRefundRequest = shopItem => {
 	return (dispatch, getState, emit) => {
 		const clientAction = {
@@ -6,7 +8,7 @@ const shopRefundRequest = shopItem => {
 				shopItem
 			}
 		};
-		emit("clientSendingAction", clientAction);
+		emit(CLIENT_SENDING_ACTION, clientAction);
 	};
 };
 
