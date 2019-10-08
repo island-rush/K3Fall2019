@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./Game.css";
 import App from "./App";
+import "./Game.css";
 
 import { Provider } from "react-redux";
 import setupStore from "./redux/setupStore";

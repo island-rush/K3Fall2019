@@ -18,18 +18,3 @@ function invReducer(state = initialInvState, { type, payload }) {
 }
 
 export default invReducer;
-
-// let inv = [
-//     {
-//         //invItemId,
-//         //invItemGameId,
-//         //invItemTeamId,
-//         //invItemTypeId,
-//     },
-//     {
-//         //invItemId,
-//         //invItemGameId,
-//         //invItemTeamId,
-//         //invItemTypeId,
-//     }
-// ]

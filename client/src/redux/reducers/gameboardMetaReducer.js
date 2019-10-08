@@ -19,13 +19,15 @@ import {
 	EVENT_BATTLE,
 	BATTLE_FIGHT_RESULTS,
 	NO_MORE_EVENTS,
-	CLEAR_BATTLE
+	CLEAR_BATTLE,
+	MENU_SELECT
 } from "../actions/actionTypes";
 
 const initialGameboardMeta = {
 	//TODO: change to selectedPositionId and selectedPieceId to better represent the values (ints) (and also selectedBattlePiece -> selectedBattlePieceId)
 	selectedPosition: -1,
 	selectedPiece: -1,
+	selectedMenuId: 0, //TODO: should probably 0 index this instead of 1 index (make -1 == no menu open)
 	news: {
 		active: false,
 		newsTitle: "Loading Title...",
@@ -54,6 +56,9 @@ const initialGameboardMeta = {
 function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 	let stateDeepCopy = JSON.parse(JSON.stringify(state));
 	switch (type) {
+		case MENU_SELECT:
+			stateDeepCopy.selectedMenuId = payload.selectedMenuId !== stateDeepCopy.selectedMenuId ? payload.selectedMenuId : 0;
+			return stateDeepCopy;
 		case POSITION_SELECT:
 			stateDeepCopy.selectedPosition = parseInt(payload.selectedPositionId);
 			return stateDeepCopy;
@@ -105,7 +110,8 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.selectedPiece = -1;
 			return stateDeepCopy;
 		case INITIAL_GAMESTATE:
-			return payload.gameboardMeta;
+			Object.assign(stateDeepCopy, payload.gameboardMeta);
+			return stateDeepCopy;
 		case SLICE_CHANGE:
 			stateDeepCopy.confirmedPlans = {};
 			return stateDeepCopy;

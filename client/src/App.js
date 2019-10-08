@@ -20,40 +20,42 @@ const isPlanningStyle = {
 
 class App extends Component {
 	render() {
+		const { gameboardMeta, selectPosition, menuSelect, clearPieceSelection } = this.props;
+
 		return (
 			<div
 				style={{
 					...appStyle,
-					...(this.props.gameboardMeta.planning.active ? isPlanningStyle : "")
+					...(gameboardMeta.planning.active ? isPlanningStyle : "")
 				}}
 				onClick={event => {
 					event.preventDefault();
-					if (this.props.selectedMenu === 0) {
-						this.props.selectPosition(-1);
+					if (gameboardMeta.selectedMenuId === 0) {
+						selectPosition(-1);
 					} else {
-						this.props.menuSelect(0);
+						menuSelect(0);
 					}
-					this.props.clearPieceSelection();
+					clearPieceSelection();
 					event.stopPropagation();
 				}}
 			>
 				<Bottombar />
 				<Gameboard />
 				<Zoombox />
-				<Sidebar />
+				<Sidebar selectedMenu={gameboardMeta.selectedMenuId} />
 			</div>
 		);
 	}
 }
 
 App.propTypes = {
+	gameboardMeta: PropTypes.object.isRequired,
 	selectPosition: PropTypes.func.isRequired,
 	menuSelect: PropTypes.func.isRequired,
-	gameboardMeta: PropTypes.object.isRequired
+	clearPieceSelection: PropTypes.func.isRequired
 };
 
-const mapStateToProps = ({ selectedMenu, gameboardMeta }) => ({
-	selectedMenu,
+const mapStateToProps = ({ gameboardMeta }) => ({
 	gameboardMeta
 });
 

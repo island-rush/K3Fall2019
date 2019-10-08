@@ -1,10 +1,4 @@
-import {
-	SHOP_PURCHASE,
-	SHOP_REFUND,
-	SHOP_CLEAR,
-	SHOP_TRANSFER,
-	INITIAL_GAMESTATE
-} from "../actions/actionTypes";
+import { SHOP_PURCHASE, SHOP_REFUND, SHOP_CLEAR, SHOP_TRANSFER, INITIAL_GAMESTATE } from "../actions/actionTypes";
 
 const initialShopState = [];
 
@@ -29,18 +23,3 @@ function shopReducer(state = initialShopState, { type, payload }) {
 }
 
 export default shopReducer;
-
-// let shop = [
-//     {
-//         //shopItemId,
-//         //shopItemGameId,
-//         //shopItemTeamId,
-//         //shopItemTypeId,
-//     },
-//     {
-//         //shopItemId,
-//         //shopItemGameId,
-//         //shopItemTeamId,
-//         //shopItemTypeId,
-//     }
-// ]

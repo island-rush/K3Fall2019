@@ -99,13 +99,12 @@ class Sidebar extends Component {
 
 Sidebar.propTypes = {
 	gameInfo: PropTypes.object.isRequired,
-	selectedMenu: PropTypes.number.isRequired,
+	selectedMenu: PropTypes.number.isRequired, //manual prop
 	menuSelect: PropTypes.func.isRequired
 };
 
-const mapStateToProps = ({ gameInfo, selectedMenu }) => ({
-	gameInfo,
-	selectedMenu
+const mapStateToProps = ({ gameInfo }) => ({
+	gameInfo
 });
 
 const mapActionsToProps = {

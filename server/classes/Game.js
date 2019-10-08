@@ -160,16 +160,10 @@ class Game {
 				invItems,
 				gameboardPieces,
 				gameboardMeta: {
-					selectedPosition: -1,
-					selectedPiece: -1,
 					news,
 					battle,
 					container,
 					refuel,
-					planning: {
-						active: false, //nothing during planning is saved by server, always defaults to this
-						moves: []
-					},
 					confirmedPlans
 				}
 			}
