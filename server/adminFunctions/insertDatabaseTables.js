@@ -1,6 +1,6 @@
 const pool = require("../database");
 const fs = require("fs");
-import { BAD_SESSION } from "../../client/src/redux/actions/types";
+import { BAD_SESSION } from "../pages/errorTypes";
 
 const insertDatabaseTables = async (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.courseDirector) {

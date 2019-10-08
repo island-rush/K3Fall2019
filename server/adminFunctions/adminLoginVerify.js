@@ -1,4 +1,4 @@
-import { BAD_REQUEST_TAG, GAME_DOES_NOT_EXIST, LOGIN_TAG } from "../../client/src/redux/actions/types";
+import { BAD_REQUEST_TAG, GAME_DOES_NOT_EXIST, LOGIN_TAG } from "../pages/errorTypes";
 const { Game } = require("../classes");
 const md5 = require("md5");
 

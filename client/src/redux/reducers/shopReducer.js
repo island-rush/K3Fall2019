@@ -4,7 +4,7 @@ import {
 	SHOP_CLEAR,
 	SHOP_TRANSFER,
 	INITIAL_GAMESTATE
-} from "../actions/types";
+} from "../actions/actionTypes";
 
 const initialShopState = [];
 

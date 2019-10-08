@@ -23,7 +23,7 @@ import {
 	NO_MORE_EVENTS,
 	BATTLE_FIGHT_RESULTS,
 	EVENT_BATTLE
-} from "../actions/types";
+} from "../actions/actionTypes";
 
 const initialUserFeedback = "Loading...";
 

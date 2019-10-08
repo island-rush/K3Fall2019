@@ -1,7 +1,7 @@
 const pool = require("../database");
 const gameInitialPieces = require("./gameInitialPieces"); //script to insert pieces
 const gameInitialNews = require("./gameInitialNews"); //script to insert news
-import { INITIAL_GAMESTATE } from "../../client/src/redux/actions/types";
+import { INITIAL_GAMESTATE } from "../../client/src/redux/actions/actionTypes";
 
 const InvItem = require("./InvItem");
 const ShopItem = require("./ShopItem");

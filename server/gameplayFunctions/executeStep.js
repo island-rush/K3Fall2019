@@ -1,5 +1,5 @@
 const { Plan, Piece, Event } = require("../classes");
-import { PLACE_PHASE, NEW_ROUND } from "../../client/src/redux/actions/types";
+import { PLACE_PHASE, NEW_ROUND } from "../../client/src/redux/actions/actionTypes";
 const giveNextEvent = require("./giveNextEvent");
 
 const executeStep = async (socket, thisGame) => {

@@ -20,7 +20,7 @@ import {
 	BATTLE_FIGHT_RESULTS,
 	NO_MORE_EVENTS,
 	CLEAR_BATTLE
-} from "../actions/types";
+} from "../actions/actionTypes";
 
 const initialGameboardMeta = {
 	//TODO: change to selectedPositionId and selectedPieceId to better represent the values (ints) (and also selectedBattlePiece -> selectedBattlePieceId)

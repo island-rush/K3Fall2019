@@ -1,5 +1,6 @@
 const { Game, Event } = require("../classes");
-import { GAME_INACTIVE_TAG, BATTLE_FIGHT_RESULTS } from "../../client/src/redux/actions/types";
+import { BATTLE_FIGHT_RESULTS } from "../../client/src/redux/actions/actionTypes";
+import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
 const sendUserFeedback = require("./sendUserFeedback");
 const giveNextEvent = require("./giveNextEvent");
 

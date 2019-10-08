@@ -1,5 +1,5 @@
 const { Game } = require("../classes");
-import { ACCESS_TAG } from "../../client/src/redux/actions/types";
+import { ACCESS_TAG } from "../pages/errorTypes";
 
 const getGames = async (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.courseDirector) {

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { typeImages } from "../constants";
+import { typeImages } from "../styleConstants";
 import { TYPE_NAMES, TYPE_MOVES, TYPE_FUEL } from "../../gameData/gameConstants";
 
 const invItemStyle = {

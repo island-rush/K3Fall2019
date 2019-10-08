@@ -1,5 +1,5 @@
 const { Game } = require("../classes");
-import { BAD_REQUEST_TAG, GAME_DOES_NOT_EXIST, ALREADY_IN_TAG, LOGIN_TAG, GAME_INACTIVE_TAG } from "../../client/src/redux/actions/types";
+import { BAD_REQUEST_TAG, GAME_DOES_NOT_EXIST, ALREADY_IN_TAG, LOGIN_TAG, GAME_INACTIVE_TAG } from "../pages/errorTypes";
 const md5 = require("md5");
 
 const gameLoginVerify = async (req, res) => {

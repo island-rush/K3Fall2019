@@ -11,7 +11,7 @@ import {
 	NEW_ROUND,
 	NEWS_PHASE,
 	EVENT_BATTLE
-} from "../actions/types";
+} from "../actions/actionTypes";
 
 const initialGameInfoState = {
 	gameSection: "Loading...",

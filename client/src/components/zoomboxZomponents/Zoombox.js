@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { zoomboxBackgrounds } from "../constants";
+import { zoomboxBackgrounds } from "../styleConstants";
 import Piece from "./Piece";
 import { selectPiece, clearPieceSelection } from "../../redux/actions/userActions";
 

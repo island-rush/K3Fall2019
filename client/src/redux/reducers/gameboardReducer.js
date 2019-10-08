@@ -1,4 +1,4 @@
-import { INITIAL_GAMESTATE, PIECES_MOVE, PIECE_PLACE, CLEAR_BATTLE, EVENT_BATTLE, NO_MORE_EVENTS } from "../actions/types";
+import { INITIAL_GAMESTATE, PIECES_MOVE, PIECE_PLACE, CLEAR_BATTLE, EVENT_BATTLE, NO_MORE_EVENTS } from "../actions/actionTypes";
 import { initialGameboardEmpty } from "./initialGameboardEmpty";
 
 function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {

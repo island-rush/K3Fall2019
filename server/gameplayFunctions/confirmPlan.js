@@ -1,6 +1,7 @@
 const { Game, Piece, Plan } = require("../classes");
 const sendUserFeedback = require("./sendUserFeedback");
-import { GAME_INACTIVE_TAG, PLAN_WAS_CONFIRMED } from "../../client/src/redux/actions/types";
+import { PLAN_WAS_CONFIRMED } from "../../client/src/redux/actions/actionTypes";
+import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
 import { CONTAINER_TYPES } from "../../client/src/gameData/gameConstants";
 import { distanceMatrix } from "../../client/src/gameData/distanceMatrix";
 

@@ -1,5 +1,5 @@
 const { Game } = require("../classes");
-import { ACCESS_TAG, BAD_REQUEST_TAG } from "../../client/src/redux/actions/types";
+import { ACCESS_TAG, BAD_REQUEST_TAG } from "../pages/errorTypes";
 const md5 = require("md5");
 
 const gameAdd = async (req, res) => {

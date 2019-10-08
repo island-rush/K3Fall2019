@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { typeImages, typeTeamBorders } from "../constants";
+import { typeImages, typeTeamBorders } from "../styleConstants";
 import { TYPE_NAMES } from "../../gameData/gameConstants";
 import Container from "./Container";
 

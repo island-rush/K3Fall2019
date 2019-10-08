@@ -1,4 +1,4 @@
-import { SET_USERFEEDBACK } from "../../client/src/redux/actions/types";
+import { SET_USERFEEDBACK } from "../../client/src/redux/actions/actionTypes";
 
 const sendUserFeedback = async (socket, userFeedback) => {
 	const serverAction = {

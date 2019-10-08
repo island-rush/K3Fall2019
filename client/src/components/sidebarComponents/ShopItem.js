@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { typeImages } from "../constants";
+import { typeImages } from "../styleConstants";
 
 const shopItemStyle = {
 	backgroundColor: "green",

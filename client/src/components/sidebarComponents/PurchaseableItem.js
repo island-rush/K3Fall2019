@@ -1,5 +1,5 @@
 import React from "react";
-import { typeImages } from "../constants";
+import { typeImages } from "../styleConstants";
 import { TYPE_COSTS, TYPE_MOVES, TYPE_FUEL, TYPE_NAMES } from "../../gameData/gameConstants";
 import PropTypes from "prop-types";
 

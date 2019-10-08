@@ -1,4 +1,4 @@
-import { INITIAL_GAMESTATE, SHOP_TRANSFER, PIECE_PLACE } from "../actions/types";
+import { INITIAL_GAMESTATE, SHOP_TRANSFER, PIECE_PLACE } from "../actions/actionTypes";
 
 const initialInvState = [];
 

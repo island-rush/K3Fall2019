@@ -1,6 +1,7 @@
 const sendUserFeedback = require("./sendUserFeedback");
 const { Game } = require("../classes");
-import { GAME_INACTIVE_TAG, MAIN_BUTTON_CLICK, PURCHASE_PHASE, COMBAT_PHASE, NEWS_PHASE, SLICE_CHANGE } from "../../client/src/redux/actions/types";
+import { MAIN_BUTTON_CLICK, PURCHASE_PHASE, COMBAT_PHASE, NEWS_PHASE, SLICE_CHANGE } from "../../client/src/redux/actions/actionTypes";
+import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
 const executeStep = require("./executeStep"); //big function
 
 const mainButtonClick = async (socket, payload) => {

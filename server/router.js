@@ -1,5 +1,5 @@
 const path = require("path");
-import { DATABASE_TAG, LOGIN_TAG } from "../client/src/redux/actions/types";
+import { DATABASE_TAG, LOGIN_TAG } from "./pages/errorTypes";
 const {
 	gameReset,
 	toggleGameActive,

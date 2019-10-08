@@ -1,4 +1,4 @@
-import { MENU_SELECT } from "../actions/types";
+import { MENU_SELECT } from "../actions/actionTypes";
 
 const initialMenuOpenId = 0;
 

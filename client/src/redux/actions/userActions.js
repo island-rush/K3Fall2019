@@ -13,7 +13,7 @@ import {
 	ENEMY_PIECE_SELECT,
 	TARGET_PIECE_SELECT,
 	CLEAR_BATTLE
-} from "./types";
+} from "./actionTypes";
 
 import { distanceMatrix } from "../../gameData/distanceMatrix";
 

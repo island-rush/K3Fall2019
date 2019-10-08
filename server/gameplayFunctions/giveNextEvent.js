@@ -1,5 +1,5 @@
 const { Event, Piece } = require("../classes");
-import { EVENT_BATTLE, NO_MORE_EVENTS } from "../../client/src/redux/actions/types";
+import { EVENT_BATTLE, NO_MORE_EVENTS } from "../../client/src/redux/actions/actionTypes";
 const sendUserFeedback = require("./sendUserFeedback");
 
 //This function does a lot of formatting for the client, could let the client format the data itself //TODO: consistent in this?

@@ -1,5 +1,6 @@
 const { Game, ShopItem } = require("../classes");
-import { GAME_INACTIVE_TAG, SHOP_PURCHASE } from "../../client/src/redux/actions/types";
+import { SHOP_PURCHASE } from "../../client/src/redux/actions/actionTypes";
+import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
 import { TYPE_COSTS } from "../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("./sendUserFeedback");
 

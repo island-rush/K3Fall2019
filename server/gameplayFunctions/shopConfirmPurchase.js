@@ -1,6 +1,7 @@
 const { Game, InvItem, ShopItem } = require("../classes");
 const sendUserFeedback = require("./sendUserFeedback");
-import { SHOP_TRANSFER, GAME_INACTIVE_TAG } from "../../client/src/redux/actions/types";
+import { SHOP_TRANSFER } from "../../client/src/redux/actions/actionTypes";
+import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
 
 /***
  * TODO: standard function descriptions (author?, arguments, returns, why/when used?)

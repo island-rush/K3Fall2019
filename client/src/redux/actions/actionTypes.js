@@ -32,13 +32,3 @@ export const EVENT_BATTLE = "EVENT_BATTLE";
 export const BATTLE_FIGHT_RESULTS = "BATTLE_FIGHT_RESULTS";
 export const NO_MORE_EVENTS = "NO_MORE_EVENTS";
 export const CLEAR_BATTLE = "CLEAR_BATTLE";
-
-export const LOGIN_TAG = "loginFail";
-export const ACCESS_TAG = "access";
-export const UNKOWN_ACCESS_TAG = "unkownGameAccess";
-export const BAD_REQUEST_TAG = "badRequest";
-export const GAME_INACTIVE_TAG = "gameNotActive";
-export const ALREADY_IN_TAG = "alreadyLoggedIn";
-export const DATABASE_TAG = "database";
-export const BAD_SESSION = "badSession";
-export const GAME_DOES_NOT_EXIST = "gameDoesNotExist";
