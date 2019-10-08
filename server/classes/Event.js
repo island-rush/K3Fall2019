@@ -1,5 +1,5 @@
 const pool = require("../database");
-import { ATTACK_MATRIX } from "../../client/src/redux/actions/types";
+import { ATTACK_MATRIX } from "../../client/src/gameData/gameConstants";
 
 class Event {
 	//TODO: we have a class for event, but multiple tables for keeping track of events, event items, and that one for temp stuff (efficient)

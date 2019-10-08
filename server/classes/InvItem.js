@@ -1,5 +1,5 @@
 const pool = require("../database");
-import { TYPE_MOVES, TYPE_FUEL } from "../../client/src/redux/actions/types";
+import { TYPE_MOVES, TYPE_FUEL } from "../../client/src/gamedata/gameConstants";
 const Piece = require("./Piece");
 
 class InvItem {

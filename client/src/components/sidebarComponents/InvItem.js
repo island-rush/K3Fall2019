@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { typeImages, typeNames, typeMoves, typeFuel } from "../constants";
+import { typeImages } from "../constants";
+import { TYPE_NAMES, TYPE_MOVES, TYPE_FUEL } from "../../gameData/gameConstants";
 
 const invItemStyle = {
 	position: "relative",
@@ -23,7 +24,7 @@ class InvItem extends Component {
 					...invItemStyle,
 					...typeImages[itemTypeId]
 				}}
-				title={`${typeNames[itemTypeId]}\nMoves: ${typeMoves[itemTypeId]}\nFuel: ${typeFuel[itemTypeId]}`}
+				title={`${TYPE_NAMES[itemTypeId]}\nMoves: ${TYPE_MOVES[itemTypeId]}\nFuel: ${TYPE_FUEL[itemTypeId]}`}
 				onClick={event => {
 					event.preventDefault();
 					this.props.invItemClick(this.props.invItem);

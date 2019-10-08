@@ -1,6 +1,7 @@
 const { Game, ShopItem } = require("../classes");
 const sendUserFeedback = require("./sendUserFeedback");
-import { GAME_INACTIVE_TAG, BAD_REQUEST_TAG, SHOP_ITEM_TYPE_COSTS, SHOP_REFUND } from "../../client/src/redux/actions/types";
+import { GAME_INACTIVE_TAG, BAD_REQUEST_TAG, SHOP_REFUND } from "../../client/src/redux/actions/types";
+import { TYPE_COSTS } from "../../client/src/gameData/gameConstants";
 
 const shopRefundRequest = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
@@ -41,7 +42,7 @@ const shopRefundRequest = async (socket, payload) => {
 		return;
 	}
 
-	const itemCost = SHOP_ITEM_TYPE_COSTS[shopItemTypeId];
+	const itemCost = TYPE_COSTS[shopItemTypeId];
 	const teamPoints = gameTeam == 0 ? game0Points : game1Points;
 
 	//Refund the shopItem

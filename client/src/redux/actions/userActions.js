@@ -15,7 +15,7 @@ import {
 	CLEAR_BATTLE
 } from "./types";
 
-import { distanceMatrix } from "./distanceMatrix";
+import { distanceMatrix } from "../../gameData/distanceMatrix";
 
 export const shopPurchaseRequest = shopItemTypeId => {
 	return (dispatch, getState, emit) => {

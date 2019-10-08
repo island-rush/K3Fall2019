@@ -1,7 +1,8 @@
 const { Game, Piece, Plan } = require("../classes");
 const sendUserFeedback = require("./sendUserFeedback");
-import { GAME_INACTIVE_TAG, CONTAINER_TYPES, PLAN_WAS_CONFIRMED } from "../../client/src/redux/actions/types";
-import { distanceMatrix } from "../../client/src/redux/actions/distanceMatrix";
+import { GAME_INACTIVE_TAG, PLAN_WAS_CONFIRMED } from "../../client/src/redux/actions/types";
+import { CONTAINER_TYPES } from "../../client/src/gameData/gameConstants";
+import { distanceMatrix } from "../../client/src/gameData/distanceMatrix";
 
 const confirmPlan = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;

@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { selectPosition } from "../../redux/actions/userActions";
 import { HexGrid, Layout, Hexagon } from "react-hexgrid";
-import { typeHighLow } from "../constants";
+import { TYPE_HIGH_LOW } from "../../gameData/gameConstants";
 import Patterns from "./Patterns";
 import BattlePopup from "./BattlePopup";
 import NewsPopup from "./NewsPopup";
@@ -56,7 +56,7 @@ const rIndexSolver = index => {
 
 const patternSolver = position => {
 	const { type, pieces } = position;
-	const { highPieces, lowPieces } = typeHighLow;
+	const { highPieces, lowPieces } = TYPE_HIGH_LOW;
 	let redHigh = 0,
 		redLow = 0,
 		blueHigh = 0,

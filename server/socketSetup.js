@@ -36,7 +36,6 @@ const socketSetup = async socket => {
 	const serverAction = await thisGame.initialStateAction(gameTeam, gameController);
 	socket.emit("serverSendingAction", serverAction); //sends the data
 
-	//TODO: reflect that the argument is a payload, change these to be objects that the server is receiving for continuity
 	//Setup the socket functions to respond to client requests
 	socket.on("clientSendingAction", ({ type, payload }) => {
 		try {

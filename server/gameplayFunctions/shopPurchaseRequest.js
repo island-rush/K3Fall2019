@@ -1,5 +1,6 @@
 const { Game, ShopItem } = require("../classes");
-import { GAME_INACTIVE_TAG, SHOP_ITEM_TYPE_COSTS, SHOP_PURCHASE } from "../../client/src/redux/actions/types";
+import { GAME_INACTIVE_TAG, SHOP_PURCHASE } from "../../client/src/redux/actions/types";
+import { TYPE_COSTS } from "../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("./sendUserFeedback");
 
 const shopPurchaseRequest = async (socket, payload) => {
@@ -26,7 +27,7 @@ const shopPurchaseRequest = async (socket, payload) => {
 		return;
 	}
 
-	const shopItemCost = SHOP_ITEM_TYPE_COSTS[shopItemTypeId];
+	const shopItemCost = TYPE_COSTS[shopItemTypeId];
 	const teamPoints = gameTeam == 0 ? game0Points : game1Points;
 
 	if (teamPoints < shopItemCost) {

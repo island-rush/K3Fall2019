@@ -1,11 +1,6 @@
 import React from "react";
-import {
-	typeImages,
-	typeCosts,
-	typeNames,
-	typeMoves,
-	typeFuel
-} from "../constants";
+import { typeImages } from "../constants";
+import { TYPE_COSTS, TYPE_MOVES, TYPE_FUEL, TYPE_NAMES } from "../../gameData/gameConstants";
 import PropTypes from "prop-types";
 
 const purchaseableItemStyle = {
@@ -28,7 +23,7 @@ const PurchaseableItem = ({ typeId, purchase }) => {
 				purchase(typeId);
 				event.stopPropagation();
 			}}
-			title={`${typeNames[typeId]}\nCost: ${typeCosts[typeId]}\nMoves: ${typeMoves[typeId]}\nFuel: ${typeFuel[typeId]}`}
+			title={`${TYPE_NAMES[typeId]}\nCost: ${TYPE_COSTS[typeId]}\nMoves: ${TYPE_MOVES[typeId]}\nFuel: ${TYPE_FUEL[typeId]}`}
 		/>
 	);
 };

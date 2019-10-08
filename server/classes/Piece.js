@@ -1,6 +1,6 @@
 const pool = require("../database");
-import { VISIBILITY_MATRIX } from "../../client/src/redux/actions/types";
-import { distanceMatrix } from "../../client/src/redux/actions/distanceMatrix";
+import { VISIBILITY_MATRIX } from "../../client/src/gameData/gameConstants";
+import { distanceMatrix } from "../../client/src/gameData/distanceMatrix";
 
 class Piece {
 	constructor(pieceId, options) {

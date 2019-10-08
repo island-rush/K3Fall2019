@@ -3,18 +3,15 @@ import io from "socket.io-client";
 const socket = io(window.location.hostname);
 
 export const init = store => {
-	socket.on("serverSendingAction", serverAction => {
-		const { type, payload } = serverAction;
+	socket.on("serverSendingAction", ({ type, payload }) => {
 		store.dispatch({
-			type: type,
-			payload: payload
+			type,
+			payload
 		});
 	});
 
 	socket.on("serverRedirect", serverError => {
-		window.location.replace(
-			`//${window.location.hostname}/index.html?error=${serverError}`
-		);
+		window.location.replace(`//${window.location.hostname}/index.html?error=${serverError}`);
 	});
 };
 

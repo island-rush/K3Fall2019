@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { typeImages, typeTeamBorders, typeNames } from "../constants";
+import { typeImages, typeTeamBorders } from "../constants";
+import { TYPE_NAMES } from "../../gameData/gameConstants";
 import Container from "./Container";
 
 const pieceStyle = {
@@ -44,7 +45,7 @@ class Piece extends Component {
 			...(this.props.selected ? selectedStyle : "")
 		};
 
-		const title = `${typeNames[this.props.piece.pieceTypeId]}\nMoves: ${this.props.piece.pieceMoves}\nFuel: ${this.props.piece.pieceFuel}`;
+		const title = `${TYPE_NAMES[this.props.piece.pieceTypeId]}\nMoves: ${this.props.piece.pieceMoves}\nFuel: ${this.props.piece.pieceFuel}`;
 
 		return (
 			<div
