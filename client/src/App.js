@@ -1,10 +1,10 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import Bottombar from "./components/bottombarComponents/Bottombar";
 import Gameboard from "./components/gameboardComponents/Gameboard";
 import Zoombox from "./components/zoomboxZomponents/Zoombox";
 import Sidebar from "./components/sidebarComponents/Sidebar";
-import { connect } from "react-redux";
-import PropTypes from "prop-types";
 import { selectPosition, menuSelect, clearPieceSelection } from "./redux/actions";
 
 const appStyle = {
