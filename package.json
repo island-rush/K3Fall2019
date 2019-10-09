@@ -22,6 +22,7 @@
 	},
 	"homepage": "https://github.com/island-rush/K3.1#readme",
 	"dependencies": {
+		"connect-loki": "^1.1.0",
 		"esm": "^3.2.25",
 		"express": "^4.17.1",
 		"express-session": "^1.16.2",

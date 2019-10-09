@@ -38,7 +38,7 @@ const gameLoginVerify = async (req, res) => {
 		return;
 	}
 
-	// await thisGame.setLoggedIn(gameTeam, gameController, 1); //TODO: ACTUALLY LOG THEM IN
+	await thisGame.setLoggedIn(gameTeam, gameController, 1);
 
 	req.session.ir3 = {
 		gameId,
