@@ -1,3 +1,4 @@
+//These paths are relative to the ./public directory
 const unitImagesPath = "./images/unitImages";
 // const diceImagesPath = "./images/diceImages";
 // const graphicsPath = "./images/graphics";

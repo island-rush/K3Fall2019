@@ -1,8 +1,8 @@
-const { Game, Piece } = require("../classes");
-const sendUserFeedback = require("./sendUserFeedback");
-import { DELETE_PLAN } from "../../client/src/redux/actions/actionTypes";
-import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
-import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
+const { Game, Piece } = require("../../classes");
+const sendUserFeedback = require("../sendUserFeedback");
+import { DELETE_PLAN } from "../../../client/src/redux/actions/actionTypes";
+import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
+import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
 
 const deletePlan = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;

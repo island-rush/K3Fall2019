@@ -1,9 +1,9 @@
-const { Game, Event } = require("../classes");
-import { BATTLE_FIGHT_RESULTS } from "../../client/src/redux/actions/actionTypes";
-import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
-import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
-const sendUserFeedback = require("./sendUserFeedback");
-const giveNextEvent = require("./giveNextEvent");
+const { Game, Event } = require("../../classes");
+import { BATTLE_FIGHT_RESULTS } from "../../../client/src/redux/actions/actionTypes";
+import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
+import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
+const sendUserFeedback = require("../sendUserFeedback");
+const giveNextEvent = require("../giveNextEvent");
 
 const confirmBattleSelection = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;

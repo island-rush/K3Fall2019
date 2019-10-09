@@ -1,8 +1,8 @@
-const { Game, InvItem, ShopItem } = require("../classes");
-const sendUserFeedback = require("./sendUserFeedback");
-import { SHOP_TRANSFER } from "../../client/src/redux/actions/actionTypes";
-import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
-import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
+const { Game, InvItem, ShopItem } = require("../../classes");
+const sendUserFeedback = require("../sendUserFeedback");
+import { SHOP_TRANSFER } from "../../../client/src/redux/actions/actionTypes";
+import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
+import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
 
 /***
  * TODO: standard function descriptions (author?, arguments, returns, why/when used?)
