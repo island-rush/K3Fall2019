@@ -5,7 +5,6 @@ import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../client/src/redux/s
 import { BAD_REQUEST_TAG, GAME_INACTIVE_TAG } from "../pages/errorTypes";
 
 const piecePlace = async (socket, payload) => {
-	//TODO: need a way of undoing piece places
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 	const { invItemId, selectedPosition } = payload;
 
@@ -48,8 +47,7 @@ const piecePlace = async (socket, payload) => {
 
 	const newPiece = await thisInvItem.placeOnBoard(selectedPosition); //should also check that this piece actually got created, could return null (should return null if it failed...TODO: return null if failed...)
 
-	//TODO: how much should the server handle making the payload 'frontend friendly', so frontend has less work to do formatting things
-	//Should probably also write down how the state is stored on the frontend eventually, so others know how it works
+	//TODO: Should probably also write down how the state is stored on the frontend eventually, so others know how it works
 	newPiece.pieceContents = { pieces: [] }; //new pieces have nothing in them, and piece contents is required for the frontend...
 
 	const serverAction = {

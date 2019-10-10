@@ -2,6 +2,7 @@ const { Plan, Piece, Event } = require("../classes");
 import { PLACE_PHASE, NEW_ROUND } from "../../client/src/redux/actions/actionTypes";
 import { SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
 const giveNextEvent = require("./giveNextEvent");
+const { BOTH_TEAMS_INDICATOR, POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE } = require("./index");
 
 const executeStep = async (socket, thisGame) => {
 	//inserting events here and moving pieces, or changing to new round or something...
@@ -41,7 +42,7 @@ const executeStep = async (socket, thisGame) => {
 		return;
 	}
 
-	//One of the teams may be without plans, keep them waiting (//TODO: possible refactor to prevent undoing their status in the 1st place (would probably be complex...))
+	//One of the teams may be without plans, keep them waiting
 	if (currentMovementOrder0 == null) {
 		await thisGame.setStatus(0, 1);
 	}
@@ -59,7 +60,7 @@ const executeStep = async (socket, thisGame) => {
 		for (let x = 0; x < allCollisions.length; x++) {
 			let { pieceId0, piecePositionId0, planPositionId0, pieceId1 } = allCollisions[x];
 
-			//TODO: figure out if these 2 pieces would actually collide / battle
+			//TODO: figure out if these 2 pieces would actually collide / battle (do the same for position battles)
 			//consider visibility
 
 			let thisEventPositions = `${piecePositionId0}-${planPositionId0}`;
@@ -68,15 +69,12 @@ const executeStep = async (socket, thisGame) => {
 			if (!allCollideEvents[thisEventPositions].includes(pieceId1)) allCollideEvents[thisEventPositions].push(pieceId1);
 		}
 
-		const bothTeamsIndicator = 2; //could be a constant...
-		const collisionEventType = 0; //should be a constant...//TODO: make constant...
-
 		let eventInserts = [];
 		let eventItemInserts = [];
 		let keys = Object.keys(allCollideEvents);
 		for (let b = 0; b < keys.length; b++) {
 			let key = keys[b];
-			eventInserts.push([gameId, bothTeamsIndicator, collisionEventType, key.split("-")[0], key.split("-")[1]]);
+			eventInserts.push([gameId, BOTH_TEAMS_INDICATOR, COL_BATTLE_EVENT_TYPE, key.split("-")[0], key.split("-")[1]]);
 			let eventPieces = allCollideEvents[key];
 			for (let x = 0; x < eventPieces.length; x++) eventItemInserts.push([eventPieces[x], gameId, key.split("-")[0], key.split("-")[1]]);
 		}
@@ -95,7 +93,7 @@ const executeStep = async (socket, thisGame) => {
 		for (let x = 0; x < allPositionCombinations.length; x++) {
 			let { pieceId0, piecePositionId0, pieceId1 } = allPositionCombinations[x];
 
-			//TODO: figure out if these 2 pieces would actually collide / battle
+			//consider if they would fight (see collision)
 			//consider visibility
 
 			let thisEventPosition = `${piecePositionId0}`;
@@ -104,15 +102,12 @@ const executeStep = async (socket, thisGame) => {
 			if (!allPosEvents[thisEventPosition].includes(pieceId1)) allPosEvents[thisEventPosition].push(pieceId1);
 		}
 
-		const bothTeamsIndicator = 2; //should be constants
-		const posBattleEventType = 1; //should be constants
-
 		let eventInserts = [];
 		let eventItemInserts = [];
 		let keys = Object.keys(allPosEvents);
 		for (let b = 0; b < keys.length; b++) {
 			let key = keys[b];
-			eventInserts.push([gameId, bothTeamsIndicator, posBattleEventType, key, key]);
+			eventInserts.push([gameId, BOTH_TEAMS_INDICATOR, POS_BATTLE_EVENT_TYPE, key, key]);
 			let eventPieces = allPosEvents[key];
 			for (let x = 0; x < eventPieces.length; x++) eventItemInserts.push([eventPieces[x], gameId, key, key]);
 		}

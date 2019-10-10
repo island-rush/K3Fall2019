@@ -34,7 +34,7 @@ const shopConfirmPurchase = async (socket, payload) => {
 
 	await InvItem.insertFromShop(gameId, gameTeam);
 	await ShopItem.deleteAll(gameId, gameTeam);
-	const invItems = await InvItem.all(gameId, gameTeam); //TODO: this may cause an error on the front end, check what happens when confirm purchase executes...
+	const invItems = await InvItem.all(gameId, gameTeam);
 
 	const serverAction = {
 		type: SHOP_TRANSFER,

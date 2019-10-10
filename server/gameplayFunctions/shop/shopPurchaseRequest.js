@@ -7,7 +7,13 @@ const sendUserFeedback = require("../sendUserFeedback");
 
 const shopPurchaseRequest = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
-	const { shopItemTypeId } = payload; //TODO: could check payloads for all these gameFunctions before destructuring them...
+
+	if (payload == null || payload.shopItemTypeId == null) {
+		sendUserFeedback(socket, "Server Error: Malformed Payload (missing shopItemTypeId)");
+		return;
+	}
+
+	const { shopItemTypeId } = payload;
 
 	const thisGame = await new Game({ gameId }).init();
 	const { gameActive, gamePhase, game0Points, game1Points } = thisGame;
@@ -42,7 +48,7 @@ const shopPurchaseRequest = async (socket, payload) => {
 
 	const shopItem = await ShopItem.insert(gameId, gameTeam, shopItemTypeId);
 
-	//TODO: payload could be more standard?
+	//TODO: standardize payloads for similar actions (points vs newpoints vs etc...)
 	const serverAction = {
 		type: SHOP_PURCHASE,
 		payload: {

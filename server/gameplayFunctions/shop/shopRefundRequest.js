@@ -52,7 +52,6 @@ const shopRefundRequest = async (socket, payload) => {
 	await thisGame.setPoints(gameTeam, newPoints);
 	await thisShopItem.delete();
 
-	//TODO: consistency between payloads for different actions (pointsAdded vs points)
 	const serverAction = {
 		type: SHOP_REFUND,
 		payload: {

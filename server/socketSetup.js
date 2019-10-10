@@ -55,7 +55,7 @@ const socketSetup = async socket => {
 	socket.on(CLIENT_SENDING_ACTION, ({ type, payload }) => {
 		try {
 			switch (type) {
-				case "shopPurchaseRequest":
+				case "shopPurchaseRequest": //Could use constants, but only used once on frontend, once on backend
 					shopPurchaseRequest(socket, payload);
 					break;
 				case "shopRefundRequest":

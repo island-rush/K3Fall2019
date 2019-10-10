@@ -137,7 +137,7 @@ router.get("/getGameActive", (req, res) => {
 		getGameActive(req, res);
 	} catch (error) {
 		console.error(error);
-		res.sendStatus(500); //TODO: should probably redirect if this fails...(custom 500 page?)
+		res.sendStatus(500);
 	}
 });
 

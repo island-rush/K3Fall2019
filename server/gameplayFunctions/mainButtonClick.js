@@ -8,7 +8,7 @@ const executeStep = require("./executeStep"); //big function
 const mainButtonClick = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	const thisGame = await new Game({ gameId }).init(); //TODO: if game is deleted mid-game, this would error (return null)
+	const thisGame = await new Game({ gameId }).init();
 	const { gameActive, gamePhase, gameRound, gameSlice, game0Status, game1Status } = thisGame;
 
 	if (!gameActive) {
@@ -44,8 +44,8 @@ const mainButtonClick = async (socket, payload) => {
 		return;
 	}
 
-	await thisGame.setStatus(otherTeam, 0); //Could skip awaiting since not used later in this function...(but can't assume it's gunna happen before we need to use it again...)
-	await thisGame.setStatus(gameTeam, 0); //TODO: make this a single call, only using 2 to prevent race condition stuff, should set both to 0 to be safe...
+	await thisGame.setStatus(otherTeam, 0);
+	await thisGame.setStatus(gameTeam, 0);
 
 	let serverAction;
 

@@ -2,8 +2,7 @@ const { Event, Piece } = require("../classes");
 import { EVENT_BATTLE, NO_MORE_EVENTS } from "../../client/src/redux/actions/actionTypes";
 import { SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
 const sendUserFeedback = require("./sendUserFeedback");
-
-//This function does a lot of formatting for the client, could let the client format the data itself //TODO: consistent in this?
+const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE } = require("./");
 
 const giveNextEvent = async (socket, options) => {
 	const { gameId } = options.thisGame;
@@ -18,8 +17,8 @@ const giveNextEvent = async (socket, options) => {
 	gameEvent0 = await Event.getNext(gameId, 0);
 	if (gameEvent0) {
 		switch (gameEvent0.eventTypeId) {
-			case 0: //collision event
-			case 1: //position event
+			case COL_BATTLE_EVENT_TYPE:
+			case POS_BATTLE_EVENT_TYPE:
 				let friendlyPiecesList = await gameEvent0.getTeamItems(0);
 				let enemyPiecesList = await gameEvent0.getTeamItems(1);
 				let friendlyPieces = [];
@@ -70,8 +69,8 @@ const giveNextEvent = async (socket, options) => {
 	gameEvent1 = await Event.getNext(gameId, 1);
 	if (gameEvent1) {
 		switch (gameEvent1.eventTypeId) {
-			case 0: //TODO: make these constants to make it more clear... (is this allowed for the events? (without the break...seems pretty cool and it works so far...))
-			case 1:
+			case COL_BATTLE_EVENT_TYPE:
+			case POS_BATTLE_EVENT_TYPE:
 				let friendlyPiecesList = await gameEvent1.getTeamItems(1);
 				let enemyPiecesList = await gameEvent1.getTeamItems(0);
 				let friendlyPieces = [];

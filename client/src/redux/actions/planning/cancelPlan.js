@@ -13,7 +13,7 @@ const cancelPlan = () => {
 			if (gameboardMeta.selectedPiece !== -1 && gameboardMeta.selectedPiece in gameboardMeta.confirmedPlans) {
 				//delete the plans from the database request
 				const clientAction = {
-					type: "deletePlan", //TODO: should use constants for these (even though probably only used twice...)
+					type: "deletePlan",
 					payload: {
 						pieceId: gameboardMeta.selectedPiece
 					}

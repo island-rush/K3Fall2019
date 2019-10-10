@@ -22,7 +22,6 @@ const confirmBattleSelection = async (socket, payload) => {
 	const otherTeamStatus = otherTeam == 0 ? game0Status : game1Status;
 
 	if (thisTeamStatus == 1 && otherTeamStatus == 0) {
-		//TODO: trying to prevent race condition, but might mess things up? (repeat inputs...)
 		sendUserFeedback(socket, "still waiting stupid...");
 		return;
 	}

@@ -13,4 +13,21 @@ const sendUserFeedback = require("./sendUserFeedback");
 const piecePlace = require("./piecePlace");
 const mainButtonClick = require("./mainButtonClick");
 
-module.exports = { shopPurchaseRequest, sendUserFeedback, shopRefundRequest, shopConfirmPurchase, confirmPlan, deletePlan, piecePlace, mainButtonClick, confirmBattleSelection };
+const BOTH_TEAMS_INDICATOR = 2;
+const POS_BATTLE_EVENT_TYPE = 1;
+const COL_BATTLE_EVENT_TYPE = 0;
+
+module.exports = {
+	shopPurchaseRequest,
+	sendUserFeedback,
+	shopRefundRequest,
+	shopConfirmPurchase,
+	confirmPlan,
+	deletePlan,
+	piecePlace,
+	mainButtonClick,
+	confirmBattleSelection,
+	BOTH_TEAMS_INDICATOR,
+	POS_BATTLE_EVENT_TYPE,
+	COL_BATTLE_EVENT_TYPE
+};
