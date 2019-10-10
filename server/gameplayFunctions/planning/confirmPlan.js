@@ -84,7 +84,6 @@ const confirmPlan = async (socket, payload) => {
 	//TODO: could change the phrasing on Plan vs Moves (as far as inserting..function names...database entries??)
 	await Plan.insert(plansToInsert);
 
-	//TODO: send the pieceId or the whole piece object? (be consistent if possible with other payloads...)
 	const serverAction = {
 		type: PLAN_WAS_CONFIRMED,
 		payload: {

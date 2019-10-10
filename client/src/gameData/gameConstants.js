@@ -125,7 +125,6 @@ export const TYPE_NAME_IDS = {
 };
 
 // used the updated units excel at https://docs.google.com/spreadsheets/d/1kiMLv05oK6IZKtiYdErvD4Kp5tI3lXLL2-qbO3ZqHAI/edit#gid=306372336
-//TODO: double check that both matrices (vis, attack) are correct for the latest information...
 export const VISIBILITY_MATRIX = [
 	[1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, -1, 2, 1, 1, -1], //bomber
 	[1, 0, -1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, -1, 2, 1, 1, -1], //stealth bomber

@@ -13,4 +13,14 @@ const sendUserFeedback = require("./sendUserFeedback");
 const piecePlace = require("./piecePlace");
 const mainButtonClick = require("./mainButtonClick");
 
-module.exports = { shopPurchaseRequest, sendUserFeedback, shopRefundRequest, shopConfirmPurchase, confirmPlan, deletePlan, piecePlace, mainButtonClick, confirmBattleSelection };
+module.exports = {
+	shopPurchaseRequest,
+	sendUserFeedback,
+	shopRefundRequest,
+	shopConfirmPurchase,
+	confirmPlan,
+	deletePlan,
+	piecePlace,
+	mainButtonClick,
+	confirmBattleSelection
+};

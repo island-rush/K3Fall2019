@@ -20,7 +20,8 @@ const socketSetup = async socket => {
 		return;
 	}
 
-	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3; //get the user's information
+	const ir3Session = socket.handshake.session.ir3;
+	const { gameId, gameTeam, gameController } = ir3Session; //get the user's information
 
 	const thisGame = await new Game({ gameId }).init(); //get the Game
 
@@ -36,6 +37,12 @@ const socketSetup = async socket => {
 	if (!loggedIn) {
 		socket.emit(SERVER_REDIRECT, NOT_LOGGED_IN_TAG);
 		return;
+	} else {
+		//probably refreshed, keep them logged in (disconnect logs them out)
+		setTimeout(() => {
+			thisGame.setLoggedIn(gameTeam, gameController, 1);
+			socket.handshake.session.ir3 = ir3Session;
+		}, 200);
 	}
 
 	//Socket Room for the Game
@@ -55,7 +62,7 @@ const socketSetup = async socket => {
 	socket.on(CLIENT_SENDING_ACTION, ({ type, payload }) => {
 		try {
 			switch (type) {
-				case "shopPurchaseRequest":
+				case "shopPurchaseRequest": //Could use constants, but only used once on frontend, once on backend
 					shopPurchaseRequest(socket, payload);
 					break;
 				case "shopRefundRequest":
@@ -91,8 +98,10 @@ const socketSetup = async socket => {
 	//Automatically Logout this person (from database) when their socket disconnects from the server
 	socket.on("disconnect", async () => {
 		try {
-			await thisGame.setLoggedIn(gameTeam, gameController, 0);
-			delete socket.handshake.session.ir3;
+			setTimeout(() => {
+				thisGame.setLoggedIn(gameTeam, gameController, 0);
+				delete socket.handshake.session.ir3;
+			}, 200);
 		} catch (error) {
 			//TODO: log errors to a file (for production/deployment reasons)
 			console.error(error);
