@@ -10,10 +10,6 @@ const gameLoginVerify = async (req, res) => {
 		return;
 	}
 
-	const inputPasswordHash = md5(gameTeamPassword);
-	const commanderLoginField = "game" + gameTeam + "Controller" + gameController; //ex: 'game0Controller0'
-	const passwordHashToCheck = "game" + gameTeam + "Password"; //ex: 'game0Password
-
 	const thisGame = await new Game({ gameSection, gameInstructor }).init();
 
 	if (!thisGame) {
@@ -28,11 +24,14 @@ const gameLoginVerify = async (req, res) => {
 		return;
 	}
 
+	const commanderLoginField = "game" + gameTeam + "Controller" + gameController; //ex: 'game0Controller0'
 	if (thisGame[commanderLoginField] != 0) {
 		res.redirect(`/index.html?error=${ALREADY_IN_TAG}`);
 		return;
 	}
 
+	const inputPasswordHash = md5(gameTeamPassword);
+	const passwordHashToCheck = "game" + gameTeam + "Password"; //ex: 'game0Password
 	if (inputPasswordHash != thisGame[passwordHashToCheck]) {
 		res.redirect(`/index.html?error=${LOGIN_TAG}`);
 		return;

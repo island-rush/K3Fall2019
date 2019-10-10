@@ -238,6 +238,9 @@
 			case "alreadyLoggedIn":
 				document.getElementById("formFeedback").innerHTML = "That controller is already logged in.";
 				break;
+			case "notLoggedIn":
+				document.getElementById("formFeedback").innerHTML = "Must be logged in to play. (session didn't match db)";
+				break;
 			case "database":
 				document.getElementById("formFeedback").innerHTML = "Database had a failure.";
 				break;
