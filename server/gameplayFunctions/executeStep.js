@@ -2,7 +2,7 @@ const { Plan, Piece, Event } = require("../classes");
 import { PLACE_PHASE, NEW_ROUND } from "../../client/src/redux/actions/actionTypes";
 import { SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
 const giveNextEvent = require("./giveNextEvent");
-const { BOTH_TEAMS_INDICATOR, POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE } = require("./index");
+const { BOTH_TEAMS_INDICATOR, POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE } = require("./eventConstants");
 
 const executeStep = async (socket, thisGame) => {
 	//inserting events here and moving pieces, or changing to new round or something...

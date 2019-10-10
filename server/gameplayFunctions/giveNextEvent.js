@@ -2,7 +2,7 @@ const { Event, Piece } = require("../classes");
 import { EVENT_BATTLE, NO_MORE_EVENTS } from "../../client/src/redux/actions/actionTypes";
 import { SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
 const sendUserFeedback = require("./sendUserFeedback");
-const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE } = require("./");
+const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE } = require("./eventConstants");
 
 const giveNextEvent = async (socket, options) => {
 	const { gameId } = options.thisGame;
@@ -14,7 +14,7 @@ const giveNextEvent = async (socket, options) => {
 
 	let serverActions = [{}, {}]; //store the actions, send at the end
 
-	gameEvent0 = await Event.getNext(gameId, 0);
+	const gameEvent0 = await Event.getNext(gameId, 0);
 	if (gameEvent0) {
 		switch (gameEvent0.eventTypeId) {
 			case COL_BATTLE_EVENT_TYPE:
@@ -66,7 +66,7 @@ const giveNextEvent = async (socket, options) => {
 		};
 	}
 
-	gameEvent1 = await Event.getNext(gameId, 1);
+	const gameEvent1 = await Event.getNext(gameId, 1);
 	if (gameEvent1) {
 		switch (gameEvent1.eventTypeId) {
 			case COL_BATTLE_EVENT_TYPE:
