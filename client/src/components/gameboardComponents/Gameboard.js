@@ -84,7 +84,7 @@ const patternSolver = position => {
 
 class Gameboard extends Component {
 	render() {
-		const { gameboard, selectedPosition, selectPosition, news, battle, container, refuel, planning, selectedPiece, confirmedPlans } = this.props;
+		const { gameboard, selectedPosition, selectPosition, news, battle, container, refuel, planning, selectedPiece, confirmedPlans, highlightedPositions } = this.props;
 
 		let planningPositions = []; //all of the positions part of a plan
 		let containerPositions = []; //specific positions part of a plan of type container
@@ -140,6 +140,8 @@ class Gameboard extends Component {
 						? "containerPos"
 						: planningPositions.includes(parseInt(positionIndex))
 						? "plannedPos"
+						: highlightedPositions.includes(parseInt(positionIndex))
+						? "highlightedPos"
 						: ""
 				}
 			/>
@@ -172,12 +174,14 @@ Gameboard.propTypes = {
 	refuel: PropTypes.object.isRequired,
 	planning: PropTypes.object.isRequired,
 	selectedPiece: PropTypes.number.isRequired,
-	confirmedPlans: PropTypes.object.isRequired
+	confirmedPlans: PropTypes.object.isRequired,
+	highlightedPositions: PropTypes.array.isRequired
 };
 
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 	gameboard,
 	selectedPosition: gameboardMeta.selectedPosition,
+	highlightedPositions: gameboardMeta.highlightedPositions,
 	news: gameboardMeta.news,
 	battle: gameboardMeta.battle,
 	refuel: gameboardMeta.refuel,

@@ -20,12 +20,14 @@ import {
 	BATTLE_FIGHT_RESULTS,
 	NO_MORE_EVENTS,
 	CLEAR_BATTLE,
-	MENU_SELECT
+	MENU_SELECT,
+	HIGHLIGHT_POSITIONS
 } from "../actions/actionTypes";
 
 const initialGameboardMeta = {
 	//TODO: change to selectedPositionId and selectedPieceId to better represent the values (ints) (and also selectedBattlePiece -> selectedBattlePieceId)
 	selectedPosition: -1,
+	highlightedPositions: [],
 	selectedPiece: -1,
 	selectedMenuId: 0, //TODO: should probably 0 index this instead of 1 index (make -1 == no menu open)
 	news: {
@@ -57,6 +59,9 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 	let stateDeepCopy = JSON.parse(JSON.stringify(state));
 
 	switch (type) {
+		case HIGHLIGHT_POSITIONS:
+			stateDeepCopy.highlightedPositions = payload.highlightedPositions;
+			break;
 		case MENU_SELECT:
 			stateDeepCopy.selectedMenuId = payload.selectedMenuId !== stateDeepCopy.selectedMenuId ? payload.selectedMenuId : 0;
 			break;
