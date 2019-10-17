@@ -42,7 +42,7 @@ const socketSetup = async socket => {
 		setTimeout(() => {
 			thisGame.setLoggedIn(gameTeam, gameController, 1);
 			socket.handshake.session.ir3 = ir3Session;
-		}, 200);
+		}, 5000);
 	}
 
 	//Socket Room for the Game
@@ -101,7 +101,7 @@ const socketSetup = async socket => {
 			setTimeout(() => {
 				thisGame.setLoggedIn(gameTeam, gameController, 0);
 				delete socket.handshake.session.ir3;
-			}, 200);
+			}, 5000);
 		} catch (error) {
 			//TODO: log errors to a file (for production/deployment reasons)
 			console.error(error);
