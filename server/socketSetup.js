@@ -1,3 +1,8 @@
+/**
+ * Setting up server-side web sockets
+ * Importing the gameplay functions and responding to client 'actions'
+ */
+
 const { Game } = require("./classes");
 import { BAD_SESSION, GAME_DOES_NOT_EXIST, NOT_LOGGED_IN_TAG } from "./pages/errorTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION, CLIENT_SENDING_ACTION } from "../client/src/redux/socketEmits";

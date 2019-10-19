@@ -1,3 +1,8 @@
+/**
+ * Handles setting up and starting the server.
+ * Sessions, Routing, and Web Sockets
+ */
+
 //Create the server
 const express = require("express");
 const app = express();

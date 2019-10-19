@@ -1,5 +1,7 @@
-// These are the Error Types, used for navigating / displaying specific errors
-// redirects to /index.html?error={ERROR_TYPE}
+/**
+ * These are the Error Types, used for navigating / displaying specific errors
+ * Used mainly for redirects to /index.html?error={ERROR_TYPE}
+ */
 
 const LOGIN_TAG = "loginFail";
 const ACCESS_TAG = "access";
