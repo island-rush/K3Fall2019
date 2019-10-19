@@ -1,4 +1,7 @@
-//Collect all functions into a single file for use in socketSetup.js
+/**
+ * These are all the functions used by the game logic, exposed to socketSetup
+ * Some functions are helpers, and used internally, and therefore not exposed (ex: ./giveNextEvent.js)
+ */
 
 const shopPurchaseRequest = require("./shop/shopPurchaseRequest");
 const shopRefundRequest = require("./shop/shopRefundRequest");

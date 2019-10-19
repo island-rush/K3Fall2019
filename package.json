@@ -1,8 +1,8 @@
 {
-	"name": "k3.1",
-	"version": "1.0.0",
-	"description": "Island Rush V3.1 is a Military Strategy Teaching Tool/Game.",
-	"main": "index.js",
+	"name": "island-rush-v3",
+	"version": "3.2.0",
+	"description": "Island Rush V3 is a Military Strategy Teaching Tool/Game.",
+	"main": "server.js",
 	"scripts": {
 		"start": "node -r esm server.js",
 		"fullInstall": "npm install && cd client && npm install && cd ..",
@@ -13,14 +13,14 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/island-rush/K3.1.git"
+		"url": "git+https://github.com/island-rush/K3.git"
 	},
 	"author": "Spencer Adolph",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/island-rush/K3.1/issues"
+		"url": "https://github.com/island-rush/K3/issues"
 	},
-	"homepage": "https://github.com/island-rush/K3.1#readme",
+	"homepage": "https://github.com/island-rush/K3#readme",
 	"dependencies": {
 		"connect-loki": "^1.1.0",
 		"esm": "^3.2.25",
