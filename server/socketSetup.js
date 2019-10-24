@@ -15,7 +15,8 @@ const {
 	deletePlan,
 	piecePlace,
 	mainButtonClick,
-	confirmBattleSelection
+	confirmBattleSelection,
+	confirmFuelSelection
 } = require("./gameplayFunctions");
 
 const socketSetup = async socket => {
@@ -90,6 +91,9 @@ const socketSetup = async socket => {
 					break;
 				case "confirmBattleSelection":
 					confirmBattleSelection(socket, payload);
+					break;
+				case "confirmFuelSelection":
+					confirmFuelSelection(socket, payload);
 					break;
 				default:
 					sendUserFeedback(socket, "Did not recognize client socket request type");

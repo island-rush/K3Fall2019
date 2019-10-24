@@ -1,5 +1,6 @@
 const { Event, Piece } = require("../classes");
-import { EVENT_BATTLE, NO_MORE_EVENTS, SET_USERFEEDBACK } from "../../client/src/redux/actions/actionTypes";
+import { EVENT_BATTLE, NO_MORE_EVENTS, EVENT_REFUEL } from "../../client/src/redux/actions/actionTypes";
+import { TYPE_NAMES } from "../../client/src/gameData/gameConstants";
 import { SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
 const sendUserFeedback = require("./sendUserFeedback");
 const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("./eventConstants");
@@ -56,10 +57,27 @@ const giveNextEvent = async (socket, options) => {
 				};
 				break;
 			case REFUEL_EVENT_TYPE:
+				//get the pieces from the event, put them into payload (pre-format based on state?)
+				let allRefuelEventItems = await gameEvent.getRefuelItems();
+
+				let tankers = [];
+				let aircraft = [];
+				for (let x = 0; x < allRefuelEventItems.length; x++) {
+					//put each piece into the refuel event....
+					let thisPiece = allRefuelEventItems[x];
+					let { pieceId, pieceTypeId, pieceFuel, pieceMoves } = thisPiece;
+					if (TYPE_NAMES[pieceTypeId] == "Tanker") {
+						tankers.push(thisPiece);
+					} else {
+						aircraft.push(thisPiece);
+					}
+				}
+
 				serverAction = {
-					type: SET_USERFEEDBACK,
+					type: EVENT_REFUEL,
 					payload: {
-						userFeedback: "testing refuel phase! omg it worked!!"
+						tankers,
+						aircraft
 					}
 				};
 				break;

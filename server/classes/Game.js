@@ -67,6 +67,7 @@ class Game {
 		};
 
 		//TODO: get these values from the database (potentially throw this into the event object)
+		//TODO: current event could be a refuel (or something else...need to handle all of them, and set other states as false...)
 		const currentEvent = await Event.getNext(this.gameId, gameTeam);
 
 		let battle = {
@@ -140,8 +141,11 @@ class Game {
 			active: false
 		};
 
+		//TODO: get these from stuff...(from above event....)
 		const refuel = {
-			active: false
+			active: false,
+			tankers: [],
+			aircraft: []
 		};
 
 		const serverAction = {

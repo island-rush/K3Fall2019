@@ -43,7 +43,9 @@ const initialGameboardMeta = {
 		enemyPieces: []
 	},
 	refuel: {
-		active: false
+		active: false,
+		tankers: [],
+		aircraft: []
 	},
 	container: {
 		active: false

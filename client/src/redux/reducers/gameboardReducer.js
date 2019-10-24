@@ -1,6 +1,7 @@
-import { INITIAL_GAMESTATE, PIECES_MOVE, PIECE_PLACE, CLEAR_BATTLE, EVENT_BATTLE, NO_MORE_EVENTS } from "../actions/actionTypes";
+import { INITIAL_GAMESTATE, PIECES_MOVE, PIECE_PLACE, CLEAR_BATTLE, EVENT_BATTLE, REFUEL_RESULTS, NO_MORE_EVENTS } from "../actions/actionTypes";
 import { initialGameboardEmpty } from "./initialGameboardEmpty";
 
+//TODO: should do the return at the bottom, not inside each case...(see metaReducer...)
 function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
 	let stateDeepCopy = JSON.parse(JSON.stringify(state));
 	let freshBoard;
@@ -44,6 +45,22 @@ function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
 			} else {
 				return stateDeepCopy;
 			}
+		case REFUEL_RESULTS:
+			const { fuelUpdates } = payload;
+
+			for (let y = 0; y < fuelUpdates.length; y++) {
+				//need to find the piece on the board and update it, would be nice if we had the position...
+				let thisFuelUpdate = fuelUpdates[y];
+				let { pieceId, piecePositionId, newFuel } = thisFuelUpdate;
+				for (let x = 0; x < stateDeepCopy[piecePositionId].pieces.length; x++) {
+					if (stateDeepCopy[piecePositionId].pieces[x].pieceId == pieceId) {
+						stateDeepCopy[piecePositionId].pieces[x].pieceFuel = newFuel;
+						break;
+					}
+				}
+			}
+
+			return stateDeepCopy;
 		case PIECE_PLACE:
 			stateDeepCopy[payload.positionId].pieces.push(payload.newPiece);
 			return stateDeepCopy;

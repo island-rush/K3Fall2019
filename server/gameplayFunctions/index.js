@@ -12,6 +12,8 @@ const deletePlan = require("./planning/deletePlan");
 
 const confirmBattleSelection = require("./battles/confirmBattleSelection");
 
+const confirmFuelSelection = require("./refuel/confirmFuelSelection");
+
 const sendUserFeedback = require("./sendUserFeedback");
 const piecePlace = require("./piecePlace");
 const mainButtonClick = require("./mainButtonClick");
@@ -25,5 +27,6 @@ module.exports = {
 	deletePlan,
 	piecePlace,
 	mainButtonClick,
-	confirmBattleSelection
+	confirmBattleSelection,
+	confirmFuelSelection
 };

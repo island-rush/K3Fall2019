@@ -22,7 +22,8 @@ import {
 	MENU_SELECT,
 	NO_MORE_EVENTS,
 	BATTLE_FIGHT_RESULTS,
-	EVENT_BATTLE
+	EVENT_BATTLE,
+	EVENT_REFUEL
 } from "../actions/actionTypes";
 
 const initialUserFeedback = "Loading...";
@@ -77,6 +78,8 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "got results of the battle...";
 		case EVENT_BATTLE:
 			return "battle has started!";
+		case EVENT_REFUEL:
+			return "got a refuel event for ya, please handle it...";
 		default:
 			return state;
 	}
