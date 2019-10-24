@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import BattlePiece from "./BattlePiece";
-import { battlePieceClick, targetPieceClick, enemyBattlePieceClick, confirmBattleSelections, clearOldBattle } from "../../redux/actions";
+import battlePopupMinimize from "../../redux/actions/battlePopupMinimize"
+import { battlePieceClick, targetPieceClick, enemyBattlePieceClick, confirmBattleSelections, clearOldBattle} from "../../redux/actions";
 
 const battlePopupStyle = {
 	position: "absolute",
@@ -42,13 +43,20 @@ const battleButtonStyle = {
 	right: "2%"
 };
 
+const battlePopupMinimizeStyle = {
+	position: "absolute",
+	top: "-5%",
+	right: "0%",
+	margin: "0%"
+}
+
 const invisibleStyle = {
 	display: "none"
 };
 
 class BattlePopup extends Component {
 	render() {
-		const { battlePieceClick, enemyBattlePieceClick, targetPieceClick, confirmBattleSelections, battle, clearOldBattle } = this.props;
+		const { battlePieceClick, enemyBattlePieceClick, targetPieceClick, confirmBattleSelections, battle, clearOldBattle, isMinimized} = this.props;
 		const { selectedBattlePiece, friendlyPieces, enemyPieces } = battle;
 
 		const friendlyBattlePieces = friendlyPieces.map((battlePiece, index) => (
@@ -78,7 +86,7 @@ class BattlePopup extends Component {
 		));
 
 		return (
-			<div style={battle.active ? battlePopupStyle : invisibleStyle}>
+			<div style={battle.active && !battle.isMinimized ? battlePopupStyle : invisibleStyle}>
 				<div style={leftBattleStyle}>Friend{friendlyBattlePieces}</div>
 				<div style={rightBattleStyle}>Foe{enemyBattlePieces}</div>
 				<button
@@ -94,6 +102,15 @@ class BattlePopup extends Component {
 					style={battleButtonStyle}
 				>
 					{battle.masterRecord == null ? "Confirm Selections" : "ack"}
+				</button>
+				<button
+					onClick={event => {
+						event.preventDefault();
+						battlePopupMinimize();
+					}}
+					style={battlePopupMinimizeStyle}
+				>
+					{"Minimize"}
 				</button>
 			</div>
 		);
@@ -118,7 +135,8 @@ const mapActionsToProps = {
 	enemyBattlePieceClick,
 	targetPieceClick,
 	confirmBattleSelections,
-	clearOldBattle
+	clearOldBattle,
+	battlePopupMinimize
 };
 
 export default connect(

@@ -15,6 +15,7 @@ import {
 	NEWS_PHASE,
 	BATTLE_PIECE_SELECT,
 	ENEMY_PIECE_SELECT,
+	BATTLEPOPUP_MINIMIZE,
 	TARGET_PIECE_SELECT,
 	EVENT_BATTLE,
 	BATTLE_FIGHT_RESULTS,
@@ -29,11 +30,13 @@ const initialGameboardMeta = {
 	selectedPiece: -1,
 	selectedMenuId: 0, //TODO: should probably 0 index this instead of 1 index (make -1 == no menu open)
 	news: {
+		isMinimized: false,
 		active: false,
 		newsTitle: "Loading Title...",
 		newsInfo: "Loading Info..."
 	},
 	battle: {
+		isMinimized: false,
 		active: false,
 		selectedBattlePiece: -1,
 		selectedBattlePieceIndex: -1, //helper to find the piece within the array
@@ -41,9 +44,11 @@ const initialGameboardMeta = {
 		enemyPieces: []
 	},
 	refuel: {
+		isMinimized: false,
 		active: false
 	},
 	container: {
+		isMinimized: false,
 		active: false
 	},
 	planning: {
@@ -121,6 +126,9 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			let lastSelectedBattlePiece = stateDeepCopy.battle.selectedBattlePiece;
 			stateDeepCopy.battle.selectedBattlePiece = payload.battlePiece.piece.pieceId === lastSelectedBattlePiece ? -1 : payload.battlePiece.piece.pieceId;
 			stateDeepCopy.battle.selectedBattlePieceIndex = payload.battlePiece.piece.pieceId === lastSelectedBattlePiece ? -1 : payload.battlePieceIndex;
+			break;
+		case BATTLEPOPUP_MINIMIZE:
+			stateDeepCopy.battle.isMinimized = !true;
 			break;
 		case ENEMY_PIECE_SELECT:
 			//need to get the piece that was selected, and put it into the target for the thing
