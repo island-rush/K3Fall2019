@@ -51,8 +51,8 @@ export const TYPE_FUEL = {
 	0: 5, //bomer
 	1: 5, //stealth bomber
 	2: 5, //stealth fighter
-	3: 5,
-	4: 5,
+	3: 500, //Tanker
+	4: 5, //Air Transport
 	5: 5,
 	6: 5,
 	7: 5,
