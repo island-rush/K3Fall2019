@@ -1,0 +1,65 @@
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { TYPE_IMAGES } from "../../styleConstants";
+
+const tankerPieceStyle = {
+	backgroundColor: "white",
+	height: "15%",
+	width: "96%",
+	margin: "1%",
+	padding: "1%",
+	borderRadius: "2%"
+};
+
+const boxStyle = {
+	backgroundRepeat: "no-repeat",
+	backgroundSize: "90% 90%",
+	backgroundPosition: "center",
+	border: "2px solid black",
+	height: "92%",
+	width: "23%",
+	float: "left",
+	margin: ".5%",
+	position: "relative"
+};
+
+//TODO: make this a styleConstant? (also used in BattlePiece.js)
+const selected = [
+	{ border: "2px solid red" }, //selected
+	{ border: "2px solid black" } //not selected
+];
+
+class TankerPiece extends Component {
+	render() {
+		const { tankerPiece, tankerPieceIndex, isSelected, tankerClick } = this.props;
+
+		return (
+			<div style={tankerPieceStyle}>
+				<div
+					style={{
+						...boxStyle,
+						...TYPE_IMAGES[tankerPiece.pieceTypeId],
+						...selected[isSelected ? 0 : 1]
+					}}
+					onClick={event => {
+						event.preventDefault();
+						tankerClick();
+						event.stopPropagation();
+					}}
+				>
+					{tankerPieceIndex}
+				</div>
+				CurrentFuel=[{tankerPiece.pieceFuel}] Removing=[] NewTotal=[]
+			</div>
+		);
+	}
+}
+
+TankerPiece.propTypes = {
+	tankerPiece: PropTypes.object.isRequired,
+	tankerPieceIndex: PropTypes.number.isRequired,
+	isSelected: PropTypes.bool.isRequired,
+	tankerClick: PropTypes.func.isRequired
+};
+
+export default TankerPiece;

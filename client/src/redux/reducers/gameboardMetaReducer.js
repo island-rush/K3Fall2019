@@ -39,11 +39,14 @@ const initialGameboardMeta = {
 		active: false,
 		selectedBattlePiece: -1,
 		selectedBattlePieceIndex: -1, //helper to find the piece within the array
+		masterRecord: null,
 		friendlyPieces: [],
 		enemyPieces: []
 	},
 	refuel: {
 		active: false,
+		selectedTankerPiece: -1,
+		selectedTankerPieceIndex: -1,
 		tankers: [],
 		aircraft: []
 	},
