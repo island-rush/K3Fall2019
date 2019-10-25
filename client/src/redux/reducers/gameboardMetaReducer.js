@@ -19,6 +19,7 @@ import {
 	EVENT_BATTLE,
 	BATTLE_FIGHT_RESULTS,
 	NO_MORE_EVENTS,
+	EVENT_REFUEL,
 	CLEAR_BATTLE,
 	MENU_SELECT,
 	HIGHLIGHT_POSITIONS
@@ -120,6 +121,13 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			delete stateDeepCopy.confirmedPlans[payload.pieceId];
 			stateDeepCopy.selectedPiece = -1;
 			break;
+		case EVENT_REFUEL:
+			stateDeepCopy.refuel.active = true;
+			stateDeepCopy.refuel.tankers = payload.tankers;
+			stateDeepCopy.refuel.aircraft = payload.aircraft;
+			stateDeepCopy.refuel.selectedTankerPiece = -1;
+			stateDeepCopy.refuel.selectedTankerPieceIndex = -1;
+			break;
 		case INITIAL_GAMESTATE:
 			Object.assign(stateDeepCopy, payload.gameboardMeta);
 			break;
@@ -154,15 +162,9 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			// stateDeepCopy.battle = initialGameboardMeta.battle;
 			// stateDeepCopy.refuel = initialGameboardMeta.refuel;  //these don't seem to work
 			// stateDeepCopy.container = initialGameboardMeta.container;
-			stateDeepCopy.battle = {
-				active: false,
-				selectedBattlePiece: -1,
-				selectedBattlePieceIndex: -1, //helper to find the piece within the array
-				friendlyPieces: [],
-				enemyPieces: []
-			};
-			stateDeepCopy.refuel = { active: false };
-			stateDeepCopy.container = { active: false };
+			stateDeepCopy.battle = initialGameboardMeta.battle;
+			stateDeepCopy.refuel = initialGameboardMeta.refuel;
+			stateDeepCopy.container = initialGameboardMeta.container;
 			break;
 		case BATTLE_FIGHT_RESULTS:
 			stateDeepCopy.battle.masterRecord = payload.masterRecord;
