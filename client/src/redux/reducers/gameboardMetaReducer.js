@@ -128,7 +128,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.battle.selectedBattlePieceIndex = payload.battlePiece.piece.pieceId === lastSelectedBattlePiece ? -1 : payload.battlePieceIndex;
 			break;
 		case BATTLEPOPUP_MINIMIZE:
-			stateDeepCopy.battle.isMinimized = !true;
+			stateDeepCopy.battle.isMinimized = true;
 			break;
 		case ENEMY_PIECE_SELECT:
 			//need to get the piece that was selected, and put it into the target for the thing

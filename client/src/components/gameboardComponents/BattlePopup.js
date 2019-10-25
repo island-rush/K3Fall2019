@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import BattlePiece from "./BattlePiece";
-import battlePopupMinimize from "../../redux/actions/battlePopupMinimize"
-import { battlePieceClick, targetPieceClick, enemyBattlePieceClick, confirmBattleSelections, clearOldBattle} from "../../redux/actions";
+import { battlePopupMinimize, battlePieceClick, targetPieceClick, enemyBattlePieceClick, confirmBattleSelections, clearOldBattle} from "../../redux/actions";
 
 const battlePopupStyle = {
 	position: "absolute",
@@ -107,6 +106,7 @@ class BattlePopup extends Component {
 					onClick={event => {
 						event.preventDefault();
 						battlePopupMinimize();
+						event.stopPropagation();
 					}}
 					style={battlePopupMinimizeStyle}
 				>
@@ -123,7 +123,8 @@ BattlePopup.propTypes = {
 	enemyBattlePieceClick: PropTypes.func.isRequired,
 	targetPieceClick: PropTypes.func.isRequired,
 	confirmBattleSelections: PropTypes.func.isRequired,
-	clearOldBattle: PropTypes.func.isRequired
+	clearOldBattle: PropTypes.func.isRequired,
+	battlePopupMinimize: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ gameboardMeta }) => ({

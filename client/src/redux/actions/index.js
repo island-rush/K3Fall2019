@@ -11,6 +11,7 @@ import startPlan from "./startPlan";
 import cancelPlan from "./cancelPlan";
 import undoMove from "./undoMove";
 import menuSelect from "./menuSelect";
+import battlePopupMinimize from "./battlePopupMinimize"
 import mainButtonClick from "./mainButtonClick";
 import battlePieceClick from "./battlePieceClick";
 import targetPieceClick from "./targetPieceClick";
@@ -32,6 +33,7 @@ export {
 	cancelPlan,
 	undoMove,
 	menuSelect,
+	battlePopupMinimize,
 	mainButtonClick,
 	battlePieceClick,
 	targetPieceClick,
