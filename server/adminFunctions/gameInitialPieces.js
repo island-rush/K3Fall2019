@@ -31,6 +31,7 @@ const gameInitialPieces = async gameId => {
 		piece(gameId, "Blue", "Tanker", 0),
 		piece(gameId, "Blue", "Bomber", 1),
 		piece(gameId, "Blue", "Tanker", 4),
+		piece(gameId, "Blue", "Tanker", 4),
 		piece(gameId, "Blue", "Bomber", 4),
 		piece(gameId, "Blue", "Stealth Fighter", 4),
 		piece(gameId, "Blue", "Stealth Bomber", 4),

@@ -22,8 +22,14 @@ import {
 	EVENT_REFUEL,
 	CLEAR_BATTLE,
 	MENU_SELECT,
-	HIGHLIGHT_POSITIONS
+	HIGHLIGHT_POSITIONS,
+	TANKER_CLICK,
+	AIRCRAFT_CLICK,
+	UNDO_FUEL_SELECTION,
+	REFUEL_RESULTS
 } from "../actions/actionTypes";
+
+import { TYPE_FUEL } from "../../gameData/gameConstants";
 
 const initialGameboardMeta = {
 	//TODO: change to selectedPositionId and selectedPieceId to better represent the values (ints) (and also selectedBattlePiece -> selectedBattlePieceId)
@@ -46,7 +52,7 @@ const initialGameboardMeta = {
 	},
 	refuel: {
 		active: false,
-		selectedTankerPiece: -1,
+		selectedTankerPieceId: -1,
 		selectedTankerPieceIndex: -1,
 		tankers: [],
 		aircraft: []
@@ -76,6 +82,45 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			break;
 		case PURCHASE_PHASE:
 			stateDeepCopy.news.active = false; //hide the popup
+			break;
+		case TANKER_CLICK:
+			//select if different, unselect if was the same
+			let lastSelectedTankerId = stateDeepCopy.refuel.selectedTankerPieceId;
+			stateDeepCopy.refuel.selectedTankerPieceId = payload.tankerPiece.pieceId === lastSelectedTankerId ? -1 : payload.tankerPiece.pieceId;
+			stateDeepCopy.refuel.selectedTankerPieceIndex = payload.tankerPiece.pieceId === lastSelectedTankerId ? -1 : payload.tankerPieceIndex;
+			break;
+		case AIRCRAFT_CLICK:
+			//show which tanker is giving the aircraft...
+			let { aircraftPieceIndex, aircraftPiece } = payload;
+			const { selectedTankerPieceId, selectedTankerPieceIndex } = stateDeepCopy.refuel;
+
+			stateDeepCopy.refuel.aircraft[aircraftPieceIndex].tankerPieceId = selectedTankerPieceId;
+			stateDeepCopy.refuel.aircraft[aircraftPieceIndex].tankerPieceIndex = selectedTankerPieceIndex;
+
+			//need how much fuel is getting removed
+			const fuelToRemove = TYPE_FUEL[aircraftPiece.pieceTypeId] - aircraftPiece.pieceFuel;
+
+			if (!stateDeepCopy.refuel.tankers[selectedTankerPieceIndex].removedFuel) {
+				stateDeepCopy.refuel.tankers[selectedTankerPieceIndex].removedFuel = 0;
+			}
+			stateDeepCopy.refuel.tankers[selectedTankerPieceIndex].removedFuel += fuelToRemove;
+
+			break;
+		case UNDO_FUEL_SELECTION:
+			//TODO: needs some good refactoring
+			// let airPiece = payload.aircraftPiece;
+			let airPieceIndex = payload.aircraftPieceIndex;
+			let tankerPieceIndex2 = stateDeepCopy.refuel.aircraft[airPieceIndex].tankerPieceIndex;
+
+			let pieceType = stateDeepCopy.refuel.aircraft[airPieceIndex].pieceTypeId;
+			let fuelThatWasGoingToGetAdded = TYPE_FUEL[pieceType] - stateDeepCopy.refuel.aircraft[airPieceIndex].pieceFuel;
+
+			stateDeepCopy.refuel.aircraft[airPieceIndex].tankerPieceId = null;
+			stateDeepCopy.refuel.aircraft[airPieceIndex].tankerPieceIndex = null;
+			stateDeepCopy.refuel.tankers[tankerPieceIndex2].removedFuel -= fuelThatWasGoingToGetAdded;
+			break;
+		case REFUEL_RESULTS:
+			stateDeepCopy.refuel = initialGameboardMeta.refuel;
 			break;
 		case NEWS_PHASE:
 			stateDeepCopy.news.active = true; //TODO: get the actual news from the database payload

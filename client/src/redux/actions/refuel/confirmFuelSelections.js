@@ -12,10 +12,14 @@ const confirmFuelSelections = () => {
 		// const { tankers, aircraft } = gameboardMeta.refuel;
 		//need to send to the server what selections were made, for it to handle it...
 
+		const { gameboardMeta } = getState();
+		const { aircraft, tankers } = gameboardMeta.refuel;
+
 		const clientAction = {
 			type: "confirmFuelSelection",
 			payload: {
-				fuelSelections: []
+				aircraft,
+				tankers
 			}
 		};
 

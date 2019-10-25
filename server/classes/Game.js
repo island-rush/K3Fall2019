@@ -176,7 +176,9 @@ class Game {
 					serverAction.payload.gameboardMeta.refuel = {
 						active: true,
 						tankers,
-						aircraft
+						aircraft,
+						selectedTankerPieceId: -1,
+						selectedTankerPieceIndex: -1
 					};
 					break;
 				default:

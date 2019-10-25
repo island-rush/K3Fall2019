@@ -57,7 +57,8 @@ const confirmBattleSelection = async (socket, payload) => {
 	}
 
 	await thisTeamsCurrentEvent.delete();
-	await giveNextEvent(socket, { thisGame }); //not putting executingStep in options to let it know not to send pieceMove
+	await giveNextEvent(socket, { thisGame, gameTeam: 0 }); //not putting executingStep in options to let it know not to send pieceMove
+	await giveNextEvent(socket, { thisGame, gameTeam: 1 }); //not putting executingStep in options to let it know not to send pieceMove
 };
 
 module.exports = confirmBattleSelection;

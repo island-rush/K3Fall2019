@@ -56,7 +56,7 @@ export const TYPE_FUEL = {
 	5: 5,
 	6: 5,
 	7: 5,
-	8: 5,
+	8: 5, //TODO: these should be -1 for non-aircraft
 	9: 5,
 	10: 5,
 	11: 5,

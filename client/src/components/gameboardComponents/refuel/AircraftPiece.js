@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { TYPE_IMAGES } from "../../styleConstants";
+import { TYPE_FUEL, TYPE_NAME_IDS } from "../../../gameData/gameConstants";
 
 const aircraftPieceStyle = {
 	backgroundColor: "white",
@@ -23,34 +24,53 @@ const boxStyle = {
 	position: "relative"
 };
 
-//TODO: make this a styleConstant? (also used in BattlePiece.js)
-const selected = [
-	{ border: "2px solid red" }, //selected
-	{ border: "2px solid black" } //not selected
-];
+const textDivStyle = {
+	position: "relative",
+	float: "left"
+};
 
 class AircraftPiece extends Component {
 	render() {
-		const { aircraftPiece, aircraftPieceIndex, isSelected, aircraftClick } = this.props;
-		const { pieceFuel } = aircraftPiece;
+		const { aircraftPiece, aircraftPieceIndex, aircraftClick, undoFuelSelection } = this.props;
+		const { pieceFuel, pieceTypeId } = aircraftPiece;
+
+		const tankerDisplay =
+			aircraftPiece.tankerPieceIndex == null ? null : (
+				<div
+					style={{ ...boxStyle, ...TYPE_IMAGES[TYPE_NAME_IDS["Tanker"]] }}
+					onClick={event => {
+						event.preventDefault();
+						undoFuelSelection(aircraftPiece, aircraftPieceIndex);
+						event.stopPropagation();
+					}}
+				>
+					{aircraftPiece.tankerPieceIndex}
+				</div>
+			);
+
+		const fuelToAdd = aircraftPiece.tankerPieceIndex == null ? 0 : TYPE_FUEL[aircraftPiece.pieceTypeId] - aircraftPiece.pieceFuel;
 
 		return (
 			<div style={aircraftPieceStyle}>
 				<div
 					style={{
 						...boxStyle,
-						...TYPE_IMAGES[aircraftPiece.pieceTypeId],
-						...selected[isSelected ? 0 : 1]
+						...TYPE_IMAGES[aircraftPiece.pieceTypeId]
 					}}
 					onClick={event => {
 						event.preventDefault();
-						aircraftClick();
+						aircraftClick(aircraftPiece, aircraftPieceIndex);
 						event.stopPropagation();
 					}}
 				>
 					{aircraftPieceIndex}
 				</div>
-				Current Fuel=[{pieceFuel}] Adding=[] New Total=[]
+				<div style={textDivStyle}>
+					<p>Current Fuel=[{pieceFuel}]</p>
+					<p>Adding=[{fuelToAdd}] </p>
+					<p>Max=[{TYPE_FUEL[pieceTypeId]}]</p>
+				</div>
+				{tankerDisplay}
 			</div>
 		);
 	}
@@ -59,8 +79,8 @@ class AircraftPiece extends Component {
 AircraftPiece.propTypes = {
 	aircraftPiece: PropTypes.object.isRequired,
 	aircraftPieceIndex: PropTypes.number.isRequired,
-	isSelected: PropTypes.bool.isRequired,
-	aircraftClick: PropTypes.func.isRequired
+	aircraftClick: PropTypes.func.isRequired,
+	undoFuelSelection: PropTypes.func.isRequired
 };
 
 export default AircraftPiece;

@@ -20,6 +20,7 @@ import clearOldBattle from "./battles/clearOldBattle";
 import confirmFuelSelections from "./refuel/confirmFuelSelections";
 import aircraftClick from "./refuel/aircraftClick";
 import tankerClick from "./refuel/tankerClick";
+import undoFuelSelection from "./refuel/undoFuelSelection";
 
 import selectPosition from "./selectPosition";
 import selectPiece from "./selectPiece";
@@ -51,5 +52,6 @@ export {
 	containerMove,
 	confirmFuelSelections,
 	tankerClick,
-	aircraftClick
+	aircraftClick,
+	undoFuelSelection
 };

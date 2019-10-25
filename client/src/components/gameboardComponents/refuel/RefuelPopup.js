@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { confirmFuelSelections, aircraftClick, tankerClick } from "../../../redux/actions";
+import { confirmFuelSelections, aircraftClick, tankerClick, undoFuelSelection } from "../../../redux/actions";
 import AircraftPiece from "./AircraftPiece";
 import TankerPiece from "./TankerPiece";
 
@@ -49,15 +49,15 @@ const invisibleStyle = {
 
 class RefuelPopup extends Component {
 	render() {
-		const { refuel, confirmFuelSelections, aircraftClick, tankerClick } = this.props;
+		const { refuel, confirmFuelSelections, aircraftClick, tankerClick, undoFuelSelection } = this.props;
 
-		const { tankers, aircraft } = refuel;
+		const { tankers, aircraft, selectedTankerPieceId } = refuel;
 
 		const tankerPieces = tankers.map((tankerPiece, index) => (
-			<TankerPiece tankerClick={tankerClick} key={index} tankerPiece={tankerPiece} tankerPieceIndex={index} isSelected={false} />
+			<TankerPiece tankerClick={tankerClick} key={index} tankerPiece={tankerPiece} tankerPieceIndex={index} isSelected={selectedTankerPieceId === tankerPiece.pieceId} />
 		));
 		const aircraftPieces = aircraft.map((aircraftPiece, index) => (
-			<AircraftPiece aircraftClick={aircraftClick} key={index} aircraftPiece={aircraftPiece} aircraftPieceIndex={index} isSelected={false} />
+			<AircraftPiece undoFuelSelection={undoFuelSelection} aircraftClick={aircraftClick} key={index} aircraftPiece={aircraftPiece} aircraftPieceIndex={index} />
 		));
 
 		return (
@@ -83,7 +83,8 @@ RefuelPopup.propTypes = {
 	refuel: PropTypes.object.isRequired,
 	confirmFuelSelections: PropTypes.func.isRequired,
 	tankerClick: PropTypes.func.isRequired,
-	aircraftClick: PropTypes.func.isRequired
+	aircraftClick: PropTypes.func.isRequired,
+	undoFuelSelection: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ gameboardMeta }) => ({
@@ -93,7 +94,8 @@ const mapStateToProps = ({ gameboardMeta }) => ({
 const mapActionsToProps = {
 	confirmFuelSelections,
 	tankerClick,
-	aircraftClick
+	aircraftClick,
+	undoFuelSelection
 };
 
 export default connect(

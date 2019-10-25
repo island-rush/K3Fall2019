@@ -33,6 +33,10 @@ class TankerPiece extends Component {
 	render() {
 		const { tankerPiece, tankerPieceIndex, isSelected, tankerClick } = this.props;
 
+		const removingFuel = tankerPiece.removedFuel != null ? tankerPiece.removedFuel : 0;
+
+		const newTotalFuel = tankerPiece.pieceFuel - removingFuel;
+
 		return (
 			<div style={tankerPieceStyle}>
 				<div
@@ -43,13 +47,15 @@ class TankerPiece extends Component {
 					}}
 					onClick={event => {
 						event.preventDefault();
-						tankerClick();
+						tankerClick(tankerPiece, tankerPieceIndex);
 						event.stopPropagation();
 					}}
 				>
 					{tankerPieceIndex}
 				</div>
-				CurrentFuel=[{tankerPiece.pieceFuel}] Removing=[] NewTotal=[]
+				<p>CurrentFuel=[{tankerPiece.pieceFuel}] </p>
+				<p>Removing=[{removingFuel}] </p>
+				<p>NewTotal=[{newTotalFuel}]</p>
 			</div>
 		);
 	}

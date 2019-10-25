@@ -1,9 +1,17 @@
-import setUserfeedbackAction from "../setUserfeedbackAction";
-import {} from "../actionTypes";
+// import setUserfeedbackAction from "../setUserfeedbackAction";
+import { TANKER_CLICK } from "../actionTypes";
 
 const tankerClick = (tankerPiece, tankerPieceIndex) => {
 	return (dispatch, getState, emit) => {
-		dispatch(setUserfeedbackAction("tanker click"));
+		//TODO: check for bad state (wrong phase? ...use userFeedback...)
+
+		dispatch({
+			type: TANKER_CLICK,
+			payload: {
+				tankerPiece,
+				tankerPieceIndex
+			}
+		});
 		return;
 	};
 };
