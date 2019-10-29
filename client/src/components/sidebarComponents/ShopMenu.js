@@ -2,8 +2,12 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import ShopCartArea from "./ShopCartArea";
-import PurchaseableItemsContainer from "./PurchaseableItemsContainer";
+import PurchaseableItemsContainerLand from "./PurchaseableItemsContainerLand";
+import PurchaseableItemsContainerSea from "./PurchaseableItemsContainerSea";
+import PurchaseableItemsContainerAir from "./PurchaseableItemsContainerAir";
+import PurchaseableItemsContainerCapabilitiesWarfare from "./PurchaseableItemsContainerCapabilitiesWarfare";	
 import { shopRefundRequest, shopPurchaseRequest, shopConfirmPurchase } from "../../redux/actions";
+
 
 const shopStyle = {
 	backgroundColor: "Yellow",
@@ -34,7 +38,10 @@ class ShopMenu extends Component {
 		return (
 			<div style={selected ? shopStyle : invisibleStyle}>
 				<ShopCartArea refund={refund} shopItems={shopItems} />
-				<PurchaseableItemsContainer points={points} purchase={purchase} />
+				<PurchaseableItemsContainerLand points={points} purchase={purchase} />
+				<PurchaseableItemsContainerSea points={points} purchase={purchase} />
+				<PurchaseableItemsContainerAir points={points} purchase={purchase} />
+				<PurchaseableItemsContainerCapabilitiesWarfare points={points} purchase={purchase} />
 				<div
 					style={purchaseButtonStyle}
 					onClick={event => {

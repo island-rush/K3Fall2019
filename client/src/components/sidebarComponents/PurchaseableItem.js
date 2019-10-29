@@ -6,10 +6,11 @@ import { TYPE_COSTS, TYPE_MOVES, TYPE_FUEL, TYPE_NAMES } from "../../gameData/ga
 const purchaseableItemStyle = {
 	backgroundColor: "grey",
 	position: "relative",
-	width: "20%",
-	paddingTop: "20%",
+	width: "28%",
+	paddingTop: "28%",
 	margin: "1%",
 	float: "left",
+	left: "5%",
 	backgroundSize: "100% 100%",
 	backgroundRepeat: "no-repeat"
 };
