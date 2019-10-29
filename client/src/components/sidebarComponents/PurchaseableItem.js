@@ -8,9 +8,9 @@ const purchaseableItemStyle = {
 	position: "relative",
 	width: "28%",
 	paddingTop: "28%",
-	margin: "1%",
+	margin: "2.5%",
 	float: "left",
-	left: "5%",
+	// left: "5%",
 	backgroundSize: "100% 100%",
 	backgroundRepeat: "no-repeat"
 };

@@ -5,7 +5,7 @@ import { HexGrid, Layout, Hexagon } from "react-hexgrid";
 import BattlePopup from "./BattlePopup";
 import NewsPopup from "./NewsPopup";
 import ContainerPopup from "./ContainerPopup";
-import RefuelPopup from "./RefuelPopup";
+import RefuelPopup from "./refuel/RefuelPopup";
 import Patterns from "./Patterns";
 import { selectPosition } from "../../redux/actions";
 import { TYPE_HIGH_LOW } from "../../gameData/gameConstants";
@@ -84,7 +84,7 @@ const patternSolver = position => {
 
 class Gameboard extends Component {
 	render() {
-		const { gameboard, selectedPosition, selectPosition, news, battle, container, refuel, planning, selectedPiece, confirmedPlans } = this.props;
+		const { gameboard, selectedPosition, selectPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions } = this.props;
 
 		let planningPositions = []; //all of the positions part of a plan
 		let containerPositions = []; //specific positions part of a plan of type container
@@ -140,6 +140,8 @@ class Gameboard extends Component {
 						? "containerPos"
 						: planningPositions.includes(parseInt(positionIndex))
 						? "plannedPos"
+						: highlightedPositions.includes(parseInt(positionIndex))
+						? "highlightedPos"
 						: ""
 				}
 			/>
@@ -155,7 +157,7 @@ class Gameboard extends Component {
 				</HexGrid>
 				<NewsPopup news={news} />
 				<BattlePopup battle={battle} />
-				<RefuelPopup refuel={refuel} />
+				<RefuelPopup />
 				<ContainerPopup container={container} />
 			</div>
 		);
@@ -169,18 +171,18 @@ Gameboard.propTypes = {
 	news: PropTypes.object.isRequired,
 	battle: PropTypes.object.isRequired,
 	container: PropTypes.object.isRequired,
-	refuel: PropTypes.object.isRequired,
 	planning: PropTypes.object.isRequired,
 	selectedPiece: PropTypes.number.isRequired,
-	confirmedPlans: PropTypes.object.isRequired
+	confirmedPlans: PropTypes.object.isRequired,
+	highlightedPositions: PropTypes.array.isRequired
 };
 
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 	gameboard,
 	selectedPosition: gameboardMeta.selectedPosition,
+	highlightedPositions: gameboardMeta.highlightedPositions,
 	news: gameboardMeta.news,
 	battle: gameboardMeta.battle,
-	refuel: gameboardMeta.refuel,
 	container: gameboardMeta.container,
 	planning: gameboardMeta.planning,
 	selectedPiece: gameboardMeta.selectedPiece,

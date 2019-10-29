@@ -28,18 +28,24 @@ const piece = (pieceGameId, pieceTeamName, pieceTypeName, piecePositionId, optio
 const gameInitialPieces = async gameId => {
 	const firstPieces = [
 		// piece(gameId, "Blue", "Tank", 0, {pieceVisible: 1, pieceContainerId: 23}),
-		piece(gameId, "Blue", "Tank", 0),
-		piece(gameId, "Red", "Tank", 1),
-		// piece(gameId, "Blue", "Tank", 2),
-		piece(gameId, "Blue", "Tank", 3),
-		piece(gameId, "Blue", "Tank", 3),
-		piece(gameId, "Blue", "Tank", 3),
-		piece(gameId, "Blue", "Tank", 3),
+		piece(gameId, "Blue", "Tanker", 0),
+		piece(gameId, "Blue", "Bomber", 1),
+		piece(gameId, "Blue", "Tanker", 4),
+		piece(gameId, "Blue", "Tanker", 4),
+		piece(gameId, "Blue", "Bomber", 4),
+		piece(gameId, "Blue", "Stealth Fighter", 4),
+		piece(gameId, "Blue", "Stealth Bomber", 4),
+		piece(gameId, "Blue", "C-130", 4),
+		piece(gameId, "Red", "Tank", 40)
+
+		// piece(gameId, "Blue", "Tank", 3),
+		// piece(gameId, "Blue", "Tank", 3),
+		// piece(gameId, "Blue", "Tank", 3),
 		// piece(gameId, "Blue", "Tank", 4),
-		piece(gameId, "Red", "Artillery", 5),
-		piece(gameId, "Red", "Artillery", 5),
-		piece(gameId, "Red", "Artillery", 5),
-		piece(gameId, "Red", "Artillery", 5)
+		// piece(gameId, "Red", "Artillery", 5),
+		// piece(gameId, "Red", "Artillery", 5),
+		// piece(gameId, "Red", "Artillery", 5),
+		// piece(gameId, "Red", "Artillery", 5)
 		// piece(gameId, "Blue", "Tank", 6),
 		// piece(gameId, "Red", "Tank", 7)
 	];

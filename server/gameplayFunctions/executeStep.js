@@ -2,12 +2,13 @@ const { Plan, Piece, Event } = require("../classes");
 import { PLACE_PHASE, NEW_ROUND } from "../../client/src/redux/actions/actionTypes";
 import { SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
 const giveNextEvent = require("./giveNextEvent");
-const { BOTH_TEAMS_INDICATOR, POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE } = require("./eventConstants");
+const { BOTH_TEAMS_INDICATOR, POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("./eventConstants");
 
 const executeStep = async (socket, thisGame) => {
 	//inserting events here and moving pieces, or changing to new round or something...
 	const { gameId, gameRound } = thisGame;
 
+	//TODO: rename this to 'hadPlans0' or something more descriptive
 	const currentMovementOrder0 = await Plan.getCurrentMovementOrder(gameId, 0);
 	const currentMovementOrder1 = await Plan.getCurrentMovementOrder(gameId, 1);
 
@@ -117,12 +118,53 @@ const executeStep = async (socket, thisGame) => {
 	}
 
 	// TODO: Refuel Events (special flag? / proximity) (check to see that the piece still exists!*!*) (still have plans from old pieces that used to exist? (but those would delete on cascade probaby...except the events themselves...))
+
+	//should not do refuel events if the team didn't have any plans for this step (TODO: prevent refuel stuff for team specific things)
+
+	//refueling is team specific (loop through 0 and 1 teamIds)
+	const teamHadPlans = [currentMovementOrder0 == null ? 0 : 1, currentMovementOrder1 == null ? 0 : 1];
+	for (let thisTeamNum = 0; thisTeamNum < 2; thisTeamNum++) {
+		if (teamHadPlans[thisTeamNum]) {
+			//refuel events if they had plans for this step, otherwise don't want to refuel stuff for no plans (possibly will do it anyway)
+			//need to grab all refuel events from database, looking at pieces in the same positions
+			let allPositionRefuels = await Piece.getPositionRefuels(gameId, thisTeamNum);
+			if (allPositionRefuels.length > 0) {
+				let allPosEvents = {};
+				for (let x = 0; x < allPositionRefuels.length; x++) {
+					// tnkrPieceId, tnkrPieceTypeId, tnkrPiecePositionId, tnkrPieceMoves, tnkrPieceFuel, arcftPieceId, arcftPieceTypeId, arcftPiecePositionId, arcftPieceMoves, arcftPieceFuel
+					//prettier-ignore
+					let { tnkrPieceId, tnkrPiecePositionId, arcftPieceId } = allPositionRefuels[x];
+
+					let thisEventPosition = `${tnkrPiecePositionId}`;
+					if (!Object.keys(allPosEvents).includes(thisEventPosition)) allPosEvents[thisEventPosition] = [];
+					if (!allPosEvents[thisEventPosition].includes(tnkrPieceId)) allPosEvents[thisEventPosition].push(tnkrPieceId);
+					if (!allPosEvents[thisEventPosition].includes(arcftPieceId)) allPosEvents[thisEventPosition].push(arcftPieceId);
+				}
+
+				let eventInserts = [];
+				let eventItemInserts = [];
+				let keys = Object.keys(allPosEvents);
+				for (let b = 0; b < keys.length; b++) {
+					let key = keys[b];
+					eventInserts.push([gameId, thisTeamNum, REFUEL_EVENT_TYPE, key, key]);
+					let eventPieces = allPosEvents[key];
+					for (let x = 0; x < eventPieces.length; x++) eventItemInserts.push([eventPieces[x], gameId, key, key]);
+				}
+
+				await Event.bulkInsertEvents(eventInserts);
+				await Event.bulkInsertItems(gameId, eventItemInserts);
+			}
+		}
+	}
+
 	// TODO: Container Events (special flag)
 
 	// Note: All non-move (specialflag != 0) plans should result in events (refuel/container)...
 	// If there is now an event, send to user instead of PIECES_MOVE
 
-	await giveNextEvent(socket, { thisGame, executingStep: true });
+	// await giveNextEvent(socket, { thisGame, executingStep: true });
+	await giveNextEvent(socket, { thisGame, executingStep: true, gameTeam: 0 });
+	await giveNextEvent(socket, { thisGame, executingStep: true, gameTeam: 1 });
 };
 
 module.exports = executeStep;

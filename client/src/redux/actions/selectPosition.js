@@ -1,10 +1,29 @@
 import { distanceMatrix } from "../../gameData/distanceMatrix";
-import { POSITION_SELECT, PLANNING_SELECT } from "./actionTypes";
+import { POSITION_SELECT, PLANNING_SELECT, HIGHLIGHT_POSITIONS } from "./actionTypes";
 import setUserFeedbackAction from "./setUserfeedbackAction";
 
 const selectPosition = selectedPositionId => {
 	return (dispatch, getState, emit) => {
 		const { gameboardMeta } = getState();
+
+		const isHighlightingARange = false;
+		if (isHighlightingARange) {
+			const range = 1;
+
+			let highlightedPositions = [];
+			for (let x = 0; x < distanceMatrix[selectedPositionId].length; x++) {
+				if (distanceMatrix[selectedPositionId][x] < range) {
+					highlightedPositions.push(x);
+				}
+			}
+
+			dispatch({
+				type: HIGHLIGHT_POSITIONS,
+				payload: {
+					highlightedPositions
+				}
+			});
+		}
 
 		//figure out if planning (constrain what to select)
 		if (gameboardMeta.planning.active) {

@@ -37,7 +37,7 @@ svg g polygon {
 .selectedPos polygon {
 	z-index: 10;
 	stroke: rgb(255, 255, 255);
-	stroke-width: 0.3;
+	stroke-width: 0.5;
 }
 .plannedPos polygon {
 	z-index: 10;
@@ -48,4 +48,9 @@ svg g polygon {
 	z-index: 10;
 	stroke: rgb(238, 255, 0);
 	stroke-width: 0.3;
+}
+.highlightedPos polygon {
+	z-index: 10;
+	stroke: rgb(255, 255, 255);
+	stroke-width: 1;
 }
