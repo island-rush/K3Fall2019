@@ -22,6 +22,20 @@ export const TYPE_COSTS = {
 	19: 5
 };
 
+export const TYPE_MAIN = 0;
+export const TYPE_AIR = 1;
+export const TYPE_LAND = 2;
+export const TYPE_SEA = 3;
+export const TYPE_SPECIAL = 4;
+
+export const TYPE_OWNERS = {
+	0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+	1: [0, 1, 2, 3, 4, 5],
+	2: [6, 7, 8, 9, 10, 11, 12],
+	3: [13, 14, 15, 16],
+	4: [17, 18, 19]
+};
+
 export const TYPE_MOVES = {
 	//TypdId: Moves
 	0: 5, //bomer

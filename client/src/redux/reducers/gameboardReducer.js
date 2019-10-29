@@ -53,7 +53,7 @@ function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
 				let thisFuelUpdate = fuelUpdates[y];
 				let { pieceId, piecePositionId, newFuel } = thisFuelUpdate;
 				for (let x = 0; x < stateDeepCopy[piecePositionId].pieces.length; x++) {
-					if (stateDeepCopy[piecePositionId].pieces[x].pieceId == pieceId) {
+					if (stateDeepCopy[piecePositionId].pieces[x].pieceId === pieceId) {
 						stateDeepCopy[piecePositionId].pieces[x].pieceFuel = newFuel;
 						break;
 					}

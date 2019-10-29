@@ -1,13 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import ShopCartArea from "./ShopCartArea";
-import PurchaseableItemsContainerLand from "./PurchaseableItemsContainerLand";
-import PurchaseableItemsContainerSea from "./PurchaseableItemsContainerSea";
-import PurchaseableItemsContainerAir from "./PurchaseableItemsContainerAir";
-import PurchaseableItemsContainerCapabilitiesWarfare from "./PurchaseableItemsContainerCapabilitiesWarfare";	
+import PurchaseableItem from "./PurchaseableItem";
+import ShopItem from "./ShopItem";
 import { shopRefundRequest, shopPurchaseRequest, shopConfirmPurchase } from "../../redux/actions";
-
+import { TYPE_OWNERS, TYPE_AIR, TYPE_LAND, TYPE_SEA, TYPE_SPECIAL } from "../../gameData/gameConstants";
 
 const shopStyle = {
 	backgroundColor: "Yellow",
@@ -31,17 +28,57 @@ const purchaseButtonStyle = {
 	backgroundColor: "pink"
 };
 
+const purchaseableItemsContainerStyle = {
+	backgroundColor: "red",
+	position: "relative",
+	width: "15%",
+	height: "80%",
+	float: "left",
+	top: "2.5%",
+	margin: ".5%"
+};
+
 class ShopMenu extends Component {
 	render() {
 		const { shopItems, selected, purchase, refund, points, confirmPurchase } = this.props;
 
+		const airShopComponents = TYPE_OWNERS[TYPE_AIR].map((typeId, index) => <PurchaseableItem key={index} purchase={purchase} typeId={typeId} />);
+		const landShopComponents = TYPE_OWNERS[TYPE_LAND].map((typeId, index) => <PurchaseableItem key={index} purchase={purchase} typeId={typeId} />);
+		const seaShopComponents = TYPE_OWNERS[TYPE_SEA].map((typeId, index) => <PurchaseableItem key={index} purchase={purchase} typeId={typeId} />);
+		const specialShopComponents = TYPE_OWNERS[TYPE_SPECIAL].map((typeId, index) => <PurchaseableItem key={index} purchase={purchase} typeId={typeId} />);
+
+		const shopItemComponents = shopItems.map((shopItem, index) => <ShopItem key={index} shopItem={shopItem} refund={shopItemId => refund(shopItemId)} />);
+
 		return (
 			<div style={selected ? shopStyle : invisibleStyle}>
-				<ShopCartArea refund={refund} shopItems={shopItems} />
-				<PurchaseableItemsContainerLand points={points} purchase={purchase} />
-				<PurchaseableItemsContainerSea points={points} purchase={purchase} />
-				<PurchaseableItemsContainerAir points={points} purchase={purchase} />
-				<PurchaseableItemsContainerCapabilitiesWarfare points={points} purchase={purchase} />
+				<div>Points: {points}</div>
+				<div style={purchaseableItemsContainerStyle}>
+					<div>Air</div>
+					{airShopComponents}
+				</div>
+				<div style={purchaseableItemsContainerStyle}>
+					<div>Land</div>
+					{landShopComponents}
+				</div>
+				<div style={purchaseableItemsContainerStyle}>
+					<div>Sea</div>
+					{seaShopComponents}
+				</div>
+				<div style={purchaseableItemsContainerStyle}>
+					<div>Special</div>
+					{specialShopComponents}
+				</div>
+				<div style={purchaseableItemsContainerStyle}>
+					<div>Warfare</div>
+					<PurchaseableItem purchase={purchase} typeId={0} />
+					<PurchaseableItem purchase={purchase} typeId={0} />
+					<PurchaseableItem purchase={purchase} typeId={0} />
+					<PurchaseableItem purchase={purchase} typeId={0} />
+				</div>
+				<div style={purchaseableItemsContainerStyle}>
+					<div>Cart</div>
+					{shopItemComponents}
+				</div>
 				<div
 					style={purchaseButtonStyle}
 					onClick={event => {
