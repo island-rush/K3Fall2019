@@ -19,10 +19,17 @@ import {
 	EVENT_BATTLE,
 	BATTLE_FIGHT_RESULTS,
 	NO_MORE_EVENTS,
+	EVENT_REFUEL,
 	CLEAR_BATTLE,
 	MENU_SELECT,
-	HIGHLIGHT_POSITIONS
+	HIGHLIGHT_POSITIONS,
+	TANKER_CLICK,
+	AIRCRAFT_CLICK,
+	UNDO_FUEL_SELECTION,
+	REFUEL_RESULTS
 } from "../actions/actionTypes";
+
+import { TYPE_FUEL } from "../../gameData/gameConstants";
 
 const initialGameboardMeta = {
 	//TODO: change to selectedPositionId and selectedPieceId to better represent the values (ints) (and also selectedBattlePiece -> selectedBattlePieceId)
@@ -39,11 +46,14 @@ const initialGameboardMeta = {
 		active: false,
 		selectedBattlePiece: -1,
 		selectedBattlePieceIndex: -1, //helper to find the piece within the array
+		masterRecord: null,
 		friendlyPieces: [],
 		enemyPieces: []
 	},
 	refuel: {
 		active: false,
+		selectedTankerPieceId: -1,
+		selectedTankerPieceIndex: -1,
 		tankers: [],
 		aircraft: []
 	},
@@ -72,6 +82,45 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			break;
 		case PURCHASE_PHASE:
 			stateDeepCopy.news.active = false; //hide the popup
+			break;
+		case TANKER_CLICK:
+			//select if different, unselect if was the same
+			let lastSelectedTankerId = stateDeepCopy.refuel.selectedTankerPieceId;
+			stateDeepCopy.refuel.selectedTankerPieceId = payload.tankerPiece.pieceId === lastSelectedTankerId ? -1 : payload.tankerPiece.pieceId;
+			stateDeepCopy.refuel.selectedTankerPieceIndex = payload.tankerPiece.pieceId === lastSelectedTankerId ? -1 : payload.tankerPieceIndex;
+			break;
+		case AIRCRAFT_CLICK:
+			//show which tanker is giving the aircraft...
+			let { aircraftPieceIndex, aircraftPiece } = payload;
+			const { selectedTankerPieceId, selectedTankerPieceIndex } = stateDeepCopy.refuel;
+
+			stateDeepCopy.refuel.aircraft[aircraftPieceIndex].tankerPieceId = selectedTankerPieceId;
+			stateDeepCopy.refuel.aircraft[aircraftPieceIndex].tankerPieceIndex = selectedTankerPieceIndex;
+
+			//need how much fuel is getting removed
+			const fuelToRemove = TYPE_FUEL[aircraftPiece.pieceTypeId] - aircraftPiece.pieceFuel;
+
+			if (!stateDeepCopy.refuel.tankers[selectedTankerPieceIndex].removedFuel) {
+				stateDeepCopy.refuel.tankers[selectedTankerPieceIndex].removedFuel = 0;
+			}
+			stateDeepCopy.refuel.tankers[selectedTankerPieceIndex].removedFuel += fuelToRemove;
+
+			break;
+		case UNDO_FUEL_SELECTION:
+			//TODO: needs some good refactoring
+			// let airPiece = payload.aircraftPiece;
+			let airPieceIndex = payload.aircraftPieceIndex;
+			let tankerPieceIndex2 = stateDeepCopy.refuel.aircraft[airPieceIndex].tankerPieceIndex;
+
+			let pieceType = stateDeepCopy.refuel.aircraft[airPieceIndex].pieceTypeId;
+			let fuelThatWasGoingToGetAdded = TYPE_FUEL[pieceType] - stateDeepCopy.refuel.aircraft[airPieceIndex].pieceFuel;
+
+			stateDeepCopy.refuel.aircraft[airPieceIndex].tankerPieceId = null;
+			stateDeepCopy.refuel.aircraft[airPieceIndex].tankerPieceIndex = null;
+			stateDeepCopy.refuel.tankers[tankerPieceIndex2].removedFuel -= fuelThatWasGoingToGetAdded;
+			break;
+		case REFUEL_RESULTS:
+			stateDeepCopy.refuel = initialGameboardMeta.refuel;
 			break;
 		case NEWS_PHASE:
 			stateDeepCopy.news.active = true; //TODO: get the actual news from the database payload
@@ -117,6 +166,13 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			delete stateDeepCopy.confirmedPlans[payload.pieceId];
 			stateDeepCopy.selectedPiece = -1;
 			break;
+		case EVENT_REFUEL:
+			stateDeepCopy.refuel.active = true;
+			stateDeepCopy.refuel.tankers = payload.tankers;
+			stateDeepCopy.refuel.aircraft = payload.aircraft;
+			stateDeepCopy.refuel.selectedTankerPiece = -1;
+			stateDeepCopy.refuel.selectedTankerPieceIndex = -1;
+			break;
 		case INITIAL_GAMESTATE:
 			Object.assign(stateDeepCopy, payload.gameboardMeta);
 			break;
@@ -151,15 +207,9 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			// stateDeepCopy.battle = initialGameboardMeta.battle;
 			// stateDeepCopy.refuel = initialGameboardMeta.refuel;  //these don't seem to work
 			// stateDeepCopy.container = initialGameboardMeta.container;
-			stateDeepCopy.battle = {
-				active: false,
-				selectedBattlePiece: -1,
-				selectedBattlePieceIndex: -1, //helper to find the piece within the array
-				friendlyPieces: [],
-				enemyPieces: []
-			};
-			stateDeepCopy.refuel = { active: false };
-			stateDeepCopy.container = { active: false };
+			stateDeepCopy.battle = initialGameboardMeta.battle;
+			stateDeepCopy.refuel = initialGameboardMeta.refuel;
+			stateDeepCopy.container = initialGameboardMeta.container;
 			break;
 		case BATTLE_FIGHT_RESULTS:
 			stateDeepCopy.battle.masterRecord = payload.masterRecord;

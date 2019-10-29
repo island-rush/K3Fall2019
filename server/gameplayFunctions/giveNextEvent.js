@@ -13,7 +13,7 @@ const giveNextEvent = async (socket, options) => {
 
 	let gameboardPiecesList; //if came from 'executeStep', send new piece locations along with actions
 	if (options.executingStep) {
-		gameboardPiecesList = await Piece.getVisiblePieces(gameId, 1);
+		gameboardPiecesList = await Piece.getVisiblePieces(gameId, gameTeam);
 	}
 
 	let serverAction = {}; //store the action, send at the end
@@ -77,7 +77,9 @@ const giveNextEvent = async (socket, options) => {
 					type: EVENT_REFUEL,
 					payload: {
 						tankers,
-						aircraft
+						aircraft,
+						gameboardPieces: options.executingStep ? gameboardPiecesList : null,
+						gameStatus: options.executingStep ? 0 : null
 					}
 				};
 				break;

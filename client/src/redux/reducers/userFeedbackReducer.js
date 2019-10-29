@@ -23,7 +23,8 @@ import {
 	NO_MORE_EVENTS,
 	BATTLE_FIGHT_RESULTS,
 	EVENT_BATTLE,
-	EVENT_REFUEL
+	EVENT_REFUEL,
+	AIRCRAFT_CLICK
 } from "../actions/actionTypes";
 
 const initialUserFeedback = "Loading...";
@@ -46,6 +47,8 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "Cancelled the plan...";
 		case DELETE_PLAN:
 			return "Deleted the confirmed plan...";
+		case AIRCRAFT_CLICK:
+			return "transferring fuel planned...";
 		case PLAN_WAS_CONFIRMED:
 			return "Plan was confirmed!";
 		case MAIN_BUTTON_CLICK:

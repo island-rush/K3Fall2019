@@ -10,7 +10,8 @@ import {
 	PIECES_MOVE,
 	NEW_ROUND,
 	NEWS_PHASE,
-	EVENT_BATTLE
+	EVENT_BATTLE,
+	NO_MORE_EVENTS
 } from "../actions/actionTypes";
 
 const initialGameInfoState = {
@@ -32,6 +33,9 @@ function gameInfoReducer(state = initialGameInfoState, { type, payload }) {
 			return payload.gameInfo;
 		case SHOP_PURCHASE:
 			state.gamePoints = payload.points;
+			return state;
+		case NO_MORE_EVENTS:
+			state.gameStatus = payload.gameStatus;
 			return state;
 		case SHOP_REFUND:
 			state.gamePoints += payload.pointsAdded;
