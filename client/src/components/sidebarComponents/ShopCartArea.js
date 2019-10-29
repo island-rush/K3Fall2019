@@ -7,8 +7,8 @@ const shopCartAreaStyle = {
 	position: "absolute",
 	width: "20%",
 	height: "80%",
-	right: "1%",
-	top: "1%"
+	right: "5%",
+	top: "10%"
 };
 
 class ShopCartArea extends Component {
@@ -19,7 +19,8 @@ class ShopCartArea extends Component {
 
 		return (
 			<div style={shopCartAreaStyle}>
-				<div>Cart</div>
+				<div> &nbsp;</div>
+				<div style ={{fontSize:"20px"}}>Cart</div>
 				{shopItemComponents}
 			</div>
 		);
