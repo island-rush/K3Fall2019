@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS eventQueue(
 	eventId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     eventGameId INT(4) NOT NULL,
     eventTeamId INT(1) NOT NULL, -- 0,1 or 2 for both
-    eventTypeId INT(2) NOT NULL, -- 0 = battle, 1 = container...
+    eventTypeId INT(2) NOT NULL, -- 0 = battle
     eventPosA INT(4) NOT NULL DEFAULT -1,
     eventPosB INT(4) NOT NULL DEFAULT -1,
     FOREIGN KEY (eventGameId) REFERENCES games (gameId) ON DELETE CASCADE
@@ -125,4 +125,15 @@ CREATE TABLE IF NOT EXISTS eventItemsTargetsTemp(
     FOREIGN KEY (eventPieceId) REFERENCES pieces (pieceId) ON DELETE CASCADE,
     FOREIGN KEY (eventItemGameId) REFERENCES games (gameId) ON DELETE CASCADE,
     PRIMARY KEY (eventId, eventPieceId)
+);
+
+-- starting to not use the naming convention as much, keeps it simple (easier to understand)
+CREATE TABLE IF NOT EXISTS pieceRefuelTemp(
+	pieceId INT(8) NOT NULL,
+    gameId INT(8) NOT NULL,
+    teamId INT(1) NOT NULL, -- 0 or 1
+    newFuel INT(8) DEFAULT -1,
+    FOREIGN KEY (pieceId) REFERENCES pieces (pieceId) ON DELETE CASCADE,
+    FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE,
+    PRIMARY KEY (pieceId)
 );

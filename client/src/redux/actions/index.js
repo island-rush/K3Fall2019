@@ -17,6 +17,11 @@ import enemyBattlePieceClick from "./battles/enemyBattlePieceClick";
 import confirmBattleSelections from "./battles/confirmBattleSelections";
 import clearOldBattle from "./battles/clearOldBattle";
 
+import confirmFuelSelections from "./refuel/confirmFuelSelections";
+import aircraftClick from "./refuel/aircraftClick";
+import tankerClick from "./refuel/tankerClick";
+import undoFuelSelection from "./refuel/undoFuelSelection";
+
 import selectPosition from "./selectPosition";
 import selectPiece from "./selectPiece";
 import menuSelect from "./menuSelect";
@@ -44,5 +49,9 @@ export {
 	clearOldBattle,
 	invItemClick,
 	clearPieceSelection,
-	containerMove
+	containerMove,
+	confirmFuelSelections,
+	tankerClick,
+	aircraftClick,
+	undoFuelSelection
 };
