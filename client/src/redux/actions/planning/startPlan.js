@@ -1,5 +1,5 @@
-import setUserfeedbackAction from "./setUserfeedbackAction";
-import { START_PLAN } from "./actionTypes";
+import setUserfeedbackAction from "../setUserfeedbackAction";
+import { START_PLAN } from "../actionTypes";
 
 const startPlan = () => {
 	return (dispatch, getState, emit) => {

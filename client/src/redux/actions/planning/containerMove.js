@@ -1,5 +1,5 @@
-import { CONTAINER_MOVE } from "./actionTypes";
-import setUserfeedbackAction from "./setUserfeedbackAction";
+import { CONTAINER_MOVE } from "../actionTypes";
+import setUserfeedbackAction from "../setUserfeedbackAction";
 
 const containerMove = () => {
 	return (dispatch, getState, emit) => {

@@ -1,3 +1,9 @@
+/**
+ * Express Router for handling all paths (routes) to server from client.
+ * Checks session for authorization to each path
+ * For accessing pages and handling AJAX requests
+ */
+
 const path = require("path");
 import { DATABASE_TAG, LOGIN_TAG } from "./pages/errorTypes";
 const {
@@ -71,7 +77,7 @@ router.get("/game.html", (req, res) => {
 });
 
 // --------------------------------------
-// Admin Functions
+// Admin Functions (forms, logins, ajax)
 // --------------------------------------
 
 router.get("/databaseStatus", (req, res) => {
@@ -137,7 +143,7 @@ router.get("/getGameActive", (req, res) => {
 		getGameActive(req, res);
 	} catch (error) {
 		console.error(error);
-		res.sendStatus(500); //TODO: should probably redirect if this fails...(custom 500 page?)
+		res.sendStatus(500);
 	}
 });
 

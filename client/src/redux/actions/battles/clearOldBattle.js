@@ -1,4 +1,4 @@
-import { CLEAR_BATTLE } from "./actionTypes";
+import { CLEAR_BATTLE } from "../actionTypes";
 
 const clearOldBattle = () => {
 	return (dispatch, getState, emit) => {

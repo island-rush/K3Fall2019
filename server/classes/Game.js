@@ -1,5 +1,7 @@
 const pool = require("../database");
 import { INITIAL_GAMESTATE } from "../../client/src/redux/actions/actionTypes";
+const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("../gameplayFunctions/eventConstants");
+import { TYPE_NAMES } from "../../client/src/gameData/gameConstants";
 
 const InvItem = require("./InvItem");
 const ShopItem = require("./ShopItem");
@@ -49,126 +51,140 @@ class Game {
 	}
 
 	async initialStateAction(gameTeam, gameController) {
-		const invItems = await InvItem.all(this.gameId, gameTeam);
-		const shopItems = await ShopItem.all(this.gameId, gameTeam);
-		const gameboardPieces = await Piece.getVisiblePieces(this.gameId, gameTeam);
-		const confirmedPlans = await Plan.getConfirmedPlans(this.gameId, gameTeam);
+		let serverAction = {
+			type: INITIAL_GAMESTATE,
+			payload: {}
+		};
+
+		serverAction.payload.invItems = await InvItem.all(this.gameId, gameTeam);
+		serverAction.payload.shopItems = await ShopItem.all(this.gameId, gameTeam);
+		serverAction.payload.gameboardPieces = await Piece.getVisiblePieces(this.gameId, gameTeam);
+
+		serverAction.payload.gameInfo = {
+			gameSection: this.gameSection,
+			gameInstructor: this.gameInstructor,
+			gameController,
+			gamePhase: this.gamePhase,
+			gameRound: this.gameRound,
+			gameSlice: this.gameSlice,
+			gameStatus: this["game" + gameTeam + "Status"],
+			gamePoints: this["game" + gameTeam + "Points"]
+		};
+
+		serverAction.payload.gameboardMeta = {};
+		serverAction.payload.gameboardMeta.confirmedPlans = await Plan.getConfirmedPlans(this.gameId, gameTeam);
 
 		//Could put news into its own object, but don't really use it much...(TODO: figure out if need to refactor this...)
-		let queryString = "SELECT newsTitle, newsInfo FROM news WHERE newsGameId = ? AND newsActivated = 1 AND newsLength != 0 ORDER BY newsOrder ASC LIMIT 1";
-		let inserts = [this.gameId];
-		const [resultNews] = await pool.query(queryString, inserts);
-		const { newsTitle, newsInfo } = resultNews[0] !== undefined ? resultNews[0] : { newsTitle: "No More News", newsInfo: "Obviously you've been playing this game too long..." };
-		const news = {
-			active: parseInt(this.gamePhase) == 0,
-			// active: false,
-			newsTitle,
-			newsInfo
-		};
+		if (this.gamePhase == 0) {
+			let queryString = "SELECT newsTitle, newsInfo FROM news WHERE newsGameId = ? AND newsActivated = 1 AND newsLength != 0 ORDER BY newsOrder ASC LIMIT 1";
+			let inserts = [this.gameId];
+			const [resultNews] = await pool.query(queryString, inserts);
+			const { newsTitle, newsInfo } = resultNews[0] !== undefined ? resultNews[0] : { newsTitle: "No More News", newsInfo: "Obviously you've been playing this game too long..." };
 
-		//TODO: get these values from the database (potentially throw this into the event object)
-		const currentEvent = await Event.getNext(this.gameId, gameTeam);
-
-		let battle = {
-			selectedBattlePiece: -1,
-			selectedBattlePieceIndex: -1,
-			masterRecord: null
-		};
-
-		if (currentEvent) {
-			//TODO: don't assume its a battle, handle according to event type
-			let friendlyPiecesList = await currentEvent.getTeamItems(gameTeam == 0 ? 0 : 1);
-			let enemyPiecesList = await currentEvent.getTeamItems(gameTeam == 0 ? 1 : 0);
-			let friendlyPieces = [];
-			let enemyPieces = [];
-
-			//formatting for the frontend
-			for (let x = 0; x < friendlyPiecesList.length; x++) {
-				//need to transform pieces and stuff...
-				let thisFriendlyPiece = {
-					piece: {
-						pieceId: friendlyPiecesList[x].pieceId,
-						pieceGameId: friendlyPiecesList[x].pieceGameId,
-						pieceTeamId: friendlyPiecesList[x].pieceTeamId,
-						pieceTypeId: friendlyPiecesList[x].pieceTypeId,
-						piecePositionId: friendlyPiecesList[x].piecePositionId,
-						pieceVisible: friendlyPiecesList[x].pieceVisible,
-						pieceMoves: friendlyPiecesList[x].pieceMoves,
-						pieceFuel: friendlyPiecesList[x].pieceFuel
-					},
-					targetPiece:
-						friendlyPiecesList[x].tpieceId == null
-							? null
-							: {
-									pieceId: friendlyPiecesList[x].tpieceId,
-									pieceGameId: friendlyPiecesList[x].tpieceGameId,
-									pieceTeamId: friendlyPiecesList[x].tpieceTeamId,
-									pieceTypeId: friendlyPiecesList[x].tpieceTypeId,
-									piecePositionId: friendlyPiecesList[x].tpiecePositionId,
-									pieceVisible: friendlyPiecesList[x].tpieceVisible,
-									pieceMoves: friendlyPiecesList[x].tpieceMoves,
-									pieceFuel: friendlyPiecesList[x].tpieceFuel
-							  }
-				};
-				friendlyPieces.push(thisFriendlyPiece);
-			}
-			for (let y = 0; y < enemyPiecesList.length; y++) {
-				let thisEnemyPiece = {
-					targetPiece: null,
-					targetPieceIndex: -1
-				};
-				thisEnemyPiece.piece = enemyPiecesList[y];
-				enemyPieces.push(thisEnemyPiece);
-			}
-
-			//now need to get the targetPieceIndex from the thing....if needed....
-			for (let z = 0; z < friendlyPieces.length; z++) {
-				if (friendlyPieces[z].targetPiece != null) {
-					const { pieceId } = friendlyPieces[z].targetPiece;
-
-					friendlyPieces[z].targetPieceIndex = enemyPieces.findIndex(enemyPieceThing => enemyPieceThing.piece.pieceId == pieceId);
-				}
-			}
-
-			Object.assign(battle, { active: true, friendlyPieces, enemyPieces });
-		} else {
-			Object.assign(battle, { active: false, friendlyPieces: [], enemyPieces: [] });
+			serverAction.payload.gameboardMeta.news = {
+				active: true,
+				newsTitle,
+				newsInfo
+			};
 		}
 
-		//TODO: throw these within the above event handler when ready to use them...
-		const container = {
-			active: false
-		};
+		//TODO: get these values from the database (potentially throw this into the event object)
+		//TODO: current event could be a refuel (or something else...need to handle all of them, and set other states as false...)
+		//TODO: don't have to check if not in the combat phase...(prevent these checks for added efficiency?)
+		const currentEvent = await Event.getNext(this.gameId, gameTeam);
 
-		const refuel = {
-			active: false
-		};
+		if (currentEvent) {
+			const { eventTypeId } = currentEvent;
+			switch (eventTypeId) {
+				case POS_BATTLE_EVENT_TYPE:
+				case COL_BATTLE_EVENT_TYPE:
+					let friendlyPiecesList = await currentEvent.getTeamItems(gameTeam == 0 ? 0 : 1);
+					let enemyPiecesList = await currentEvent.getTeamItems(gameTeam == 0 ? 1 : 0);
+					let friendlyPieces = [];
+					let enemyPieces = [];
 
-		const serverAction = {
-			type: INITIAL_GAMESTATE,
-			payload: {
-				gameInfo: {
-					gameSection: this.gameSection,
-					gameInstructor: this.gameInstructor,
-					gameController,
-					gamePhase: this.gamePhase,
-					gameRound: this.gameRound,
-					gameSlice: this.gameSlice,
-					gameStatus: this["game" + gameTeam + "Status"],
-					gamePoints: this["game" + gameTeam + "Points"]
-				},
-				shopItems,
-				invItems,
-				gameboardPieces,
-				gameboardMeta: {
-					news,
-					battle,
-					container,
-					refuel,
-					confirmedPlans
-				}
+					//formatting for the frontend
+					for (let x = 0; x < friendlyPiecesList.length; x++) {
+						//need to transform pieces and stuff...
+						let thisFriendlyPiece = {
+							piece: {
+								pieceId: friendlyPiecesList[x].pieceId,
+								pieceGameId: friendlyPiecesList[x].pieceGameId,
+								pieceTeamId: friendlyPiecesList[x].pieceTeamId,
+								pieceTypeId: friendlyPiecesList[x].pieceTypeId,
+								piecePositionId: friendlyPiecesList[x].piecePositionId,
+								pieceVisible: friendlyPiecesList[x].pieceVisible,
+								pieceMoves: friendlyPiecesList[x].pieceMoves,
+								pieceFuel: friendlyPiecesList[x].pieceFuel
+							},
+							targetPiece:
+								friendlyPiecesList[x].tpieceId == null
+									? null
+									: {
+											pieceId: friendlyPiecesList[x].tpieceId,
+											pieceGameId: friendlyPiecesList[x].tpieceGameId,
+											pieceTeamId: friendlyPiecesList[x].tpieceTeamId,
+											pieceTypeId: friendlyPiecesList[x].tpieceTypeId,
+											piecePositionId: friendlyPiecesList[x].tpiecePositionId,
+											pieceVisible: friendlyPiecesList[x].tpieceVisible,
+											pieceMoves: friendlyPiecesList[x].tpieceMoves,
+											pieceFuel: friendlyPiecesList[x].tpieceFuel
+									  }
+						};
+						friendlyPieces.push(thisFriendlyPiece);
+					}
+					for (let y = 0; y < enemyPiecesList.length; y++) {
+						let thisEnemyPiece = {
+							targetPiece: null,
+							targetPieceIndex: -1
+						};
+						thisEnemyPiece.piece = enemyPiecesList[y];
+						enemyPieces.push(thisEnemyPiece);
+					}
+
+					//now need to get the targetPieceIndex from the thing....if needed....
+					for (let z = 0; z < friendlyPieces.length; z++) {
+						if (friendlyPieces[z].targetPiece != null) {
+							const { pieceId } = friendlyPieces[z].targetPiece;
+
+							friendlyPieces[z].targetPieceIndex = enemyPieces.findIndex(enemyPieceThing => enemyPieceThing.piece.pieceId == pieceId);
+						}
+					}
+
+					serverAction.payload.gameboardMeta.battle = {
+						active: true,
+						friendlyPieces,
+						enemyPieces
+					};
+					break;
+				case REFUEL_EVENT_TYPE:
+					//need to get tankers and aircraft and put that into the payload...
+					let tankers = [];
+					let aircraft = [];
+					const allRefuelItems = await currentEvent.getRefuelItems();
+
+					for (let x = 0; x < allRefuelItems.length; x++) {
+						let thisRefuelItem = allRefuelItems[x];
+						let { pieceTypeId } = thisRefuelItem;
+						if (TYPE_NAMES[pieceTypeId] == "Tanker") {
+							tankers.push(thisRefuelItem);
+						} else {
+							aircraft.push(thisRefuelItem);
+						}
+					}
+
+					serverAction.payload.gameboardMeta.refuel = {
+						active: true,
+						tankers,
+						aircraft,
+						selectedTankerPieceId: -1,
+						selectedTankerPieceIndex: -1
+					};
+					break;
+				default:
+				//do nothing, unknown event type...should do something...
 			}
-		};
+		}
 
 		return serverAction;
 	}

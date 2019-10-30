@@ -1,9 +1,9 @@
-const { Game, ShopItem } = require("../classes");
-const sendUserFeedback = require("./sendUserFeedback");
-import { SHOP_REFUND } from "../../client/src/redux/actions/actionTypes";
-import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
-import { GAME_INACTIVE_TAG, BAD_REQUEST_TAG } from "../pages/errorTypes";
-import { TYPE_COSTS } from "../../client/src/gameData/gameConstants";
+const { Game, ShopItem } = require("../../classes");
+const sendUserFeedback = require("../sendUserFeedback");
+import { SHOP_REFUND } from "../../../client/src/redux/actions/actionTypes";
+import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../../client/src/redux/socketEmits";
+import { GAME_INACTIVE_TAG, BAD_REQUEST_TAG } from "../../pages/errorTypes";
+import { TYPE_COSTS } from "../../../client/src/gameData/gameConstants";
 
 const shopRefundRequest = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
@@ -52,7 +52,6 @@ const shopRefundRequest = async (socket, payload) => {
 	await thisGame.setPoints(gameTeam, newPoints);
 	await thisShopItem.delete();
 
-	//TODO: consistency between payloads for different actions (pointsAdded vs points)
 	const serverAction = {
 		type: SHOP_REFUND,
 		payload: {

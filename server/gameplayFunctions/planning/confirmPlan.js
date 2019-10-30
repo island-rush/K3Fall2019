@@ -1,10 +1,10 @@
-const { Game, Piece, Plan } = require("../classes");
-const sendUserFeedback = require("./sendUserFeedback");
-import { PLAN_WAS_CONFIRMED } from "../../client/src/redux/actions/actionTypes";
-import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
-import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
-import { CONTAINER_TYPES } from "../../client/src/gameData/gameConstants";
-import { distanceMatrix } from "../../client/src/gameData/distanceMatrix";
+const { Game, Piece, Plan } = require("../../classes");
+const sendUserFeedback = require("../sendUserFeedback");
+import { PLAN_WAS_CONFIRMED } from "../../../client/src/redux/actions/actionTypes";
+import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
+import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
+import { CONTAINER_TYPES } from "../../../client/src/gameData/gameConstants";
+import { distanceMatrix } from "../../../client/src/gameData/distanceMatrix";
 
 const confirmPlan = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
@@ -84,7 +84,6 @@ const confirmPlan = async (socket, payload) => {
 	//TODO: could change the phrasing on Plan vs Moves (as far as inserting..function names...database entries??)
 	await Plan.insert(plansToInsert);
 
-	//TODO: send the pieceId or the whole piece object? (be consistent if possible with other payloads...)
 	const serverAction = {
 		type: PLAN_WAS_CONFIRMED,
 		payload: {

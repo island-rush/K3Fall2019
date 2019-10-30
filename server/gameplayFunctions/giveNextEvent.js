@@ -1,27 +1,30 @@
 const { Event, Piece } = require("../classes");
-import { EVENT_BATTLE, NO_MORE_EVENTS } from "../../client/src/redux/actions/actionTypes";
+import { EVENT_BATTLE, NO_MORE_EVENTS, EVENT_REFUEL } from "../../client/src/redux/actions/actionTypes";
+import { TYPE_NAMES } from "../../client/src/gameData/gameConstants";
 import { SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
 const sendUserFeedback = require("./sendUserFeedback");
-
-//This function does a lot of formatting for the client, could let the client format the data itself //TODO: consistent in this?
+const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("./eventConstants");
 
 const giveNextEvent = async (socket, options) => {
-	const { gameId } = options.thisGame;
+	const { thisGame, gameTeam } = options;
+	const { gameId } = thisGame;
+
+	const otherTeam = gameTeam == 0 ? 1 : 0;
 
 	let gameboardPiecesList; //if came from 'executeStep', send new piece locations along with actions
 	if (options.executingStep) {
-		gameboardPiecesList = [await Piece.getVisiblePieces(gameId, 0), await Piece.getVisiblePieces(gameId, 1)];
+		gameboardPiecesList = await Piece.getVisiblePieces(gameId, gameTeam);
 	}
 
-	let serverActions = [{}, {}]; //store the actions, send at the end
+	let serverAction = {}; //store the action, send at the end
 
-	gameEvent0 = await Event.getNext(gameId, 0);
-	if (gameEvent0) {
-		switch (gameEvent0.eventTypeId) {
-			case 0: //collision event
-			case 1: //position event
-				let friendlyPiecesList = await gameEvent0.getTeamItems(0);
-				let enemyPiecesList = await gameEvent0.getTeamItems(1);
+	const gameEvent = await Event.getNext(gameId, gameTeam);
+	if (gameEvent) {
+		switch (gameEvent.eventTypeId) {
+			case COL_BATTLE_EVENT_TYPE:
+			case POS_BATTLE_EVENT_TYPE:
+				let friendlyPiecesList = await gameEvent.getTeamItems(gameTeam);
+				let enemyPiecesList = await gameEvent.getTeamItems(otherTeam);
 				let friendlyPieces = [];
 				let enemyPieces = [];
 
@@ -43,12 +46,39 @@ const giveNextEvent = async (socket, options) => {
 					enemyPieces.push(thisEnemyPiece);
 				}
 
-				serverActions[0] = {
+				serverAction = {
 					type: EVENT_BATTLE,
 					payload: {
 						friendlyPieces,
 						enemyPieces,
-						gameboardPieces: options.executingStep ? gameboardPiecesList[0] : null,
+						gameboardPieces: options.executingStep ? gameboardPiecesList : null,
+						gameStatus: options.executingStep ? 0 : null
+					}
+				};
+				break;
+			case REFUEL_EVENT_TYPE:
+				//get the pieces from the event, put them into payload (pre-format based on state?)
+				let allRefuelEventItems = await gameEvent.getRefuelItems();
+
+				let tankers = [];
+				let aircraft = [];
+				for (let x = 0; x < allRefuelEventItems.length; x++) {
+					//put each piece into the refuel event....
+					let thisPiece = allRefuelEventItems[x];
+					let { pieceId, pieceTypeId, pieceFuel, pieceMoves } = thisPiece;
+					if (TYPE_NAMES[pieceTypeId] == "Tanker") {
+						tankers.push(thisPiece);
+					} else {
+						aircraft.push(thisPiece);
+					}
+				}
+
+				serverAction = {
+					type: EVENT_REFUEL,
+					payload: {
+						tankers,
+						aircraft,
+						gameboardPieces: options.executingStep ? gameboardPiecesList : null,
 						gameStatus: options.executingStep ? 0 : null
 					}
 				};
@@ -58,71 +88,21 @@ const giveNextEvent = async (socket, options) => {
 				return;
 		}
 	} else {
-		serverActions[0] = {
+		serverAction = {
 			type: NO_MORE_EVENTS,
 			payload: {
-				gameboardPieces: options.executingStep ? gameboardPiecesList[0] : null,
+				gameboardPieces: options.executingStep ? gameboardPiecesList : null,
 				gameStatus: options.executingStep ? 0 : null
 			}
 		};
 	}
 
-	gameEvent1 = await Event.getNext(gameId, 1);
-	if (gameEvent1) {
-		switch (gameEvent1.eventTypeId) {
-			case 0: //TODO: make these constants to make it more clear... (is this allowed for the events? (without the break...seems pretty cool and it works so far...))
-			case 1:
-				let friendlyPiecesList = await gameEvent1.getTeamItems(1);
-				let enemyPiecesList = await gameEvent1.getTeamItems(0);
-				let friendlyPieces = [];
-				let enemyPieces = [];
+	//sending the event that we got, or "no more events"? (but also sending piece moves after this
+	socket.to("game" + gameId + "team" + gameTeam).emit(SERVER_SENDING_ACTION, serverAction);
 
-				for (let x = 0; x < friendlyPiecesList.length; x++) {
-					let thisFriendlyPiece = {
-						targetPiece: null,
-						targetPieceIndex: -1
-					};
-					thisFriendlyPiece.piece = friendlyPiecesList[x];
-					friendlyPieces.push(thisFriendlyPiece);
-				}
-
-				for (let y = 0; y < enemyPiecesList.length; y++) {
-					let thisEnemyPiece = {
-						targetPiece: null,
-						targetPieceIndex: -1
-					};
-					thisEnemyPiece.piece = enemyPiecesList[y];
-					enemyPieces.push(thisEnemyPiece);
-				}
-
-				serverActions[1] = {
-					type: EVENT_BATTLE,
-					payload: {
-						friendlyPieces,
-						enemyPieces,
-						gameboardPieces: options.executingStep ? gameboardPiecesList[1] : null,
-						gameStatus: options.executingStep ? 0 : null
-					}
-				};
-				break;
-			default:
-				sendUserFeedback(socket, "Server Error, unknown event type...");
-				return;
-		}
-	} else {
-		serverActions[1] = {
-			type: NO_MORE_EVENTS,
-			payload: {
-				gameboardPieces: options.executingStep ? gameboardPiecesList[1] : null,
-				gameStatus: options.executingStep ? 0 : null
-			}
-		};
+	if (socket.handshake.session.ir3.gameTeam == gameTeam) {
+		socket.emit(SERVER_SENDING_ACTION, serverAction);
 	}
-
-	//sending the events that we got, or "no more events"? (but also sending piece moves after this...should combine...)
-	socket.to("game" + gameId + "team0").emit(SERVER_SENDING_ACTION, serverActions[0]);
-	socket.to("game" + gameId + "team1").emit(SERVER_SENDING_ACTION, serverActions[1]);
-	socket.emit(SERVER_SENDING_ACTION, serverActions[socket.handshake.session.ir3.gameTeam]);
 };
 
 module.exports = giveNextEvent;

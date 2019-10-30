@@ -1,26 +1,36 @@
 //puts all userActions into the same file for importing / exporting
 //TODO: put these into a better organized structure (the function files) for easier access
 
-import shopRefundRequest from "./shopRefundRequest";
-import shopPurchaseRequest from "./shopPurchaseRequest";
-import shopConfirmPurchase from "./shopConfirmPurchase";
+import shopRefundRequest from "./shop/shopRefundRequest";
+import shopPurchaseRequest from "./shop/shopPurchaseRequest";
+import shopConfirmPurchase from "./shop/shopConfirmPurchase";
+
+import confirmPlan from "./planning/confirmPlan";
+import startPlan from "./planning/startPlan";
+import cancelPlan from "./planning/cancelPlan";
+import undoMove from "./planning/undoMove";
+import containerMove from "./planning/containerMove";
+
+import battlePieceClick from "./battles/battlePieceClick";
+import targetPieceClick from "./battles/targetPieceClick";
+import enemyBattlePieceClick from "./battles/enemyBattlePieceClick";
+import confirmBattleSelections from "./battles/confirmBattleSelections";
+import clearOldBattle from "./battles/clearOldBattle";
+
+import confirmFuelSelections from "./refuel/confirmFuelSelections";
+import aircraftClick from "./refuel/aircraftClick";
+import tankerClick from "./refuel/tankerClick";
+import undoFuelSelection from "./refuel/undoFuelSelection";
+
 import selectPosition from "./selectPosition";
 import selectPiece from "./selectPiece";
-import confirmPlan from "./confirmPlan";
-import startPlan from "./startPlan";
-import cancelPlan from "./cancelPlan";
-import undoMove from "./undoMove";
 import menuSelect from "./menuSelect";
+
 import battlePopupMinimize from "./battlePopupMinimize"
+
 import mainButtonClick from "./mainButtonClick";
-import battlePieceClick from "./battlePieceClick";
-import targetPieceClick from "./targetPieceClick";
-import enemyBattlePieceClick from "./enemyBattlePieceClick";
-import confirmBattleSelections from "./confirmBattleSelections";
-import clearOldBattle from "./clearOldBattle";
 import invItemClick from "./invItemClick";
-import clearPieceSelection from "./clearPieceSelection";
-import containerMove from "./containerMove";
+import clearPieceSelection from "./clearPieceSelection"; //eventually replaced with menuSelect(-1) or menuSelect(0)
 
 export {
 	shopRefundRequest,
@@ -42,5 +52,9 @@ export {
 	clearOldBattle,
 	invItemClick,
 	clearPieceSelection,
-	containerMove
+	containerMove,
+	confirmFuelSelections,
+	tankerClick,
+	aircraftClick,
+	undoFuelSelection
 };

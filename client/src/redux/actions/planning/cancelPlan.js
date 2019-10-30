@@ -1,6 +1,6 @@
-import { CANCEL_PLAN } from "./actionTypes";
-import setUserfeedbackAction from "./setUserfeedbackAction";
-import { CLIENT_SENDING_ACTION } from "../socketEmits";
+import { CANCEL_PLAN } from "../actionTypes";
+import setUserfeedbackAction from "../setUserfeedbackAction";
+import { CLIENT_SENDING_ACTION } from "../../socketEmits";
 
 const cancelPlan = () => {
 	return (dispatch, getState, emit) => {

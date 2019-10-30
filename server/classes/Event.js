@@ -42,12 +42,20 @@ class Event {
 		}
 	}
 
+	//TODO: should change this to resond to eventType (change SELECT)...instead of also having getRefuelItems
 	async getTeamItems(gameTeam) {
 		const queryString =
 			"SELECT * FROM (SELECT * FROM eventItems NATUAL JOIN pieces WHERE eventPieceId = pieceId AND eventId = ? AND pieceTeamId = ?) a LEFT JOIN (SELECT pieceId as tpieceId, pieceGameId as tpieceGameId, pieceTeamId as tpieceTeamId, pieceTypeId as tpieceTypeId, piecePositionId as tpiecePositionId, pieceContainerId as tpieceContainerId, pieceVisible as tpieceVisible, pieceMoves as tpieceMoves, pieceFuel as tpieceFuel FROM pieces) b ON a.eventItemTarget = b.tpieceId";
 		const inserts = [this.eventId, gameTeam];
 		const [eventTeamItems] = await pool.query(queryString, inserts);
 		return eventTeamItems; //TODO: do we need to return null explicitly? (this is an empty array ^^^ see getItems for difference (not sure why needed))
+	}
+
+	async getRefuelItems() {
+		const queryString = "SELECT * FROM eventItems NATURAL JOIN pieces WHERE eventId = ? AND pieceId = eventPieceId";
+		const inserts = [this.eventId];
+		const [eventRefuelItems] = await pool.query(queryString, inserts);
+		return eventRefuelItems;
 	}
 
 	static async getNext(gameId, gameTeam) {
@@ -124,6 +132,32 @@ class Event {
 			inserts = [this.eventGameId];
 			await pool.query(queryString, inserts);
 		}
+	}
+
+	async bulkUpdatePieceFuels(fuelUpdates, gameTeam) {
+		if (fuelUpdates.length == 0) {
+			return; //no db interactions for 0 updates...
+		}
+
+		let allInserts = [];
+		for (let x = 0; x < fuelUpdates.length; x++) {
+			let { pieceId, newFuel } = fuelUpdates[x]; //assuming this is what is inside of it, should probably check
+			let newInsert = [pieceId, this.eventGameId, gameTeam, newFuel];
+			allInserts.push(newInsert);
+			console.log(newInsert);
+		}
+
+		let queryString = "INSERT INTO pieceRefuelTemp (pieceId, gameId, teamId, newFuel) VALUES ?";
+		let inserts = [allInserts];
+		await pool.query(queryString, inserts);
+
+		queryString =
+			"UPDATE pieces, pieceRefuelTemp SET pieces.pieceFuel = pieceRefuelTemp.newFuel WHERE pieces.pieceId = pieceRefuelTemp.pieceId AND pieces.pieceTeamId = pieceRefuelTemp.teamId";
+		await pool.query(queryString);
+
+		queryString = "DELETE FROM pieceRefuelTemp WHERE gameId = ? AND teamId = ?";
+		inserts = [this.eventGameId, gameTeam];
+		await pool.query(queryString, inserts);
 	}
 
 	//prettier-ignore

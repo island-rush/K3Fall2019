@@ -6,10 +6,8 @@ import "./Game.css";
 import { Provider } from "react-redux";
 import setupStore from "./redux/setupStore";
 
-const store = setupStore();
-
 ReactDOM.render(
-	<Provider store={store}>
+	<Provider store={setupStore()}>
 		<App />
 	</Provider>,
 	document.getElementById("root")

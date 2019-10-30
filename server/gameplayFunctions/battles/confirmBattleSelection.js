@@ -1,9 +1,9 @@
-const { Game, Event } = require("../classes");
-import { BATTLE_FIGHT_RESULTS } from "../../client/src/redux/actions/actionTypes";
-import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
-import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
-const sendUserFeedback = require("./sendUserFeedback");
-const giveNextEvent = require("./giveNextEvent");
+const { Game, Event } = require("../../classes");
+import { BATTLE_FIGHT_RESULTS } from "../../../client/src/redux/actions/actionTypes";
+import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
+import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
+const sendUserFeedback = require("../sendUserFeedback");
+const giveNextEvent = require("../giveNextEvent");
 
 const confirmBattleSelection = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
@@ -22,7 +22,6 @@ const confirmBattleSelection = async (socket, payload) => {
 	const otherTeamStatus = otherTeam == 0 ? game0Status : game1Status;
 
 	if (thisTeamStatus == 1 && otherTeamStatus == 0) {
-		//TODO: trying to prevent race condition, but might mess things up? (repeat inputs...)
 		sendUserFeedback(socket, "still waiting stupid...");
 		return;
 	}
@@ -58,7 +57,8 @@ const confirmBattleSelection = async (socket, payload) => {
 	}
 
 	await thisTeamsCurrentEvent.delete();
-	await giveNextEvent(socket, { thisGame }); //not putting executingStep in options to let it know not to send pieceMove
+	await giveNextEvent(socket, { thisGame, gameTeam: 0 }); //not putting executingStep in options to let it know not to send pieceMove
+	await giveNextEvent(socket, { thisGame, gameTeam: 1 }); //not putting executingStep in options to let it know not to send pieceMove
 };
 
 module.exports = confirmBattleSelection;

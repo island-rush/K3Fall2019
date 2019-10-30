@@ -1,3 +1,5 @@
 node_modules
 scratch.sql
 dropTables.sql
+session-store.db
+.vscode

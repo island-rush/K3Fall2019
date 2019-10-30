@@ -1,4 +1,4 @@
-import { CLIENT_SENDING_ACTION } from "../socketEmits";
+import { CLIENT_SENDING_ACTION } from "../../socketEmits";
 
 const shopRefundRequest = shopItem => {
 	return (dispatch, getState, emit) => {

@@ -1,15 +1,17 @@
+-- This file contains the database table creations
+
 CREATE TABLE IF NOT EXISTS games (
 	gameId INT(3) PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
-    gameSection VARCHAR(4) NOT NULL,
-    gameInstructor VARCHAR(32) NOT NULL,
+    gameSection VARCHAR(16) NOT NULL,  -- ex: M1A1
+    gameInstructor VARCHAR(32) NOT NULL, -- ex: Adolph
     
-    gameAdminPassword VARCHAR(32) NOT NULL,
-    gameActive INT(1) NOT NULL DEFAULT 0,
+    gameAdminPassword VARCHAR(32) NOT NULL, -- MD5 Hash
+    gameActive INT(1) NOT NULL DEFAULT 0, -- 0 inactive, 1 active
     
-    game0Password VARCHAR(32) NOT NULL DEFAULT '5f4dcc3b5aa765d61d8327deb882cf99',
+    game0Password VARCHAR(32) NOT NULL DEFAULT '5f4dcc3b5aa765d61d8327deb882cf99', -- MD5 Hash
     game1Password VARCHAR(32) NOT NULL DEFAULT '5f4dcc3b5aa765d61d8327deb882cf99',
     
-    game0Controller0 INT(1) NOT NULL DEFAULT 0,
+    game0Controller0 INT(1) NOT NULL DEFAULT 0, -- 0 not logged in, 1 logged in
     game0Controller1 INT(1) NOT NULL DEFAULT 0,
     game0Controller2 INT(1) NOT NULL DEFAULT 0,
     game0Controller3 INT(1) NOT NULL DEFAULT 0,
@@ -24,9 +26,9 @@ CREATE TABLE IF NOT EXISTS games (
     game0Points INT(5) NOT NULL DEFAULT 50,
     game1Points INT(5) NOT NULL DEFAULT 50,
     
-    gamePhase INT(1) NOT NULL DEFAULT 0, -- 0: news, 1: buy, 2: gameplay, 3: place inv
+    gamePhase INT(1) NOT NULL DEFAULT 0, -- 0: news, 1: buy, 2: combat, 3: place inv
     gameRound INT(1) NOT NULL DEFAULT 0, -- 0, 1, 2  rounds of movement
-    gameSlice INT(1) NOT NULL DEFAULT 0 -- 0: planning, 1: battle/movement, 2: refuel, 3: containers
+    gameSlice INT(1) NOT NULL DEFAULT 0 -- 0: planning, 1: events/movement
 ) AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS shopItems (
@@ -90,7 +92,7 @@ CREATE TABLE IF NOT EXISTS eventQueue(
 	eventId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     eventGameId INT(4) NOT NULL,
     eventTeamId INT(1) NOT NULL, -- 0,1 or 2 for both
-    eventTypeId INT(2) NOT NULL, -- 0 = battle, 1 = container, 2 = refuel
+    eventTypeId INT(2) NOT NULL, -- 0 = battle
     eventPosA INT(4) NOT NULL DEFAULT -1,
     eventPosB INT(4) NOT NULL DEFAULT -1,
     FOREIGN KEY (eventGameId) REFERENCES games (gameId) ON DELETE CASCADE
@@ -123,4 +125,15 @@ CREATE TABLE IF NOT EXISTS eventItemsTargetsTemp(
     FOREIGN KEY (eventPieceId) REFERENCES pieces (pieceId) ON DELETE CASCADE,
     FOREIGN KEY (eventItemGameId) REFERENCES games (gameId) ON DELETE CASCADE,
     PRIMARY KEY (eventId, eventPieceId)
+);
+
+-- starting to not use the naming convention as much, keeps it simple (easier to understand)
+CREATE TABLE IF NOT EXISTS pieceRefuelTemp(
+	pieceId INT(8) NOT NULL,
+    gameId INT(8) NOT NULL,
+    teamId INT(1) NOT NULL, -- 0 or 1
+    newFuel INT(8) DEFAULT -1,
+    FOREIGN KEY (pieceId) REFERENCES pieces (pieceId) ON DELETE CASCADE,
+    FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE,
+    PRIMARY KEY (pieceId)
 );

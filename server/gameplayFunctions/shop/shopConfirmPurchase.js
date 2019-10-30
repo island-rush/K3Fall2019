@@ -1,8 +1,8 @@
-const { Game, InvItem, ShopItem } = require("../classes");
-const sendUserFeedback = require("./sendUserFeedback");
-import { SHOP_TRANSFER } from "../../client/src/redux/actions/actionTypes";
-import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
-import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
+const { Game, InvItem, ShopItem } = require("../../classes");
+const sendUserFeedback = require("../sendUserFeedback");
+import { SHOP_TRANSFER } from "../../../client/src/redux/actions/actionTypes";
+import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
+import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
 
 /***
  * TODO: standard function descriptions (author?, arguments, returns, why/when used?)
@@ -34,7 +34,7 @@ const shopConfirmPurchase = async (socket, payload) => {
 
 	await InvItem.insertFromShop(gameId, gameTeam);
 	await ShopItem.deleteAll(gameId, gameTeam);
-	const invItems = await InvItem.all(gameId, gameTeam); //TODO: this may cause an error on the front end, check what happens when confirm purchase executes...
+	const invItems = await InvItem.all(gameId, gameTeam);
 
 	const serverAction = {
 		type: SHOP_TRANSFER,

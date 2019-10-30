@@ -1,13 +1,19 @@
-const { Game, ShopItem } = require("../classes");
-import { SHOP_PURCHASE } from "../../client/src/redux/actions/actionTypes";
-import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
-import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
-import { TYPE_COSTS } from "../../client/src/gameData/gameConstants";
-const sendUserFeedback = require("./sendUserFeedback");
+const { Game, ShopItem } = require("../../classes");
+import { SHOP_PURCHASE } from "../../../client/src/redux/actions/actionTypes";
+import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
+import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
+import { TYPE_COSTS } from "../../../client/src/gameData/gameConstants";
+const sendUserFeedback = require("../sendUserFeedback");
 
 const shopPurchaseRequest = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
-	const { shopItemTypeId } = payload; //TODO: could check payloads for all these gameFunctions before destructuring them...
+
+	if (payload == null || payload.shopItemTypeId == null) {
+		sendUserFeedback(socket, "Server Error: Malformed Payload (missing shopItemTypeId)");
+		return;
+	}
+
+	const { shopItemTypeId } = payload;
 
 	const thisGame = await new Game({ gameId }).init();
 	const { gameActive, gamePhase, game0Points, game1Points } = thisGame;
@@ -42,7 +48,7 @@ const shopPurchaseRequest = async (socket, payload) => {
 
 	const shopItem = await ShopItem.insert(gameId, gameTeam, shopItemTypeId);
 
-	//TODO: payload could be more standard?
+	//TODO: standardize payloads for similar actions (points vs newpoints vs etc...)
 	const serverAction = {
 		type: SHOP_PURCHASE,
 		payload: {
