@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import BattlePiece from "./BattlePiece";
+import { BATTLE_POPUP_IMAGES } from "../styleConstants";
 import { battlePopupMinimize, battlePieceClick, targetPieceClick, enemyBattlePieceClick, confirmBattleSelections, clearOldBattle} from "../../redux/actions";
 
 const battlePopupStyle = {
@@ -15,6 +16,21 @@ const battlePopupStyle = {
 	border: "2px solid black",
 	zIndex: 4
 };
+
+const battlePopupMinimizeStyle = {
+	position: "absolute",
+	display: "block",
+	width: "7%",
+	height: "12%",
+	top: "50%",
+	right: "98%",
+	backgroundColor: "white",
+	border: "2px solid black",
+	zIndex: 4,
+	backgroundImage: BATTLE_POPUP_IMAGES.minIcon,
+	backgroundPosition: "center",
+	backgroundSize: "cover"
+}
 
 const leftBattleStyle = {
 	position: "relative",
@@ -42,7 +58,7 @@ const battleButtonStyle = {
 	right: "2%"
 };
 
-const battlePopupMinimizeStyle = {
+const battlePopupMinimizeButtonStyle = {
 	position: "absolute",
 	top: "-5%",
 	right: "0%",
@@ -55,7 +71,7 @@ const invisibleStyle = {
 
 class BattlePopup extends Component {
 	render() {
-		const { battlePieceClick, enemyBattlePieceClick, targetPieceClick, confirmBattleSelections, battle, clearOldBattle, isMinimized} = this.props;
+		const { battlePieceClick, enemyBattlePieceClick, targetPieceClick, confirmBattleSelections, battle, clearOldBattle, battlePopupMinimize} = this.props;
 		const { selectedBattlePiece, friendlyPieces, enemyPieces } = battle;
 
 		const friendlyBattlePieces = friendlyPieces.map((battlePiece, index) => (
@@ -85,33 +101,47 @@ class BattlePopup extends Component {
 		));
 
 		return (
-			<div style={battle.active && !battle.isMinimized ? battlePopupStyle : invisibleStyle}>
-				<div style={leftBattleStyle}>Friend{friendlyBattlePieces}</div>
-				<div style={rightBattleStyle}>Foe{enemyBattlePieces}</div>
-				<button
-					onClick={event => {
-						event.preventDefault();
-						if (battle.masterRecord != null) {
-							clearOldBattle();
-						} else {
-							confirmBattleSelections();
-						}
-						event.stopPropagation();
-					}}
-					style={battleButtonStyle}
-				>
-					{battle.masterRecord == null ? "Confirm Selections" : "ack"}
-				</button>
-				<button
-					onClick={event => {
-						event.preventDefault();
-						battlePopupMinimize();
-						event.stopPropagation();
-					}}
-					style={battlePopupMinimizeStyle}
-				>
-					{"Minimize"}
-				</button>
+			<div>
+				<div style={battle.active && !battle.isMinimized ? battlePopupStyle : invisibleStyle}>
+					<div style={leftBattleStyle}>Friend{friendlyBattlePieces}</div>
+					<div style={rightBattleStyle}>Foe{enemyBattlePieces}</div>
+					<button
+						onClick={event => {
+							event.preventDefault();
+							if (battle.masterRecord != null) {
+								clearOldBattle();
+							} else {
+								confirmBattleSelections();
+							}
+							event.stopPropagation();
+						}}
+						style={battleButtonStyle}
+					>
+						{battle.masterRecord == null ? "Confirm Selections" : "ack"}
+					</button>
+					<button
+						onClick={event => {
+							event.preventDefault();
+							battlePopupMinimize();
+							event.stopPropagation();
+						}}
+						style={battlePopupMinimizeButtonStyle}
+					>
+						{"Minimize"}
+					</button>
+				</div>
+				<div style={battle.active && battle.isMinimized ? battlePopupMinimizeStyle : invisibleStyle}>
+					<button
+						onClick={event => {
+							event.preventDefault();
+							battlePopupMinimize();
+							event.stopPropagation();
+						}}
+						style={battlePopupMinimizeButtonStyle}
+					>
+						{"Restore"}
+					</button>
+				</div>
 			</div>
 		);
 	}

@@ -1,6 +1,6 @@
 const unitImagesPath = "./images/unitImages";
 // const diceImagesPath = "./images/diceImages";
-// const graphicsPath = "./images/graphics";
+const graphicsPath = "./images/graphics";
 const buttonImagesPath = "./images/buttonImages";
 
 export const TYPE_IMAGES = {
@@ -54,6 +54,10 @@ export const LEFT_CONTROLS_IMAGES = {
 		backgroundImage: `url("${buttonImagesPath}/iconContainer.png")`
 	}
 };
+
+export const BATTLE_POPUP_IMAGES ={
+	minIcon: { backgroundImage: `url("${graphicsPath}/battleIcon.png")`}
+}
 
 export const ZOOMBOX_BACKGROUNDS = {
 	land: { backgroundColor: "green" },
