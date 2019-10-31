@@ -16,6 +16,7 @@ import targetPieceClick from "./battles/targetPieceClick";
 import enemyBattlePieceClick from "./battles/enemyBattlePieceClick";
 import confirmBattleSelections from "./battles/confirmBattleSelections";
 import clearOldBattle from "./battles/clearOldBattle";
+import battlePopupMinimizeToggle from "./battles/battlePopupMinimizeToggle";
 
 import confirmFuelSelections from "./refuel/confirmFuelSelections";
 import aircraftClick from "./refuel/aircraftClick";
@@ -41,6 +42,7 @@ export {
 	cancelPlan,
 	undoMove,
 	menuSelect,
+	battlePopupMinimizeToggle,
 	mainButtonClick,
 	battlePieceClick,
 	targetPieceClick,
