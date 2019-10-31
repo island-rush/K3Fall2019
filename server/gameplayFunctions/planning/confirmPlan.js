@@ -3,7 +3,7 @@ const sendUserFeedback = require("../sendUserFeedback");
 import { PLAN_WAS_CONFIRMED } from "../../../client/src/redux/actions/actionTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
-import { CONTAINER_TYPES } from "../../../client/src/gameData/gameConstants";
+import { CONTAINER_TYPES, TYPE_MOVES } from "../../../client/src/gameData/gameConstants";
 import { distanceMatrix } from "../../../client/src/gameData/distanceMatrix";
 
 const confirmPlan = async (socket, payload) => {
@@ -43,6 +43,7 @@ const confirmPlan = async (socket, payload) => {
 
 	//Check adjacency and other parts of the plan to make sure the whole thing makes sense
 	let previousPosition = piecePositionId;
+	var pieceMoves = 0;
 	for (let x = 0; x < plan.length; x++) {
 		//make sure adjacency between positions in the plan...
 		//other checks...piece type and number of moves?
@@ -62,14 +63,25 @@ const confirmPlan = async (socket, payload) => {
 			}
 		}
 
+		//This condition may have to change in the future if parts of the plan
+		//don't actually move the piece
 		if (distanceMatrix[previousPosition][positionId] !== 1) {
 			if (type !== "container") {
 				sendUserFeedback(socket, "sent a bad plan, positions were not adjacent...");
 				return;
 			}
 		}
+		else {
+			pieceMoves++;
+		}
 
 		previousPosition = positionId;
+	}
+
+	//Is the plan length less than or equal to the max moves of the piece?
+	if (pieceMoves > TYPE_MOVES[pieceTypeId]){
+		sendUserFeedback(socket, "sent a bad plan, piece was moved more than its range...");
+		return;
 	}
 
 	//prepare the bulk insert
