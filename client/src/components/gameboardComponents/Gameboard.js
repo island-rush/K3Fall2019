@@ -19,6 +19,11 @@ const gameboardStyle = {
 	position: "absolute"
 };
 
+const subDivStyle = {
+	height: "100%",
+	width: "100%"
+};
+
 //These functions organize the hexagons into the proper rows/columns to make the shape of the board (based on the index of the position (0->726))
 const qIndexSolver = index => {
 	if (index < 81) {
@@ -88,6 +93,7 @@ class Gameboard extends Component {
 
 		let planningPositions = []; //all of the positions part of a plan
 		let containerPositions = []; //specific positions part of a plan of type container
+		let battlePositions = []; //position(s) involved in a battle
 
 		for (let x = 0; x < planning.moves.length; x++) {
 			const { type, positionId } = planning.moves[x];
@@ -112,6 +118,17 @@ class Gameboard extends Component {
 						containerPositions.push(parseInt(positionId));
 					}
 				}
+			}
+		}
+
+		if (battle.active) {
+			if (battle.friendlyPieces.length > 0) {
+				let { piecePositionId } = battle.friendlyPieces[0].piece;
+				battlePositions.push(parseInt(piecePositionId));
+			}
+			if (battle.enemyPieces.length > 0) {
+				let { piecePositionId } = battle.enemyPieces[0].piece;
+				battlePositions.push(parseInt(piecePositionId));
 			}
 		}
 
@@ -142,19 +159,25 @@ class Gameboard extends Component {
 						? "plannedPos"
 						: highlightedPositions.includes(parseInt(positionIndex))
 						? "highlightedPos"
+						: battlePositions.includes(parseInt(positionIndex))
+						? "battlePos"
 						: ""
 				}
+				someOtherProp={battlePositions.includes(parseInt(positionIndex))}
 			/>
 		));
 
 		return (
 			<div style={gameboardStyle}>
-				<HexGrid width={"100%"} height={"100%"} viewBox="-50 -50 100 100">
-					<Layout size={{ x: 3.15, y: 3.15 }} flat={true} spacing={1.03} origin={{ x: -98, y: -46 }}>
-						{positions}
-					</Layout>
-					<Patterns />
-				</HexGrid>
+				<div style={subDivStyle}>
+					<HexGrid width={"100%"} height={"100%"} viewBox="-50 -50 100 100">
+						<Layout size={{ x: 3.15, y: 3.15 }} flat={true} spacing={1.03} origin={{ x: -98, y: -46 }}>
+							{positions}
+						</Layout>
+						<Patterns />
+					</HexGrid>
+				</div>
+
 				<NewsPopup news={news} />
 				<BattlePopup battle={battle} />
 				<RefuelPopup />
