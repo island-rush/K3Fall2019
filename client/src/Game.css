@@ -49,6 +49,11 @@ svg g polygon {
 	stroke: rgb(238, 255, 0);
 	stroke-width: 0.3;
 }
+.battlePos polygon {
+	z-index: 10;
+	stroke: rgb(255, 0, 0);
+	stroke-width: 0.8;
+}
 .highlightedPos polygon {
 	z-index: 10;
 	stroke: rgb(255, 255, 255);

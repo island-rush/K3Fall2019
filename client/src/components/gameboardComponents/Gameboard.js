@@ -88,6 +88,7 @@ class Gameboard extends Component {
 
 		let planningPositions = []; //all of the positions part of a plan
 		let containerPositions = []; //specific positions part of a plan of type container
+		let battlePositions = []; //position(s) involved in a battle
 
 		for (let x = 0; x < planning.moves.length; x++) {
 			const { type, positionId } = planning.moves[x];
@@ -112,6 +113,17 @@ class Gameboard extends Component {
 						containerPositions.push(parseInt(positionId));
 					}
 				}
+			}
+		}
+
+		if (battle.active) {
+			if (battle.friendlyPieces.length > 0) {
+				let { piecePositionId } = battle.friendlyPieces[0].piece;
+				battlePositions.push(parseInt(piecePositionId));
+			}
+			if (battle.enemyPieces.length > 0) {
+				let { piecePositionId } = battle.enemyPieces[0].piece;
+				battlePositions.push(parseInt(piecePositionId));
 			}
 		}
 
@@ -142,6 +154,8 @@ class Gameboard extends Component {
 						? "plannedPos"
 						: highlightedPositions.includes(parseInt(positionIndex))
 						? "highlightedPos"
+						: battlePositions.includes(parseInt(positionIndex))
+						? "battlePos"
 						: ""
 				}
 			/>
