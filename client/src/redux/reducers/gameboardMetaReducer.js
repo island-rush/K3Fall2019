@@ -15,7 +15,7 @@ import {
 	NEWS_PHASE,
 	BATTLE_PIECE_SELECT,
 	ENEMY_PIECE_SELECT,
-	BATTLEPOPUP_MINIMIZE,
+	BATTLEPOPUP_MINIMIZE_TOGGLE,
 	TARGET_PIECE_SELECT,
 	EVENT_BATTLE,
 	BATTLE_FIGHT_RESULTS,
@@ -190,7 +190,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.battle.selectedBattlePiece = payload.battlePiece.piece.pieceId === lastSelectedBattlePiece ? -1 : payload.battlePiece.piece.pieceId;
 			stateDeepCopy.battle.selectedBattlePieceIndex = payload.battlePiece.piece.pieceId === lastSelectedBattlePiece ? -1 : payload.battlePieceIndex;
 			break;
-		case BATTLEPOPUP_MINIMIZE:
+		case BATTLEPOPUP_MINIMIZE_TOGGLE:
 			stateDeepCopy.battle.isMinimized = !stateDeepCopy.battle.isMinimized;
 			break;
 		case ENEMY_PIECE_SELECT:

@@ -16,6 +16,7 @@ import targetPieceClick from "./battles/targetPieceClick";
 import enemyBattlePieceClick from "./battles/enemyBattlePieceClick";
 import confirmBattleSelections from "./battles/confirmBattleSelections";
 import clearOldBattle from "./battles/clearOldBattle";
+import battlePopupMinimizeToggle from "./battles/battlePopupMinimizeToggle";
 
 import confirmFuelSelections from "./refuel/confirmFuelSelections";
 import aircraftClick from "./refuel/aircraftClick";
@@ -25,8 +26,6 @@ import undoFuelSelection from "./refuel/undoFuelSelection";
 import selectPosition from "./selectPosition";
 import selectPiece from "./selectPiece";
 import menuSelect from "./menuSelect";
-
-import battlePopupMinimize from "./battlePopupMinimize"
 
 import mainButtonClick from "./mainButtonClick";
 import invItemClick from "./invItemClick";
@@ -43,7 +42,7 @@ export {
 	cancelPlan,
 	undoMove,
 	menuSelect,
-	battlePopupMinimize,
+	battlePopupMinimizeToggle,
 	mainButtonClick,
 	battlePieceClick,
 	targetPieceClick,
