@@ -90,7 +90,7 @@ class Piece {
 
 		const inserts = [gameId, movementOrder];
 		const movePiecesQuery =
-			"UPDATE pieces, plans SET pieces.piecePositionId = plans.planPositionId WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
+			"UPDATE pieces, plans SET pieces.piecePositionId = plans.planPositionId, pieces.pieceMoves = pieces.pieceMoves - 1 WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
 		await conn.query(movePiecesQuery, inserts);
 
 		//TODO: referencing another table here...(could change to put into the plans class)
