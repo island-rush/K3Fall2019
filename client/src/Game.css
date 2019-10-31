@@ -35,27 +35,27 @@ svg g polygon {
 	stroke-width: 0.15;
 }
 .selectedPos polygon {
-	z-index: 10;
+	/* z-index: 10; */
 	stroke: rgb(255, 255, 255);
 	stroke-width: 0.5;
 }
 .plannedPos polygon {
-	z-index: 10;
+	/* z-index: 10; */
 	stroke: rgb(255, 0, 212);
 	stroke-width: 0.3;
 }
 .containerPos polygon {
-	z-index: 10;
+	/* z-index: 10; */
 	stroke: rgb(238, 255, 0);
 	stroke-width: 0.3;
 }
 .battlePos polygon {
-	z-index: 10;
+	/* z-index: 10; */
 	stroke: rgb(255, 0, 0);
-	stroke-width: 0.8;
+	stroke-width: 0.7;
 }
 .highlightedPos polygon {
-	z-index: 10;
+	/* z-index: 10; */
 	stroke: rgb(255, 255, 255);
 	stroke-width: 1;
 }

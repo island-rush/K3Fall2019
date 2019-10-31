@@ -19,6 +19,11 @@ const gameboardStyle = {
 	position: "absolute"
 };
 
+const subDivStyle = {
+	height: "100%",
+	width: "100%"
+};
+
 //These functions organize the hexagons into the proper rows/columns to make the shape of the board (based on the index of the position (0->726))
 const qIndexSolver = index => {
 	if (index < 81) {
@@ -158,17 +163,21 @@ class Gameboard extends Component {
 						? "battlePos"
 						: ""
 				}
+				someOtherProp={battlePositions.includes(parseInt(positionIndex))}
 			/>
 		));
 
 		return (
 			<div style={gameboardStyle}>
-				<HexGrid width={"100%"} height={"100%"} viewBox="-50 -50 100 100">
-					<Layout size={{ x: 3.15, y: 3.15 }} flat={true} spacing={1.03} origin={{ x: -98, y: -46 }}>
-						{positions}
-					</Layout>
-					<Patterns />
-				</HexGrid>
+				<div style={subDivStyle}>
+					<HexGrid width={"100%"} height={"100%"} viewBox="-50 -50 100 100">
+						<Layout size={{ x: 3.15, y: 3.15 }} flat={true} spacing={1.03} origin={{ x: -98, y: -46 }}>
+							{positions}
+						</Layout>
+						<Patterns />
+					</HexGrid>
+				</div>
+
 				<NewsPopup news={news} />
 				<BattlePopup battle={battle} />
 				<RefuelPopup />
