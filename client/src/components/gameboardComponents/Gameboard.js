@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { HexGrid, Layout, Hexagon } from "react-hexgrid";
-import BattlePopup from "./BattlePopup";
+import BattlePopup from "./battle/BattlePopup";
 import NewsPopup from "./NewsPopup";
 import ContainerPopup from "./ContainerPopup";
 import RefuelPopup from "./refuel/RefuelPopup";
