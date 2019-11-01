@@ -61,19 +61,19 @@ class ShopMenu extends Component {
 					{landShopComponents}
 				</div>
 				<div style={purchaseableItemsContainerStyle}>
-					<div>Sea</div>
+					<div>Maritime</div>
 					{seaShopComponents}
 				</div>
 				<div style={purchaseableItemsContainerStyle}>
-					<div>Special</div>
+					<div>SOF</div>
 					{specialShopComponents}
 				</div>
 				<div style={purchaseableItemsContainerStyle}>
-					<div>Warfare</div>
+					<div>Capabilities</div>
+					{/* <PurchaseableItem purchase={purchase} typeId={0} />
 					<PurchaseableItem purchase={purchase} typeId={0} />
 					<PurchaseableItem purchase={purchase} typeId={0} />
-					<PurchaseableItem purchase={purchase} typeId={0} />
-					<PurchaseableItem purchase={purchase} typeId={0} />
+					<PurchaseableItem purchase={purchase} typeId={0} /> */}
 				</div>
 				<div style={purchaseableItemsContainerStyle}>
 					<div>Cart</div>
