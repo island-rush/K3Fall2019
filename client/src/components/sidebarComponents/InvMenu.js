@@ -55,7 +55,7 @@ class InvMenu extends Component {
 		return (
 			<div style={selected ? inventoryStyle : invisibleStyle}>
 				<div style={warfareItemsContainerStyle}>
-					<div>Warefare Items</div>
+					<div>Capabilities</div>
 					{warefareInvItemComponents}
 				</div>
 				<div style={pieceItemsContainerStyle}>

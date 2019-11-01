@@ -215,9 +215,24 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			// stateDeepCopy.battle = initialGameboardMeta.battle;
 			// stateDeepCopy.refuel = initialGameboardMeta.refuel;  //these don't seem to work
 			// stateDeepCopy.container = initialGameboardMeta.container;
-			stateDeepCopy.battle = initialGameboardMeta.battle;
-			stateDeepCopy.refuel = initialGameboardMeta.refuel;
-			stateDeepCopy.container = initialGameboardMeta.container;
+			stateDeepCopy.battle = {
+				isMinimized: false,
+				active: false,
+				selectedBattlePiece: -1,
+				selectedBattlePieceIndex: -1, //helper to find the piece within the array
+				masterRecord: null,
+				friendlyPieces: [],
+				enemyPieces: []
+			};
+			stateDeepCopy.refuel = {
+				isMinimized: false,
+				active: false,
+				selectedTankerPieceId: -1,
+				selectedTankerPieceIndex: -1,
+				tankers: [],
+				aircraft: []
+			};
+			// stateDeepCopy.container = initialGameboardMeta.container;
 			break;
 		case BATTLE_FIGHT_RESULTS:
 			stateDeepCopy.battle.masterRecord = payload.masterRecord;
