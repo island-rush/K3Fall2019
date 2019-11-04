@@ -27,7 +27,8 @@ import {
 	TANKER_CLICK,
 	AIRCRAFT_CLICK,
 	UNDO_FUEL_SELECTION,
-	REFUEL_RESULTS
+	REFUEL_RESULTS,
+	NEWSPOPUP_MINIMIZE_TOGGLE
 } from "../actions/actionTypes";
 
 import { TYPE_FUEL } from "../../gameData/gameConstants";
@@ -180,6 +181,9 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			break;
 		case INITIAL_GAMESTATE:
 			Object.assign(stateDeepCopy, payload.gameboardMeta);
+			break;
+		case NEWSPOPUP_MINIMIZE_TOGGLE:
+			stateDeepCopy.news.isMinimized = !stateDeepCopy.news.isMinimized
 			break;
 		case SLICE_CHANGE:
 			stateDeepCopy.confirmedPlans = {};

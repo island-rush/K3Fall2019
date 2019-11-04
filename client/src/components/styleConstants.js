@@ -56,8 +56,12 @@ export const LEFT_CONTROLS_IMAGES = {
 	}
 };
 
-export const BATTLE_POPUP_IMAGES ={
+export const BATTLE_POPUP_IMAGES = {
 	minIcon: { backgroundImage: `url("${graphicsPath}/battleIcon.png")`}
+} 
+
+export const NEWS_POPUP_IMAGES = {
+	minIcon: { backgroundImage: `url("${graphicsPath}/newsIcon.png")`}
 }
 
 export const ZOOMBOX_BACKGROUNDS = {
