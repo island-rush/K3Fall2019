@@ -36,7 +36,7 @@ const invisibleStyle = {
 	display: "none"
 };
 
-const NewsAlertPopup = ({ news }) => {
+const NewsAlertPopup = ({ news, newsPopupMinimizeToggle }) => {
 	return (
 		<div style={news.active ? null : invisibleStyle}>
 			<div style={!news.isMinimized ? newsPopupStyle : invisibleStyle}>
@@ -64,8 +64,9 @@ const NewsAlertPopup = ({ news }) => {
 	);
 };
 
-
-
+const mapActionsToProps = {
+	newsPopupMinimizeToggle
+};
 
 NewsAlertPopup.propTypes = {
 	news: PropTypes.object.isRequired,

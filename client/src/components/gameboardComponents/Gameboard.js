@@ -9,6 +9,7 @@ import RefuelPopup from "./refuel/RefuelPopup";
 import Patterns from "./Patterns";
 import { selectPosition } from "../../redux/actions";
 import { TYPE_HIGH_LOW } from "../../gameData/gameConstants";
+import { newsPopupMinimizeToggle } from "../../redux/actions"
 
 const gameboardStyle = {
 	backgroundColor: "blue",
@@ -89,7 +90,7 @@ const patternSolver = position => {
 
 class Gameboard extends Component {
 	render() {
-		const { gameboard, selectedPosition, selectPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions } = this.props;
+		const { gameboard, selectedPosition, selectPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions, newsPopupMinimizeToggle } = this.props;
 
 		let planningPositions = []; //all of the positions part of a plan
 		let containerPositions = []; //specific positions part of a plan of type container
@@ -178,7 +179,7 @@ class Gameboard extends Component {
 					</HexGrid>
 				</div>
 
-				<NewsPopup news={news} />
+				<NewsPopup news={news} newsPopupMinimizeToggle={newsPopupMinimizeToggle} />
 				<BattlePopup battle={battle} />
 				<RefuelPopup />
 				<ContainerPopup container={container} />
@@ -197,7 +198,8 @@ Gameboard.propTypes = {
 	planning: PropTypes.object.isRequired,
 	selectedPiece: PropTypes.number.isRequired,
 	confirmedPlans: PropTypes.object.isRequired,
-	highlightedPositions: PropTypes.array.isRequired
+	highlightedPositions: PropTypes.array.isRequired,
+	newsPopupMinimizeToggle: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
@@ -213,7 +215,8 @@ const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 });
 
 const mapActionsToProps = {
-	selectPosition: selectPosition
+	selectPosition: selectPosition,
+	newsPopupMinimizeToggle: newsPopupMinimizeToggle
 };
 
 export default connect(
