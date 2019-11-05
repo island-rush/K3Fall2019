@@ -8,6 +8,7 @@ const getGameActive = require("./getGameActive");
 const getGames = require("./getGames");
 const insertDatabaseTables = require("./insertDatabaseTables");
 const gameDelete = require("./gameDelete");
+const passwordUpdate = require("./passwordUpdate");
 const gameAdd = require("./gameAdd");
 const gameLoginVerify = require("./gameLoginVerify");
 const adminLoginVerify = require("./adminLoginVerify");
@@ -20,6 +21,7 @@ module.exports = {
 	getGames,
 	insertDatabaseTables,
 	gameDelete,
+	passwordUpdate,
 	gameAdd,
 	gameLoginVerify,
 	adminLoginVerify,

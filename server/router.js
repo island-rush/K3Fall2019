@@ -13,6 +13,7 @@ const {
 	getGames,
 	insertDatabaseTables,
 	gameDelete,
+	passwordUpdate,
 	gameAdd,
 	gameLoginVerify,
 	adminLoginVerify,
@@ -122,6 +123,15 @@ router.post("/gameDelete", (req, res) => {
 	} catch (error) {
 		console.error(error);
 		res.status(500).redirect("/courseDirector.html?gameDelete=failed");
+	}
+});
+
+router.post("/passwordUpdate", (req, res) => {
+	try {
+		passwordUpdate(req, res);
+	} catch (error) {
+		console.error(error);
+		res.status(500).redirect("/courseDirector.html?passwordUpdate=failed");
 	}
 });
 
