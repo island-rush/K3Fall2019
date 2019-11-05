@@ -25,7 +25,21 @@ export const TYPE_IMAGES = {
 	16: { backgroundImage: `url("${unitImagesPath}/transport.png")` },
 	17: { backgroundImage: `url("${unitImagesPath}/mc12.png")` },
 	18: { backgroundImage: `url("${unitImagesPath}/c130.png")` },
-	19: { backgroundImage: `url("${unitImagesPath}/sofTeam.png")` }
+	19: { backgroundImage: `url("${unitImagesPath}/sofTeam.png")` },
+	20: { backgroundImage: `url("${unitImagesPath}/ATCScramble.png")` },
+	21: { backgroundImage: `url("${unitImagesPath}/cyberDominance.png")` },
+	22: { backgroundImage: `url("${unitImagesPath}/missileLaunchDisruption.png")` },
+	23: { backgroundImage: `url("${unitImagesPath}/communicationsInterruption.png")` },
+	24: { backgroundImage: `url("${unitImagesPath}/remoteSensing.png")` },
+	25: { backgroundImage: `url("${unitImagesPath}/rodsFromGod.png")` },
+	26: { backgroundImage: `url("${unitImagesPath}/antiSatelliteMissiles.png")` },
+	27: { backgroundImage: `url("${unitImagesPath}/goldenEye.png")` },
+	28: { backgroundImage: `url("${unitImagesPath}/nuclearStrike.png")` },
+	29: { backgroundImage: `url("${unitImagesPath}/biologicalWeapons.png")` },
+	30: { backgroundImage: `url("${unitImagesPath}/seaMines.png")` },
+	31: { backgroundImage: `url("${unitImagesPath}/droneSwarm.png")` },
+	32: { backgroundImage: `url("${unitImagesPath}/insurgency.png")` },
+	33: { backgroundImage: `url("${unitImagesPath}/raiseMorale.png")` },
 };
 
 export const DICE_IMAGES = {
