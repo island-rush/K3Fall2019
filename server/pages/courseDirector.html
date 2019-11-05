@@ -85,7 +85,7 @@
 
 		<h1>Add a Game</h1>
 		<form name="gameAdd" method="post" id="gameAddForm" action="/gameAdd">
-			<table border="0" cellpadding="3" cellspacing="1">
+			<table border="0" cellpadding="1" cellspacing="1">
 				<tr>
 					<td>Section</td>
 					<td>Teacher Last Name</td>
@@ -125,7 +125,7 @@
 
 		<h1>Delete a Game</h1>
 		<form name="gameDelete" method="post" id="gameDeleteForm" onsubmit="return confirmDelete()" action="/gameDelete">
-			<table border="0" cellpadding="3" cellspacing="1">
+			<table border="0" cellpadding="1" cellspacing="1">
 				<tr>
 					<td>Game Id</td>
 				</tr>
@@ -145,7 +145,8 @@
 			<table border="0" cellpadding="1" cellspacing="1">
 				<tr>
 					<td>Game Id</td>
-					<td>Game Password</td>
+					<td>Team1 Password</td>
+					<td>Team2 Password</td>
 				</tr>
 				<tr>
 					<td>
@@ -153,7 +154,11 @@
 					</td>
 
 					<td>
-						<input name="gamePassword" type="text" id="gamePassword" placeholder="Game Password #" required />
+						<input name="team1Password" type="text" id="team1Password" placeholder="Team1 Password #"  />
+					</td>
+
+					<td>
+						<input name="team2Password" type="text" id="team2Password" placeholder="Team2 Password #"  />
 					</td>
 
 					<td colspan="2">
@@ -260,6 +265,11 @@
 			function confirmDelete() {
 				return confirm("ARE YOU SURE YOU WANT TO DELETE THIS GAME?");
 			}
+
+			function confirmUpdate() {
+				return confirm("ARE YOU SURE YOU WANT TO UPDATE TEAM PASSWORD?");
+			}
+
 			var password = document.getElementById("adminPassword");
 			var confirm_password = document.getElementById("adminPasswordConfirm");
 			function validatePassword() {

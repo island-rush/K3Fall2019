@@ -14,6 +14,7 @@ const {
 	insertDatabaseTables,
 	gameDelete,
 	passwordUpdate,
+	teacherPwdUpdate,
 	gameAdd,
 	gameLoginVerify,
 	adminLoginVerify,
@@ -132,6 +133,15 @@ router.post("/passwordUpdate", (req, res) => {
 	} catch (error) {
 		console.error(error);
 		res.status(500).redirect("/courseDirector.html?passwordUpdate=failed");
+	}
+});
+
+router.post("/teacherPwdUpdate", (req, res) => {
+	try {
+		teacherPwdUpdate(req, res);
+	} catch (error) {
+		console.error(error);
+		res.status(500).redirect("/teacher.html?teacherPwdUpdate=failed");
 	}
 });
 

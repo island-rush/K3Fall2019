@@ -3,8 +3,8 @@ const pool = require("../database");
 const md5 = require("md5");
 import { ACCESS_TAG } from "../pages/errorTypes";
 
-const passwordUpdate = async (req, res) => {
-	if (!req.session.ir3 || !req.session.ir3.courseDirector) {
+const teacherPwdUpdate = async (req, res) => {
+	if (!req.session.ir3 || !req.session.ir3.teacher) {
 		res.status(403).redirect(`/index.html?error=${ACCESS_TAG}`);
 		return;
 	}
@@ -14,19 +14,20 @@ const passwordUpdate = async (req, res) => {
 
 	const { team1Password,team2Password } = req.body;
 	const { gameId } = req.session.ir3;
+
 	if (!gameId) {
-		res.status(400).redirect("/courseDirector.html?passwordUpdate=failed"); //TODO: could have better errors here saying 'gameid missing', or 'game did not exist'
+		res.status(400).redirect("/teacher.html?teacherPwdUpdate=failed"); //TODO: could have better errors here saying 'gameid missing', or 'game did not exist'
 		return;
 	}
 
 	const thisGame = await new Game({ gameId }).init();
 	if (!thisGame) {
-		res.status(400).redirect("/courseDirector.html?passwordUpdate=failed");
+		res.status(400).redirect("/teacher.html?teacherPwdUpdate=failed");
 		return;
 	}	
 
 	if(!team1Password && !team2Password){
-		res.status(400).redirect("/courseDirector.html?passwordUpdate=failed");
+		res.status(400).redirect("/teacher.html?teacherPwdUpdate=failed");
 		return;
 	}
 	else if( !team1Password && team2Password){			
@@ -49,7 +50,7 @@ const passwordUpdate = async (req, res) => {
 		await pool.query(queryString, inserts);
 	}
 
-	res.redirect("/courseDirector.html?passwordUpdate=success");
+	res.redirect("/teacher.html?teacherPwdUpdate=success");
 };
 
-module.exports = passwordUpdate;
+module.exports = teacherPwdUpdate;
