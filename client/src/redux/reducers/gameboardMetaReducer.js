@@ -38,6 +38,7 @@ const initialGameboardMeta = {
 	selectedPosition: -1,
 	highlightedPositions: [],
 	selectedPiece: -1,
+	selectedPieceTypeId: -1,
 	selectedMenuId: 0, //TODO: should probably 0 index this instead of 1 index (make -1 == no menu open)
 	news: {
 		isMinimized: false,
@@ -133,9 +134,11 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			break;
 		case PIECE_CLICK:
 			stateDeepCopy.selectedPiece = parseInt(payload.selectedPieceId);
+			stateDeepCopy.selectedPieceTypeId = parseInt(payload.selectedPieceTypeId);
 			break;
 		case PIECE_CLEAR_SELECTION:
 			stateDeepCopy.selectedPiece = -1;
+			stateDeepCopy.selectedPieceTypeId = -1;
 			break;
 		case START_PLAN:
 			stateDeepCopy.planning.active = true;
@@ -144,6 +147,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.planning.active = false;
 			stateDeepCopy.planning.moves = [];
 			stateDeepCopy.selectedPiece = -1;
+			stateDeepCopy.selectedPieceTypeId = -1;
 			break;
 		case UNDO_MOVE:
 			stateDeepCopy.planning.moves.pop();
@@ -167,10 +171,12 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.planning.active = false;
 			stateDeepCopy.planning.moves = [];
 			stateDeepCopy.selectedPiece = -1;
+			stateDeepCopy.selectedPieceTypeId = -1;
 			break;
 		case DELETE_PLAN:
 			delete stateDeepCopy.confirmedPlans[payload.pieceId];
 			stateDeepCopy.selectedPiece = -1;
+			stateDeepCopy.selectedPieceTypeId = -1;
 			break;
 		case EVENT_REFUEL:
 			stateDeepCopy.refuel.active = true;

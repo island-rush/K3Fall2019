@@ -1,5 +1,6 @@
 import { distanceMatrix } from "../../gameData/distanceMatrix";
 import { POSITION_SELECT, PLANNING_SELECT, HIGHLIGHT_POSITIONS } from "./actionTypes";
+import { TYPE_MOVES } from "../../../src/gameData/gameConstants";
 import setUserFeedbackAction from "./setUserfeedbackAction";
 
 const selectPosition = selectedPositionId => {
@@ -30,11 +31,12 @@ const selectPosition = selectedPositionId => {
 			//TODO: need to be adjacent, can't be -1?
 			if (selectedPositionId !== -1) {
 				//from the selected position or the last move in the plan?
-
 				const lastSelectedPosition =
 					gameboardMeta.planning.moves.length > 0 ? gameboardMeta.planning.moves[gameboardMeta.planning.moves.length - 1].positionId : gameboardMeta.selectedPosition;
-
-				if (distanceMatrix[lastSelectedPosition][selectedPositionId] === 1) {
+				
+				if (gameboardMeta.planning.moves.length > TYPE_MOVES[gameboardMeta.selectedPieceTypeId] - 1) {
+					dispatch(setUserFeedbackAction("Must move piece within range..."));
+				} else if (distanceMatrix[lastSelectedPosition][selectedPositionId] === 1) {
 					dispatch({
 						type: PLANNING_SELECT,
 						payload: {
