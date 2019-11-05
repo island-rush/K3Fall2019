@@ -2,12 +2,12 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { HexGrid, Layout, Hexagon } from "react-hexgrid";
-import BattlePopup from "./BattlePopup";
+import BattlePopup from "./battle/BattlePopup";
 import NewsPopup from "./NewsPopup";
 import ContainerPopup from "./ContainerPopup";
 import RefuelPopup from "./refuel/RefuelPopup";
 import Patterns from "./Patterns";
-import { selectPosition } from "../../redux/actions";
+import { selectPosition, newsPopupMinimizeToggle } from "../../redux/actions";
 import { TYPE_HIGH_LOW } from "../../gameData/gameConstants";
 
 const gameboardStyle = {
@@ -17,6 +17,11 @@ const gameboardStyle = {
 	top: "0%",
 	right: "0%",
 	position: "absolute"
+};
+
+const subDivStyle = {
+	height: "100%",
+	width: "100%"
 };
 
 //These functions organize the hexagons into the proper rows/columns to make the shape of the board (based on the index of the position (0->726))
@@ -84,10 +89,11 @@ const patternSolver = position => {
 
 class Gameboard extends Component {
 	render() {
-		const { gameboard, selectedPosition, selectPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions } = this.props;
+		const { gameboard, selectedPosition, selectPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions, newsPopupMinimizeToggle } = this.props;
 
 		let planningPositions = []; //all of the positions part of a plan
 		let containerPositions = []; //specific positions part of a plan of type container
+		let battlePositions = []; //position(s) involved in a battle
 
 		for (let x = 0; x < planning.moves.length; x++) {
 			const { type, positionId } = planning.moves[x];
@@ -112,6 +118,17 @@ class Gameboard extends Component {
 						containerPositions.push(parseInt(positionId));
 					}
 				}
+			}
+		}
+
+		if (battle.active) {
+			if (battle.friendlyPieces.length > 0) {
+				let { piecePositionId } = battle.friendlyPieces[0].piece;
+				battlePositions.push(parseInt(piecePositionId));
+			}
+			if (battle.enemyPieces.length > 0) {
+				let { piecePositionId } = battle.enemyPieces[0].piece;
+				battlePositions.push(parseInt(piecePositionId));
 			}
 		}
 
@@ -142,20 +159,26 @@ class Gameboard extends Component {
 						? "plannedPos"
 						: highlightedPositions.includes(parseInt(positionIndex))
 						? "highlightedPos"
+						: battlePositions.includes(parseInt(positionIndex))
+						? "battlePos"
 						: ""
 				}
+				someOtherProp={battlePositions.includes(parseInt(positionIndex))}
 			/>
 		));
 
 		return (
 			<div style={gameboardStyle}>
-				<HexGrid width={"100%"} height={"100%"} viewBox="-50 -50 100 100">
-					<Layout size={{ x: 3.15, y: 3.15 }} flat={true} spacing={1.03} origin={{ x: -98, y: -46 }}>
-						{positions}
-					</Layout>
-					<Patterns />
-				</HexGrid>
-				<NewsPopup news={news} />
+				<div style={subDivStyle}>
+					<HexGrid width={"100%"} height={"100%"} viewBox="-50 -50 100 100">
+						<Layout size={{ x: 3.15, y: 3.15 }} flat={true} spacing={1.03} origin={{ x: -98, y: -46 }}>
+							{positions}
+						</Layout>
+						<Patterns />
+					</HexGrid>
+				</div>
+
+				<NewsPopup news={news} newsPopupMinimizeToggle={newsPopupMinimizeToggle} />
 				<BattlePopup battle={battle} />
 				<RefuelPopup />
 				<ContainerPopup container={container} />
@@ -174,7 +197,8 @@ Gameboard.propTypes = {
 	planning: PropTypes.object.isRequired,
 	selectedPiece: PropTypes.number.isRequired,
 	confirmedPlans: PropTypes.object.isRequired,
-	highlightedPositions: PropTypes.array.isRequired
+	highlightedPositions: PropTypes.array.isRequired,
+	newsPopupMinimizeToggle: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
@@ -190,7 +214,8 @@ const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 });
 
 const mapActionsToProps = {
-	selectPosition: selectPosition
+	selectPosition,
+	newsPopupMinimizeToggle
 };
 
 export default connect(

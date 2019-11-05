@@ -62,11 +62,11 @@ class ShopMenu extends Component {
 					{landShopComponents}
 				</div>
 				<div style={purchaseableItemsContainerStyle}>
-					<div>Sea</div>
+					<div>Maritime</div>
 					{seaShopComponents}
 				</div>
 				<div style={purchaseableItemsContainerStyle}>
-					<div>Special</div>
+					<div>SOF</div>
 					{specialShopComponents}
 				</div>
 				<div style={purchaseableItemsContainerStyle}>

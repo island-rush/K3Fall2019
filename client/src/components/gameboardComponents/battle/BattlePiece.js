@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { TYPE_IMAGES, DICE_IMAGES } from "../styleConstants";
+import { TYPE_IMAGES, DICE_IMAGES } from "../../styleConstants";
 
 const battlePieceStyle = {
 	backgroundColor: "white",

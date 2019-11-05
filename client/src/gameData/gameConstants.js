@@ -1,25 +1,25 @@
 export const TYPE_COSTS = {
 	//TypeId: Cost
-	0: 5, //bomer
-	1: 5, //stealth bomber
-	2: 5, //stealth fighter
-	3: 5,
-	4: 5,
-	5: 5,
-	6: 5,
-	7: 5,
-	8: 5,
-	9: 5,
-	10: 5,
-	11: 5,
-	12: 5,
-	13: 5,
-	14: 5,
-	15: 5,
-	16: 5,
-	17: 5,
-	18: 5,
-	19: 5,
+	0: 15, //bomer
+	1: 21, //stealth bomber
+	2: 18, //stealth fighter
+	3: 11,
+	4: 12,
+	5: 8,
+	6: 3,
+	7: 8,
+	8: 8,
+	9: 4,
+	10: 11,
+	11: 7,
+	12: 9,
+	13: 18,
+	14: 24,
+	15: 16,
+	16: 10,
+	17: 11,
+	18: 12,
+	19: 7,
 	20: 20,
 	21: 40,
 	22: 25,
@@ -52,76 +52,20 @@ export const TYPE_OWNERS = {
 	5: [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33]
 };
 
-export const TYPE_MOVES = {
-	//TypdId: Moves
-	0: 5, //bomer
-	1: 5, //stealth bomber
-	2: 5, //stealth fighter
-	3: 5,
-	4: 5,
-	5: 5,
-	6: 5,
-	7: 5,
-	8: 5,
-	9: 5,
-	10: 5,
-	11: 5,
-	12: 5,
-	13: 5,
-	14: 5,
-	15: 5,
-	16: 5,
-	17: 5,
-	18: 5,
-	19: 5
-};
-
-export const TYPE_FUEL = {
-	//TypdId: Moves (-1 = warfare)
-	0: 5, //bomer
-	1: 5, //stealth bomber
-	2: 5, //stealth fighter
-	3: 500, //Tanker
-	4: 5, //Air Transport
-	5: 5,
-	6: 5,
-	7: 5,
-	8: 5, //TODO: these should be -1 for non-aircraft
-	9: 5,
-	10: 5,
-	11: 5,
-	12: 5,
-	13: 5,
-	14: 5,
-	15: 5,
-	16: 5,
-	17: 5,
-	18: 5,
-	19: 5
-};
-
-//this represents the typeIds that are 'containers' and can perform container moves for a plan, and other things
-export const CONTAINER_TYPES = [4, 14, 16, 18];
-
-export const TYPE_HIGH_LOW = {
-	highPieces: [0, 1, 2, 3, 4, 5, 10, 17, 18],
-	lowPieces: [6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 19]
-};
-
 export const TYPE_NAMES = {
-	0: "Bomber",
-	1: "Stealth Bomber",
-	2: "Stealth Fighter",
-	3: "Tanker",
-	4: "Air Transport",
-	5: "Air ISR",
-	6: "Army Infantry",
-	7: "Artillery",
-	8: "Tank",
-	9: "Marine Infantry",
+	0: "Bomber Squadron",
+	1: "Stealth Bomber Squadron",
+	2: "Stealth Fighter Squadron",
+	3: "Air Refueling Squadron",
+	4: "Tactical Airlift Squadron",
+	5: "Airborne ISR",
+	6: "Army Infantry Company",
+	7: "Artillery Battery",
+	8: "Tank Company",
+	9: "Marine Infantry Company",
 	10: "Attack Helicopter",
-	11: "LAV",
-	12: "SAM",
+	11: "Light Infantry Vehicle Convoy",
+	12: "SAM Site",
 	13: "Destroyer",
 	14: "A.C. Carrier",
 	15: "Submarine",
@@ -180,6 +124,64 @@ export const TYPE_NAME_IDS = {
 	"Drone Swarms": 31,
 	"Insurgency": 32,
 	"Raise Morale": 33
+};
+
+
+
+export const TYPE_MOVES = {
+	//TypdId: Moves
+	0: 6, //bomber
+	1: 8, //stealth bomber
+	2: 12, //stealth fighter
+	3: 6,
+	4: 7,
+	5: 7,
+	6: 1,
+	7: 1,
+	8: 1,
+	9: 1,
+	10: 2,
+	11: 2,
+	12: 1,
+	13: 2,
+	14: 2,
+	15: 2,
+	16: 2,
+	17: 4,
+	18: 7,
+	19: 1
+};
+
+export const TYPE_FUEL = {
+	//TypdId: Moves (-1 = warfare)
+	0: 15, //bomber
+	1: 12, //stealth bomber
+	2: 8, //stealth fighter
+	3: 22, //Tanker
+	4: 17, //Air Transport
+	5: 13,
+	6: -1,
+	7: -1,
+	8: -1, //TODO: these should be -1 for non-aircraft
+	9: -1,
+	10: 3,
+	11: -1,
+	12: -1,
+	13: -1,
+	14: -1,
+	15: -1,
+	16: -1,
+	17: 12,
+	18: 14,
+	19: -1
+};
+
+//this represents the typeIds that are 'containers' and can perform container moves for a plan, and other things
+export const CONTAINER_TYPES = [4, 14, 16, 18];
+
+export const TYPE_HIGH_LOW = {
+	highPieces: [0, 1, 2, 3, 4, 5, 10, 17, 18],
+	lowPieces: [6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 19]
 };
 
 // used the updated units excel at https://docs.google.com/spreadsheets/d/1kiMLv05oK6IZKtiYdErvD4Kp5tI3lXLL2-qbO3ZqHAI/edit#gid=306372336

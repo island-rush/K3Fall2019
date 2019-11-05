@@ -15,6 +15,7 @@ import {
 	NEWS_PHASE,
 	BATTLE_PIECE_SELECT,
 	ENEMY_PIECE_SELECT,
+	BATTLEPOPUP_MINIMIZE_TOGGLE,
 	TARGET_PIECE_SELECT,
 	EVENT_BATTLE,
 	BATTLE_FIGHT_RESULTS,
@@ -26,7 +27,8 @@ import {
 	TANKER_CLICK,
 	AIRCRAFT_CLICK,
 	UNDO_FUEL_SELECTION,
-	REFUEL_RESULTS
+	REFUEL_RESULTS,
+	NEWSPOPUP_MINIMIZE_TOGGLE
 } from "../actions/actionTypes";
 
 import { TYPE_FUEL } from "../../gameData/gameConstants";
@@ -38,11 +40,13 @@ const initialGameboardMeta = {
 	selectedPiece: -1,
 	selectedMenuId: 0, //TODO: should probably 0 index this instead of 1 index (make -1 == no menu open)
 	news: {
+		isMinimized: false,
 		active: false,
 		newsTitle: "Loading Title...",
 		newsInfo: "Loading Info..."
 	},
 	battle: {
+		isMinimized: false,
 		active: false,
 		selectedBattlePiece: -1,
 		selectedBattlePieceIndex: -1, //helper to find the piece within the array
@@ -51,6 +55,7 @@ const initialGameboardMeta = {
 		enemyPieces: []
 	},
 	refuel: {
+		isMinimized: false,
 		active: false,
 		selectedTankerPieceId: -1,
 		selectedTankerPieceIndex: -1,
@@ -58,6 +63,7 @@ const initialGameboardMeta = {
 		aircraft: []
 	},
 	container: {
+		isMinimized: false,
 		active: false
 	},
 	planning: {
@@ -176,6 +182,9 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 		case INITIAL_GAMESTATE:
 			Object.assign(stateDeepCopy, payload.gameboardMeta);
 			break;
+		case NEWSPOPUP_MINIMIZE_TOGGLE:
+			stateDeepCopy.news.isMinimized = !stateDeepCopy.news.isMinimized
+			break;
 		case SLICE_CHANGE:
 			stateDeepCopy.confirmedPlans = {};
 			break;
@@ -184,6 +193,9 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			let lastSelectedBattlePiece = stateDeepCopy.battle.selectedBattlePiece;
 			stateDeepCopy.battle.selectedBattlePiece = payload.battlePiece.piece.pieceId === lastSelectedBattlePiece ? -1 : payload.battlePiece.piece.pieceId;
 			stateDeepCopy.battle.selectedBattlePieceIndex = payload.battlePiece.piece.pieceId === lastSelectedBattlePiece ? -1 : payload.battlePieceIndex;
+			break;
+		case BATTLEPOPUP_MINIMIZE_TOGGLE:
+			stateDeepCopy.battle.isMinimized = !stateDeepCopy.battle.isMinimized;
 			break;
 		case ENEMY_PIECE_SELECT:
 			//need to get the piece that was selected, and put it into the target for the thing
@@ -207,9 +219,24 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			// stateDeepCopy.battle = initialGameboardMeta.battle;
 			// stateDeepCopy.refuel = initialGameboardMeta.refuel;  //these don't seem to work
 			// stateDeepCopy.container = initialGameboardMeta.container;
-			stateDeepCopy.battle = initialGameboardMeta.battle;
-			stateDeepCopy.refuel = initialGameboardMeta.refuel;
-			stateDeepCopy.container = initialGameboardMeta.container;
+			stateDeepCopy.battle = {
+				isMinimized: false,
+				active: false,
+				selectedBattlePiece: -1,
+				selectedBattlePieceIndex: -1, //helper to find the piece within the array
+				masterRecord: null,
+				friendlyPieces: [],
+				enemyPieces: []
+			};
+			stateDeepCopy.refuel = {
+				isMinimized: false,
+				active: false,
+				selectedTankerPieceId: -1,
+				selectedTankerPieceIndex: -1,
+				tankers: [],
+				aircraft: []
+			};
+			// stateDeepCopy.container = initialGameboardMeta.container;
 			break;
 		case BATTLE_FIGHT_RESULTS:
 			stateDeepCopy.battle.masterRecord = payload.masterRecord;

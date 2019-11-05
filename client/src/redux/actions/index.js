@@ -16,6 +16,7 @@ import targetPieceClick from "./battles/targetPieceClick";
 import enemyBattlePieceClick from "./battles/enemyBattlePieceClick";
 import confirmBattleSelections from "./battles/confirmBattleSelections";
 import clearOldBattle from "./battles/clearOldBattle";
+import battlePopupMinimizeToggle from "./battles/battlePopupMinimizeToggle";
 
 import confirmFuelSelections from "./refuel/confirmFuelSelections";
 import aircraftClick from "./refuel/aircraftClick";
@@ -30,6 +31,8 @@ import mainButtonClick from "./mainButtonClick";
 import invItemClick from "./invItemClick";
 import clearPieceSelection from "./clearPieceSelection"; //eventually replaced with menuSelect(-1) or menuSelect(0)
 
+import newsPopupMinimizeToggle from "./newsPopupMinimizeToggle"
+
 export {
 	shopRefundRequest,
 	shopPurchaseRequest,
@@ -41,6 +44,7 @@ export {
 	cancelPlan,
 	undoMove,
 	menuSelect,
+	battlePopupMinimizeToggle,
 	mainButtonClick,
 	battlePieceClick,
 	targetPieceClick,
@@ -53,5 +57,6 @@ export {
 	confirmFuelSelections,
 	tankerClick,
 	aircraftClick,
-	undoFuelSelection
+	undoFuelSelection,
+	newsPopupMinimizeToggle
 };
