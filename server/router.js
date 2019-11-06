@@ -14,9 +14,8 @@ const {
 	getNews,
 	insertDatabaseTables,
 	gameDelete,
-	teamPwdUpdate,
-	adminPwdUpdate,
-	teacherTeamPwdUpdate,
+	setAdminPassword,
+	setTeamPasswords,
 	gameAdd,
 	gameLoginVerify,
 	adminLoginVerify,
@@ -129,30 +128,21 @@ router.post("/gameDelete", (req, res) => {
 	}
 });
 
-router.post("/teamPwdUpdate", (req, res) => {
+router.post("/setAdminPassword", (req, res) => {
 	try {
-		teamPwdUpdate(req, res);
+		setAdminPassword(req, res);
 	} catch (error) {
 		console.error(error);
-		res.status(500).redirect("/courseDirector.html?teamPwdUpdate=failed");
+		res.status(500).redirect("/courseDirector.html?setAdminPassword=failed");
 	}
 });
 
-router.post("/adminPwdUpdate", (req, res) => {
+router.post("/setTeamPasswords", (req, res) => {
 	try {
-		adminPwdUpdate(req, res);
+		setTeamPasswords(req, res);
 	} catch (error) {
 		console.error(error);
-		res.status(500).redirect("/courseDirector.html?adminPwdUpdate=failed");
-	}
-});
-
-router.post("/teacherTeamPwdUpdate", (req, res) => {
-	try {
-		teacherTeamPwdUpdate(req, res);
-	} catch (error) {
-		console.error(error);
-		res.status(500).redirect("/teacher.html?teacherTeamPwdUpdate=failed");
+		res.status(500).redirect("/teacher.html?setTeamPasswords=failed");
 	}
 });
 

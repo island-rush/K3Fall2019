@@ -50,6 +50,27 @@ class Game {
 		await pool.query(queryString, inserts);
 	}
 
+	async setAdminPassword(gameAdminPassword) {
+		const queryString = "UPDATE games SET gameAdminPassword = ? WHERE gameId = ?";
+		const inserts = [gameAdminPassword, this.gameId];
+		await pool.query(queryString, inserts);
+		const updatedInfo = {
+			gameAdminPassword
+		};
+		Object.assign(this, updatedInfo); //very unlikely we would need the updated info on this object...
+	}
+
+	async setTeamPasswords(game0Password, game1Password) {
+		const queryString = "UPDATE games SET game0Password = ?, game1Password = ? WHERE gameId = ?";
+		const inserts = [game0Password, game1Password, this.gameId];
+		await pool.query(queryString, inserts);
+		const updatedInfo = {
+			game0Password,
+			game1Password
+		};
+		Object.assign(this, updatedInfo); //very unlikely we would need the updated info on this object...
+	}
+
 	async getNextNews() {
 		//Delete the old news
 		let queryString = "DELETE FROM news WHERE newsGameId = ? ORDER BY newsOrder ASC LIMIT 1";

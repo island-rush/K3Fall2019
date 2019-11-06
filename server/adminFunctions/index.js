@@ -9,9 +9,8 @@ const getGames = require("./getGames");
 const getNews = require("./getNews");
 const insertDatabaseTables = require("./insertDatabaseTables");
 const gameDelete = require("./gameDelete");
-const teamPwdUpdate = require("./teamPwdUpdate");
-const adminPwdUpdate = require("./adminPwdUpdate")
-const teacherTeamPwdUpdate = require("./teacherTeamPwdUpdate");
+const setAdminPassword = require("./setAdminPassword");
+const setTeamPasswords = require("./setTeamPasswords");
 const gameAdd = require("./gameAdd");
 const gameLoginVerify = require("./gameLoginVerify");
 const adminLoginVerify = require("./adminLoginVerify");
@@ -25,9 +24,8 @@ module.exports = {
 	getNews,
 	insertDatabaseTables,
 	gameDelete,
-	teamPwdUpdate,
-	adminPwdUpdate,
-	teacherTeamPwdUpdate,
+	setTeamPasswords,
+	setAdminPassword,
 	gameAdd,
 	gameLoginVerify,
 	adminLoginVerify,
