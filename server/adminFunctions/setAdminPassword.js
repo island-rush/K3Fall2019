@@ -8,19 +8,19 @@ const setAdminPassword = async (req, res) => {
 		return;
 	}
 
-	if (req.body.gameId == null || req.body.adminUpdatePassword == null) {
+	if (req.body.gameId == null || req.body.adminPassword == null) {
 		res.status(403).redirect(`/index.html?error=${BAD_REQUEST_TAG}`);
 		return;
 	}
 
-	const { gameId, adminUpdatePassword } = req.body;
+	const { gameId, adminPassword } = req.body;
 	const thisGame = await new Game({ gameId }).init();
 	if (!thisGame) {
 		res.status(400).redirect(`/index.html?error=${GAME_DOES_NOT_EXIST}`);
 		return;
 	}
 
-	const adminPasswordHashed = md5(adminUpdatePassword);
+	const adminPasswordHashed = md5(adminPassword);
 	await thisGame.setAdminPassword(adminPasswordHashed);
 
 	res.redirect("/courseDirector.html?setAdminPassword=success");
