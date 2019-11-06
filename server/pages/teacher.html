@@ -135,6 +135,29 @@
 		<span>Active</span>
 		<hr />
 
+		<h3>Game Password Update</h3>		
+		<form name="teacherTeamPwdUpdate" method="post" id="teacherTeamPwdUpdateForm" onsubmit="return confirmUpdate()" action="/teacherTeamPwdUpdate">
+			<table border="0" cellpadding="1" cellspacing="1">
+				<tr>
+					<td>Team1 Password</td>
+					<td>Team2 Password</td>
+				</tr>
+				<tr>
+					<td>
+						<input name="team1Password" type="text" id="team1Password" placeholder="Team1 Password #"  />
+					</td>
+
+					<td>
+						<input name="team2Password" type="text" id="team2Password" placeholder="Team2 Password #"  />
+					</td>
+
+					<td colspan="2">
+						<input type="submit" name="Submit" value="Set or Update Game Password" />
+					</td>
+				</tr>
+			</table>
+		</form>
+		<hr />
 		<h3>Game Reset</h3>
 
 		<form name="gameResetForm" method="post" id="gameResetForm" onsubmit="return gameReset()" action="/gameReset">
@@ -188,12 +211,25 @@
 				return urlparameter;
 			}
 
+			function confirmUpdate() {
+				return confirm("ARE YOU SURE YOU WANT TO UPDATE TEAM PASSWORD?");
+			}
+
 			switch (getUrlParam("gameReset")) {
 				case "success":
 					document.getElementById("SuccessTag").innerHTML = "Successfully Reset Game";
 					break;
 				case "failed":
 					document.getElementById("ErrorTag").innerHTML = "Failed to Reset Game";
+					break;
+			}
+
+			switch (getUrlParam("teacherTeamPwdUpdate")) {
+				case "success":
+					document.getElementById("SuccessTag").innerHTML = "Successfully Updated Password";
+					break;
+				case "failed":
+					document.getElementById("ErrorTag").innerHTML = "Failed to Update Game";
 					break;
 			}
 		</script>
