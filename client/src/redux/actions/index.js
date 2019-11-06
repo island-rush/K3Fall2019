@@ -31,6 +31,8 @@ import mainButtonClick from "./mainButtonClick";
 import invItemClick from "./invItemClick";
 import clearPieceSelection from "./clearPieceSelection"; //eventually replaced with menuSelect(-1) or menuSelect(0)
 
+import newsPopupMinimizeToggle from "./newsPopupMinimizeToggle"
+
 export {
 	shopRefundRequest,
 	shopPurchaseRequest,
@@ -55,5 +57,6 @@ export {
 	confirmFuelSelections,
 	tankerClick,
 	aircraftClick,
-	undoFuelSelection
+	undoFuelSelection,
+	newsPopupMinimizeToggle
 };
