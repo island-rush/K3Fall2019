@@ -147,7 +147,7 @@
 
 		<table id="newsTable" border="1">
 			<tr>
-				<td>News Id</td>
+				<td>News Order</td>
 				<td>News Title</td>
 			</tr>
 		</table>
@@ -179,7 +179,7 @@
 					for (let x = 0; x < news.length; x++) {
 						let row = table.insertRow(-1);
 						let cell1 = row.insertCell(0);
-						cell1.innerHTML = news[x].newsId;
+						cell1.innerHTML = news[x].newsOrder;
 						let cell2 = row.insertCell(1);
 						cell2.innerHTML = news[x].newsTitle;
 					}
