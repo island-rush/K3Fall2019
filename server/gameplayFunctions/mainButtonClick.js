@@ -85,9 +85,12 @@ const mainButtonClick = async (socket, payload) => {
 		//Place Troops -> News
 		case 3:
 			await thisGame.setPhase(0);
+			const news = await thisGame.getNextNews();
 			serverAction = {
 				type: NEWS_PHASE,
-				payload: {}
+				payload: {
+					news
+				}
 			};
 			break;
 

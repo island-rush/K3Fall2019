@@ -140,36 +140,8 @@
 			</table>
 		</form>
 
-		<h3>Update Team Password</h3>
-		<form name="teamPwdUpdate" method="post" id="teamPwdUpdateForm" onsubmit="return confirmTeamPwdUpdate()" action="/teamPwdUpdate">
-			<table border="0" cellpadding="1" cellspacing="1">
-				<tr>
-					<td>Game Id</td>
-					<td>Team1 New Password</td>
-					<td>Team2 New Password</td>
-				</tr>
-				<tr>
-					<td>
-						<input name="gameId" type="text" id="gameId" placeholder="Game Id #" required />
-					</td>
-
-					<td>
-						<input name="team1Password" type="text" id="team1Password" placeholder="Team1 New Password #"  />
-					</td>
-
-					<td>
-						<input name="team2Password" type="text" id="team2Password" placeholder="Team2 New Password #"  />
-					</td>
-
-					<td colspan="2">
-						<input type="submit" name="Submit" value="Update Team Password" />
-					</td>
-				</tr>
-			</table>
-		</form>
-
 		<h3>Update Admin Password</h3>
-		<form name="adminPwdUpdate" method="post" id="adminPwdUpdateForm" onsubmit="return confirmAdminPwdUpdate()" action="/adminPwdUpdate">
+		<form name="setAdminPassword" method="post" id="setAdminPasswordForm" onsubmit="return confirmSetAdminPassword()" action="/setAdminPassword">
 			<table border="0" cellpadding="1" cellspacing="1">
 				<tr>
 					<td>Game Id</td>
@@ -181,7 +153,7 @@
 					</td>
 
 					<td>
-						<input name="adminUpdatePassword" type="text" id="adminUpdatePassword" placeholder="Admin New Password #" required />
+						<input name="adminPassword" type="text" id="adminPassword" placeholder="Admin New Password #" required />
 					</td>
 
 					<td colspan="2">
@@ -262,16 +234,7 @@
 					break;
 			}
 
-			switch (getUrlParam("teamPwdUpdate")) {
-				case "success":
-					document.getElementById("SuccessTag").innerHTML = "Successfully Updated Team Password";
-					break;
-				case "failed":
-					document.getElementById("ErrorTag").innerHTML = "Failed to Update Team Password";
-					break;
-			}
-
-			switch (getUrlParam("adminPwdUpdate")) {
+			switch (getUrlParam("setAdminPassword")) {
 				case "success":
 					document.getElementById("SuccessTag").innerHTML = "Successfully Updated Admin Password";
 					break;
@@ -298,13 +261,9 @@
 				return confirm("ARE YOU SURE YOU WANT TO DELETE THIS GAME?");
 			}
 
-			function confirmTeamPwdUpdate() {
-				return confirm("ARE YOU SURE YOU WANT TO UPDATE TEAM PASSWORD?");
-			}
-
-			function confirmAdminPwdUpdate() {
+			function confirmSetAdminPassword() {
 				return confirm("ARE YOU SURE YOU WANT TO UPDATE ADMIN PASSWORD?");
-			}		
+			}
 
 			var password = document.getElementById("adminPassword");
 			var confirm_password = document.getElementById("adminPasswordConfirm");

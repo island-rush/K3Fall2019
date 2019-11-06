@@ -129,7 +129,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.refuel = initialGameboardMeta.refuel;
 			break;
 		case NEWS_PHASE:
-			stateDeepCopy.news.active = true; //TODO: get the actual news from the database payload
+			stateDeepCopy.news = payload.news;
 			break;
 		case PIECE_CLICK:
 			stateDeepCopy.selectedPiece = parseInt(payload.selectedPieceId);

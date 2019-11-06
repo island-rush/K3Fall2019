@@ -135,8 +135,8 @@
 		<span>Active</span>
 		<hr />
 
-		<h3>Game Password Update</h3>		
-		<form name="teacherTeamPwdUpdate" method="post" id="teacherTeamPwdUpdateForm" onsubmit="return confirmUpdate()" action="/teacherTeamPwdUpdate">
+		<h3>Game Password Update</h3>
+		<form name="setTeamPasswords" method="post" id="setTeamPasswordsForm" onsubmit="return confirmSetTeamPasswords()" action="/setTeamPasswords">
 			<table border="0" cellpadding="1" cellspacing="1">
 				<tr>
 					<td>Team1 Password</td>
@@ -144,11 +144,11 @@
 				</tr>
 				<tr>
 					<td>
-						<input name="team1Password" type="text" id="team1Password" placeholder="Team1 Password #"  />
+						<input name="game0Password" type="text" id="game0Password" required placeholder="Team1 Password #" />
 					</td>
 
 					<td>
-						<input name="team2Password" type="text" id="team2Password" placeholder="Team2 Password #"  />
+						<input name="game1Password" type="text" id="game1Password" required placeholder="Team2 Password #" />
 					</td>
 
 					<td colspan="2">
@@ -168,7 +168,12 @@
 
 		<h3>News Alerts for this game:</h3>
 
-		<p>Todo: Implement News Alerts</p>
+		<table id="newsTable" border="1">
+			<tr>
+				<td>News Order</td>
+				<td>News Title</td>
+			</tr>
+		</table>
 
 		<script>
 			function gameReset() {
@@ -188,6 +193,23 @@
 			};
 			getGameActive.open("GET", "/getGameActive", true);
 			getGameActive.send();
+
+			let getNewsTable = new XMLHttpRequest();
+			getNewsTable.onreadystatechange = function() {
+				if (this.readyState == 4) {
+					const news = JSON.parse(this.response);
+					const table = document.getElementById("newsTable");
+					for (let x = 0; x < news.length; x++) {
+						let row = table.insertRow(-1);
+						let cell1 = row.insertCell(0);
+						cell1.innerHTML = news[x].newsOrder;
+						let cell2 = row.insertCell(1);
+						cell2.innerHTML = news[x].newsTitle;
+					}
+				}
+			};
+			getNewsTable.open("GET", "/getNews", true);
+			getNewsTable.send();
 
 			function toggleActive() {
 				let toggleGameActive = new XMLHttpRequest();
@@ -211,8 +233,8 @@
 				return urlparameter;
 			}
 
-			function confirmUpdate() {
-				return confirm("ARE YOU SURE YOU WANT TO UPDATE TEAM PASSWORD?");
+			function confirmSetTeamPasswords() {
+				return confirm("ARE YOU SURE YOU WANT TO UPDATE TEAM PASSWORDS?");
 			}
 
 			switch (getUrlParam("gameReset")) {
@@ -224,12 +246,12 @@
 					break;
 			}
 
-			switch (getUrlParam("teacherTeamPwdUpdate")) {
+			switch (getUrlParam("setTeamPasswords")) {
 				case "success":
-					document.getElementById("SuccessTag").innerHTML = "Successfully Updated Password";
+					document.getElementById("SuccessTag").innerHTML = "Successfully Updated Passwords";
 					break;
 				case "failed":
-					document.getElementById("ErrorTag").innerHTML = "Failed to Update Game";
+					document.getElementById("ErrorTag").innerHTML = "Failed to Update Passwords";
 					break;
 			}
 		</script>
