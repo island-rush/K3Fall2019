@@ -11,6 +11,7 @@ const {
 	toggleGameActive,
 	getGameActive,
 	getGames,
+	getNews,
 	insertDatabaseTables,
 	gameDelete,
 	gameAdd,
@@ -136,6 +137,10 @@ router.post("/insertDatabaseTables", (req, res) => {
 
 router.get("/getGames", (req, res) => {
 	getGames(req, res); //try / catch is within this function, higher level catch didn't catch :(
+});
+
+router.get("/getNews", (req, res) => {
+	getNews(req, res);
 });
 
 router.get("/getGameActive", (req, res) => {

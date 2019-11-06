@@ -145,7 +145,12 @@
 
 		<h3>News Alerts for this game:</h3>
 
-		<p>Todo: Implement News Alerts</p>
+		<table id="newsTable" border="1">
+			<tr>
+				<td>News Id</td>
+				<td>News Title</td>
+			</tr>
+		</table>
 
 		<script>
 			function gameReset() {
@@ -165,6 +170,23 @@
 			};
 			getGameActive.open("GET", "/getGameActive", true);
 			getGameActive.send();
+
+			let getNewsTable = new XMLHttpRequest();
+			getNewsTable.onreadystatechange = function() {
+				if (this.readyState == 4) {
+					const news = JSON.parse(this.response);
+					const table = document.getElementById("newsTable");
+					for (let x = 0; x < news.length; x++) {
+						let row = table.insertRow(-1);
+						let cell1 = row.insertCell(0);
+						cell1.innerHTML = news[x].newsId;
+						let cell2 = row.insertCell(1);
+						cell2.innerHTML = news[x].newsTitle;
+					}
+				}
+			};
+			getNewsTable.open("GET", "/getNews", true);
+			getNewsTable.send();
 
 			function toggleActive() {
 				let toggleGameActive = new XMLHttpRequest();

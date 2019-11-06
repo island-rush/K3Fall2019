@@ -6,6 +6,7 @@ const gameReset = require("./gameReset");
 const toggleGameActive = require("./toggleGameActive");
 const getGameActive = require("./getGameActive");
 const getGames = require("./getGames");
+const getNews = require("./getNews");
 const insertDatabaseTables = require("./insertDatabaseTables");
 const gameDelete = require("./gameDelete");
 const gameAdd = require("./gameAdd");
@@ -18,6 +19,7 @@ module.exports = {
 	toggleGameActive,
 	getGameActive,
 	getGames,
+	getNews,
 	insertDatabaseTables,
 	gameDelete,
 	gameAdd,
