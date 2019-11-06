@@ -3,7 +3,7 @@ const pool = require("../database");
 const md5 = require("md5");
 import { ACCESS_TAG } from "../pages/errorTypes";
 
-const teacherPwdUpdate = async (req, res) => {
+const teacherTeamPwdUpdate = async (req, res) => {
 	if (!req.session.ir3 || !req.session.ir3.teacher) {
 		res.status(403).redirect(`/index.html?error=${ACCESS_TAG}`);
 		return;
@@ -14,43 +14,44 @@ const teacherPwdUpdate = async (req, res) => {
 
 	const { team1Password,team2Password } = req.body;
 	const { gameId } = req.session.ir3;
+	var queryString = "";
+	var inserts = "";	
 
 	if (!gameId) {
-		res.status(400).redirect("/teacher.html?teacherPwdUpdate=failed"); //TODO: could have better errors here saying 'gameid missing', or 'game did not exist'
+		res.status(400).redirect("/teacher.html?teacherTeamPwdUpdate=failed"); //TODO: could have better errors here saying 'gameid missing', or 'game did not exist'
 		return;
 	}
 
 	const thisGame = await new Game({ gameId }).init();
 	if (!thisGame) {
-		res.status(400).redirect("/teacher.html?teacherPwdUpdate=failed");
+		res.status(400).redirect("/teacher.html?teacherTeamPwdUpdate=failed");
 		return;
 	}	
 
 	if(!team1Password && !team2Password){
-		res.status(400).redirect("/teacher.html?teacherPwdUpdate=failed");
+		res.status(400).redirect("/teacher.html?teacherTeamPwdUpdate=failed");
 		return;
 	}
 	else if( !team1Password && team2Password){			
-		const queryString = "UPDATE games SET game1Password = ? WHERE gameId = ?";
+		queryString = "UPDATE games SET game1Password = ? WHERE gameId = ?";
 		const team2PasswordHashed = md5(team2Password);
-		const inserts = [team2PasswordHashed, gameId];		
-		await pool.query(queryString, inserts);
+		inserts = [team2PasswordHashed, gameId];
 	}
 	else if( team1Password && !team2Password){
-		const queryString = "UPDATE games SET game0Password = ? WHERE gameId = ?";
+		queryString = "UPDATE games SET game0Password = ? WHERE gameId = ?";
 		const team1PasswordHashed = md5(team1Password);
-		const inserts = [team1PasswordHashed,gameId];
-		await pool.query(queryString, inserts);
+		inserts = [team1PasswordHashed,gameId];
 	}
 	else{
-		const queryString = "UPDATE games SET game0Password = ?, game1Password = ? WHERE gameId = ?";
+		queryString = "UPDATE games SET game0Password = ?, game1Password = ? WHERE gameId = ?";
 		const team1PasswordHashed = md5(team1Password);
 		const team2PasswordHashed = md5(team2Password);
-		const inserts = [team1PasswordHashed,team2PasswordHashed, gameId];
-		await pool.query(queryString, inserts);
+		inserts = [team1PasswordHashed,team2PasswordHashed, gameId];
 	}
 
-	res.redirect("/teacher.html?teacherPwdUpdate=success");
+	await pool.query(queryString, inserts);
+
+	res.redirect("/teacher.html?teacherTeamPwdUpdate=success");
 };
 
-module.exports = teacherPwdUpdate;
+module.exports = teacherTeamPwdUpdate;

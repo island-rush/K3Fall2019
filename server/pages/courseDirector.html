@@ -81,16 +81,16 @@
 		<div id="SuccessTag" style="color: green"></div>
 		<div id="ErrorTag" style="color: red"></div>
 
-		<h2 id="DatabaseConnectionTag">Database Status: Loading...</h2>
+		<h3 id="DatabaseConnectionTag">Database Status: Loading...</h3>
 
-		<h1>Add a Game</h1>
+		<h3>Add a Game</h3>
 		<form name="gameAdd" method="post" id="gameAddForm" action="/gameAdd">
 			<table border="0" cellpadding="1" cellspacing="1">
 				<tr>
 					<td>Section</td>
 					<td>Teacher Last Name</td>
-					<td>Password</td>
-					<td>Password Confirm</td>
+					<td>Admin Password</td>
+					<td>Admin Password Confirm</td>
 				</tr>
 				<tr>
 					<td>
@@ -112,7 +112,7 @@
 			</table>
 		</form>
 
-		<h1>Current Games</h1>
+		<h3>Current Games</h3>
 
 		<table id="gamesTable" border="1">
 			<tr>
@@ -123,7 +123,7 @@
 			</tr>
 		</table>
 
-		<h1>Delete a Game</h1>
+		<h3>Delete a Game</h3>
 		<form name="gameDelete" method="post" id="gameDeleteForm" onsubmit="return confirmDelete()" action="/gameDelete">
 			<table border="0" cellpadding="1" cellspacing="1">
 				<tr>
@@ -140,13 +140,13 @@
 			</table>
 		</form>
 
-		<h1>Changing or Setting Admin Password</h1>
-		<form name="passwordUpdate" method="post" id="passwordUpdateForm" onsubmit="return confirmUpdate()" action="/passwordUpdate">
+		<h3>Update Team Password</h3>
+		<form name="teamPwdUpdate" method="post" id="teamPwdUpdateForm" onsubmit="return confirmTeamPwdUpdate()" action="/teamPwdUpdate">
 			<table border="0" cellpadding="1" cellspacing="1">
 				<tr>
 					<td>Game Id</td>
-					<td>Team1 Password</td>
-					<td>Team2 Password</td>
+					<td>Team1 New Password</td>
+					<td>Team2 New Password</td>
 				</tr>
 				<tr>
 					<td>
@@ -154,15 +154,38 @@
 					</td>
 
 					<td>
-						<input name="team1Password" type="text" id="team1Password" placeholder="Team1 Password #"  />
+						<input name="team1Password" type="text" id="team1Password" placeholder="Team1 New Password #"  />
 					</td>
 
 					<td>
-						<input name="team2Password" type="text" id="team2Password" placeholder="Team2 Password #"  />
+						<input name="team2Password" type="text" id="team2Password" placeholder="Team2 New Password #"  />
 					</td>
 
 					<td colspan="2">
-						<input type="submit" name="Submit" value="Set or Update Game Password" />
+						<input type="submit" name="Submit" value="Update Team Password" />
+					</td>
+				</tr>
+			</table>
+		</form>
+
+		<h3>Update Admin Password</h3>
+		<form name="adminPwdUpdate" method="post" id="adminPwdUpdateForm" onsubmit="return confirmAdminPwdUpdate()" action="/adminPwdUpdate">
+			<table border="0" cellpadding="1" cellspacing="1">
+				<tr>
+					<td>Game Id</td>
+					<td>Admin Password</td>
+				</tr>
+				<tr>
+					<td>
+						<input name="gameId" type="text" id="gameId" placeholder="Game Id #" required />
+					</td>
+
+					<td>
+						<input name="adminUpdatePassword" type="text" id="adminUpdatePassword" placeholder="Admin New Password #" required />
+					</td>
+
+					<td colspan="2">
+						<input type="submit" name="Submit" value="Update Admin Password" />
 					</td>
 				</tr>
 			</table>
@@ -239,12 +262,21 @@
 					break;
 			}
 
-			switch (getUrlParam("passwordUpdate")) {
+			switch (getUrlParam("teamPwdUpdate")) {
 				case "success":
-					document.getElementById("SuccessTag").innerHTML = "Successfully Updated Password";
+					document.getElementById("SuccessTag").innerHTML = "Successfully Updated Team Password";
 					break;
 				case "failed":
-					document.getElementById("ErrorTag").innerHTML = "Failed to Update Game";
+					document.getElementById("ErrorTag").innerHTML = "Failed to Update Team Password";
+					break;
+			}
+
+			switch (getUrlParam("adminPwdUpdate")) {
+				case "success":
+					document.getElementById("SuccessTag").innerHTML = "Successfully Updated Admin Password";
+					break;
+				case "failed":
+					document.getElementById("ErrorTag").innerHTML = "Failed to Update Admin Password";
 					break;
 			}
 
@@ -266,9 +298,13 @@
 				return confirm("ARE YOU SURE YOU WANT TO DELETE THIS GAME?");
 			}
 
-			function confirmUpdate() {
+			function confirmTeamPwdUpdate() {
 				return confirm("ARE YOU SURE YOU WANT TO UPDATE TEAM PASSWORD?");
 			}
+
+			function confirmAdminPwdUpdate() {
+				return confirm("ARE YOU SURE YOU WANT TO UPDATE ADMIN PASSWORD?");
+			}		
 
 			var password = document.getElementById("adminPassword");
 			var confirm_password = document.getElementById("adminPasswordConfirm");

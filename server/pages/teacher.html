@@ -136,7 +136,7 @@
 		<hr />
 
 		<h3>Game Password Update</h3>		
-		<form name="teacherPwdUpdate" method="post" id="teacherPwdUpdate" onsubmit="return confirmUpdate()" action="/teacherPwdUpdate">
+		<form name="teacherTeamPwdUpdate" method="post" id="teacherTeamPwdUpdateForm" onsubmit="return confirmUpdate()" action="/teacherTeamPwdUpdate">
 			<table border="0" cellpadding="1" cellspacing="1">
 				<tr>
 					<td>Team1 Password</td>
@@ -224,7 +224,7 @@
 					break;
 			}
 
-			switch (getUrlParam("teacherPwdUpdate")) {
+			switch (getUrlParam("teacherTeamPwdUpdate")) {
 				case "success":
 					document.getElementById("SuccessTag").innerHTML = "Successfully Updated Password";
 					break;
