@@ -18,30 +18,74 @@ const invisibleStyle = {
 	display: "none"
 };
 
+
+const airpieceItemsContainerStyle = {
+	backgroundColor: "pink",
+	position: "absolute",
+	width: "18%",
+	height: "80%",
+	right: "81%",
+	top: "1%"
+};
+
+const landpieceItemsContainerStyle = {
+	backgroundColor: "pink",
+	position: "absolute",
+	width: "18%",
+	height: "80%",
+	right: "61%",
+	top: "1%"
+};
+const seapieceItemsContainerStyle = {
+	backgroundColor: "pink",
+	position: "absolute",
+	width: "18%",
+	height: "80%",
+	right: "41%",
+	top: "1%"
+};
+const specialpieceItemsContainerStyle = {
+	backgroundColor: "pink",
+	position: "absolute",
+	width: "18%",
+	height: "80%",
+	right: "21%",
+	top: "1%"
+};
+
 const warfareItemsContainerStyle = {
 	backgroundColor: "pink",
 	position: "absolute",
-	width: "20%",
+	width: "18%",
 	height: "80%",
-	left: "1%",
+	left: "81%",
 	top: "1%"
 };
-
-const pieceItemsContainerStyle = {
-	backgroundColor: "pink",
-	position: "absolute",
-	width: "20%",
-	height: "80%",
-	right: "1%",
-	top: "1%"
-};
-
 class InvMenu extends Component {
 	render() {
 		const { selected, invItems, invItemClick } = this.props;
 
+		const airItems = invItems.filter(item => {
+			return item.invItemTypeId <=5 && item.invItemTypeId>=0;
+		});
+		const landItems = invItems.filter(item => {
+			return item.invItemTypeId <=12 && item.invItemTypeId>=6;
+		});
+		const seaItems = invItems.filter(item => {
+			return item.invItemTypeId <=16 && item.invItemTypeId>=13;
+		});
+
+		const specialItems = invItems.filter(item => {
+			return item.invItemTypeId <=19 && item.invItemTypeId>=17;
+		});
+		
+		const airInvComponents = airItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
+		const landInvComponents = landItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
+		const seaInvComponents = seaItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
+		const specialInvComponents = specialItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
+
 		const warfareInvItems = invItems.filter(item => {
-			return item.invItemTypeId > 19;
+			return item.invItemTypeId > 19;//TODO: (19) this should be a constant in gameData, number of pieces may change...
 		});
 
 		const warefareInvItemComponents = warfareInvItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
@@ -50,17 +94,27 @@ class InvMenu extends Component {
 			return item.invItemTypeId <= 19;
 		});
 
-		const pieceInvItemComponents = pieceInvItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
-
 		return (
 			<div style={selected ? inventoryStyle : invisibleStyle}>
 				<div style={warfareItemsContainerStyle}>
 					<div>Capabilities</div>
 					{warefareInvItemComponents}
 				</div>
-				<div style={pieceItemsContainerStyle}>
-					<div>Pieces</div>
-					{pieceInvItemComponents}
+				<div style={airpieceItemsContainerStyle}>
+					<div> Air Pieces</div>
+					{airInvComponents}
+				</div>
+				<div style={landpieceItemsContainerStyle}>
+					<div>Land Pieces</div>
+					{landInvComponents}
+				</div>
+				<div style={seapieceItemsContainerStyle}>
+					<div>Maritime Pieces</div>
+					{seaInvComponents}
+				</div>
+				<div style={specialpieceItemsContainerStyle}>
+					<div>SOF Pieces</div>
+					{specialInvComponents}
 				</div>
 			</div>
 		);
