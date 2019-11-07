@@ -310,7 +310,7 @@ class Game {
 		
 		const result = await pool.query(queryString, inserts);
 		if( result[0].affectedRows == 0)
-			return ;
+			return;
 
 		const thisGame = await new Game({ gameSection, gameInstructor }).init(); //could not init, but since we don't know who is using this function, return the full game
 
