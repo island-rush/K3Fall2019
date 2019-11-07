@@ -50,6 +50,45 @@ class Game {
 		await pool.query(queryString, inserts);
 	}
 
+	async setAdminPassword(gameAdminPassword) {
+		const queryString = "UPDATE games SET gameAdminPassword = ? WHERE gameId = ?";
+		const inserts = [gameAdminPassword, this.gameId];
+		await pool.query(queryString, inserts);
+		const updatedInfo = {
+			gameAdminPassword
+		};
+		Object.assign(this, updatedInfo); //very unlikely we would need the updated info on this object...
+	}
+
+	async setTeamPasswords(game0Password, game1Password) {
+		const queryString = "UPDATE games SET game0Password = ?, game1Password = ? WHERE gameId = ?";
+		const inserts = [game0Password, game1Password, this.gameId];
+		await pool.query(queryString, inserts);
+		const updatedInfo = {
+			game0Password,
+			game1Password
+		};
+		Object.assign(this, updatedInfo); //very unlikely we would need the updated info on this object...
+	}
+
+	async getNextNews() {
+		//Delete the old news
+		let queryString = "DELETE FROM news WHERE newsGameId = ? ORDER BY newsOrder ASC LIMIT 1";
+		let inserts = [this.gameId];
+		await pool.query(queryString, inserts);
+
+		//Grab the next news
+		queryString = "SELECT newsTitle, newsInfo FROM news WHERE newsGameId = ? ORDER BY newsOrder ASC LIMIT 1";
+		const [resultNews] = await pool.query(queryString, inserts);
+		const { newsTitle, newsInfo } = resultNews[0] !== undefined ? resultNews[0] : { newsTitle: "No More News", newsInfo: "Obviously you've been playing this game too long..." };
+
+		return {
+			active: true,
+			newsTitle,
+			newsInfo
+		};
+	}
+
 	async initialStateAction(gameTeam, gameController) {
 		let serverAction = {
 			type: INITIAL_GAMESTATE,
@@ -76,7 +115,7 @@ class Game {
 
 		//Could put news into its own object, but don't really use it much...(TODO: figure out if need to refactor this...)
 		if (this.gamePhase == 0) {
-			let queryString = "SELECT newsTitle, newsInfo FROM news WHERE newsGameId = ? AND newsActivated = 1 AND newsLength != 0 ORDER BY newsOrder ASC LIMIT 1";
+			let queryString = "SELECT newsTitle, newsInfo FROM news WHERE newsGameId = ? ORDER BY newsOrder ASC LIMIT 1";
 			let inserts = [this.gameId];
 			const [resultNews] = await pool.query(queryString, inserts);
 			const { newsTitle, newsInfo } = resultNews[0] !== undefined ? resultNews[0] : { newsTitle: "No More News", newsInfo: "Obviously you've been playing this game too long..." };
@@ -262,14 +301,16 @@ class Game {
 		let inserts;
 
 		if (options.gameId) {
-			queryString = "INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?, ?)";
-			inserts = [options.gameId, gameSection, gameInstructor, gameAdminPasswordHash];
+			queryString = "INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) SELECT ?,?,?,? WHERE NOT EXISTS(SELECT * from games WHERE gameSection=? AND gameInstructor = ?)";
+			inserts = [options.gameId, gameSection, gameInstructor, gameAdminPasswordHash, gameSection, gameInstructor];
 		} else {
-			queryString = "INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?)";
-			inserts = [gameSection, gameInstructor, gameAdminPasswordHash];
+			queryString = "INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) SELECT ?,?,? WHERE NOT EXISTS(SELECT * from games WHERE gameSection=? AND gameInstructor = ?)";
+			inserts = [gameSection, gameInstructor, gameAdminPasswordHash,gameSection, gameInstructor];
 		}
-
-		await pool.query(queryString, inserts);
+		
+		const result = await pool.query(queryString, inserts);
+		if( result[0].affectedRows == 0)
+			return;
 
 		const thisGame = await new Game({ gameSection, gameInstructor }).init(); //could not init, but since we don't know who is using this function, return the full game
 
@@ -283,6 +324,13 @@ class Game {
 	static async getGames() {
 		const queryString = "SELECT gameId, gameSection, gameInstructor, gameActive FROM games";
 		const [results] = await pool.query(queryString);
+		return results;
+	}
+
+	static async getAllNews(gameId) {
+		const queryString = "SELECT * FROM news WHERE newsGameId = ? ORDER BY newsOrder ASC";
+		const inserts = [gameId];
+		const [results] = await pool.query(queryString, inserts);
 		return results;
 	}
 }

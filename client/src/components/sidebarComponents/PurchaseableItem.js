@@ -10,23 +10,27 @@ const purchaseableItemStyle = {
 	paddingTop: "28%",
 	margin: "2.5%",
 	float: "left",
-	// left: "5%",
 	backgroundSize: "100% 100%",
 	backgroundRepeat: "no-repeat"
 };
 
 const PurchaseableItem = ({ typeId, purchase }) => {
-	return (
-		<div
-			style={{ ...purchaseableItemStyle, ...TYPE_IMAGES[typeId] }}
-			onClick={event => {
-				event.preventDefault();
-				purchase(typeId);
-				event.stopPropagation();
-			}}
-			title={`${TYPE_NAMES[typeId]}\nCost: ${TYPE_COSTS[typeId]}\nMoves: ${TYPE_MOVES[typeId]}\nFuel: ${TYPE_FUEL[typeId]}`}
-		/>
-	);
+	const style = { ...purchaseableItemStyle, ...TYPE_IMAGES[typeId] };
+
+	const name = TYPE_NAMES[typeId];
+	const cost = TYPE_COSTS[typeId];
+	const moves = TYPE_MOVES[typeId];
+	const fuel = TYPE_FUEL[typeId];
+
+	const title = `${name}\nCost: ${cost}\nMoves: ${moves !== undefined ? moves : "N/A"}\nFuel: ${fuel !== undefined && fuel !== -1 ? fuel : "N/A"}`;
+
+	const onClick = event => {
+		event.preventDefault();
+		purchase(typeId);
+		event.stopPropagation();
+	};
+
+	return <div style={style} title={title} onClick={onClick} />;
 };
 
 PurchaseableItem.propTypes = {

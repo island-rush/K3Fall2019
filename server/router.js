@@ -11,8 +11,11 @@ const {
 	toggleGameActive,
 	getGameActive,
 	getGames,
+	getNews,
 	insertDatabaseTables,
 	gameDelete,
+	setAdminPassword,
+	setTeamPasswords,
 	gameAdd,
 	gameLoginVerify,
 	adminLoginVerify,
@@ -125,6 +128,24 @@ router.post("/gameDelete", (req, res) => {
 	}
 });
 
+router.post("/setAdminPassword", (req, res) => {
+	try {
+		setAdminPassword(req, res);
+	} catch (error) {
+		console.error(error);
+		res.status(500).redirect("/courseDirector.html?setAdminPassword=failed");
+	}
+});
+
+router.post("/setTeamPasswords", (req, res) => {
+	try {
+		setTeamPasswords(req, res);
+	} catch (error) {
+		console.error(error);
+		res.status(500).redirect("/teacher.html?setTeamPasswords=failed");
+	}
+});
+
 router.post("/insertDatabaseTables", (req, res) => {
 	try {
 		insertDatabaseTables(req, res);
@@ -136,6 +157,10 @@ router.post("/insertDatabaseTables", (req, res) => {
 
 router.get("/getGames", (req, res) => {
 	getGames(req, res); //try / catch is within this function, higher level catch didn't catch :(
+});
+
+router.get("/getNews", (req, res) => {
+	getNews(req, res);
 });
 
 router.get("/getGameActive", (req, res) => {

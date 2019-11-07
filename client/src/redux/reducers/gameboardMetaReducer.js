@@ -130,7 +130,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.refuel = initialGameboardMeta.refuel;
 			break;
 		case NEWS_PHASE:
-			stateDeepCopy.news.active = true; //TODO: get the actual news from the database payload
+			stateDeepCopy.news = payload.news;
 			break;
 		case PIECE_CLICK:
 			stateDeepCopy.selectedPiece = parseInt(payload.selectedPieceId);
@@ -256,11 +256,13 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 					return record.pieceId === stateDeepCopy.battle.friendlyPieces[x].piece.pieceId;
 				});
 
-				let { targetId, diceRoll, win } = currentRecord;
+				let { targetId, diceRoll, win, diceRoll1, diceRoll2 } = currentRecord;
 
 				if (targetId) {
 					stateDeepCopy.battle.friendlyPieces[x].diceRoll = diceRoll;
 					stateDeepCopy.battle.friendlyPieces[x].win = win;
+					stateDeepCopy.battle.friendlyPieces[x].diceRoll1 = diceRoll1;
+					stateDeepCopy.battle.friendlyPieces[x].diceRoll2 = diceRoll2;
 				}
 			}
 
@@ -273,7 +275,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 					return record.pieceId === stateDeepCopy.battle.enemyPieces[z].piece.pieceId;
 				});
 
-				let { pieceId, targetId, diceRoll, win } = currentRecord;
+				let { pieceId, targetId, diceRoll, win, diceRoll1, diceRoll2 } = currentRecord;
 
 				if (targetId) {
 					//get the target information from the friendlyPieces
@@ -285,6 +287,8 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 					stateDeepCopy.battle.enemyPieces[enemyPieceIndex].targetPieceIndex = friendlyPieceIndex;
 					stateDeepCopy.battle.enemyPieces[enemyPieceIndex].win = win;
 					stateDeepCopy.battle.enemyPieces[enemyPieceIndex].diceRoll = diceRoll;
+					stateDeepCopy.battle.enemyPieces[enemyPieceIndex].diceRoll1 = diceRoll1;
+					stateDeepCopy.battle.enemyPieces[enemyPieceIndex].diceRoll2 = diceRoll2;
 				}
 			}
 

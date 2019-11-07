@@ -35,13 +35,32 @@ const invisibleStyle = {
 	display: "none"
 };
 
+const popupTitleStyle = {
+	textAlign: "center",
+	fontSize: "200%"
+};
+
+const newsTitleStyle = {
+	textAlign: "center",
+	fontSize: "150%"
+};
+
+const newsInfoStyle = {
+	textAlign: "left",
+	fontSize: "100%",
+	margin: "1%",
+	padding: "2%"
+};
+
 const NewsAlertPopup = ({ news, newsPopupMinimizeToggle }) => {
 	return (
 		<div style={news.active ? null : invisibleStyle}>
 			<div style={!news.isMinimized ? newsPopupStyle : invisibleStyle}>
-				<div>NEWS ALERT!</div>
-				<div>Title: {news.newsTitle}</div>
-				<div>Info: {news.newsInfo}</div>
+				<div style={popupTitleStyle}>NEWS ALERT!</div>
+				<br />
+				<h1 style={newsTitleStyle}>{news.newsTitle}</h1>
+				<br />
+				<div style={newsInfoStyle}>{news.newsInfo}</div>
 				<div
 					onClick={event => {
 						event.preventDefault();
@@ -52,7 +71,7 @@ const NewsAlertPopup = ({ news, newsPopupMinimizeToggle }) => {
 				/>
 			</div>
 			<div
-				style={{ ...(news.isMinimized ? newsPopupMinimizeStyle : invisibleStyle), ...NEWS_POPUP_IMAGES.minIcon, ...isMinimizedStyle}}
+				style={{ ...(news.isMinimized ? newsPopupMinimizeStyle : invisibleStyle), ...NEWS_POPUP_IMAGES.minIcon, ...isMinimizedStyle }}
 				onClick={event => {
 					event.preventDefault();
 					newsPopupMinimizeToggle();

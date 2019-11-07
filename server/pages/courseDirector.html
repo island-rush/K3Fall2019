@@ -81,16 +81,16 @@
 		<div id="SuccessTag" style="color: green"></div>
 		<div id="ErrorTag" style="color: red"></div>
 
-		<h2 id="DatabaseConnectionTag">Database Status: Loading...</h2>
+		<h3 id="DatabaseConnectionTag">Database Status: Loading...</h3>
 
-		<h1>Add a Game</h1>
+		<h3>Add a Game</h3>
 		<form name="gameAdd" method="post" id="gameAddForm" action="/gameAdd">
-			<table border="0" cellpadding="3" cellspacing="1">
+			<table border="0" cellpadding="1" cellspacing="1">
 				<tr>
 					<td>Section</td>
 					<td>Teacher Last Name</td>
-					<td>Password</td>
-					<td>Password Confirm</td>
+					<td>Admin Password</td>
+					<td>Admin Password Confirm</td>
 				</tr>
 				<tr>
 					<td>
@@ -112,7 +112,7 @@
 			</table>
 		</form>
 
-		<h1>Current Games</h1>
+		<h3>Current Games</h3>
 
 		<table id="gamesTable" border="1">
 			<tr>
@@ -123,9 +123,9 @@
 			</tr>
 		</table>
 
-		<h1>Delete a Game</h1>
+		<h3>Delete a Game</h3>
 		<form name="gameDelete" method="post" id="gameDeleteForm" onsubmit="return confirmDelete()" action="/gameDelete">
-			<table border="0" cellpadding="3" cellspacing="1">
+			<table border="0" cellpadding="1" cellspacing="1">
 				<tr>
 					<td>Game Id</td>
 				</tr>
@@ -135,6 +135,29 @@
 					</td>
 					<td colspan="2">
 						<input type="submit" name="Submit" value="Delete Game" />
+					</td>
+				</tr>
+			</table>
+		</form>
+
+		<h3>Update Admin Password</h3>
+		<form name="setAdminPassword" method="post" id="setAdminPasswordForm" onsubmit="return confirmSetAdminPassword()" action="/setAdminPassword">
+			<table border="0" cellpadding="1" cellspacing="1">
+				<tr>
+					<td>Game Id</td>
+					<td>Admin Password</td>
+				</tr>
+				<tr>
+					<td>
+						<input name="gameId" type="text" id="gameId" placeholder="Game Id #" required />
+					</td>
+
+					<td>
+						<input name="adminPassword" type="text" id="adminPassword" placeholder="Admin New Password #" required />
+					</td>
+
+					<td colspan="2">
+						<input type="submit" name="Submit" value="Update Admin Password" />
 					</td>
 				</tr>
 			</table>
@@ -198,7 +221,7 @@
 					document.getElementById("SuccessTag").innerHTML = "Successfully Created Game";
 					break;
 				case "failed":
-					document.getElementById("ErrorTag").innerHTML = "Failed to Create Game: Check Database Initialization";
+					document.getElementById("ErrorTag").innerHTML = "Failed to Create Game: Already Exists, or Database Failed.";
 					break;
 			}
 
@@ -208,6 +231,15 @@
 					break;
 				case "failed":
 					document.getElementById("ErrorTag").innerHTML = "Failed to Delete Game";
+					break;
+			}
+
+			switch (getUrlParam("setAdminPassword")) {
+				case "success":
+					document.getElementById("SuccessTag").innerHTML = "Successfully Updated Admin Password";
+					break;
+				case "failed":
+					document.getElementById("ErrorTag").innerHTML = "Failed to Update Admin Password";
 					break;
 			}
 
@@ -228,6 +260,11 @@
 			function confirmDelete() {
 				return confirm("ARE YOU SURE YOU WANT TO DELETE THIS GAME?");
 			}
+
+			function confirmSetAdminPassword() {
+				return confirm("ARE YOU SURE YOU WANT TO UPDATE ADMIN PASSWORD?");
+			}
+
 			var password = document.getElementById("adminPassword");
 			var confirm_password = document.getElementById("adminPasswordConfirm");
 			function validatePassword() {
