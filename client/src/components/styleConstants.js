@@ -1,5 +1,6 @@
 //These paths are relative to the ./public directory
 const unitImagesPath = "./images/unitImages";
+const diceImagePath = "./images/diceImages";
 // const diceImagesPath = "./images/diceImages";
 const graphicsPath = "./images/graphics";
 const buttonImagesPath = "./images/buttonImages";
@@ -45,19 +46,12 @@ export const TYPE_IMAGES = {
 export const DICE_IMAGES = {
 	//TODO: use actual dice images instead of unit images
 	// 0 => no dice roll yet
-	0: { backgroundImage: `url("${unitImagesPath}/bomber.png")` }, //impossible (used, but wouldn't get called...(prevented))
-	1: { backgroundImage: `url("${unitImagesPath}/stealthBomber.png")` }, //impossible, but used for testing (force a loss)
-	2: { backgroundImage: `url("${unitImagesPath}/fighter.png")` },
-	3: { backgroundImage: `url("${unitImagesPath}/tanker.png")` },
-	4: { backgroundImage: `url("${unitImagesPath}/c17.png")` },
-	5: { backgroundImage: `url("${unitImagesPath}/e3.png")` },
-	6: { backgroundImage: `url("${unitImagesPath}/infantry.png")` },
-	7: { backgroundImage: `url("${unitImagesPath}/artillery.png")` },
-	8: { backgroundImage: `url("${unitImagesPath}/tank.png")` },
-	9: { backgroundImage: `url("${unitImagesPath}/marine.png")` },
-	10: { backgroundImage: `url("${unitImagesPath}/attackHeli.png")` },
-	11: { backgroundImage: `url("${unitImagesPath}/convoy.png")` },
-	12: { backgroundImage: `url("${unitImagesPath}/sam.png")` }
+	1: { backgroundImage: `url("${diceImagePath}/1.png")` }, 
+	2: { backgroundImage: `url("${diceImagePath}/2.png")` }, 
+	3: { backgroundImage: `url("${diceImagePath}/3.png")` }, 
+	4: { backgroundImage: `url("${diceImagePath}/4.png")` }, 
+	5: { backgroundImage: `url("${diceImagePath}/5.png")` }, 
+	6: { backgroundImage: `url("${diceImagePath}/6.png")` }
 };
 
 export const LEFT_CONTROLS_IMAGES = {
