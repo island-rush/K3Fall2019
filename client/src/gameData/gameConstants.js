@@ -36,20 +36,22 @@ export const TYPE_COSTS = {
 	33: 50
 };
 
+//TODO: re-work capabilities to be less involved with piece constants
+//This is especially misleading when it is used in ShopMenu (auto-creating PurchaseItems based on these constants...)
 export const TYPE_MAIN = 0;
 export const TYPE_AIR = 1;
 export const TYPE_LAND = 2;
 export const TYPE_SEA = 3;
 export const TYPE_SPECIAL = 4;
-export const TYPE_CAPABILITY = 5;
+export const TYPE_CAPABILITY = 5; //This is not a 'login type', but a category identifier
 
 export const TYPE_OWNERS = {
-	0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+	0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
 	1: [0, 1, 2, 3, 4, 5],
 	2: [6, 7, 8, 9, 10, 11, 12],
 	3: [13, 14, 15, 16],
 	4: [17, 18, 19],
-	5: [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33]
+	5: [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33] //Only MAIN 'owns' these, putting them here to help catagorize
 };
 
 export const TYPE_NAMES = {
@@ -125,8 +127,6 @@ export const TYPE_NAME_IDS = {
 	"Insurgency": 32,
 	"Raise Morale": 33
 };
-
-
 
 export const TYPE_MOVES = {
 	//TypdId: Moves
