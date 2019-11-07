@@ -107,10 +107,10 @@ class Gameboard extends Component {
 			}
 		}
 
-		if (selectedPiece !== -1) {
-			if (selectedPiece in confirmedPlans) {
-				for (let z = 0; z < confirmedPlans[selectedPiece].length; z++) {
-					const { type, positionId } = confirmedPlans[selectedPiece][z];
+		if (selectedPiece !== null) {
+			if (selectedPiece.pieceId in confirmedPlans) {
+				for (let z = 0; z < confirmedPlans[selectedPiece.pieceId].length; z++) {
+					const { type, positionId } = confirmedPlans[selectedPiece.pieceId][z];
 					if (type === "move") {
 						planningPositions.push(parseInt(positionId));
 					}
@@ -195,7 +195,7 @@ Gameboard.propTypes = {
 	battle: PropTypes.object.isRequired,
 	container: PropTypes.object.isRequired,
 	planning: PropTypes.object.isRequired,
-	selectedPiece: PropTypes.number.isRequired,
+	selectedPiece: PropTypes.object.isRequired,
 	confirmedPlans: PropTypes.object.isRequired,
 	highlightedPositions: PropTypes.array.isRequired,
 	newsPopupMinimizeToggle: PropTypes.func.isRequired

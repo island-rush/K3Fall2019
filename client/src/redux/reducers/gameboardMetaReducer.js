@@ -37,8 +37,7 @@ const initialGameboardMeta = {
 	//TODO: change to selectedPositionId and selectedPieceId to better represent the values (ints) (and also selectedBattlePiece -> selectedBattlePieceId)
 	selectedPosition: -1,
 	highlightedPositions: [],
-	selectedPiece: -1,
-	selectedPieceTypeId: -1,
+	selectedPiece: null,
 	selectedMenuId: 0, //TODO: should probably 0 index this instead of 1 index (make -1 == no menu open)
 	news: {
 		isMinimized: false,
@@ -133,12 +132,10 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.news = payload.news;
 			break;
 		case PIECE_CLICK:
-			stateDeepCopy.selectedPiece = parseInt(payload.selectedPieceId);
-			stateDeepCopy.selectedPieceTypeId = parseInt(payload.selectedPieceTypeId);
+			stateDeepCopy.selectedPiece = payload.selectedPiece;
 			break;
 		case PIECE_CLEAR_SELECTION:
-			stateDeepCopy.selectedPiece = -1;
-			stateDeepCopy.selectedPieceTypeId = -1;
+			stateDeepCopy.selectedPiece = null;
 			break;
 		case START_PLAN:
 			stateDeepCopy.planning.active = true;
@@ -146,8 +143,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 		case CANCEL_PLAN:
 			stateDeepCopy.planning.active = false;
 			stateDeepCopy.planning.moves = [];
-			stateDeepCopy.selectedPiece = -1;
-			stateDeepCopy.selectedPieceTypeId = -1;
+			stateDeepCopy.selectedPiece = null;
 			break;
 		case UNDO_MOVE:
 			stateDeepCopy.planning.moves.pop();
@@ -170,13 +166,11 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.confirmedPlans[pieceId] = plan;
 			stateDeepCopy.planning.active = false;
 			stateDeepCopy.planning.moves = [];
-			stateDeepCopy.selectedPiece = -1;
-			stateDeepCopy.selectedPieceTypeId = -1;
+			stateDeepCopy.selectedPiece = null;
 			break;
 		case DELETE_PLAN:
 			delete stateDeepCopy.confirmedPlans[payload.pieceId];
-			stateDeepCopy.selectedPiece = -1;
-			stateDeepCopy.selectedPieceTypeId = -1;
+			stateDeepCopy.selectedPiece = null;
 			break;
 		case EVENT_REFUEL:
 			stateDeepCopy.refuel.active = true;

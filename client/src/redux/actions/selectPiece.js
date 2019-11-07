@@ -8,8 +8,7 @@ const selectPiece = selectedPiece => {
 			dispatch({
 				type: PIECE_CLICK,
 				payload: {
-					selectedPieceId: selectedPiece.pieceId,
-					selectedPieceTypeId: selectedPiece.pieceTypeId
+					selectedPiece: selectedPiece
 				}
 			});
 		}
