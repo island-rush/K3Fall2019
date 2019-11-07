@@ -1,15 +1,55 @@
+export const TYPE_COSTS = {
+	//TypeId: Cost
+	0: 15, //bomer
+	1: 21, //stealth bomber
+	2: 18, //stealth fighter
+	3: 11,
+	4: 12,
+	5: 8,
+	6: 3,
+	7: 8,
+	8: 8,
+	9: 4,
+	10: 11,
+	11: 7,
+	12: 9,
+	13: 18,
+	14: 24,
+	15: 16,
+	16: 10,
+	17: 11,
+	18: 12,
+	19: 7,
+	20: 20,
+	21: 40,
+	22: 25,
+	23: 30,
+	24: 60,
+	25: 35,
+	26: 35,
+	27: 90,
+	28: 190,
+	29: 25,
+	30: 20,
+	31: 20,
+	32: 20,
+	33: 50
+};
+
 export const TYPE_MAIN = 0;
 export const TYPE_AIR = 1;
 export const TYPE_LAND = 2;
 export const TYPE_SEA = 3;
 export const TYPE_SPECIAL = 4;
+export const TYPE_CAPABILITY = 5;
 
 export const TYPE_OWNERS = {
 	0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
 	1: [0, 1, 2, 3, 4, 5],
 	2: [6, 7, 8, 9, 10, 11, 12],
 	3: [13, 14, 15, 16],
-	4: [17, 18, 19]
+	4: [17, 18, 19],
+	5: [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33]
 };
 
 export const TYPE_NAMES = {
@@ -32,7 +72,21 @@ export const TYPE_NAMES = {
 	16: "Transport",
 	17: "MC-12",
 	18: "C-130",
-	19: "SOF Team"
+	19: "SOF Team",
+	20: "ATC Scramble",
+	21: "Cyber Dominance",
+	22: "Missile Launch Disruptio",
+	23: "Communications Interruption",
+	24: "Remote Sensing",
+	25: "Rods from God",
+	26: "Anti Satellite Missiles",
+	27: "Golden Eye",
+	28: "Nuclear Strike",
+	29: "Biological Weapons",
+	30: "Sea Mines",
+	31: "Drone Swarms",
+	32: "Insurgency",
+	33: "Raise Morale"
 };
 
 export const TYPE_NAME_IDS = {
@@ -55,32 +109,24 @@ export const TYPE_NAME_IDS = {
 	"Transport": 16,
 	"MC-12": 17,
 	"C-130": 18,
-	"SOF Team": 19
+	"SOF Team": 19,
+	"ATC Scramble": 20,
+	"Cyber Dominance": 21,
+	"Missile Launch Disruptio": 22,
+	"Communications Interruption": 23,
+	"Remote Sensing": 24,
+	"Rods from God": 25,
+	"Anti Satellite Missiles": 26,
+	"Golden Eye": 27,
+	"Nuclear Strike": 28,
+	"Biological Weapons": 29,
+	"Sea Mines": 30,
+	"Drone Swarms": 31,
+	"Insurgency": 32,
+	"Raise Morale": 33
 };
 
-export const TYPE_COSTS = {
-	//TypeId: Cost
-	0: 15, //bomer
-	1: 21, //stealth bomber
-	2: 18, //stealth fighter
-	3: 11,
-	4: 12,
-	5: 8,
-	6: 3,
-	7: 8,
-	8: 8,
-	9: 4,
-	10: 11,
-	11: 7,
-	12: 9,
-	13: 18,
-	14: 24,
-	15: 16,
-	16: 10,
-	17: 11,
-	18: 12,
-	19: 7
-};
+
 
 export const TYPE_MOVES = {
 	//TypdId: Moves
