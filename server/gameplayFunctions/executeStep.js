@@ -1,6 +1,6 @@
 const { Plan, Piece, Event } = require("../classes");
-import { PLACE_PHASE, NEW_ROUND } from "../../client/src/redux/actions/actionTypes";
-import { SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
+import { PLACE_PHASE, NEW_ROUND, PIECES_MOVE } from "../../client/src/redux/actions/actionTypes";
+import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
 const giveNextEvent = require("./giveNextEvent");
 const { BOTH_TEAMS_INDICATOR, POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("./eventConstants");
 
@@ -17,29 +17,58 @@ const executeStep = async (socket, thisGame) => {
 	if (currentMovementOrder0 == null && currentMovementOrder1 == null) {
 		await thisGame.setSlice(0); //if no more moves, end of slice 1
 
-		let serverAction;
+		await Piece.resetMoves(gameId); //TODO: could move this functionality to Game (no need to pass in the gameId)
+
+		const gameboardPiecesList0 = await Piece.getVisiblePieces(gameId, 0);
+		const gameboardPiecesList1 = await Piece.getVisiblePieces(gameId, 1);
+
+		let serverAction0;
+		let serverAction1;
 		if (gameRound == 2) {
+			//Combat -> Place Phase
 			await thisGame.setRound(0);
 			await thisGame.setPhase(3);
 
-			//Combat -> Place Phase
-			serverAction = {
+			serverAction0 = {
 				type: PLACE_PHASE,
-				payload: {}
+				payload: {
+					gameboardPieces: gameboardPiecesList0
+				}
+			};
+
+			serverAction1 = {
+				type: PLACE_PHASE,
+				payload: {
+					gameboardPieces: gameboardPiecesList1
+				}
 			};
 		} else {
+			//Next Round of Combat
 			await thisGame.setRound(gameRound + 1);
 
-			serverAction = {
+			serverAction0 = {
 				type: NEW_ROUND,
 				payload: {
-					gameRound: thisGame.gameRound
+					gameRound: thisGame.gameRound,
+					gameboardPieces: gameboardPiecesList0
+				}
+			};
+
+			serverAction1 = {
+				type: NEW_ROUND,
+				payload: {
+					gameRound: thisGame.gameRound,
+					gameboardPieces: gameboardPiecesList1
 				}
 			};
 		}
 
-		socket.to("game" + gameId).emit(SERVER_SENDING_ACTION, serverAction);
-		socket.emit(SERVER_SENDING_ACTION, serverAction);
+		socket.to("game" + gameId + "team0").emit(SERVER_SENDING_ACTION, serverAction0);
+		socket.to("game" + gameId + "team1").emit(SERVER_SENDING_ACTION, serverAction1);
+
+		const thisSocketsAction = socket.handshake.session.ir3.gameTeam === 0 ? serverAction0 : serverAction1;
+		socket.emit(SERVER_SENDING_ACTION, thisSocketsAction);
+
 		return;
 	}
 

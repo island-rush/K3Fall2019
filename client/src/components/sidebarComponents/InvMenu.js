@@ -41,7 +41,7 @@ class InvMenu extends Component {
 		const { selected, invItems, invItemClick } = this.props;
 
 		const warfareInvItems = invItems.filter(item => {
-			return item.invItemTypeId > 19;
+			return item.invItemTypeId > 19; //TODO: (19) this should be a constant in gameData, number of pieces may change...
 		});
 
 		const warefareInvItemComponents = warfareInvItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);

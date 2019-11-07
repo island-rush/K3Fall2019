@@ -1,5 +1,5 @@
 const pool = require("../database");
-import { VISIBILITY_MATRIX } from "../../client/src/gameData/gameConstants";
+import { VISIBILITY_MATRIX, TYPE_MOVES } from "../../client/src/gameData/gameConstants";
 import { distanceMatrix } from "../../client/src/gameData/distanceMatrix";
 
 class Piece {
@@ -153,6 +153,35 @@ class Piece {
 			pieceFuel
 		});
 		return thisPiece;
+	}
+
+	static async resetMoves(gameId) {
+		const testquery =
+			"UPDATE pieces SET pieceMoves = CASE WHEN pieceTypeId = 0 THEN ? WHEN pieceTypeId = 1 THEN ? WHEN pieceTypeId = 2 THEN ? WHEN pieceTypeId = 3 THEN ? WHEN pieceTypeId = 4 THEN ? WHEN pieceTypeId = 5 THEN ? WHEN pieceTypeId = 6 THEN ? WHEN pieceTypeId = 7 THEN ? WHEN pieceTypeId = 8 THEN ? WHEN pieceTypeId = 9 THEN ? WHEN pieceTypeId = 10 THEN ? WHEN pieceTypeId = 11 THEN ? WHEN pieceTypeId = 12 THEN ? WHEN pieceTypeId = 13 THEN ? WHEN pieceTypeId = 14 THEN ? WHEN pieceTypeId = 15 THEN ? WHEN pieceTypeId = 16 THEN ? WHEN pieceTypeId = 17 THEN ? WHEN pieceTypeId = 18 THEN ? WHEN pieceTypeId = 19 THEN ? END WHERE pieceGameId = ?";
+		const inserts = [
+			TYPE_MOVES[0],
+			TYPE_MOVES[1],
+			TYPE_MOVES[2],
+			TYPE_MOVES[3],
+			TYPE_MOVES[4],
+			TYPE_MOVES[5],
+			TYPE_MOVES[6],
+			TYPE_MOVES[7],
+			TYPE_MOVES[8],
+			TYPE_MOVES[9],
+			TYPE_MOVES[10],
+			TYPE_MOVES[11],
+			TYPE_MOVES[12],
+			TYPE_MOVES[13],
+			TYPE_MOVES[14],
+			TYPE_MOVES[15],
+			TYPE_MOVES[16],
+			TYPE_MOVES[17],
+			TYPE_MOVES[18],
+			TYPE_MOVES[19],
+			gameId
+		];
+		await pool.query(testquery, inserts);
 	}
 }
 

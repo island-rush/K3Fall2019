@@ -41,7 +41,7 @@ const diceBoxStyle = {
 	float: "left",
 	margin: ".5%",
 	position: "relative"
-}
+};
 
 const selected = [
 	{ border: "2px solid red" }, //selected
@@ -85,22 +85,10 @@ class BattlePiece extends Component {
 					{battlePiece.targetPieceIndex}
 				</div>
 			);
-		
-		const diceBox1 = 
-			battlePiece.diceRoll == null ? null : (
-				<div style={{ ...diceBoxStyle, ...DICE_IMAGES[battlePiece.diceRoll1] }}>
-					{battlePiece.diceRoll1}
-				</div>
-				
-			);
 
-		const diceBox2 = 
-		battlePiece.diceRoll == null ? null : (
-			<div style={{ ...diceBoxStyle, ...DICE_IMAGES[battlePiece.diceRoll2] }}>
-				{battlePiece.diceRoll2}
-			</div>
-			
-		);
+		const diceBox1 = battlePiece.diceRoll == null ? null : <div style={{ ...diceBoxStyle, ...DICE_IMAGES[battlePiece.diceRoll1] }} />;
+
+		const diceBox2 = battlePiece.diceRoll == null ? null : <div style={{ ...diceBoxStyle, ...DICE_IMAGES[battlePiece.diceRoll2] }} />;
 
 		return (
 			<div style={{ ...battlePieceStyle, ...battlePieceWonStyle[battlePiece.win != null && battlePiece.win ? 1 : 0] }}>

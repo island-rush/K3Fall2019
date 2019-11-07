@@ -19,20 +19,25 @@ class InvItem extends Component {
 		const { invItem, invItemClick } = this.props;
 		const { invItemTypeId } = invItem;
 
-		return (
-			<div
-				style={{
-					...invItemStyle,
-					...TYPE_IMAGES[invItemTypeId]
-				}}
-				title={`${TYPE_NAMES[invItemTypeId]}\nMoves: ${TYPE_MOVES[invItemTypeId]}\nFuel: ${TYPE_FUEL[invItemTypeId]}`}
-				onClick={event => {
-					event.preventDefault();
-					invItemClick(invItem);
-					event.stopPropagation();
-				}}
-			/>
-		);
+		const name = TYPE_NAMES[invItemTypeId];
+		const moves = TYPE_MOVES[invItemTypeId];
+		const fuel = TYPE_FUEL[invItemTypeId];
+
+		const style = {
+			...invItemStyle,
+			...TYPE_IMAGES[invItemTypeId]
+		};
+
+		//TODO: remove -1 fuel for pieces who don't use fuel (let those be undefined (like capabilities))
+		const title = `${name}\nMoves: ${moves !== undefined ? moves : "N/A"}\nFuel: ${fuel !== undefined && fuel !== -1 ? fuel : "N/A"}`;
+
+		const onClick = event => {
+			event.preventDefault();
+			invItemClick(invItem);
+			event.stopPropagation();
+		};
+
+		return <div style={style} title={title} onClick={onClick} />;
 	}
 }
 
