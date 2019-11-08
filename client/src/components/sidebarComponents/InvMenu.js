@@ -25,7 +25,7 @@ const airpieceItemsContainerStyle = {
 	width: "18%",
 	height: "80%",
 	right: "81%",
-	top: "1%"
+	top: "10%"
 };
 
 const landpieceItemsContainerStyle = {
@@ -34,7 +34,7 @@ const landpieceItemsContainerStyle = {
 	width: "18%",
 	height: "80%",
 	right: "61%",
-	top: "1%"
+	top: "10%"
 };
 const seapieceItemsContainerStyle = {
 	backgroundColor: "pink",
@@ -42,7 +42,7 @@ const seapieceItemsContainerStyle = {
 	width: "18%",
 	height: "80%",
 	right: "41%",
-	top: "1%"
+	top: "10%"
 };
 const specialpieceItemsContainerStyle = {
 	backgroundColor: "pink",
@@ -50,7 +50,7 @@ const specialpieceItemsContainerStyle = {
 	width: "18%",
 	height: "80%",
 	right: "21%",
-	top: "1%"
+	top: "10%"
 };
 
 const warfareItemsContainerStyle = {
@@ -59,7 +59,7 @@ const warfareItemsContainerStyle = {
 	width: "18%",
 	height: "80%",
 	left: "81%",
-	top: "1%"
+	top: "10%"
 };
 class InvMenu extends Component {
 	render() {
