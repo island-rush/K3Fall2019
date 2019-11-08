@@ -18,7 +18,6 @@ const invisibleStyle = {
 	display: "none"
 };
 
-
 const airpieceItemsContainerStyle = {
 	backgroundColor: "pink",
 	position: "absolute",
@@ -65,41 +64,35 @@ class InvMenu extends Component {
 	render() {
 		const { selected, invItems, invItemClick } = this.props;
 
+		//TODO: change these numbers to constants, or change to use the ownership stuff
+		//Also need to distinguish the capabilities from the pieces (better) (probably with different constants?)
 		const airItems = invItems.filter(item => {
-			return item.invItemTypeId <=5 && item.invItemTypeId>=0;
+			return item.invItemTypeId <= 5 && item.invItemTypeId >= 0;
 		});
 		const landItems = invItems.filter(item => {
-			return item.invItemTypeId <=12 && item.invItemTypeId>=6;
+			return item.invItemTypeId <= 12 && item.invItemTypeId >= 6;
 		});
 		const seaItems = invItems.filter(item => {
-			return item.invItemTypeId <=16 && item.invItemTypeId>=13;
+			return item.invItemTypeId <= 16 && item.invItemTypeId >= 13;
+		});
+		const specialItems = invItems.filter(item => {
+			return item.invItemTypeId <= 19 && item.invItemTypeId >= 17;
+		});
+		const capabilityItems = invItems.filter(item => {
+			return item.invItemTypeId > 19;
 		});
 
-		const specialItems = invItems.filter(item => {
-			return item.invItemTypeId <=19 && item.invItemTypeId>=17;
-		});
-		
-		
 		const airInvComponents = airItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
 		const landInvComponents = landItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
 		const seaInvComponents = seaItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
 		const specialInvComponents = specialItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
-
-		const warfareInvItems = invItems.filter(item => {
-			return item.invItemTypeId > 19;//TODO: (19) this should be a constant in gameData, number of pieces may change...
-		});
-
-		const warefareInvItemComponents = warfareInvItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
-
-		const pieceInvItems = invItems.filter(item => {
-			return item.invItemTypeId <= 19;
-		});
+		const capabilityItemComponents = capabilityItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
 
 		return (
 			<div style={selected ? inventoryStyle : invisibleStyle}>
 				<div style={warfareItemsContainerStyle}>
 					<div>Capabilities</div>
-					{warefareInvItemComponents}
+					{capabilityItemComponents}
 				</div>
 				<div style={airpieceItemsContainerStyle}>
 					<div> Air Pieces</div>
@@ -123,7 +116,7 @@ class InvMenu extends Component {
 }
 
 InvMenu.propTypes = {
-	selected: PropTypes.bool.isRequired,
+	selected: PropTypes.bool.isRequired, //from the parent
 	invItems: PropTypes.array.isRequired,
 	invItemClick: PropTypes.func.isRequired
 };
