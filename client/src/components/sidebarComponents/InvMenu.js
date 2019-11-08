@@ -85,7 +85,11 @@ class InvMenu extends Component {
 		const specialInvComponents = specialItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);
 
 		const warfareInvItems = invItems.filter(item => {
+<<<<<<< HEAD
 			return item.invItemTypeId > 19;//TODO: (19) this should be a constant in gameData, number of pieces may change...
+=======
+			return item.invItemTypeId > 19; //TODO: (19) this should be a constant in gameData, number of pieces may change...
+>>>>>>> c66f3342de22f7f0a18764e809cecd346fb3cb47
 		});
 
 		const warefareInvItemComponents = warfareInvItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={invItemClick} />);

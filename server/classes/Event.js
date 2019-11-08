@@ -204,7 +204,9 @@ class Event {
 					//do a dice roll
 					//figure out needed value for success
 					let neededValue = ATTACK_MATRIX[pieceTypeId][tpieceTypeId];
-					let diceRollValue = this.diceRoll();
+					var diceRolledResult1 = Math.floor(Math.random() * 6) + 1;
+					var diceRolledResult2 = Math.floor(Math.random() * 6) + 1;
+					let diceRollValue = diceRolledResult1+diceRolledResult2;
 
 					// console.log(`just had ${diceRollValue} and needed ${neededValue}`);
 	
@@ -217,7 +219,9 @@ class Event {
 							pieceId,
 							diceRoll: diceRollValue,
 							targetId: tpieceId,
-							win: true
+							win: true,
+							diceRoll1: diceRolledResult1,
+							diceRoll2: diceRolledResult2
 						});
 					} else {
 						//nothing happens, show dice, don't highlight?
@@ -225,7 +229,9 @@ class Event {
 							pieceId,
 							diceRoll: diceRollValue,
 							targetId: tpieceId,
-							win: false
+							win: false,
+							diceRoll1: diceRolledResult1,
+							diceRoll2: diceRolledResult2
 						});
 					}
 				}
@@ -247,12 +253,6 @@ class Event {
 		}
 
 		return fightResults;
-	}
-
-	diceRoll() {
-		let firstDice = Math.floor(Math.random() * 6) + 1;
-		let secondDice = Math.floor(Math.random() * 6) + 1;
-		return firstDice + secondDice;
 	}
 }
 

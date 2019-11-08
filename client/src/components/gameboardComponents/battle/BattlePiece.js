@@ -31,6 +31,18 @@ const boxStyle = {
 	position: "relative"
 };
 
+const diceBoxStyle = {
+	backgroundRepeat: "no-repeat",
+	backgroundSize: "90% 90%",
+	backgroundPosition: "center",
+	border: "2px solid black",
+	height: "40%",
+	width: "15%",
+	float: "left",
+	margin: ".5%",
+	position: "relative"
+};
+
 const selected = [
 	{ border: "2px solid red" }, //selected
 	{ border: "2px solid black" } //not selected
@@ -74,14 +86,17 @@ class BattlePiece extends Component {
 				</div>
 			);
 
-		const diceBox = battlePiece.diceRoll == null ? null : <div style={{ ...boxStyle, ...DICE_IMAGES[battlePiece.diceRoll] }}>{battlePiece.diceRoll}</div>;
+		const diceBox1 = battlePiece.diceRoll == null ? null : <div style={{ ...diceBoxStyle, ...DICE_IMAGES[battlePiece.diceRoll1] }} />;
+
+		const diceBox2 = battlePiece.diceRoll == null ? null : <div style={{ ...diceBoxStyle, ...DICE_IMAGES[battlePiece.diceRoll2] }} />;
 
 		return (
 			<div style={{ ...battlePieceStyle, ...battlePieceWonStyle[battlePiece.win != null && battlePiece.win ? 1 : 0] }}>
 				{battlePieceBox}
 				{arrowBox}
 				{targetBox}
-				{diceBox}
+				{diceBox1}
+				{diceBox2}
 			</div>
 		);
 	}

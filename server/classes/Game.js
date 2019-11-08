@@ -301,14 +301,16 @@ class Game {
 		let inserts;
 
 		if (options.gameId) {
-			queryString = "INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?, ?)";
-			inserts = [options.gameId, gameSection, gameInstructor, gameAdminPasswordHash];
+			queryString = "INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) SELECT ?,?,?,? WHERE NOT EXISTS(SELECT * from games WHERE gameSection=? AND gameInstructor = ?)";
+			inserts = [options.gameId, gameSection, gameInstructor, gameAdminPasswordHash, gameSection, gameInstructor];
 		} else {
-			queryString = "INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) VALUES (?, ?, ?)";
-			inserts = [gameSection, gameInstructor, gameAdminPasswordHash];
+			queryString = "INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) SELECT ?,?,? WHERE NOT EXISTS(SELECT * from games WHERE gameSection=? AND gameInstructor = ?)";
+			inserts = [gameSection, gameInstructor, gameAdminPasswordHash,gameSection, gameInstructor];
 		}
-
-		await pool.query(queryString, inserts);
+		
+		const result = await pool.query(queryString, inserts);
+		if( result[0].affectedRows == 0)
+			return;
 
 		const thisGame = await new Game({ gameSection, gameInstructor }).init(); //could not init, but since we don't know who is using this function, return the full game
 
