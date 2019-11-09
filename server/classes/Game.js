@@ -114,6 +114,7 @@ class Game {
 		serverAction.payload.gameboardMeta = {};
 		serverAction.payload.gameboardMeta.confirmedPlans = await Plan.getConfirmedPlans(this.gameId, gameTeam);
 		serverAction.payload.gameboardMeta.confirmedRods = await Capability.getRodsFromGod(this.gameId, gameTeam);
+		serverAction.payload.gameboardMeta.confirmedRemoteSense = await Capability.getRemoteSensing(this.gameId, gameTeam);
 
 		//Could put news into its own object, but don't really use it much...(TODO: figure out if need to refactor this...)
 		if (this.gamePhase == 0) {

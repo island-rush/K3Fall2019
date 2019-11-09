@@ -48,7 +48,7 @@ class Zoombox extends Component {
 
 Zoombox.propTypes = {
 	selectedPos: PropTypes.number.isRequired,
-	selectedPiece: PropTypes.object.isRequired,
+	selectedPiece: PropTypes.object,
 	gameboard: PropTypes.array.isRequired,
 	selectPiece: PropTypes.func.isRequired,
 	clearPieceSelection: PropTypes.func.isRequired

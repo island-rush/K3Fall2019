@@ -59,3 +59,7 @@ svg g polygon {
 	stroke: rgb(255, 255, 255);
 	stroke-width: 1;
 }
+.remoteSensePos polygon {
+	stroke: rgb(255, 136, 0);
+	stroke-width: 0.3;
+}

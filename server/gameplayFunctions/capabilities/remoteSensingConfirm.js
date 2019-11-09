@@ -72,12 +72,14 @@ const remoteSensingConfirm = async (socket, payload) => {
 
 	await thisInvItem.delete();
 
+	const confirmedRemoteSense = await Capability.getRemoteSensing(gameId, gameTeam);
+
 	// let the client(team) know that this plan was accepted
 	const serverAction = {
 		type: REMOTE_SENSING_SELECTED,
 		payload: {
 			invItem: thisInvItem,
-			selectedPositionId
+			confirmedRemoteSense
 		}
 	};
 	socket.emit(SERVER_SENDING_ACTION, serverAction);

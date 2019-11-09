@@ -79,7 +79,8 @@ const initialGameboardMeta = {
 		moves: []
 	},
 	confirmedPlans: {},
-	confirmedRods: []
+	confirmedRods: [],
+	confirmedRemoteSense: []
 };
 
 function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
@@ -175,9 +176,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.planning.capability = false;
 			stateDeepCopy.planning.invItem = null;
 			stateDeepCopy.planning.active = false;
-			//
-			//state to keep track of areas to highlight...
-			//
+			stateDeepCopy.confirmedRemoteSense = payload.confirmedRemoteSense;
 			break;
 		case CANCEL_PLAN:
 			stateDeepCopy.planning.active = false;
