@@ -1,5 +1,5 @@
 const pool = require("../database");
-import { VISIBILITY_MATRIX, TYPE_MOVES, REMOTE_SENSING_RANGE } from "../../client/src/gameData/gameConstants";
+import { VISIBILITY_MATRIX, TYPE_MOVES, REMOTE_SENSING_RANGE, TYPE_NAME_IDS } from "../../client/src/gameData/gameConstants";
 import { distanceMatrix } from "../../client/src/gameData/distanceMatrix";
 
 class Piece {
@@ -90,7 +90,8 @@ class Piece {
 					let { teamId } = results[x];
 					let otherTeam = teamId === 0 ? 1 : 0;
 					for (let pieceType = 0; pieceType < posTypesVisible[otherTeam].length; pieceType++) {
-						if (!posTypesVisible[otherTeam][pieceType].includes(currentPos)) { //add this position if not already added by another piece somewhere else
+						//does not see subs or sof teams
+						if (!posTypesVisible[otherTeam][pieceType].includes(currentPos) && piceType !== TYPE_NAME_IDS["SOF Team"] && pieceType !== TYPE_NAME_IDS["Submarine"]) { //add this position if not already added by another piece somewhere else
 							posTypesVisible[otherTeam][pieceType].push(currentPos);
 						}
 					}
