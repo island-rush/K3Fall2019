@@ -18,6 +18,8 @@ const sendUserFeedback = require("./sendUserFeedback");
 const piecePlace = require("./piecePlace");
 const mainButtonClick = require("./mainButtonClick");
 
+const rodsFromGodSelect = require("./capabilities/rodsFromGodSelect");
+
 module.exports = {
 	shopPurchaseRequest,
 	sendUserFeedback,
@@ -28,5 +30,6 @@ module.exports = {
 	piecePlace,
 	mainButtonClick,
 	confirmBattleSelection,
-	confirmFuelSelection
+	confirmFuelSelection,
+	rodsFromGodSelect
 };

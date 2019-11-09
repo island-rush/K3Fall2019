@@ -1,4 +1,4 @@
-import { INITIAL_GAMESTATE, SHOP_TRANSFER, PIECE_PLACE } from "../actions/actionTypes";
+import { INITIAL_GAMESTATE, SHOP_TRANSFER, PIECE_PLACE, RODS_FROM_GOD_SELECTED } from "../actions/actionTypes";
 
 const initialInvState = [];
 
@@ -11,6 +11,10 @@ function invReducer(state = initialInvState, { type, payload }) {
 		case PIECE_PLACE:
 			return state.filter(invItem => {
 				return invItem.invItemId !== payload.invItemId;
+			});
+		case RODS_FROM_GOD_SELECTED:
+			return state.filter(invItem => {
+				return invItem.invItemId !== payload.invItem.invItemId;
 			});
 		default:
 			return state;

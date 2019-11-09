@@ -29,7 +29,9 @@ import {
 	UNDO_FUEL_SELECTION,
 	REFUEL_RESULTS,
 	NEWSPOPUP_MINIMIZE_TOGGLE,
-	REFUELPOPUP_MINIMIZE_TOGGLE
+	REFUELPOPUP_MINIMIZE_TOGGLE,
+	RODS_FROM_GOD_SELECTING,
+	RODS_FROM_GOD_SELECTED
 } from "../actions/actionTypes";
 
 import { TYPE_FUEL } from "../../gameData/gameConstants";
@@ -69,9 +71,12 @@ const initialGameboardMeta = {
 	},
 	planning: {
 		active: false,
+		capability: false,
+		invItem: null,
 		moves: []
 	},
-	confirmedPlans: {}
+	confirmedPlans: {},
+	confirmedRods: []
 };
 
 function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
@@ -141,8 +146,22 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 		case START_PLAN:
 			stateDeepCopy.planning.active = true;
 			break;
+		case RODS_FROM_GOD_SELECTING:
+			stateDeepCopy.planning.active = true;
+			stateDeepCopy.planning.capability = true;
+			stateDeepCopy.planning.invItem = payload.invItem;
+			stateDeepCopy.selectedMenuId = 0;
+			break;
+		case RODS_FROM_GOD_SELECTED:
+			stateDeepCopy.planning.capability = false;
+			stateDeepCopy.planning.invItem = null;
+			stateDeepCopy.planning.active = false;
+
+			stateDeepCopy.confirmedRods.push(parseInt(payload.selectedPositionId));
+			break;
 		case CANCEL_PLAN:
 			stateDeepCopy.planning.active = false;
+			stateDeepCopy.planning.capability = false;
 			stateDeepCopy.planning.moves = [];
 			stateDeepCopy.selectedPiece = null;
 			break;
@@ -187,7 +206,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			Object.assign(stateDeepCopy, payload.gameboardMeta);
 			break;
 		case NEWSPOPUP_MINIMIZE_TOGGLE:
-			stateDeepCopy.news.isMinimized = !stateDeepCopy.news.isMinimized
+			stateDeepCopy.news.isMinimized = !stateDeepCopy.news.isMinimized;
 			break;
 		case SLICE_CHANGE:
 			stateDeepCopy.confirmedPlans = {};
