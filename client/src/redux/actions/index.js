@@ -28,10 +28,17 @@ import selectPiece from "./selectPiece";
 import menuSelect from "./menuSelect";
 
 import mainButtonClick from "./mainButtonClick";
-import invItemClick from "./invItemClick";
+
 import clearPieceSelection from "./clearPieceSelection"; //eventually replaced with menuSelect(-1) or menuSelect(0)
 
-import newsPopupMinimizeToggle from "./newsPopupMinimizeToggle"
+import newsPopupMinimizeToggle from "./newsPopupMinimizeToggle";
+
+import invItemClick from "./inv/invItemClick";
+import airPieceClick from "./inv/airPieceClick";
+import landPieceClick from "./inv/landPieceClick";
+import seaPieceClick from "./inv/seaPieceClick";
+
+import rodsFromGod from "./capabilities/rodsFromGod";
 
 export {
 	shopRefundRequest,
@@ -58,5 +65,9 @@ export {
 	tankerClick,
 	aircraftClick,
 	undoFuelSelection,
-	newsPopupMinimizeToggle
+	newsPopupMinimizeToggle,
+	rodsFromGod,
+	airPieceClick,
+	landPieceClick,
+	seaPieceClick
 };

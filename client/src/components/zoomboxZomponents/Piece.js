@@ -42,7 +42,7 @@ class Piece extends Component {
 			...(selected ? selectedStyle : "")
 		};
 
-		const title = `${TYPE_NAMES[piece.pieceTypeId]}\nMoves: ${piece.pieceMoves}\nFuel: ${piece.pieceFuel}`;
+		const title = `${TYPE_NAMES[piece.pieceTypeId]}\nMoves: ${piece.pieceMoves}\nFuel: ${piece.pieceFuel !== -1 ? piece.pieceFuel : "N/A"}`;
 
 		const onClick = event => {
 			event.preventDefault();

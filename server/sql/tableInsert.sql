@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS games (
 	game0Status INT(1) NOT NULL DEFAULT 0,  -- 0: still active, 1: waiting for other player
 	game1Status INT(1) NOT NULL DEFAULT 0,
     
-    game0Points INT(5) NOT NULL DEFAULT 50,
-    game1Points INT(5) NOT NULL DEFAULT 50,
+    game0Points INT(5) NOT NULL DEFAULT 5000,
+    game1Points INT(5) NOT NULL DEFAULT 5000,
     
     gamePhase INT(1) NOT NULL DEFAULT 0, -- 0: news, 1: buy, 2: combat, 3: place inv
     gameRound INT(1) NOT NULL DEFAULT 0, -- 0, 1, 2  rounds of movement
