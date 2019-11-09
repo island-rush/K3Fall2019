@@ -7,9 +7,8 @@ import NewsPopup from "./NewsPopup";
 import ContainerPopup from "./ContainerPopup";
 import RefuelPopup from "./refuel/RefuelPopup";
 import Patterns from "./Patterns";
-import { selectPosition } from "../../redux/actions";
+import { selectPosition, newsPopupMinimizeToggle } from "../../redux/actions";
 import { TYPE_HIGH_LOW } from "../../gameData/gameConstants";
-import { newsPopupMinimizeToggle } from "../../redux/actions"
 
 const gameboardStyle = {
 	backgroundColor: "blue",
@@ -215,8 +214,8 @@ const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 });
 
 const mapActionsToProps = {
-	selectPosition: selectPosition,
-	newsPopupMinimizeToggle: newsPopupMinimizeToggle
+	selectPosition,
+	newsPopupMinimizeToggle
 };
 
 export default connect(

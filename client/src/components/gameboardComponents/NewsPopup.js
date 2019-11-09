@@ -1,6 +1,5 @@
 import React from "react";
 import { NEWS_POPUP_IMAGES } from "../styleConstants";
-import { newsPopupMinimizeToggle } from "../../redux/actions"
 import PropTypes from "prop-types";
 
 const newsPopupStyle = {
@@ -62,10 +61,6 @@ const NewsAlertPopup = ({ news, newsPopupMinimizeToggle }) => {
 			/>
 		</div>
 	);
-};
-
-const mapActionsToProps = {
-	newsPopupMinimizeToggle
 };
 
 NewsAlertPopup.propTypes = {
