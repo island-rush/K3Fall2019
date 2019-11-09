@@ -11,7 +11,7 @@ const confirmPlan = () => {
 			const clientAction = {
 				type: "confirmPlan",
 				payload: {
-					pieceId: gameboardMeta.selectedPiece,
+					pieceId: gameboardMeta.selectedPiece.pieceId,
 					plan: gameboardMeta.planning.moves
 				}
 			};

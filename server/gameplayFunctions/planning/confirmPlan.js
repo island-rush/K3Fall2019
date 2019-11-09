@@ -43,7 +43,7 @@ const confirmPlan = async (socket, payload) => {
 
 	//Check adjacency and other parts of the plan to make sure the whole thing makes sense
 	let previousPosition = piecePositionId;
-	var pieceMoves = 0;
+	var trueMoveCount = 0;
 	for (let x = 0; x < plan.length; x++) {
 		//make sure adjacency between positions in the plan...
 		//other checks...piece type and number of moves?
@@ -61,6 +61,8 @@ const confirmPlan = async (socket, payload) => {
 				sendUserFeedback(socket, "sent a bad plan, container move was not in previous position...");
 				return;
 			}
+		} else if (type == "move") {
+			trueMoveCount++;
 		}
 
 		//This condition may have to change in the future if parts of the plan
@@ -71,15 +73,12 @@ const confirmPlan = async (socket, payload) => {
 				return;
 			}
 		}
-		else {
-			pieceMoves++;
-		}
 
 		previousPosition = positionId;
 	}
 
 	//Is the plan length less than or equal to the max moves of the piece?
-	if (pieceMoves > TYPE_MOVES[pieceTypeId]){
+	if (trueMoveCount > TYPE_MOVES[pieceTypeId]){
 		sendUserFeedback(socket, "sent a bad plan, piece was moved more than its range...");
 		return;
 	}
