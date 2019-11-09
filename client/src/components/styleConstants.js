@@ -72,6 +72,10 @@ export const NEWS_POPUP_IMAGES = {
 	minIcon: { backgroundImage: `url("${graphicsPath}/newsIcon.png")`}
 }
 
+export const REFUEL_POPUP_IMAGES = {
+	minIcon: { backgroundImage: `url("${graphicsPath}/refuelIcon.png")`}
+}
+
 export const ZOOMBOX_BACKGROUNDS = {
 	land: { backgroundColor: "green" },
 	water: { backgroundColor: "cyan" },
