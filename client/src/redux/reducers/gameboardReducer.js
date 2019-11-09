@@ -8,7 +8,8 @@ import {
 	NO_MORE_EVENTS,
 	EVENT_REFUEL,
 	NEW_ROUND,
-	PLACE_PHASE
+	PLACE_PHASE,
+	SLICE_CHANGE
 } from "../actions/actionTypes";
 import { initialGameboardEmpty } from "./initialGameboardEmpty";
 
@@ -45,6 +46,11 @@ function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
 				freshBoard[positions[x]].pieces = payload.gameboardPieces[positions[x]];
 			}
 			return freshBoard;
+		case SLICE_CHANGE:
+			for (let x = 0; x < payload.confirmedRods.length; x++) {
+				stateDeepCopy[payload.confirmedRods[x]].pieces = [];
+			}
+			return stateDeepCopy;
 		case NO_MORE_EVENTS:
 			if (payload.gameboardPieces) {
 				//this would happen on the 1st event (from executeStep)

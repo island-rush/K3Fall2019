@@ -30,6 +30,34 @@ class Capability {
 
 		return listOfPositions;
 	}
+
+	static async useRodsFromGod(gameId) {
+		//get all the rods from god
+		//delete pieces on those positions
+		//let the user know which positions got hit
+
+		let queryString = "SELECT * FROM rodsFromGod WHERE gameId = ?";
+		let inserts = [gameId];
+		const [results] = await pool.query(queryString, inserts);
+
+		//need the positions anyway to give back to the clients for updating
+		let fullListOfPositions = [];
+		for (let x = 0; x < results.length; x++) {
+			fullListOfPositions.push(results[x].positionId);
+		}
+
+		//now delete pieces with this position
+		queryString = "DELETE FROM pieces WHERE pieceGameId = ? AND piecePositionId in (?)";
+		inserts = [gameId, fullListOfPositions];
+		await pool.query(queryString, inserts);
+
+		//delete the rodsFromGod in the db
+		queryString = "DELETE FROM rodsFromGod WHERE gameId = ?";
+		inserts = [gameId];
+		await pool.query(queryString, inserts);
+
+		return fullListOfPositions;
+	}
 }
 
 module.exports = Capability;
