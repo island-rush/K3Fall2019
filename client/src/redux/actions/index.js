@@ -24,7 +24,6 @@ import droneSwarms from "./capabilities/droneSwarms";
 import insurgency from "./capabilities/insurgency";
 import raiseMorale from "./capabilities/raiseMorale";
 
-import invItemClick from "./inv/invItemClick";
 import airPieceClick from "./inv/airPieceClick";
 import landPieceClick from "./inv/landPieceClick";
 import seaPieceClick from "./inv/seaPieceClick";
@@ -74,7 +73,6 @@ export {
 	enemyBattlePieceClick,
 	confirmBattleSelections,
 	clearOldBattle,
-	invItemClick,
 	clearPieceSelection,
 	containerMove,
 	confirmFuelSelections,

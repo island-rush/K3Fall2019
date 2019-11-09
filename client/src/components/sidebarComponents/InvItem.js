@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { TYPE_NAMES, TYPE_MOVES, TYPE_FUEL } from "../../gameData/gameConstants";
 import { TYPE_IMAGES } from "../styleConstants";

@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import InvItem from "./InvItem";
-import { invItemClick, airPieceClick, landPieceClick, seaPieceClick, rodsFromGod } from "../../redux/actions";
+//prettier-ignore
+import { airPieceClick, landPieceClick, seaPieceClick, atcScamble, cyberDominance, missileLaunchDisruption, communicationsInterruption, remoteSensing, rodsFromGod, antiSatelliteMissiles, goldenEye, nuclearStrike, biologicalWeapons, seaMines, droneSwarms, insurgency, raiseMorale } from "../../redux/actions";
 import { TYPE_NAME_IDS } from "../../gameData/gameConstants";
 
 const inventoryStyle = {
@@ -64,7 +65,25 @@ const warfareItemsContainerStyle = {
 class InvMenu extends Component {
 	render() {
 		//TODO: selected is a poorly chosen variable name, change to MenuIsVisible or something (since selected is used for other components too)
-		const { selected, invItems, invItemClick, airPieceClick, landPieceClick, seaPieceClick, rodsFromGod } = this.props;
+		//prettier-ignore
+		const { selected, invItems, airPieceClick, landPieceClick, seaPieceClick, atcScamble, cyberDominance, missileLaunchDisruption, communicationsInterruption, remoteSensing, rodsFromGod, antiSatelliteMissiles, goldenEye, nuclearStrike, biologicalWeapons, seaMines, droneSwarms, insurgency, raiseMorale } = this.props;
+
+		const capabilityFunctions = {
+			20: atcScamble,
+			21: cyberDominance,
+			22: missileLaunchDisruption,
+			23: communicationsInterruption,
+			24: remoteSensing,
+			25: rodsFromGod,
+			26: antiSatelliteMissiles,
+			27: goldenEye,
+			28: nuclearStrike,
+			29: biologicalWeapons,
+			30: seaMines,
+			31: droneSwarms,
+			32: insurgency,
+			33: raiseMorale
+		};
 
 		//TODO: change these numbers to constants, or change to use the ownership stuff
 		//Also need to distinguish the capabilities from the pieces (better) (probably with different constants?)
@@ -94,10 +113,7 @@ class InvMenu extends Component {
 			<InvItem key={index} invItem={invItem} invItemClick={invItem.invItemTypeId === TYPE_NAME_IDS["SOF Team"] ? landPieceClick : airPieceClick} />
 		));
 
-		//TODO: get rid of invItemClick placeholder and figure out clean logic to give corresponding function to the right capability
-		const capabilityItemComponents = capabilityItems.map((invItem, index) => (
-			<InvItem key={index} invItem={invItem} invItemClick={invItem.invItemTypeId === TYPE_NAME_IDS["Rods from God"] ? rodsFromGod : invItemClick} />
-		));
+		const capabilityItemComponents = capabilityItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={capabilityFunctions[invItem.invItemTypeId]} />);
 
 		return (
 			<div style={selected ? inventoryStyle : invisibleStyle}>
@@ -129,11 +145,23 @@ class InvMenu extends Component {
 InvMenu.propTypes = {
 	selected: PropTypes.bool.isRequired, //from the parent
 	invItems: PropTypes.array.isRequired,
-	invItemClick: PropTypes.func.isRequired,
 	airPieceClick: PropTypes.func.isRequired,
 	landPieceClick: PropTypes.func.isRequired,
 	seaPieceClick: PropTypes.func.isRequired,
-	rodsFromGod: PropTypes.func.isRequired
+	atcScamble: PropTypes.func.isRequired,
+	cyberDominance: PropTypes.func.isRequired,
+	missileLaunchDisruption: PropTypes.func.isRequired,
+	communicationsInterruption: PropTypes.func.isRequired,
+	remoteSensing: PropTypes.func.isRequired,
+	rodsFromGod: PropTypes.func.isRequired,
+	antiSatelliteMissiles: PropTypes.func.isRequired,
+	goldenEye: PropTypes.func.isRequired,
+	nuclearStrike: PropTypes.func.isRequired,
+	biologicalWeapons: PropTypes.func.isRequired,
+	seaMines: PropTypes.func.isRequired,
+	droneSwarms: PropTypes.func.isRequired,
+	insurgency: PropTypes.func.isRequired,
+	raiseMorale: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ invItems }) => ({
@@ -141,11 +169,24 @@ const mapStateToProps = ({ invItems }) => ({
 });
 
 const mapActionsToProps = {
-	invItemClick,
 	airPieceClick,
 	landPieceClick,
 	seaPieceClick,
-	rodsFromGod
+	//TODO: refactor to use names / variables instead of hard coded numbers? (refactor to throw these in an object/array)
+	atcScamble,
+	cyberDominance,
+	missileLaunchDisruption,
+	communicationsInterruption,
+	remoteSensing,
+	rodsFromGod,
+	antiSatelliteMissiles,
+	goldenEye,
+	nuclearStrike,
+	biologicalWeapons,
+	seaMines,
+	droneSwarms,
+	insurgency,
+	raiseMorale
 };
 
 export default connect(
