@@ -66,7 +66,7 @@ const executeStep = async (socket, thisGame) => {
 		socket.to("game" + gameId + "team0").emit(SERVER_SENDING_ACTION, serverAction0);
 		socket.to("game" + gameId + "team1").emit(SERVER_SENDING_ACTION, serverAction1);
 
-		const thisSocketsAction = socket.handshake.session.ir3.gameTeam === 0 ? serverAction0 : serverAction1;
+		const thisSocketsAction = parseInt(socket.handshake.session.ir3.gameTeam) === 0 ? serverAction0 : serverAction1;
 		socket.emit(SERVER_SENDING_ACTION, thisSocketsAction);
 
 		return;
