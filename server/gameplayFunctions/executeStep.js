@@ -1,4 +1,4 @@
-const { Plan, Piece, Event } = require("../classes");
+const { Plan, Piece, Event, Capability } = require("../classes");
 import { PLACE_PHASE, NEW_ROUND, PIECES_MOVE } from "../../client/src/redux/actions/actionTypes";
 import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
 const giveNextEvent = require("./giveNextEvent");
@@ -19,8 +19,14 @@ const executeStep = async (socket, thisGame) => {
 
 		await Piece.resetMoves(gameId); //TODO: could move this functionality to Game (no need to pass in the gameId)
 
+		//need to handle remote sense decreasing by round, or getting removed
+		await Capability.decreaseRemoteSensing(gameId);
+
 		const gameboardPiecesList0 = await Piece.getVisiblePieces(gameId, 0);
 		const gameboardPiecesList1 = await Piece.getVisiblePieces(gameId, 1);
+
+		const remoteSense0 = await Capability.getRemoteSensing(gameId, 0);
+		const remoteSense1 = await Capability.getRemoteSensing(gameId, 1);
 
 		let serverAction0;
 		let serverAction1;
@@ -32,14 +38,16 @@ const executeStep = async (socket, thisGame) => {
 			serverAction0 = {
 				type: PLACE_PHASE,
 				payload: {
-					gameboardPieces: gameboardPiecesList0
+					gameboardPieces: gameboardPiecesList0,
+					confirmedRemoteSense: remoteSense0
 				}
 			};
 
 			serverAction1 = {
 				type: PLACE_PHASE,
 				payload: {
-					gameboardPieces: gameboardPiecesList1
+					gameboardPieces: gameboardPiecesList1,
+					confirmedRemoteSense: remoteSense1
 				}
 			};
 		} else {
@@ -50,7 +58,8 @@ const executeStep = async (socket, thisGame) => {
 				type: NEW_ROUND,
 				payload: {
 					gameRound: thisGame.gameRound,
-					gameboardPieces: gameboardPiecesList0
+					gameboardPieces: gameboardPiecesList0,
+					confirmedRemoteSense: remoteSense0
 				}
 			};
 
@@ -58,7 +67,8 @@ const executeStep = async (socket, thisGame) => {
 				type: NEW_ROUND,
 				payload: {
 					gameRound: thisGame.gameRound,
-					gameboardPieces: gameboardPiecesList1
+					gameboardPieces: gameboardPiecesList1,
+					confirmedRemoteSense: remoteSense1
 				}
 			};
 		}

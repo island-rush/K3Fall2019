@@ -87,6 +87,16 @@ class Capability {
 
 		return listOfPositions;
 	}
+
+	static async decreaseRemoteSensing(gameId) {
+		//TODO: probably a more efficient way of doing this (single request...)
+		let queryString = "UPDATE remoteSensing SET roundsLeft = roundsLeft - 1 WHERE gameId = ?;";
+		const inserts = [gameId];
+		await pool.query(queryString, inserts);
+
+		queryString = "DELETE FROM remoteSensing WHERE roundsLeft = 0";
+		await pool.query(queryString);
+	}
 }
 
 module.exports = Capability;

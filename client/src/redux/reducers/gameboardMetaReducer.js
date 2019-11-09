@@ -34,7 +34,8 @@ import {
 	RODS_FROM_GOD_SELECTED,
 	NEW_ROUND,
 	REMOTE_SENSING_SELECTING,
-	REMOTE_SENSING_SELECTED
+	REMOTE_SENSING_SELECTED,
+	PLACE_PHASE
 } from "../actions/actionTypes";
 
 import { TYPE_FUEL } from "../../gameData/gameConstants";
@@ -95,6 +96,10 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			break;
 		case NEW_ROUND:
 			stateDeepCopy.confirmedRods = [];
+			stateDeepCopy.confirmedRemoteSense = payload.confirmedRemoteSense;
+			break;
+		case PLACE_PHASE:
+			stateDeepCopy.confirmedRemoteSense = payload.confirmedRemoteSense;
 			break;
 		case POSITION_SELECT:
 			stateDeepCopy.selectedPosition = parseInt(payload.selectedPositionId);
