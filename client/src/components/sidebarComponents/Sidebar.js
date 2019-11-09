@@ -50,6 +50,7 @@ class Sidebar extends Component {
 			<div
 				style={sidebarStyle}
 				onClick={event => {
+					event.preventDefault();
 					event.stopPropagation();
 				}}
 			>
@@ -99,7 +100,7 @@ class Sidebar extends Component {
 
 Sidebar.propTypes = {
 	gameInfo: PropTypes.object.isRequired,
-	selectedMenu: PropTypes.number.isRequired, //manual prop
+	selectedMenu: PropTypes.number.isRequired, //from the parent
 	menuSelect: PropTypes.func.isRequired
 };
 

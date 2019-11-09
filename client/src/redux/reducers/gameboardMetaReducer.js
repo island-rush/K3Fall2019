@@ -29,7 +29,10 @@ import {
 	UNDO_FUEL_SELECTION,
 	REFUEL_RESULTS,
 	NEWSPOPUP_MINIMIZE_TOGGLE,
-	REFUELPOPUP_MINIMIZE_TOGGLE
+	REFUELPOPUP_MINIMIZE_TOGGLE,
+	RODS_FROM_GOD_SELECTING,
+	RODS_FROM_GOD_SELECTED,
+	NEW_ROUND
 } from "../actions/actionTypes";
 
 import { TYPE_FUEL } from "../../gameData/gameConstants";
@@ -69,9 +72,12 @@ const initialGameboardMeta = {
 	},
 	planning: {
 		active: false,
+		capability: false,
+		invItem: null,
 		moves: []
 	},
-	confirmedPlans: {}
+	confirmedPlans: {},
+	confirmedRods: []
 };
 
 function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
@@ -83,6 +89,9 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			break;
 		case MENU_SELECT:
 			stateDeepCopy.selectedMenuId = payload.selectedMenuId !== stateDeepCopy.selectedMenuId ? payload.selectedMenuId : 0;
+			break;
+		case NEW_ROUND:
+			stateDeepCopy.confirmedRods = [];
 			break;
 		case POSITION_SELECT:
 			stateDeepCopy.selectedPosition = parseInt(payload.selectedPositionId);
@@ -141,8 +150,22 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 		case START_PLAN:
 			stateDeepCopy.planning.active = true;
 			break;
+		case RODS_FROM_GOD_SELECTING:
+			stateDeepCopy.planning.active = true;
+			stateDeepCopy.planning.capability = true;
+			stateDeepCopy.planning.invItem = payload.invItem;
+			stateDeepCopy.selectedMenuId = 0;
+			break;
+		case RODS_FROM_GOD_SELECTED:
+			stateDeepCopy.planning.capability = false;
+			stateDeepCopy.planning.invItem = null;
+			stateDeepCopy.planning.active = false;
+
+			stateDeepCopy.confirmedRods.push(parseInt(payload.selectedPositionId));
+			break;
 		case CANCEL_PLAN:
 			stateDeepCopy.planning.active = false;
+			stateDeepCopy.planning.capability = false;
 			stateDeepCopy.planning.moves = [];
 			stateDeepCopy.selectedPiece = null;
 			break;
@@ -174,6 +197,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.selectedPiece = null;
 			break;
 		case EVENT_REFUEL:
+			stateDeepCopy.confirmedRods = [];
 			stateDeepCopy.refuel.active = true;
 			stateDeepCopy.refuel.tankers = payload.tankers;
 			stateDeepCopy.refuel.aircraft = payload.aircraft;
@@ -187,10 +211,11 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			Object.assign(stateDeepCopy, payload.gameboardMeta);
 			break;
 		case NEWSPOPUP_MINIMIZE_TOGGLE:
-			stateDeepCopy.news.isMinimized = !stateDeepCopy.news.isMinimized
+			stateDeepCopy.news.isMinimized = !stateDeepCopy.news.isMinimized;
 			break;
 		case SLICE_CHANGE:
 			stateDeepCopy.confirmedPlans = {};
+			stateDeepCopy.confirmedRods = payload.confirmedRods;
 			break;
 		case BATTLE_PIECE_SELECT:
 			//select if different, unselect if was the same
@@ -213,12 +238,14 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.battle.friendlyPieces[payload.battlePieceIndex].targetPieceIndex = -1;
 			break;
 		case EVENT_BATTLE:
+			stateDeepCopy.confirmedRods = [];
 			stateDeepCopy.battle = initialGameboardMeta.battle;
 			stateDeepCopy.battle.active = true;
 			stateDeepCopy.battle.friendlyPieces = payload.friendlyPieces;
 			stateDeepCopy.battle.enemyPieces = payload.enemyPieces;
 			break;
 		case NO_MORE_EVENTS:
+			stateDeepCopy.confirmedRods = [];
 			// stateDeepCopy = initialGameboardMeta; //gets rid of selected position/piece if there was one...
 			// stateDeepCopy.battle = initialGameboardMeta.battle;
 			// stateDeepCopy.refuel = initialGameboardMeta.refuel;  //these don't seem to work

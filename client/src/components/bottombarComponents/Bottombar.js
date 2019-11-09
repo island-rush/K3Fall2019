@@ -19,13 +19,13 @@ class Bottombar extends Component {
 	render() {
 		const { userFeedback, gameInfo, mainButtonClick } = this.props;
 
+		const onClick = event => {
+			event.preventDefault();
+			event.stopPropagation();
+		};
+
 		return (
-			<div
-				style={bottombarStyle}
-				onClick={event => {
-					event.stopPropagation();
-				}}
-			>
+			<div style={bottombarStyle} onClick={onClick}>
 				<LeftControls />
 				<UserFeedback userFeedback={userFeedback} />
 				<MainButton gameInfo={gameInfo} mainButtonClick={mainButtonClick} />

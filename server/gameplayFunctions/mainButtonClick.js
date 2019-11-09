@@ -1,5 +1,5 @@
 const sendUserFeedback = require("./sendUserFeedback");
-const { Game } = require("../classes");
+const { Game, Capability } = require("../classes");
 import { MAIN_BUTTON_CLICK, PURCHASE_PHASE, COMBAT_PHASE, NEWS_PHASE, SLICE_CHANGE } from "../../client/src/redux/actions/actionTypes";
 import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
@@ -72,9 +72,15 @@ const mainButtonClick = async (socket, payload) => {
 		case 2:
 			if (gameSlice == 0) {
 				await thisGame.setSlice(1);
+
+				//rods from god happen here, show the players if anything gets removed (highlight positions anyway?)
+				const confirmedRods = await Capability.useRodsFromGod(gameId);
+
 				serverAction = {
 					type: SLICE_CHANGE,
-					payload: {}
+					payload: {
+						confirmedRods
+					}
 				};
 			} else {
 				await executeStep(socket, thisGame);

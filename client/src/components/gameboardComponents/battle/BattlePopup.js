@@ -115,7 +115,7 @@ class BattlePopup extends Component {
 						}}
 						style={battleButtonStyle}
 					>
-						{battle.masterRecord == null ? "Confirm Selections" : "ack"}
+						{battle.masterRecord == null ? "Confirm Selections" : "Return to Battle"}
 					</button>
 					<div
 						onClick={event => {

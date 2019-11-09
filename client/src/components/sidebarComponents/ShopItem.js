@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { TYPE_IMAGES } from "../styleConstants";
 
@@ -13,25 +13,20 @@ const shopItemStyle = {
 	backgroundRepeat: "no-repeat"
 };
 
-class ShopItem extends Component {
-	render() {
-		const { refund, shopItem } = this.props;
+const ShopItem = ({ refund, shopItem }) => {
+	const style = {
+		...shopItemStyle,
+		...TYPE_IMAGES[shopItem.shopItemTypeId]
+	};
 
-		return (
-			<div
-				style={{
-					...shopItemStyle,
-					...TYPE_IMAGES[shopItem.shopItemTypeId]
-				}}
-				onClick={event => {
-					event.preventDefault();
-					refund(shopItem);
-					event.stopPropagation();
-				}}
-			/>
-		);
-	}
-}
+	const onClick = event => {
+		event.preventDefault();
+		refund(shopItem);
+		event.stopPropagation();
+	};
+
+	return <div style={style} onClick={onClick} />;
+};
 
 ShopItem.propTypes = {
 	refund: PropTypes.func.isRequired,

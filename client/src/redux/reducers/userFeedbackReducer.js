@@ -24,7 +24,9 @@ import {
 	BATTLE_FIGHT_RESULTS,
 	EVENT_BATTLE,
 	EVENT_REFUEL,
-	AIRCRAFT_CLICK
+	AIRCRAFT_CLICK,
+	RODS_FROM_GOD_SELECTING,
+	RODS_FROM_GOD_SELECTED
 } from "../actions/actionTypes";
 
 const initialUserFeedback = "Loading...";
@@ -47,6 +49,10 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "Cancelled the plan...";
 		case DELETE_PLAN:
 			return "Deleted the confirmed plan...";
+		case RODS_FROM_GOD_SELECTING:
+			return "Now select a position to be obliterated.";
+		case RODS_FROM_GOD_SELECTED:
+			return "selected position to kill!";
 		case AIRCRAFT_CLICK:
 			return "transferring fuel planned...";
 		case PLAN_WAS_CONFIRMED:

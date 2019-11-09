@@ -89,7 +89,20 @@ const patternSolver = position => {
 
 class Gameboard extends Component {
 	render() {
-		const { gameboard, selectedPosition, selectPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions, newsPopupMinimizeToggle } = this.props;
+		const {
+			gameboard,
+			confirmedRods,
+			selectedPosition,
+			selectPosition,
+			news,
+			battle,
+			container,
+			planning,
+			selectedPiece,
+			confirmedPlans,
+			highlightedPositions,
+			newsPopupMinimizeToggle
+		} = this.props;
 
 		let planningPositions = []; //all of the positions part of a plan
 		let containerPositions = []; //specific positions part of a plan of type container
@@ -161,6 +174,8 @@ class Gameboard extends Component {
 						? "highlightedPos"
 						: battlePositions.includes(parseInt(positionIndex))
 						? "battlePos"
+						: confirmedRods.includes(parseInt(positionIndex))
+						? "battlePos"
 						: ""
 				}
 				someOtherProp={battlePositions.includes(parseInt(positionIndex))}
@@ -198,7 +213,8 @@ Gameboard.propTypes = {
 	selectedPiece: PropTypes.object.isRequired,
 	confirmedPlans: PropTypes.object.isRequired,
 	highlightedPositions: PropTypes.array.isRequired,
-	newsPopupMinimizeToggle: PropTypes.func.isRequired
+	newsPopupMinimizeToggle: PropTypes.func.isRequired,
+	confirmedRods: PropTypes.array.isRequired
 };
 
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
@@ -210,7 +226,8 @@ const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 	container: gameboardMeta.container,
 	planning: gameboardMeta.planning,
 	selectedPiece: gameboardMeta.selectedPiece,
-	confirmedPlans: gameboardMeta.confirmedPlans
+	confirmedPlans: gameboardMeta.confirmedPlans,
+	confirmedRods: gameboardMeta.confirmedRods
 });
 
 const mapActionsToProps = {

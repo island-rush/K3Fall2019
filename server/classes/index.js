@@ -8,5 +8,6 @@ const InvItem = require("./InvItem");
 const Piece = require("./Piece");
 const Plan = require("./Plan");
 const Event = require("./Event");
+const Capability = require("./Capability");
 
-module.exports = { Game, ShopItem, InvItem, Piece, Plan, Event };
+module.exports = { Game, ShopItem, InvItem, Piece, Plan, Event, Capability };
