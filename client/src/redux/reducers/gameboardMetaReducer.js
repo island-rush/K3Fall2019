@@ -32,7 +32,9 @@ import {
 	REFUELPOPUP_MINIMIZE_TOGGLE,
 	RODS_FROM_GOD_SELECTING,
 	RODS_FROM_GOD_SELECTED,
-	NEW_ROUND
+	NEW_ROUND,
+	REMOTE_SENSING_SELECTING,
+	REMOTE_SENSING_SELECTED
 } from "../actions/actionTypes";
 
 import { TYPE_FUEL } from "../../gameData/gameConstants";
@@ -162,6 +164,20 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.planning.active = false;
 
 			stateDeepCopy.confirmedRods.push(parseInt(payload.selectedPositionId));
+			break;
+		case REMOTE_SENSING_SELECTING:
+			stateDeepCopy.planning.active = true;
+			stateDeepCopy.planning.capability = true;
+			stateDeepCopy.planning.invItem = payload.invItem;
+			stateDeepCopy.selectedMenuId = 0;
+			break;
+		case REMOTE_SENSING_SELECTED:
+			stateDeepCopy.planning.capability = false;
+			stateDeepCopy.planning.invItem = null;
+			stateDeepCopy.planning.active = false;
+			//
+			//state to keep track of areas to highlight...
+			//
 			break;
 		case CANCEL_PLAN:
 			stateDeepCopy.planning.active = false;

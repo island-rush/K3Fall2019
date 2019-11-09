@@ -1,5 +1,5 @@
 import { distanceMatrix } from "../../gameData/distanceMatrix";
-import { TYPE_MOVES } from "../../gameData/gameConstants";
+import { TYPE_MOVES, TYPE_NAME_IDS } from "../../gameData/gameConstants";
 import { POSITION_SELECT, PLANNING_SELECT, HIGHLIGHT_POSITIONS } from "./actionTypes";
 import { CLIENT_SENDING_ACTION } from "../socketEmits";
 import setUserFeedbackAction from "./setUserfeedbackAction";
@@ -8,24 +8,24 @@ const selectPosition = selectedPositionId => {
 	return (dispatch, getState, emit) => {
 		const { gameboardMeta } = getState();
 
-		const isHighlightingARange = false;
-		if (isHighlightingARange) {
-			const range = 1;
+		// const isHighlightingARange = true;
+		// if (isHighlightingARange) {
+		// 	const range = 3;
 
-			let highlightedPositions = [];
-			for (let x = 0; x < distanceMatrix[selectedPositionId].length; x++) {
-				if (distanceMatrix[selectedPositionId][x] < range) {
-					highlightedPositions.push(x);
-				}
-			}
+		// 	let highlightedPositions = [];
+		// 	for (let x = 0; x < distanceMatrix[selectedPositionId].length; x++) {
+		// 		if (distanceMatrix[selectedPositionId][x] <= range) {
+		// 			highlightedPositions.push(x);
+		// 		}
+		// 	}
 
-			dispatch({
-				type: HIGHLIGHT_POSITIONS,
-				payload: {
-					highlightedPositions
-				}
-			});
-		}
+		// 	dispatch({
+		// 		type: HIGHLIGHT_POSITIONS,
+		// 		payload: {
+		// 			highlightedPositions
+		// 		}
+		// 	});
+		// }
 
 		if (!gameboardMeta.planning.active) {
 			//select anything and highlight, looking at the position
@@ -47,9 +47,24 @@ const selectPosition = selectedPositionId => {
 		//Currently for 'rods from god' but will likely be used for other capabilities (non-piece selections on the board (with planning))
 		if (gameboardMeta.planning.capability) {
 			// eslint-disable-next-line no-restricted-globals
-			if (confirm("Are you sure you want to use rod's from god on this position?")) {
+			if (confirm("Are you sure you want to use capability on this position?")) {
+				let type;
+				switch (gameboardMeta.planning.invItem.invItemTypeId) {
+					case TYPE_NAME_IDS["Rods from God"]:
+						type = "rodsFromGodConfirm";
+						break;
+					case TYPE_NAME_IDS["Remote Sensing"]:
+						type = "remoteSensingConfirm";
+						break;
+					default:
+						dispatch(setUserFeedbackAction("unkown/not yet implemented invItemTypeId functionality (capability)"));
+						return;
+				}
+
+				//TODO: frontend action to change into a 'waiting on server' state?
+
 				const clientAction = {
-					type: "rodsFromGodSelect",
+					type,
 					payload: {
 						selectedPositionId: selectedPositionId !== -1 ? selectedPositionId : gameboardMeta.selectedPosition,
 						invItem: gameboardMeta.planning.invItem
@@ -57,14 +72,34 @@ const selectPosition = selectedPositionId => {
 				};
 
 				emit(CLIENT_SENDING_ACTION, clientAction);
-			} else {
+				return;
+			}
+
+			//highlight area if needed
+			if (gameboardMeta.planning.invItem.invItemTypeId === TYPE_NAME_IDS["Remote Sensing"]) {
+				const range = 3; //TODO: should be a constant, not hard coded...
+
+				let clickedPosition = selectedPositionId !== -1 ? selectedPositionId : gameboardMeta.selectedPosition;
+				let highlightedPositions = [];
+				for (let x = 0; x < distanceMatrix[clickedPosition].length; x++) {
+					if (distanceMatrix[clickedPosition][x] <= range) highlightedPositions.push(x);
+				}
+
 				dispatch({
-					type: POSITION_SELECT,
+					type: HIGHLIGHT_POSITIONS,
 					payload: {
-						selectedPositionId
+						highlightedPositions
 					}
 				});
 			}
+
+			//select the position anyway
+			dispatch({
+				type: POSITION_SELECT,
+				payload: {
+					selectedPositionId: selectedPositionId !== -1 ? selectedPositionId : gameboardMeta.selectedPosition
+				}
+			});
 			return;
 		}
 

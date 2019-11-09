@@ -26,7 +26,9 @@ import {
 	EVENT_REFUEL,
 	AIRCRAFT_CLICK,
 	RODS_FROM_GOD_SELECTING,
-	RODS_FROM_GOD_SELECTED
+	RODS_FROM_GOD_SELECTED,
+	REMOTE_SENSING_SELECTING,
+	REMOTE_SENSING_SELECTED
 } from "../actions/actionTypes";
 
 const initialUserFeedback = "Loading...";
@@ -53,6 +55,10 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "Now select a position to be obliterated.";
 		case RODS_FROM_GOD_SELECTED:
 			return "selected position to kill!";
+		case REMOTE_SENSING_SELECTED:
+			return "selected area to remote sense!";
+		case REMOTE_SENSING_SELECTING:
+			return "Now select an area to remote sense.";
 		case AIRCRAFT_CLICK:
 			return "transferring fuel planned...";
 		case PLAN_WAS_CONFIRMED:

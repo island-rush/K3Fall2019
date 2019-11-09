@@ -1,12 +1,11 @@
 const { Game, InvItem, Capability } = require("../../classes");
-import { RODS_FROM_GOD_SELECTED } from "../../../client/src/redux/actions/actionTypes";
+import { REMOTE_SENSING_SELECTED } from "../../../client/src/redux/actions/actionTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
 import { TYPE_NAME_IDS } from "../../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 
-//TOOD: could rename to 'rodsFromGodConfirm' since we use 'confirm' as a keyword for other stuff
-const rodsFromGodSelect = async (socket, payload) => {
+const remoteSensingConfirm = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	if (payload == null || payload.selectedPositionId == null) {
@@ -24,19 +23,19 @@ const rodsFromGodSelect = async (socket, payload) => {
 		return;
 	}
 
-	//gamePhase 1 is only phase for rods from god
+	//gamePhase 2 is only phase for remote sensing
 	if (gamePhase != 2) {
 		sendUserFeedback(socket, "Not the right phase...");
 		return;
 	}
 
-	//gameSlice 0 is only slice for rods from god
+	//gameSlice 0 is only slice for remote sensing
 	if (gameSlice != 0) {
 		sendUserFeedback(socket, "Not the right slice (must be planning)...");
 		return;
 	}
 
-	//Only the main controller (0) can use rods from god
+	//Only the main controller (0) can use remote sensing
 	if (gameController != 0) {
 		sendUserFeedback(socket, "Not the main controller (0)...");
 		return;
@@ -53,28 +52,29 @@ const rodsFromGodSelect = async (socket, payload) => {
 
 	//verify correct type of inv item
 	const { invItemTypeId } = thisInvItem;
-	if (invItemTypeId != TYPE_NAME_IDS["Rods from God"]) {
-		sendUserFeedback(socket, "Inv Item was not a rods from god type.");
+	if (invItemTypeId != TYPE_NAME_IDS["Remote Sensing"]) {
+		sendUserFeedback(socket, "Inv Item was not a remote sensing type.");
 		return;
 	}
 
 	//does the position make sense?
 	if (selectedPositionId < 0) {
-		sendUserFeedback(socket, "got a negative position for rods from god.");
+		sendUserFeedback(socket, "got a negative position for remote sensing.");
 		return;
 	}
 
-	//insert the 'plan' for rods from god into the db for later use
-	//let the client(team) know that this plan was accepted
-	if (!(await Capability.rodsFromGodInsert(gameId, gameTeam, selectedPositionId))) {
-		sendUserFeedback(socket, "db failed to insert rods from god, likely already an entry for that position.");
+	//insert the 'plan' for remote sensing into the db for later use
+
+	if (!(await Capability.remoteSensingInsert(gameId, gameTeam, selectedPositionId))) {
+		sendUserFeedback(socket, "db failed to insert remote sensing, likely already an entry for that position.");
 		return;
 	}
 
 	await thisInvItem.delete();
 
+	// let the client(team) know that this plan was accepted
 	const serverAction = {
-		type: RODS_FROM_GOD_SELECTED,
+		type: REMOTE_SENSING_SELECTED,
 		payload: {
 			invItem: thisInvItem,
 			selectedPositionId
@@ -83,4 +83,4 @@ const rodsFromGodSelect = async (socket, payload) => {
 	socket.emit(SERVER_SENDING_ACTION, serverAction);
 };
 
-module.exports = rodsFromGodSelect;
+module.exports = remoteSensingConfirm;

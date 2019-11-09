@@ -58,6 +58,35 @@ class Capability {
 
 		return fullListOfPositions;
 	}
+
+	static async remoteSensingInsert(gameId, gameTeam, selectedPositionId) {
+		let queryString = "SELECT * FROM remoteSensing WHERE gameId = ? AND teamId = ? AND positionId = ?";
+		let inserts = [gameId, gameTeam, selectedPositionId];
+		let [results] = await pool.query(queryString, inserts);
+
+		//prevent duplicate entries if possible
+		if (results.length !== 0) {
+			return false;
+		}
+
+		queryString = "INSERT INTO remoteSensing (gameId, teamId, positionId, roundsLeft) VALUES (?, ?, ?, ?)";
+		inserts = [gameId, gameTeam, selectedPositionId, 9]; //TODO: use a constant, not 9 (9 rounds for remote sensing...)
+		await pool.query(queryString, inserts);
+		return true;
+	}
+
+	static async getRemoteSensing(gameId, gameTeam) {
+		const queryString = "SELECT * FROM remoteSensing WHERE gameId = ? AND teamId = ?";
+		const inserts = [gameId, gameTeam];
+		const [results] = await pool.query(queryString, inserts);
+
+		let listOfPositions = [];
+		for (let x = 0; x < results.length; x++) {
+			listOfPositions.push(results[x].positionId);
+		}
+
+		return listOfPositions;
+	}
 }
 
 module.exports = Capability;
