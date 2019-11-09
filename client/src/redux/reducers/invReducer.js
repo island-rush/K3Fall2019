@@ -1,4 +1,4 @@
-import { INITIAL_GAMESTATE, SHOP_TRANSFER, PIECE_PLACE, RODS_FROM_GOD_SELECTED } from "../actions/actionTypes";
+import { INITIAL_GAMESTATE, SHOP_TRANSFER, PIECE_PLACE, RODS_FROM_GOD_SELECTED, REMOTE_SENSING_SELECTED } from "../actions/actionTypes";
 
 const initialInvState = [];
 
@@ -12,7 +12,12 @@ function invReducer(state = initialInvState, { type, payload }) {
 			return state.filter(invItem => {
 				return invItem.invItemId !== payload.invItemId;
 			});
+		//TOOD: could combine these methods
 		case RODS_FROM_GOD_SELECTED:
+			return state.filter(invItem => {
+				return invItem.invItemId !== payload.invItem.invItemId;
+			});
+		case REMOTE_SENSING_SELECTED:
 			return state.filter(invItem => {
 				return invItem.invItemId !== payload.invItem.invItemId;
 			});

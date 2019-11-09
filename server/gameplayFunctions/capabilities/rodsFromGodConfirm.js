@@ -5,8 +5,7 @@ import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
 import { TYPE_NAME_IDS } from "../../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 
-//TOOD: could rename to 'rodsFromGodConfirm' since we use 'confirm' as a keyword for other stuff
-const rodsFromGodSelect = async (socket, payload) => {
+const rodsFromGodConfirm = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	if (payload == null || payload.selectedPositionId == null) {
@@ -24,7 +23,7 @@ const rodsFromGodSelect = async (socket, payload) => {
 		return;
 	}
 
-	//gamePhase 1 is only phase for rods from god
+	//gamePhase 2 is only phase for rods from god
 	if (gamePhase != 2) {
 		sendUserFeedback(socket, "Not the right phase...");
 		return;
@@ -83,4 +82,4 @@ const rodsFromGodSelect = async (socket, payload) => {
 	socket.emit(SERVER_SENDING_ACTION, serverAction);
 };
 
-module.exports = rodsFromGodSelect;
+module.exports = rodsFromGodConfirm;

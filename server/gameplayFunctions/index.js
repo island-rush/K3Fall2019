@@ -18,7 +18,8 @@ const sendUserFeedback = require("./sendUserFeedback");
 const piecePlace = require("./piecePlace");
 const mainButtonClick = require("./mainButtonClick");
 
-const rodsFromGodSelect = require("./capabilities/rodsFromGodSelect");
+const rodsFromGodConfirm = require("./capabilities/rodsFromGodConfirm");
+const remoteSensingConfirm = require("./capabilities/remoteSensingConfirm");
 
 module.exports = {
 	shopPurchaseRequest,
@@ -31,5 +32,6 @@ module.exports = {
 	mainButtonClick,
 	confirmBattleSelection,
 	confirmFuelSelection,
-	rodsFromGodSelect
+	rodsFromGodConfirm,
+	remoteSensingConfirm
 };

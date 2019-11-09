@@ -75,16 +75,9 @@ CREATE TABLE IF NOT EXISTS plans(
 CREATE TABLE IF NOT EXISTS news(
 	newsId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     newsGameId INT(4) NOT NULL,
-    newsTeam INT(4) NOT NULL,
     newsOrder INT(4) NOT NULL,
-    newsPieces INT(4) NOT NULL,
-    newsEffect INT(4) NOT NULL,
-    newsRoll INT(4) NOT NULL,
-    newsLength INT(4) NOT NULL,
-    newsZone INT(4) NOT NULL,
     newsTitle VARCHAR(100) NOT NULL,
     newsInfo VARCHAR(800) NOT NULL,
-    newsActivated INT(1) NOT NULL,
     FOREIGN KEY (newsGameId) REFERENCES games (gameId) ON DELETE CASCADE
 ) AUTO_INCREMENT=1;
 
@@ -143,5 +136,14 @@ CREATE TABLE IF NOT EXISTS rodsFromGod(
 	gameId INT(8) NOT NULL,
     teamId INT(1) NOT NULL,
     positionId INT(4) NOT NULL,
+    FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE
+) AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS remoteSensing(
+	remoteSensingId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	gameId INT(8) NOT NULL,
+    teamId INT(1) NOT NULL,
+    positionId INT(4) NOT NULL,
+    roundsLeft INT(2) NOT NULL,
     FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE
 ) AUTO_INCREMENT=1;

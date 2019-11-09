@@ -32,13 +32,13 @@ class Capability {
 	}
 
 	static async useRodsFromGod(gameId) {
-		//get all the rods from god
-		//delete pieces on those positions
-		//let the user know which positions got hit
-
 		let queryString = "SELECT * FROM rodsFromGod WHERE gameId = ?";
 		let inserts = [gameId];
 		const [results] = await pool.query(queryString, inserts);
+
+		if (results.length === 0) {
+			return [];
+		}
 
 		//need the positions anyway to give back to the clients for updating
 		let fullListOfPositions = [];
@@ -57,6 +57,45 @@ class Capability {
 		await pool.query(queryString, inserts);
 
 		return fullListOfPositions;
+	}
+
+	static async remoteSensingInsert(gameId, gameTeam, selectedPositionId) {
+		let queryString = "SELECT * FROM remoteSensing WHERE gameId = ? AND teamId = ? AND positionId = ?";
+		let inserts = [gameId, gameTeam, selectedPositionId];
+		let [results] = await pool.query(queryString, inserts);
+
+		//prevent duplicate entries if possible
+		if (results.length !== 0) {
+			return false;
+		}
+
+		queryString = "INSERT INTO remoteSensing (gameId, teamId, positionId, roundsLeft) VALUES (?, ?, ?, ?)";
+		inserts = [gameId, gameTeam, selectedPositionId, 9]; //TODO: use a constant, not 9 (9 rounds for remote sensing...)
+		await pool.query(queryString, inserts);
+		return true;
+	}
+
+	static async getRemoteSensing(gameId, gameTeam) {
+		const queryString = "SELECT * FROM remoteSensing WHERE gameId = ? AND teamId = ?";
+		const inserts = [gameId, gameTeam];
+		const [results] = await pool.query(queryString, inserts);
+
+		let listOfPositions = [];
+		for (let x = 0; x < results.length; x++) {
+			listOfPositions.push(results[x].positionId);
+		}
+
+		return listOfPositions;
+	}
+
+	static async decreaseRemoteSensing(gameId) {
+		//TODO: probably a more efficient way of doing this (single request...)
+		let queryString = "UPDATE remoteSensing SET roundsLeft = roundsLeft - 1 WHERE gameId = ?;";
+		const inserts = [gameId];
+		await pool.query(queryString, inserts);
+
+		queryString = "DELETE FROM remoteSensing WHERE roundsLeft = 0";
+		await pool.query(queryString);
 	}
 }
 

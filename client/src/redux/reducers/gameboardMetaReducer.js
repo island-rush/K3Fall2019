@@ -32,7 +32,10 @@ import {
 	REFUELPOPUP_MINIMIZE_TOGGLE,
 	RODS_FROM_GOD_SELECTING,
 	RODS_FROM_GOD_SELECTED,
-	NEW_ROUND
+	NEW_ROUND,
+	REMOTE_SENSING_SELECTING,
+	REMOTE_SENSING_SELECTED,
+	PLACE_PHASE
 } from "../actions/actionTypes";
 
 import { TYPE_FUEL } from "../../gameData/gameConstants";
@@ -77,7 +80,8 @@ const initialGameboardMeta = {
 		moves: []
 	},
 	confirmedPlans: {},
-	confirmedRods: []
+	confirmedRods: [],
+	confirmedRemoteSense: []
 };
 
 function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
@@ -92,9 +96,14 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			break;
 		case NEW_ROUND:
 			stateDeepCopy.confirmedRods = [];
+			stateDeepCopy.confirmedRemoteSense = payload.confirmedRemoteSense;
+			break;
+		case PLACE_PHASE:
+			stateDeepCopy.confirmedRemoteSense = payload.confirmedRemoteSense;
 			break;
 		case POSITION_SELECT:
 			stateDeepCopy.selectedPosition = parseInt(payload.selectedPositionId);
+			// stateDeepCopy.highlightedPositions = [];
 			break;
 		case PURCHASE_PHASE:
 			stateDeepCopy.news.active = false; //hide the popup
@@ -162,6 +171,18 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.planning.active = false;
 
 			stateDeepCopy.confirmedRods.push(parseInt(payload.selectedPositionId));
+			break;
+		case REMOTE_SENSING_SELECTING:
+			stateDeepCopy.planning.active = true;
+			stateDeepCopy.planning.capability = true;
+			stateDeepCopy.planning.invItem = payload.invItem;
+			stateDeepCopy.selectedMenuId = 0;
+			break;
+		case REMOTE_SENSING_SELECTED:
+			stateDeepCopy.planning.capability = false;
+			stateDeepCopy.planning.invItem = null;
+			stateDeepCopy.planning.active = false;
+			stateDeepCopy.confirmedRemoteSense = payload.confirmedRemoteSense;
 			break;
 		case CANCEL_PLAN:
 			stateDeepCopy.planning.active = false;

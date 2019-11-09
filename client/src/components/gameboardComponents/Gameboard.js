@@ -8,7 +8,8 @@ import ContainerPopup from "./ContainerPopup";
 import RefuelPopup from "./refuel/RefuelPopup";
 import Patterns from "./Patterns";
 import { selectPosition, newsPopupMinimizeToggle } from "../../redux/actions";
-import { TYPE_HIGH_LOW } from "../../gameData/gameConstants";
+import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE } from "../../gameData/gameConstants";
+import { distanceMatrix } from "../../gameData/distanceMatrix";
 
 const gameboardStyle = {
 	backgroundColor: "blue",
@@ -92,6 +93,7 @@ class Gameboard extends Component {
 		const {
 			gameboard,
 			confirmedRods,
+			confirmedRemoteSense,
 			selectedPosition,
 			selectPosition,
 			news,
@@ -107,6 +109,7 @@ class Gameboard extends Component {
 		let planningPositions = []; //all of the positions part of a plan
 		let containerPositions = []; //specific positions part of a plan of type container
 		let battlePositions = []; //position(s) involved in a battle
+		let remoteSensedPositions = [];
 
 		for (let x = 0; x < planning.moves.length; x++) {
 			const { type, positionId } = planning.moves[x];
@@ -145,6 +148,16 @@ class Gameboard extends Component {
 			}
 		}
 
+		for (let x = 0; x < confirmedRemoteSense.length; x++) {
+			//need the adjacent by 3 radius positions to be highlighted
+			let remoteSenseCenter = confirmedRemoteSense[x];
+			for (let y = 0; y < distanceMatrix[remoteSenseCenter].length; y++) {
+				if (distanceMatrix[remoteSenseCenter][y] <= REMOTE_SENSING_RANGE) {
+					remoteSensedPositions.push(y);
+				}
+			}
+		}
+
 		const positions = Object.keys(gameboard).map(positionIndex => (
 			<Hexagon
 				key={positionIndex}
@@ -176,6 +189,8 @@ class Gameboard extends Component {
 						? "battlePos"
 						: confirmedRods.includes(parseInt(positionIndex))
 						? "battlePos"
+						: remoteSensedPositions.includes(parseInt(positionIndex))
+						? "remoteSensePos"
 						: ""
 				}
 				someOtherProp={battlePositions.includes(parseInt(positionIndex))}
@@ -210,13 +225,15 @@ Gameboard.propTypes = {
 	battle: PropTypes.object.isRequired,
 	container: PropTypes.object.isRequired,
 	planning: PropTypes.object.isRequired,
-	selectedPiece: PropTypes.object.isRequired,
+	selectedPiece: PropTypes.object,
 	confirmedPlans: PropTypes.object.isRequired,
 	highlightedPositions: PropTypes.array.isRequired,
 	newsPopupMinimizeToggle: PropTypes.func.isRequired,
-	confirmedRods: PropTypes.array.isRequired
+	confirmedRods: PropTypes.array.isRequired,
+	confirmedRemoteSense: PropTypes.array.isRequired
 };
 
+//TODO: just send the meta, don't worry about individual things (cleaner code)
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 	gameboard,
 	selectedPosition: gameboardMeta.selectedPosition,
@@ -227,7 +244,8 @@ const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 	planning: gameboardMeta.planning,
 	selectedPiece: gameboardMeta.selectedPiece,
 	confirmedPlans: gameboardMeta.confirmedPlans,
-	confirmedRods: gameboardMeta.confirmedRods
+	confirmedRods: gameboardMeta.confirmedRods,
+	confirmedRemoteSense: gameboardMeta.confirmedRemoteSense
 });
 
 const mapActionsToProps = {

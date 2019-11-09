@@ -9,7 +9,8 @@ import {
 	EVENT_REFUEL,
 	NEW_ROUND,
 	PLACE_PHASE,
-	SLICE_CHANGE
+	SLICE_CHANGE,
+	REMOTE_SENSING_SELECTED
 } from "../actions/actionTypes";
 import { initialGameboardEmpty } from "./initialGameboardEmpty";
 
@@ -63,6 +64,13 @@ function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
 			} else {
 				return stateDeepCopy;
 			}
+		case REMOTE_SENSING_SELECTED:
+			freshBoard = JSON.parse(JSON.stringify(initialGameboardEmpty));
+			positions = Object.keys(payload.gameboardPieces);
+			for (let x = 0; x < positions.length; x++) {
+				freshBoard[positions[x]].pieces = payload.gameboardPieces[positions[x]];
+			}
+			return freshBoard;
 		case EVENT_BATTLE:
 			//TODO: refactor, done twice? (event_refuel...)
 			if (payload.gameboardPieces) {
