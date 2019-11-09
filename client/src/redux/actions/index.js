@@ -22,6 +22,7 @@ import confirmFuelSelections from "./refuel/confirmFuelSelections";
 import aircraftClick from "./refuel/aircraftClick";
 import tankerClick from "./refuel/tankerClick";
 import undoFuelSelection from "./refuel/undoFuelSelection";
+import refuelPopupMinimizeToggle from "./refuel/refuelPopupMinimizeToggle"
 
 import selectPosition from "./selectPosition";
 import selectPiece from "./selectPiece";
@@ -58,5 +59,6 @@ export {
 	tankerClick,
 	aircraftClick,
 	undoFuelSelection,
-	newsPopupMinimizeToggle
+	newsPopupMinimizeToggle,
+	refuelPopupMinimizeToggle
 };

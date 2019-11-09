@@ -28,7 +28,8 @@ import {
 	AIRCRAFT_CLICK,
 	UNDO_FUEL_SELECTION,
 	REFUEL_RESULTS,
-	NEWSPOPUP_MINIMIZE_TOGGLE
+	NEWSPOPUP_MINIMIZE_TOGGLE,
+	REFUELPOPUP_MINIMIZE_TOGGLE
 } from "../actions/actionTypes";
 
 import { TYPE_FUEL } from "../../gameData/gameConstants";
@@ -178,6 +179,9 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.refuel.aircraft = payload.aircraft;
 			stateDeepCopy.refuel.selectedTankerPiece = -1;
 			stateDeepCopy.refuel.selectedTankerPieceIndex = -1;
+			break;
+		case REFUELPOPUP_MINIMIZE_TOGGLE:
+			stateDeepCopy.refuel.isMinimized = !stateDeepCopy.refuel.isMinimized;
 			break;
 		case INITIAL_GAMESTATE:
 			Object.assign(stateDeepCopy, payload.gameboardMeta);
