@@ -6,7 +6,7 @@ const startPlan = () => {
 		const { gameboardMeta } = getState();
 
 		//TODO: other checks for if planning is okay, "disable" the button if no piece selected as well
-		if (gameboardMeta.selectedPiece !== -1) {
+		if (gameboardMeta.selectedPiece !== null) {
 			if (gameboardMeta.planning.active) {
 				dispatch(setUserfeedbackAction("Already planning a move..."));
 			} else {
