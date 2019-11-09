@@ -32,13 +32,13 @@ class Capability {
 	}
 
 	static async useRodsFromGod(gameId) {
-		//get all the rods from god
-		//delete pieces on those positions
-		//let the user know which positions got hit
-
 		let queryString = "SELECT * FROM rodsFromGod WHERE gameId = ?";
 		let inserts = [gameId];
 		const [results] = await pool.query(queryString, inserts);
+
+		if (results.length === 0) {
+			return [];
+		}
 
 		//need the positions anyway to give back to the clients for updating
 		let fullListOfPositions = [];

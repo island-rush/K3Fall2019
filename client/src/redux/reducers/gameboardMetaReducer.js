@@ -98,6 +98,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			break;
 		case POSITION_SELECT:
 			stateDeepCopy.selectedPosition = parseInt(payload.selectedPositionId);
+			// stateDeepCopy.highlightedPositions = [];
 			break;
 		case PURCHASE_PHASE:
 			stateDeepCopy.news.active = false; //hide the popup

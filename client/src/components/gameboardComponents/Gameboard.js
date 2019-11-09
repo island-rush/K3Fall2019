@@ -8,7 +8,7 @@ import ContainerPopup from "./ContainerPopup";
 import RefuelPopup from "./refuel/RefuelPopup";
 import Patterns from "./Patterns";
 import { selectPosition, newsPopupMinimizeToggle } from "../../redux/actions";
-import { TYPE_HIGH_LOW } from "../../gameData/gameConstants";
+import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE } from "../../gameData/gameConstants";
 import { distanceMatrix } from "../../gameData/distanceMatrix";
 
 const gameboardStyle = {
@@ -152,8 +152,7 @@ class Gameboard extends Component {
 			//need the adjacent by 3 radius positions to be highlighted
 			let remoteSenseCenter = confirmedRemoteSense[x];
 			for (let y = 0; y < distanceMatrix[remoteSenseCenter].length; y++) {
-				//TODO: use a constant instead of this
-				if (distanceMatrix[remoteSenseCenter][y] <= 3) {
+				if (distanceMatrix[remoteSenseCenter][y] <= REMOTE_SENSING_RANGE) {
 					remoteSensedPositions.push(y);
 				}
 			}

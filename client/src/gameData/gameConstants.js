@@ -230,3 +230,5 @@ export const ATTACK_MATRIX = [
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //c-130
 	[0, 0, 0, 0, 0, 0, 3, 8, 2, 3, 2, 5, 10, 0, 0, 0, 0, 0, 0, 7, 8, 0, 0] //sof team
 ];
+
+export const REMOTE_SENSING_RANGE = 3;

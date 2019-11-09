@@ -1,4 +1,4 @@
-const { Game, InvItem, Capability } = require("../../classes");
+const { Game, InvItem, Capability, Piece } = require("../../classes");
 import { REMOTE_SENSING_SELECTED } from "../../../client/src/redux/actions/actionTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
@@ -72,6 +72,8 @@ const remoteSensingConfirm = async (socket, payload) => {
 
 	await thisInvItem.delete();
 
+	await Piece.updateVisibilities(gameId);
+	const gameboardPieces = await Piece.getVisiblePieces(gameId, gameTeam);
 	const confirmedRemoteSense = await Capability.getRemoteSensing(gameId, gameTeam);
 
 	// let the client(team) know that this plan was accepted
@@ -79,7 +81,8 @@ const remoteSensingConfirm = async (socket, payload) => {
 		type: REMOTE_SENSING_SELECTED,
 		payload: {
 			invItem: thisInvItem,
-			confirmedRemoteSense
+			confirmedRemoteSense,
+			gameboardPieces
 		}
 	};
 	socket.emit(SERVER_SENDING_ACTION, serverAction);
