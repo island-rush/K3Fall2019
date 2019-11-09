@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 
 const userfeedbackStyle = {
@@ -10,13 +10,9 @@ const userfeedbackStyle = {
 	margin: ".5%"
 };
 
-class Userfeedback extends Component {
-	render() {
-		const { userFeedback } = this.props;
-
-		return <div style={userfeedbackStyle}>{userFeedback}</div>;
-	}
-}
+const Userfeedback = ({ userFeedback }) => {
+	return <div style={userfeedbackStyle}>{userFeedback}</div>;
+};
 
 Userfeedback.propTypes = {
 	userFeedback: PropTypes.string.isRequired

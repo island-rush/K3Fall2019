@@ -20,7 +20,6 @@ const newsPopupMinimizeStyle = {
 	left: "-8%",
 	backgroundColor: "white",
 	border: "2px solid black",
-	zIndex: 4,
 	backgroundSize: "100% 100%",
 	backgroundRepeat: "no-repeat"
 };
@@ -53,6 +52,12 @@ const newsInfoStyle = {
 };
 
 const NewsAlertPopup = ({ news, newsPopupMinimizeToggle }) => {
+	const minimizeClick = event => {
+		event.preventDefault();
+		newsPopupMinimizeToggle();
+		event.stopPropagation();
+	};
+
 	return (
 		<div style={news.active ? null : invisibleStyle}>
 			<div style={!news.isMinimized ? newsPopupStyle : invisibleStyle}>
@@ -61,23 +66,9 @@ const NewsAlertPopup = ({ news, newsPopupMinimizeToggle }) => {
 				<h1 style={newsTitleStyle}>{news.newsTitle}</h1>
 				<br />
 				<div style={newsInfoStyle}>{news.newsInfo}</div>
-				<div
-					onClick={event => {
-						event.preventDefault();
-						newsPopupMinimizeToggle();
-						event.stopPropagation();
-					}}
-					style={{ ...newsPopupMinimizeStyle, ...NEWS_POPUP_IMAGES.minIcon }}
-				/>
+				<div onClick={minimizeClick} style={{ ...newsPopupMinimizeStyle, ...NEWS_POPUP_IMAGES.minIcon }} />
 			</div>
-			<div
-				style={{ ...(news.isMinimized ? newsPopupMinimizeStyle : invisibleStyle), ...NEWS_POPUP_IMAGES.minIcon, ...isMinimizedStyle }}
-				onClick={event => {
-					event.preventDefault();
-					newsPopupMinimizeToggle();
-					event.stopPropagation();
-				}}
-			/>
+			<div style={{ ...(news.isMinimized ? newsPopupMinimizeStyle : invisibleStyle), ...NEWS_POPUP_IMAGES.minIcon, ...isMinimizedStyle }} onClick={minimizeClick} />
 		</div>
 	);
 };

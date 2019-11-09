@@ -2,6 +2,7 @@ import { CANCEL_PLAN } from "../actionTypes";
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { CLIENT_SENDING_ACTION } from "../../socketEmits";
 
+//TODO: rename cancelPlan to deletePlan to match the server side function (possibly match all client/server functions with each other...)
 const cancelPlan = () => {
 	return (dispatch, getState, emit) => {
 		const { gameboardMeta } = getState();
