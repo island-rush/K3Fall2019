@@ -1,15 +1,6 @@
-//puts all userActions into the same file for importing / exporting
-//TODO: put these into a better organized structure (the function files) for easier access
-
-import shopRefundRequest from "./shop/shopRefundRequest";
-import shopPurchaseRequest from "./shop/shopPurchaseRequest";
-import shopConfirmPurchase from "./shop/shopConfirmPurchase";
-
-import confirmPlan from "./planning/confirmPlan";
-import startPlan from "./planning/startPlan";
-import cancelPlan from "./planning/cancelPlan";
-import undoMove from "./planning/undoMove";
-import containerMove from "./planning/containerMove";
+/**
+ * Central Importing for all redux actions
+ */
 
 import battlePieceClick from "./battles/battlePieceClick";
 import targetPieceClick from "./battles/targetPieceClick";
@@ -18,13 +9,45 @@ import confirmBattleSelections from "./battles/confirmBattleSelections";
 import clearOldBattle from "./battles/clearOldBattle";
 import battlePopupMinimizeToggle from "./battles/battlePopupMinimizeToggle";
 
+import atcScamble from "./capabilities/atcScramble";
+import cyberDominance from "./capabilities/cyberDominance";
+import missileLaunchDisruption from "./capabilities/missileLaunchDisruption";
+import communicationsInterruption from "./capabilities/communicationsInterruption";
+import remoteSensing from "./capabilities/remoteSensing";
+import rodsFromGod from "./capabilities/rodsFromGod";
+import antiSatelliteMissiles from "./capabilities/antiSatelliteMissiles";
+import goldenEye from "./capabilities/goldenEye";
+import nuclearStrike from "./capabilities/nuclearStrike";
+import biologicalWeapons from "./capabilities/biologicalWeapons";
+import seaMines from "./capabilities/seaMines";
+import droneSwarms from "./capabilities/droneSwarms";
+import insurgency from "./capabilities/insurgency";
+import raiseMorale from "./capabilities/raiseMorale";
+
+import invItemClick from "./inv/invItemClick";
+import airPieceClick from "./inv/airPieceClick";
+import landPieceClick from "./inv/landPieceClick";
+import seaPieceClick from "./inv/seaPieceClick";
+
+import confirmPlan from "./planning/confirmPlan";
+import startPlan from "./planning/startPlan";
+import cancelPlan from "./planning/cancelPlan";
+import undoMove from "./planning/undoMove";
+import containerMove from "./planning/containerMove";
+
 import confirmFuelSelections from "./refuel/confirmFuelSelections";
 import aircraftClick from "./refuel/aircraftClick";
 import tankerClick from "./refuel/tankerClick";
 import undoFuelSelection from "./refuel/undoFuelSelection";
 
+import shopRefundRequest from "./shop/shopRefundRequest";
+import shopPurchaseRequest from "./shop/shopPurchaseRequest";
+import shopConfirmPurchase from "./shop/shopConfirmPurchase";
+
 import selectPosition from "./selectPosition";
+
 import selectPiece from "./selectPiece";
+
 import menuSelect from "./menuSelect";
 
 import mainButtonClick from "./mainButtonClick";
@@ -32,13 +55,6 @@ import mainButtonClick from "./mainButtonClick";
 import clearPieceSelection from "./clearPieceSelection"; //eventually replaced with menuSelect(-1) or menuSelect(0)
 
 import newsPopupMinimizeToggle from "./newsPopupMinimizeToggle";
-
-import invItemClick from "./inv/invItemClick";
-import airPieceClick from "./inv/airPieceClick";
-import landPieceClick from "./inv/landPieceClick";
-import seaPieceClick from "./inv/seaPieceClick";
-
-import rodsFromGod from "./capabilities/rodsFromGod";
 
 export {
 	shopRefundRequest,
@@ -66,8 +82,21 @@ export {
 	aircraftClick,
 	undoFuelSelection,
 	newsPopupMinimizeToggle,
-	rodsFromGod,
 	airPieceClick,
 	landPieceClick,
-	seaPieceClick
+	seaPieceClick,
+	atcScamble,
+	cyberDominance,
+	missileLaunchDisruption,
+	communicationsInterruption,
+	remoteSensing,
+	rodsFromGod,
+	antiSatelliteMissiles,
+	goldenEye,
+	nuclearStrike,
+	biologicalWeapons,
+	seaMines,
+	droneSwarms,
+	insurgency,
+	raiseMorale
 };
