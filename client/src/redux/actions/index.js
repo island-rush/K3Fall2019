@@ -38,6 +38,7 @@ import confirmFuelSelections from "./refuel/confirmFuelSelections";
 import aircraftClick from "./refuel/aircraftClick";
 import tankerClick from "./refuel/tankerClick";
 import undoFuelSelection from "./refuel/undoFuelSelection";
+import refuelPopupMinimizeToggle from "./refuel/refuelPopupMinimizeToggle";
 
 import shopRefundRequest from "./shop/shopRefundRequest";
 import shopPurchaseRequest from "./shop/shopPurchaseRequest";
@@ -96,5 +97,6 @@ export {
 	seaMines,
 	droneSwarms,
 	insurgency,
-	raiseMorale
+	raiseMorale,
+	refuelPopupMinimizeToggle
 };
