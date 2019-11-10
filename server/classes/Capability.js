@@ -182,6 +182,7 @@ class Capability {
 	}
 
 	static async insertBiologicalWeapons(gameId, gameTeam, selectedPositionId) {
+		//TODO: Humanitarian assistance is restricted for the duration of this effect.
 		let queryString = "SELECT * FROM biologicalWeapons WHERE gameId = ? AND teamId = ? AND positionId = ?";
 		let inserts = [gameId, gameTeam, selectedPositionId];
 		let [results] = await pool.query(queryString, inserts);
