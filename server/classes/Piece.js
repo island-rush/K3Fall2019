@@ -91,7 +91,7 @@ class Piece {
 					let otherTeam = teamId === 0 ? 1 : 0;
 					for (let pieceType = 0; pieceType < posTypesVisible[otherTeam].length; pieceType++) {
 						//does not see subs or sof teams
-						if (!posTypesVisible[otherTeam][pieceType].includes(currentPos) && piceType !== TYPE_NAME_IDS["SOF Team"] && pieceType !== TYPE_NAME_IDS["Submarine"]) { //add this position if not already added by another piece somewhere else
+						if (!posTypesVisible[otherTeam][pieceType].includes(currentPos) && pieceType !== TYPE_NAME_IDS["SOF Team"] && pieceType !== TYPE_NAME_IDS["Submarine"]) { //add this position if not already added by another piece somewhere else
 							posTypesVisible[otherTeam][pieceType].push(currentPos);
 						}
 					}
