@@ -1,6 +1,14 @@
 import { distanceMatrix } from "../../gameData/distanceMatrix";
 import { TYPE_MOVES, TYPE_NAME_IDS, REMOTE_SENSING_RANGE } from "../../gameData/gameConstants";
-import { POSITION_SELECT, PLANNING_SELECT, HIGHLIGHT_POSITIONS, SERVER_INSURGENCY_CONFIRM, SERVER_REMOTE_SENSING_CONFIRM, SERVER_RODS_FROM_GOD_CONFIRM } from "./actionTypes";
+import {
+	POSITION_SELECT,
+	PLANNING_SELECT,
+	HIGHLIGHT_POSITIONS,
+	SERVER_INSURGENCY_CONFIRM,
+	SERVER_REMOTE_SENSING_CONFIRM,
+	SERVER_RODS_FROM_GOD_CONFIRM,
+	SERVER_BIOLOGICAL_WEAPONS_CONFIRM
+} from "./actionTypes";
 import { CLIENT_SENDING_ACTION } from "../socketEmits";
 import setUserFeedbackAction from "./setUserfeedbackAction";
 
@@ -57,7 +65,7 @@ const selectPosition = selectedPositionId => {
 						type = SERVER_INSURGENCY_CONFIRM;
 						break;
 					case TYPE_NAME_IDS["Biological Weapons"]:
-						type = "biologicalWeaponsConfirm";
+						type = SERVER_BIOLOGICAL_WEAPONS_CONFIRM;
 						break;
 					default:
 						dispatch(setUserFeedbackAction("unkown/not yet implemented invItemTypeId functionality (capability)"));

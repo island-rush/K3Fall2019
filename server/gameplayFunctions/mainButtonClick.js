@@ -75,15 +75,16 @@ const mainButtonClick = async (socket, payload) => {
 
 				//TODO: change payload to reflect what's being sent (confirmedRods = list of positions, confirmedInsurgency = list of pieces to delete)
 				const confirmedRods = await Capability.useRodsFromGod(gameId);
-				// const confirmedBioWeapons = await Capability.useBiologicalWeapons(gameId);
-				const [listOfPiecesKilled, listOfEffectedPositions] = await Capability.useInsurgency(gameId);
+				const confirmedBioWeapons = await Capability.useBiologicalWeapons(gameId);
+				const { listOfPiecesToKill, listOfEffectedPositions } = await Capability.useInsurgency(gameId);
 
 				serverAction = {
 					type: SLICE_CHANGE,
 					payload: {
 						confirmedRods,
+						confirmedBioWeapons,
 						confirmedInsurgencyPos: listOfEffectedPositions,
-						confirmedInsurgencyPieces: listOfPiecesKilled
+						confirmedInsurgencyPieces: listOfPiecesToKill
 					}
 				};
 			} else {

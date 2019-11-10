@@ -95,15 +95,15 @@ class Capability {
 		let inserts = [gameId];
 		const [results] = await pool.query(queryString, inserts);
 
-		if (results.length === 0) {
-			return [];
-		}
-
 		//TODO: make this more efficient using bulk selects/updates/deletes
 
 		let listOfPiecesToKill = [];
 		let listOfPieceIdsToKill = [];
 		let listOfEffectedPositions = [];
+
+		if (results.length === 0) {
+			return { listOfPiecesToKill, listOfEffectedPositions };
+		}
 
 		//for each insurgency
 		for (let x = 0; x < results.length; x++) {
@@ -139,7 +139,7 @@ class Capability {
 		inserts = [gameId];
 		await pool.query(queryString, inserts);
 
-		return [listOfPiecesToKill, listOfEffectedPositions];
+		return { listOfPiecesToKill, listOfEffectedPositions };
 	}
 
 	static async remoteSensingInsert(gameId, gameTeam, selectedPositionId) {
@@ -218,7 +218,7 @@ class Capability {
 
 	static async useBiologicalWeapons(gameId) {
 		//take inactivated biological weapons and activate them?, let clients know which positions are toxic
-		let queryString = "UPDATE biologicalWeapons SET activate = 1 WHERE gameId = ?";
+		let queryString = "UPDATE biologicalWeapons SET activated = 1 WHERE gameId = ?";
 		let inserts = [gameId];
 		await pool.query(queryString, inserts);
 
@@ -236,10 +236,12 @@ class Capability {
 			fullListOfPositions.push(results[x].positionId);
 		}
 
-		//now delete pieces with this position
-		queryString = "DELETE FROM pieces WHERE pieceGameId = ? AND piecePositionId in (?)";
-		inserts = [gameId, fullListOfPositions];
-		await pool.query(queryString, inserts);
+		if (fullListOfPositions.length > 0) {
+			//now delete pieces with this position
+			queryString = "DELETE FROM pieces WHERE pieceGameId = ? AND piecePositionId in (?)";
+			inserts = [gameId, fullListOfPositions];
+			await pool.query(queryString, inserts);
+		}
 
 		return fullListOfPositions;
 	}

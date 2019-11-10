@@ -93,7 +93,7 @@ class Gameboard extends Component {
 		const { gameboard, gameboardMeta, selectPosition, newsPopupMinimizeToggle } = this.props;
 
 		//prettier-ignore
-		const { confirmedInsurgency, confirmedRods, confirmedRemoteSense, selectedPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions } = gameboardMeta;
+		const {confirmedBioWeapons, confirmedInsurgency, confirmedRods, confirmedRemoteSense, selectedPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions } = gameboardMeta;
 
 		let planningPositions = []; //all of the positions part of a plan
 		let containerPositions = []; //specific positions part of a plan of type container
@@ -179,6 +179,8 @@ class Gameboard extends Component {
 						? "battlePos"
 						: confirmedRods.includes(parseInt(positionIndex))
 						? "battlePos"
+						: confirmedBioWeapons.includes(parseInt(positionIndex))
+						? "bioWeaponPos"
 						: confirmedInsurgency.includes(parseInt(positionIndex))
 						? "battlePos"
 						: remoteSensedPositions.includes(parseInt(positionIndex))

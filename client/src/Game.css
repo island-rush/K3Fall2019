@@ -63,3 +63,7 @@ svg g polygon {
 	stroke: rgb(255, 136, 0);
 	stroke-width: 0.3;
 }
+.bioWeaponPos polygon {
+	stroke: rgb(88, 0, 81);
+	stroke-width: 0.9;
+}

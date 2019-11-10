@@ -38,7 +38,9 @@ import {
 	REMOTE_SENSING_SELECTED,
 	PLACE_PHASE,
 	INSURGENCY_SELECTED,
-	INSURGENCY_SELECTING
+	INSURGENCY_SELECTING,
+	BIO_WEAPON_SELECTED,
+	BIO_WEAPON_SELECTING
 } from "../actions/actionTypes";
 
 import { TYPE_FUEL } from "../../gameData/gameConstants";
@@ -85,7 +87,8 @@ const initialGameboardMeta = {
 	confirmedPlans: {},
 	confirmedRods: [],
 	confirmedRemoteSense: [],
-	confirmedInsurgency: []
+	confirmedInsurgency: [],
+	confirmedBioWeapons: []
 };
 
 function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
@@ -102,9 +105,11 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.confirmedRods = [];
 			stateDeepCopy.confirmedInsurgency = [];
 			stateDeepCopy.confirmedRemoteSense = payload.confirmedRemoteSense;
+			stateDeepCopy.confirmedBioWeapons = payload.confirmedBioWeapons;
 			break;
 		case PLACE_PHASE:
 			stateDeepCopy.confirmedRemoteSense = payload.confirmedRemoteSense;
+			stateDeepCopy.confirmedBioWeapons = payload.confirmedBioWeapons;
 			break;
 		case POSITION_SELECT:
 			stateDeepCopy.selectedPosition = parseInt(payload.selectedPositionId);
@@ -176,12 +181,25 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.planning.invItem = payload.invItem;
 			stateDeepCopy.selectedMenuId = 0;
 			break;
+		case BIO_WEAPON_SELECTING:
+			stateDeepCopy.planning.active = true;
+			stateDeepCopy.planning.capability = true;
+			stateDeepCopy.planning.invItem = payload.invItem;
+			stateDeepCopy.selectedMenuId = 0;
+			break;
 		case RODS_FROM_GOD_SELECTED:
 			stateDeepCopy.planning.capability = false;
 			stateDeepCopy.planning.invItem = null;
 			stateDeepCopy.planning.active = false;
 
 			stateDeepCopy.confirmedRods.push(parseInt(payload.selectedPositionId));
+			break;
+		case BIO_WEAPON_SELECTED:
+			stateDeepCopy.planning.capability = false;
+			stateDeepCopy.planning.invItem = null;
+			stateDeepCopy.planning.active = false;
+
+			stateDeepCopy.confirmedBioWeapons.push(parseInt(payload.selectedPositionId));
 			break;
 		case INSURGENCY_SELECTED:
 			stateDeepCopy.planning.capability = false;
@@ -256,6 +274,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 		case SLICE_CHANGE:
 			stateDeepCopy.confirmedPlans = {};
 			stateDeepCopy.confirmedRods = payload.confirmedRods;
+			stateDeepCopy.confirmedBioWeapons = payload.confirmedBioWeapons;
 			stateDeepCopy.confirmedInsurgency = payload.confirmedInsurgencyPos;
 			break;
 		case BATTLE_PIECE_SELECT:
