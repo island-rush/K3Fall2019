@@ -51,6 +51,9 @@ function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
 			for (let x = 0; x < payload.confirmedRods.length; x++) {
 				stateDeepCopy[payload.confirmedRods[x]].pieces = [];
 			}
+			for (let x = 0; x < payload.confirmedBioWeapons.length; x++) {
+				stateDeepCopy[payload.confirmedBioWeapons[x]].pieces = [];
+			}
 			for (let x = 0; x < payload.confirmedInsurgencyPieces.length; x++) {
 				let currentPiece = payload.confirmedInsurgencyPieces[x];
 				let { piecePositionId, pieceId } = currentPiece;

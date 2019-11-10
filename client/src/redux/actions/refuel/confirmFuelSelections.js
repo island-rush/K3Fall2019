@@ -1,5 +1,6 @@
 // import setUserfeedbackAction from "../setUserfeedbackAction";
 import { CLIENT_SENDING_ACTION } from "../../socketEmits";
+import { SERVER_CONFIRM_FUEL_SELECTION } from "../actionTypes";
 
 const confirmFuelSelections = () => {
 	return (dispatch, getState, emit) => {
@@ -16,7 +17,7 @@ const confirmFuelSelections = () => {
 		const { aircraft, tankers } = gameboardMeta.refuel;
 
 		const clientAction = {
-			type: "confirmFuelSelection",
+			type: SERVER_CONFIRM_FUEL_SELECTION,
 			payload: {
 				aircraft,
 				tankers

@@ -1,4 +1,4 @@
-import { INITIAL_GAMESTATE, SHOP_TRANSFER, PIECE_PLACE, RODS_FROM_GOD_SELECTED, REMOTE_SENSING_SELECTED, INSURGENCY_SELECTED } from "../actions/actionTypes";
+import { INITIAL_GAMESTATE, SHOP_TRANSFER, PIECE_PLACE, RODS_FROM_GOD_SELECTED, REMOTE_SENSING_SELECTED, INSURGENCY_SELECTED, BIO_WEAPON_SELECTED } from "../actions/actionTypes";
 
 const initialInvState = [];
 
@@ -22,6 +22,10 @@ function invReducer(state = initialInvState, { type, payload }) {
 				return invItem.invItemId !== payload.invItem.invItemId;
 			});
 		case INSURGENCY_SELECTED:
+			return state.filter(invItem => {
+				return invItem.invItemId !== payload.invItem.invItemId;
+			});
+		case BIO_WEAPON_SELECTED:
 			return state.filter(invItem => {
 				return invItem.invItemId !== payload.invItem.invItemId;
 			});

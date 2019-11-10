@@ -95,15 +95,15 @@ class Capability {
 		let inserts = [gameId];
 		const [results] = await pool.query(queryString, inserts);
 
-		if (results.length === 0) {
-			return [];
-		}
-
 		//TODO: make this more efficient using bulk selects/updates/deletes
 
 		let listOfPiecesToKill = [];
 		let listOfPieceIdsToKill = [];
 		let listOfEffectedPositions = [];
+
+		if (results.length === 0) {
+			return { listOfPiecesToKill, listOfEffectedPositions };
+		}
 
 		//for each insurgency
 		for (let x = 0; x < results.length; x++) {
@@ -139,7 +139,7 @@ class Capability {
 		inserts = [gameId];
 		await pool.query(queryString, inserts);
 
-		return [listOfPiecesToKill, listOfEffectedPositions];
+		return { listOfPiecesToKill, listOfEffectedPositions };
 	}
 
 	static async remoteSensingInsert(gameId, gameTeam, selectedPositionId) {
@@ -178,6 +178,82 @@ class Capability {
 		await pool.query(queryString, inserts);
 
 		queryString = "DELETE FROM remoteSensing WHERE roundsLeft = 0";
+		await pool.query(queryString);
+	}
+
+	static async insertBiologicalWeapons(gameId, gameTeam, selectedPositionId) {
+		//TODO: Humanitarian assistance is restricted for the duration of this effect.
+		let queryString = "SELECT * FROM biologicalWeapons WHERE gameId = ? AND teamId = ? AND positionId = ?";
+		let inserts = [gameId, gameTeam, selectedPositionId];
+		let [results] = await pool.query(queryString, inserts);
+
+		//prevent duplicate entries if possible
+		if (results.length !== 0) {
+			return false;
+		}
+
+		queryString = "INSERT INTO biologicalWeapons (gameId, teamId, positionId, roundsLeft) VALUES (?, ?, ?, ?)";
+		inserts = [gameId, gameTeam, selectedPositionId, 9]; //TODO: use a constant, not 9 (9 rounds for bio weapons...)
+		await pool.query(queryString, inserts);
+		return true;
+	}
+
+	static async getBiologicalWeapons(gameId, gameTeam) {
+		//get this team's bio weapons, and all team's activated bio weapons
+		//what positions are currently toxic (planned to be toxic?)
+		//happens in the same timeframe as rods from god, but sticks around...could be complicated with separating from plannedBio and activeBio
+		//probably keep the same for now, keep it simple and upgrade it later. Since upgrading is easy due to good organize functions now.
+
+		//TODO: maybe use a constant for activated = ACTIVATED_CONSTANT but seems not needed
+		const queryString = "SELECT * FROM biologicalWeapons WHERE gameId = ? AND (activated = 1 OR teamId = ?)";
+		const inserts = [gameId, gameTeam];
+		const [results] = await pool.query(queryString, inserts);
+
+		let listOfPositions = [];
+		for (let x = 0; x < results.length; x++) {
+			listOfPositions.push(results[x].positionId);
+		}
+
+		return listOfPositions;
+	}
+
+	static async useBiologicalWeapons(gameId) {
+		//take inactivated biological weapons and activate them?, let clients know which positions are toxic
+		let queryString = "UPDATE biologicalWeapons SET activated = 1 WHERE gameId = ?";
+		let inserts = [gameId];
+		await pool.query(queryString, inserts);
+
+		queryString = "SELECT * FROM biologicalWeapons WHERE gameId = ?"; //all should be activated, no need to specify
+		inserts = [gameId];
+		const [results] = await pool.query(queryString, inserts);
+
+		if (results.length === 0) {
+			return [];
+		}
+
+		//need the positions anyway to give back to the clients for updating
+		let fullListOfPositions = [];
+		for (let x = 0; x < results.length; x++) {
+			fullListOfPositions.push(results[x].positionId);
+		}
+
+		if (fullListOfPositions.length > 0) {
+			//now delete pieces with this position
+			queryString = "DELETE FROM pieces WHERE pieceGameId = ? AND piecePositionId in (?)";
+			inserts = [gameId, fullListOfPositions];
+			await pool.query(queryString, inserts);
+		}
+
+		return fullListOfPositions;
+	}
+
+	static async decreaseBiologicalWeapons(gameId) {
+		//roundsLeft--
+		let queryString = "UPDATE biologicalWeapons SET roundsLeft = roundsLeft - 1 WHERE gameId = ? AND activated = 1";
+		const inserts = [gameId];
+		await pool.query(queryString, inserts);
+
+		queryString = "DELETE FROM biologicalWeapons WHERE roundsLeft = 0";
 		await pool.query(queryString);
 	}
 }

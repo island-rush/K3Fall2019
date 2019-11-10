@@ -1,5 +1,6 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { CLIENT_SENDING_ACTION } from "../../socketEmits";
+import { SERVER_CONFIRM_BATTLE_SELECTION } from "../actionTypes";
 
 const confirmBattleSelections = () => {
 	return (dispatch, getState, emit) => {
@@ -18,7 +19,7 @@ const confirmBattleSelections = () => {
 		//need to send to the server what selections were made, for it to handle it...
 
 		const clientAction = {
-			type: "confirmBattleSelection",
+			type: SERVER_CONFIRM_BATTLE_SELECTION,
 			payload: {
 				friendlyPieces
 			}

@@ -30,7 +30,9 @@ import {
 	REMOTE_SENSING_SELECTING,
 	REMOTE_SENSING_SELECTED,
 	INSURGENCY_SELECTED,
-	INSURGENCY_SELECTING
+	INSURGENCY_SELECTING,
+	BIO_WEAPON_SELECTED,
+	BIO_WEAPON_SELECTING
 } from "../actions/actionTypes";
 
 const initialUserFeedback = "Loading...";
@@ -57,6 +59,10 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "Now select a position to be obliterated.";
 		case RODS_FROM_GOD_SELECTED:
 			return "selected position to kill!";
+		case BIO_WEAPON_SELECTED:
+			return "selected position to deploy bio weapons to";
+		case BIO_WEAPON_SELECTING:
+			return "Now select a position to get bio weaponed!";
 		case REMOTE_SENSING_SELECTED:
 			return "selected area to remote sense!";
 		case REMOTE_SENSING_SELECTING:

@@ -1,7 +1,7 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 // import { CLIENT_SENDING_ACTION } from "../../socketEmits";
 
-const nuclearStrike = () => {
+const nuclearStrike = invItem => {
 	return (dispatch, getState, emit) => {
 		dispatch(setUserfeedbackAction("nuclearStrike"));
 	};

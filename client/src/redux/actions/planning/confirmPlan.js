@@ -1,5 +1,6 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { CLIENT_SENDING_ACTION } from "../../socketEmits";
+import { SERVER_CONFIRM_PLAN } from "../actionTypes";
 
 const confirmPlan = () => {
 	return (dispatch, getState, emit) => {
@@ -9,7 +10,7 @@ const confirmPlan = () => {
 			dispatch(setUserfeedbackAction("Can't submit an empty plan..."));
 		} else {
 			const clientAction = {
-				type: "confirmPlan",
+				type: SERVER_CONFIRM_PLAN,
 				payload: {
 					pieceId: gameboardMeta.selectedPiece.pieceId,
 					plan: gameboardMeta.planning.moves

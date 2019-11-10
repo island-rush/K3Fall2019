@@ -91,7 +91,7 @@ class Piece {
 					let otherTeam = teamId === 0 ? 1 : 0;
 					for (let pieceType = 0; pieceType < posTypesVisible[otherTeam].length; pieceType++) {
 						//does not see subs or sof teams
-						if (!posTypesVisible[otherTeam][pieceType].includes(currentPos) && piceType !== TYPE_NAME_IDS["SOF Team"] && pieceType !== TYPE_NAME_IDS["Submarine"]) { //add this position if not already added by another piece somewhere else
+						if (!posTypesVisible[otherTeam][pieceType].includes(currentPos) && pieceType !== TYPE_NAME_IDS["SOF Team"] && pieceType !== TYPE_NAME_IDS["Submarine"]) { //add this position if not already added by another piece somewhere else
 							posTypesVisible[otherTeam][pieceType].push(currentPos);
 						}
 					}
@@ -119,6 +119,26 @@ class Piece {
 		//TODO: referencing another table here...(could change to put into the plans class)
 		const deletePlansQuery = "DELETE FROM plans WHERE planGameId = ? AND planMovementOrder = ? AND planSpecialFlag = 0";
 		await conn.query(deletePlansQuery, inserts);
+
+		//handle if the pieces moved into a bio / nuclear place
+		let queryString = "SELECT * FROM biologicalWeapons WHERE gameId = ? AND activated = 1";
+		let moreInserts = [gameId];
+		const [results] = await conn.query(queryString, moreInserts);
+
+		let listOfPositions = [];
+		for (let x = 0; x < results.length; x++) {
+			//delete the pieces in these positions
+			let thisBioWeapon = results[x];
+			let { positionId } = thisBioWeapon;
+			listOfPositions.push(positionId);
+		}
+
+		//TODO: only do this for ground pieces...
+		if (listOfPositions > 0) {
+			queryString = "DELETE FROM pieces WHERE pieceGameId = ? AND piecePositionId in (?)";
+			moreInserts = [gameId, listOfPositions];
+			await conn.query(queryString, moreInserts);
+		}
 
 		conn.release();
 	}
