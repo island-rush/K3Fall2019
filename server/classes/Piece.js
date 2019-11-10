@@ -120,6 +120,26 @@ class Piece {
 		const deletePlansQuery = "DELETE FROM plans WHERE planGameId = ? AND planMovementOrder = ? AND planSpecialFlag = 0";
 		await conn.query(deletePlansQuery, inserts);
 
+		//handle if the pieces moved into a bio / nuclear place
+		let queryString = "SELECT * FROM biologicalWeapons WHERE gameId = ? AND activated = 1";
+		let moreInserts = [gameId];
+		const [results] = await conn.query(queryString, moreInserts);
+
+		let listOfPositions = [];
+		for (let x = 0; x < results.length; x++) {
+			//delete the pieces in these positions
+			let thisBioWeapon = results[x];
+			let { positionId } = thisBioWeapon;
+			listOfPositions.push(positionId);
+		}
+
+		//TODO: only do this for ground pieces...
+		if (listOfPositions > 0) {
+			queryString = "DELETE FROM pieces WHERE pieceGameId = ? AND piecePositionId in (?)";
+			moreInserts = [gameId, listOfPositions];
+			await conn.query(queryString, moreInserts);
+		}
+
 		conn.release();
 	}
 
