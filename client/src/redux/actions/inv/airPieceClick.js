@@ -1,5 +1,6 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { CLIENT_SENDING_ACTION } from "../../socketEmits";
+import { SERVER_PIECE_PLACE } from "../actionTypes";
 
 const airPieceClick = invItem => {
 	return (dispatch, getState, emit) => {
@@ -26,7 +27,7 @@ const airPieceClick = invItem => {
 		const { invItemId } = invItem; //TODO: send the whole item anyway? (even though the server only uses the id, consistent...)
 
 		const clientAction = {
-			type: "piecePlace",
+			type: SERVER_PIECE_PLACE,
 			payload: {
 				invItemId,
 				selectedPosition

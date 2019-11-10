@@ -75,6 +75,7 @@ const mainButtonClick = async (socket, payload) => {
 
 				//TODO: change payload to reflect what's being sent (confirmedRods = list of positions, confirmedInsurgency = list of pieces to delete)
 				const confirmedRods = await Capability.useRodsFromGod(gameId);
+				// const confirmedBioWeapons = await Capability.useBiologicalWeapons(gameId);
 				const [listOfPiecesKilled, listOfEffectedPositions] = await Capability.useInsurgency(gameId);
 
 				serverAction = {

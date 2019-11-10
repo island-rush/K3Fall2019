@@ -1,7 +1,7 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 // import { CLIENT_SENDING_ACTION } from "../../socketEmits";
 
-const seaMines = () => {
+const seaMines = invItem => {
 	return (dispatch, getState, emit) => {
 		dispatch(setUserfeedbackAction("seaMines"));
 	};

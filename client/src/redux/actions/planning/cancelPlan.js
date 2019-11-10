@@ -1,4 +1,4 @@
-import { CANCEL_PLAN } from "../actionTypes";
+import { CANCEL_PLAN, SERVER_DELETE_PLAN } from "../actionTypes";
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { CLIENT_SENDING_ACTION } from "../../socketEmits";
 
@@ -14,7 +14,7 @@ const cancelPlan = () => {
 			if (gameboardMeta.selectedPiece !== null && gameboardMeta.selectedPiece.pieceId in gameboardMeta.confirmedPlans) {
 				//delete the plans from the database request
 				const clientAction = {
-					type: "deletePlan",
+					type: SERVER_DELETE_PLAN,
 					payload: {
 						pieceId: gameboardMeta.selectedPiece.pieceId
 					}

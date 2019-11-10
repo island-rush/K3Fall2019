@@ -21,12 +21,16 @@ const executeStep = async (socket, thisGame) => {
 
 		//Decrease game effects that last for x rounds
 		await Capability.decreaseRemoteSensing(gameId);
+		await Capability.decreaseBiologicalWeapons(gameId);
 
 		const gameboardPiecesList0 = await Piece.getVisiblePieces(gameId, 0);
 		const gameboardPiecesList1 = await Piece.getVisiblePieces(gameId, 1);
 
 		const remoteSense0 = await Capability.getRemoteSensing(gameId, 0);
 		const remoteSense1 = await Capability.getRemoteSensing(gameId, 1);
+
+		// const bioWeapons0 = await Capability.getBiologicalWeapons(gameId, 0); //any team should work, since all activated at this point?
+		// const bioWeapons1 = await Capability.getBiologicalWeapons(gameId, 1);
 
 		let serverAction0;
 		let serverAction1;
