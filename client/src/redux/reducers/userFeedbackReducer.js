@@ -28,7 +28,9 @@ import {
 	RODS_FROM_GOD_SELECTING,
 	RODS_FROM_GOD_SELECTED,
 	REMOTE_SENSING_SELECTING,
-	REMOTE_SENSING_SELECTED
+	REMOTE_SENSING_SELECTED,
+	INSURGENCY_SELECTED,
+	INSURGENCY_SELECTING
 } from "../actions/actionTypes";
 
 const initialUserFeedback = "Loading...";
@@ -59,6 +61,10 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "selected area to remote sense!";
 		case REMOTE_SENSING_SELECTING:
 			return "Now select an area to remote sense.";
+		case INSURGENCY_SELECTED:
+			return "selected position to start insurgency!";
+		case INSURGENCY_SELECTING:
+			return "Now select a position to start an insurgency!";
 		case AIRCRAFT_CLICK:
 			return "transferring fuel planned...";
 		case PLAN_WAS_CONFIRMED:

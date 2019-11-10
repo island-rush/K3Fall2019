@@ -53,6 +53,9 @@ const selectPosition = selectedPositionId => {
 					case TYPE_NAME_IDS["Remote Sensing"]:
 						type = "remoteSensingConfirm";
 						break;
+					case TYPE_NAME_IDS["Insurgency"]:
+						type = "insurgencyConfirm";
+						break;
 					default:
 						dispatch(setUserFeedbackAction("unkown/not yet implemented invItemTypeId functionality (capability)"));
 						return;

@@ -90,21 +90,10 @@ const patternSolver = position => {
 
 class Gameboard extends Component {
 	render() {
-		const {
-			gameboard,
-			confirmedRods,
-			confirmedRemoteSense,
-			selectedPosition,
-			selectPosition,
-			news,
-			battle,
-			container,
-			planning,
-			selectedPiece,
-			confirmedPlans,
-			highlightedPositions,
-			newsPopupMinimizeToggle
-		} = this.props;
+		const { gameboard, gameboardMeta, selectPosition, newsPopupMinimizeToggle } = this.props;
+
+		//prettier-ignore
+		const { confirmedInsurgency, confirmedRods, confirmedRemoteSense, selectedPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions } = gameboardMeta;
 
 		let planningPositions = []; //all of the positions part of a plan
 		let containerPositions = []; //specific positions part of a plan of type container
@@ -166,6 +155,7 @@ class Gameboard extends Component {
 				r={rIndexSolver(positionIndex)}
 				s={-999}
 				fill={patternSolver(gameboard[positionIndex])}
+				//TODO: change this to always selectPositon(positionindex), instead of sending -1 (more info for the action, let it take care of it)
 				onClick={event => {
 					event.preventDefault();
 					if (parseInt(positionIndex) === parseInt(selectedPosition)) {
@@ -189,6 +179,8 @@ class Gameboard extends Component {
 						? "battlePos"
 						: confirmedRods.includes(parseInt(positionIndex))
 						? "battlePos"
+						: confirmedInsurgency.includes(parseInt(positionIndex))
+						? "battlePos"
 						: remoteSensedPositions.includes(parseInt(positionIndex))
 						? "remoteSensePos"
 						: ""
@@ -208,6 +200,7 @@ class Gameboard extends Component {
 					</HexGrid>
 				</div>
 
+				{/* TODO: more parent level connect to redux, less children connect, pass down relevant functions from here (try not to mix redux and parent passing) */}
 				<NewsPopup news={news} newsPopupMinimizeToggle={newsPopupMinimizeToggle} />
 				<BattlePopup battle={battle} />
 				<RefuelPopup />
@@ -219,33 +212,14 @@ class Gameboard extends Component {
 
 Gameboard.propTypes = {
 	gameboard: PropTypes.array.isRequired,
-	selectedPosition: PropTypes.number.isRequired,
+	gameboardMeta: PropTypes.object.isRequired,
 	selectPosition: PropTypes.func.isRequired,
-	news: PropTypes.object.isRequired,
-	battle: PropTypes.object.isRequired,
-	container: PropTypes.object.isRequired,
-	planning: PropTypes.object.isRequired,
-	selectedPiece: PropTypes.object,
-	confirmedPlans: PropTypes.object.isRequired,
-	highlightedPositions: PropTypes.array.isRequired,
-	newsPopupMinimizeToggle: PropTypes.func.isRequired,
-	confirmedRods: PropTypes.array.isRequired,
-	confirmedRemoteSense: PropTypes.array.isRequired
+	newsPopupMinimizeToggle: PropTypes.func.isRequired
 };
 
-//TODO: just send the meta, don't worry about individual things (cleaner code)
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 	gameboard,
-	selectedPosition: gameboardMeta.selectedPosition,
-	highlightedPositions: gameboardMeta.highlightedPositions,
-	news: gameboardMeta.news,
-	battle: gameboardMeta.battle,
-	container: gameboardMeta.container,
-	planning: gameboardMeta.planning,
-	selectedPiece: gameboardMeta.selectedPiece,
-	confirmedPlans: gameboardMeta.confirmedPlans,
-	confirmedRods: gameboardMeta.confirmedRods,
-	confirmedRemoteSense: gameboardMeta.confirmedRemoteSense
+	gameboardMeta
 });
 
 const mapActionsToProps = {

@@ -1,7 +1,7 @@
 const { Game, InvItem, Capability } = require("../../classes");
 import { RODS_FROM_GOD_SELECTED } from "../../../client/src/redux/actions/actionTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
-import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
+import { GAME_INACTIVE_TAG, GAME_DOES_NOT_EXIST } from "../../pages/errorTypes";
 import { TYPE_NAME_IDS } from "../../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 
@@ -16,6 +16,11 @@ const rodsFromGodConfirm = async (socket, payload) => {
 	const { selectedPositionId, invItem } = payload;
 
 	const thisGame = await new Game({ gameId }).init();
+	if (!thisGame) {
+		socket.emit(SERVER_REDIRECT, GAME_DOES_NOT_EXIST);
+		return;
+	}
+
 	const { gameActive, gamePhase, gameSlice, game0Points, game1Points } = thisGame;
 
 	if (!gameActive) {

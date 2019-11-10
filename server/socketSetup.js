@@ -18,7 +18,8 @@ const {
 	confirmBattleSelection,
 	confirmFuelSelection,
 	rodsFromGodConfirm,
-	remoteSensingConfirm
+	remoteSensingConfirm,
+	insurgencyConfirm
 } = require("./gameplayFunctions");
 
 const socketSetup = async socket => {
@@ -102,6 +103,9 @@ const socketSetup = async socket => {
 					break;
 				case "remoteSensingConfirm":
 					remoteSensingConfirm(socket, payload);
+					break;
+				case "insurgencyConfirm":
+					insurgencyConfirm(socket, payload);
 					break;
 				default:
 					sendUserFeedback(socket, "Did not recognize client socket request type");
