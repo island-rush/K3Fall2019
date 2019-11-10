@@ -24,7 +24,15 @@ import {
 	BATTLE_FIGHT_RESULTS,
 	EVENT_BATTLE,
 	EVENT_REFUEL,
-	AIRCRAFT_CLICK
+	AIRCRAFT_CLICK,
+	RODS_FROM_GOD_SELECTING,
+	RODS_FROM_GOD_SELECTED,
+	REMOTE_SENSING_SELECTING,
+	REMOTE_SENSING_SELECTED,
+	INSURGENCY_SELECTED,
+	INSURGENCY_SELECTING,
+	BIO_WEAPON_SELECTED,
+	BIO_WEAPON_SELECTING
 } from "../actions/actionTypes";
 
 const initialUserFeedback = "Loading...";
@@ -47,6 +55,22 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "Cancelled the plan...";
 		case DELETE_PLAN:
 			return "Deleted the confirmed plan...";
+		case RODS_FROM_GOD_SELECTING:
+			return "Now select a position to be obliterated.";
+		case RODS_FROM_GOD_SELECTED:
+			return "selected position to kill!";
+		case BIO_WEAPON_SELECTED:
+			return "selected position to deploy bio weapons to";
+		case BIO_WEAPON_SELECTING:
+			return "Now select a position to get bio weaponed!";
+		case REMOTE_SENSING_SELECTED:
+			return "selected area to remote sense!";
+		case REMOTE_SENSING_SELECTING:
+			return "Now select an area to remote sense.";
+		case INSURGENCY_SELECTED:
+			return "selected position to start insurgency!";
+		case INSURGENCY_SELECTING:
+			return "Now select a position to start an insurgency!";
 		case AIRCRAFT_CLICK:
 			return "transferring fuel planned...";
 		case PLAN_WAS_CONFIRMED:

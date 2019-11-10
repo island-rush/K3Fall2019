@@ -33,8 +33,6 @@ class Piece extends Component {
 	render() {
 		const { piece, topLevel, selected, pieceClick } = this.props;
 
-		const contents = piece.pieceContents.pieces.length === 0 ? null : <Container selected={selected} pieces={piece.pieceContents.pieces} pieceClick={pieceClick} />;
-
 		const pieceCombinedStyle = {
 			...pieceStyle,
 			...(topLevel ? topLevelStyle : bottomLevelStyle),
@@ -44,18 +42,18 @@ class Piece extends Component {
 			...(selected ? selectedStyle : "")
 		};
 
-		const title = `${TYPE_NAMES[piece.pieceTypeId]}\nMoves: ${piece.pieceMoves}\nFuel: ${piece.pieceFuel}`;
+		const title = `${TYPE_NAMES[piece.pieceTypeId]}\nMoves: ${piece.pieceMoves}\nFuel: ${piece.pieceFuel !== -1 ? piece.pieceFuel : "N/A"}`;
+
+		const onClick = event => {
+			event.preventDefault();
+			pieceClick(piece);
+			event.stopPropagation();
+		};
+
+		const contents = piece.pieceContents.pieces.length === 0 ? null : <Container selected={selected} pieces={piece.pieceContents.pieces} pieceClick={pieceClick} />;
 
 		return (
-			<div
-				style={{ ...pieceCombinedStyle }}
-				title={title}
-				onClick={event => {
-					event.preventDefault();
-					pieceClick(piece);
-					event.stopPropagation();
-				}}
-			>
+			<div style={pieceCombinedStyle} title={title} onClick={onClick}>
 				{contents}
 			</div>
 		);

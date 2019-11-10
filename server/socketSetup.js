@@ -6,6 +6,21 @@
 const { Game } = require("./classes");
 import { BAD_SESSION, GAME_DOES_NOT_EXIST, NOT_LOGGED_IN_TAG } from "./pages/errorTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION, CLIENT_SENDING_ACTION } from "../client/src/redux/socketEmits";
+import {
+	SERVER_BIOLOGICAL_WEAPONS_CONFIRM,
+	SERVER_INSURGENCY_CONFIRM,
+	SERVER_REMOTE_SENSING_CONFIRM,
+	SERVER_RODS_FROM_GOD_CONFIRM,
+	SERVER_CONFIRM_FUEL_SELECTION,
+	SERVER_CONFIRM_BATTLE_SELECTION,
+	SERVER_MAIN_BUTTON_CLICK,
+	SERVER_PIECE_PLACE,
+	SERVER_DELETE_PLAN,
+	SERVER_CONFIRM_PLAN,
+	SERVER_SHOP_CONFIRM_PURCHASE,
+	SERVER_SHOP_REFUND_REQUEST,
+	SERVER_SHOP_PURCHASE_REQUEST
+} from "../client/src/redux/actions/actionTypes";
 const {
 	sendUserFeedback,
 	shopPurchaseRequest,
@@ -16,7 +31,11 @@ const {
 	piecePlace,
 	mainButtonClick,
 	confirmBattleSelection,
-	confirmFuelSelection
+	confirmFuelSelection,
+	rodsFromGodConfirm,
+	remoteSensingConfirm,
+	insurgencyConfirm,
+	biologicalWeaponsConfirm
 } = require("./gameplayFunctions");
 
 const socketSetup = async socket => {
@@ -68,32 +87,44 @@ const socketSetup = async socket => {
 	socket.on(CLIENT_SENDING_ACTION, ({ type, payload }) => {
 		try {
 			switch (type) {
-				case "shopPurchaseRequest": //Could use constants, but only used once on frontend, once on backend
+				case SERVER_SHOP_PURCHASE_REQUEST:
 					shopPurchaseRequest(socket, payload);
 					break;
-				case "shopRefundRequest":
+				case SERVER_SHOP_REFUND_REQUEST:
 					shopRefundRequest(socket, payload);
 					break;
-				case "shopConfirmPurchase":
+				case SERVER_SHOP_CONFIRM_PURCHASE:
 					shopConfirmPurchase(socket, payload);
 					break;
-				case "confirmPlan":
+				case SERVER_CONFIRM_PLAN:
 					confirmPlan(socket, payload);
 					break;
-				case "deletePlan":
+				case SERVER_DELETE_PLAN:
 					deletePlan(socket, payload);
 					break;
-				case "piecePlace":
+				case SERVER_PIECE_PLACE:
 					piecePlace(socket, payload);
 					break;
-				case "mainButtonClick":
+				case SERVER_MAIN_BUTTON_CLICK:
 					mainButtonClick(socket, payload);
 					break;
-				case "confirmBattleSelection":
+				case SERVER_CONFIRM_BATTLE_SELECTION:
 					confirmBattleSelection(socket, payload);
 					break;
-				case "confirmFuelSelection":
+				case SERVER_CONFIRM_FUEL_SELECTION:
 					confirmFuelSelection(socket, payload);
+					break;
+				case SERVER_RODS_FROM_GOD_CONFIRM:
+					rodsFromGodConfirm(socket, payload);
+					break;
+				case SERVER_REMOTE_SENSING_CONFIRM:
+					remoteSensingConfirm(socket, payload);
+					break;
+				case SERVER_INSURGENCY_CONFIRM:
+					insurgencyConfirm(socket, payload);
+					break;
+				case SERVER_BIOLOGICAL_WEAPONS_CONFIRM:
+					biologicalWeaponsConfirm(socket, payload);
 					break;
 				default:
 					sendUserFeedback(socket, "Did not recognize client socket request type");

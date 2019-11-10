@@ -8,6 +8,7 @@ const ShopItem = require("./ShopItem");
 const Piece = require("./Piece");
 const Plan = require("./Plan");
 const Event = require("./Event");
+const Capability = require("./Capability");
 
 const gameInitialPieces = require("../adminFunctions/gameInitialPieces");
 const gameInitialNews = require("../adminFunctions/gameInitialNews");
@@ -112,6 +113,10 @@ class Game {
 
 		serverAction.payload.gameboardMeta = {};
 		serverAction.payload.gameboardMeta.confirmedPlans = await Plan.getConfirmedPlans(this.gameId, gameTeam);
+		serverAction.payload.gameboardMeta.confirmedRods = await Capability.getRodsFromGod(this.gameId, gameTeam);
+		serverAction.payload.gameboardMeta.confirmedRemoteSense = await Capability.getRemoteSensing(this.gameId, gameTeam);
+		serverAction.payload.gameboardMeta.confirmedInsurgency = await Capability.getInsurgency(this.gameId, gameTeam);
+		serverAction.payload.gameboardMeta.confirmedBioWeapons = await Capability.getBiologicalWeapons(this.gameId, gameTeam);
 
 		//Could put news into its own object, but don't really use it much...(TODO: figure out if need to refactor this...)
 		if (this.gamePhase == 0) {
@@ -301,16 +306,17 @@ class Game {
 		let inserts;
 
 		if (options.gameId) {
-			queryString = "INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) SELECT ?,?,?,? WHERE NOT EXISTS(SELECT * from games WHERE gameSection=? AND gameInstructor = ?)";
+			queryString =
+				"INSERT INTO games (gameId, gameSection, gameInstructor, gameAdminPassword) SELECT ?,?,?,? WHERE NOT EXISTS(SELECT * from games WHERE gameSection=? AND gameInstructor = ?)";
 			inserts = [options.gameId, gameSection, gameInstructor, gameAdminPasswordHash, gameSection, gameInstructor];
 		} else {
-			queryString = "INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) SELECT ?,?,? WHERE NOT EXISTS(SELECT * from games WHERE gameSection=? AND gameInstructor = ?)";
-			inserts = [gameSection, gameInstructor, gameAdminPasswordHash,gameSection, gameInstructor];
+			queryString =
+				"INSERT INTO games (gameSection, gameInstructor, gameAdminPassword) SELECT ?,?,? WHERE NOT EXISTS(SELECT * from games WHERE gameSection=? AND gameInstructor = ?)";
+			inserts = [gameSection, gameInstructor, gameAdminPasswordHash, gameSection, gameInstructor];
 		}
-		
+
 		const result = await pool.query(queryString, inserts);
-		if( result[0].affectedRows == 0)
-			return;
+		if (result[0].affectedRows == 0) return;
 
 		const thisGame = await new Game({ gameSection, gameInstructor }).init(); //could not init, but since we don't know who is using this function, return the full game
 

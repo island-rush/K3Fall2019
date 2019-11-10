@@ -1,4 +1,4 @@
-const { Plan, Piece, Event } = require("../classes");
+const { Plan, Piece, Event, Capability } = require("../classes");
 import { PLACE_PHASE, NEW_ROUND, PIECES_MOVE } from "../../client/src/redux/actions/actionTypes";
 import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
 const giveNextEvent = require("./giveNextEvent");
@@ -19,8 +19,18 @@ const executeStep = async (socket, thisGame) => {
 
 		await Piece.resetMoves(gameId); //TODO: could move this functionality to Game (no need to pass in the gameId)
 
+		//Decrease game effects that last for x rounds
+		await Capability.decreaseRemoteSensing(gameId);
+		await Capability.decreaseBiologicalWeapons(gameId);
+
 		const gameboardPiecesList0 = await Piece.getVisiblePieces(gameId, 0);
 		const gameboardPiecesList1 = await Piece.getVisiblePieces(gameId, 1);
+
+		const remoteSense0 = await Capability.getRemoteSensing(gameId, 0);
+		const remoteSense1 = await Capability.getRemoteSensing(gameId, 1);
+
+		const bioWeapons0 = await Capability.getBiologicalWeapons(gameId, 0); //any team should work, since all activated at this point?
+		const bioWeapons1 = await Capability.getBiologicalWeapons(gameId, 1);
 
 		let serverAction0;
 		let serverAction1;
@@ -32,14 +42,18 @@ const executeStep = async (socket, thisGame) => {
 			serverAction0 = {
 				type: PLACE_PHASE,
 				payload: {
-					gameboardPieces: gameboardPiecesList0
+					gameboardPieces: gameboardPiecesList0,
+					confirmedRemoteSense: remoteSense0,
+					confirmedBioWeapons: bioWeapons0
 				}
 			};
 
 			serverAction1 = {
 				type: PLACE_PHASE,
 				payload: {
-					gameboardPieces: gameboardPiecesList1
+					gameboardPieces: gameboardPiecesList1,
+					confirmedRemoteSense: remoteSense1,
+					confirmedBioWeapons: bioWeapons1
 				}
 			};
 		} else {
@@ -50,7 +64,9 @@ const executeStep = async (socket, thisGame) => {
 				type: NEW_ROUND,
 				payload: {
 					gameRound: thisGame.gameRound,
-					gameboardPieces: gameboardPiecesList0
+					gameboardPieces: gameboardPiecesList0,
+					confirmedRemoteSense: remoteSense0,
+					confirmedBioWeapons: bioWeapons0
 				}
 			};
 
@@ -58,7 +74,9 @@ const executeStep = async (socket, thisGame) => {
 				type: NEW_ROUND,
 				payload: {
 					gameRound: thisGame.gameRound,
-					gameboardPieces: gameboardPiecesList1
+					gameboardPieces: gameboardPiecesList1,
+					confirmedRemoteSense: remoteSense1,
+					confirmedBioWeapons: bioWeapons1
 				}
 			};
 		}
@@ -66,7 +84,7 @@ const executeStep = async (socket, thisGame) => {
 		socket.to("game" + gameId + "team0").emit(SERVER_SENDING_ACTION, serverAction0);
 		socket.to("game" + gameId + "team1").emit(SERVER_SENDING_ACTION, serverAction1);
 
-		const thisSocketsAction = socket.handshake.session.ir3.gameTeam === 0 ? serverAction0 : serverAction1;
+		const thisSocketsAction = parseInt(socket.handshake.session.ir3.gameTeam) === 0 ? serverAction0 : serverAction1;
 		socket.emit(SERVER_SENDING_ACTION, thisSocketsAction);
 
 		return;

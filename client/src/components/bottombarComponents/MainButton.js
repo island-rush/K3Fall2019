@@ -14,6 +14,7 @@ class MainButton extends Component {
 		const { mainButtonClick, gameInfo } = this.props;
 		const { gameStatus, gamePhase, gameSlice } = gameInfo;
 
+		//TODO: clean this mess up
 		let buttonText;
 		if (gameStatus === 1) {
 			buttonText = "Waiting on other Team...";

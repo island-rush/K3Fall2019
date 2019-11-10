@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS games (
 	game0Status INT(1) NOT NULL DEFAULT 0,  -- 0: still active, 1: waiting for other player
 	game1Status INT(1) NOT NULL DEFAULT 0,
     
-    game0Points INT(5) NOT NULL DEFAULT 50,
-    game1Points INT(5) NOT NULL DEFAULT 50,
+    game0Points INT(5) NOT NULL DEFAULT 5000,
+    game1Points INT(5) NOT NULL DEFAULT 5000,
     
     gamePhase INT(1) NOT NULL DEFAULT 0, -- 0: news, 1: buy, 2: combat, 3: place inv
     gameRound INT(1) NOT NULL DEFAULT 0, -- 0, 1, 2  rounds of movement
@@ -75,16 +75,9 @@ CREATE TABLE IF NOT EXISTS plans(
 CREATE TABLE IF NOT EXISTS news(
 	newsId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     newsGameId INT(4) NOT NULL,
-    newsTeam INT(4) NOT NULL,
     newsOrder INT(4) NOT NULL,
-    newsPieces INT(4) NOT NULL,
-    newsEffect INT(4) NOT NULL,
-    newsRoll INT(4) NOT NULL,
-    newsLength INT(4) NOT NULL,
-    newsZone INT(4) NOT NULL,
     newsTitle VARCHAR(100) NOT NULL,
     newsInfo VARCHAR(800) NOT NULL,
-    newsActivated INT(1) NOT NULL,
     FOREIGN KEY (newsGameId) REFERENCES games (gameId) ON DELETE CASCADE
 ) AUTO_INCREMENT=1;
 
@@ -137,3 +130,38 @@ CREATE TABLE IF NOT EXISTS pieceRefuelTemp(
     FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE,
     PRIMARY KEY (pieceId)
 );
+
+CREATE TABLE IF NOT EXISTS rodsFromGod(
+	rodsFromGodId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	gameId INT(8) NOT NULL,
+    teamId INT(1) NOT NULL,
+    positionId INT(4) NOT NULL,
+    FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE
+) AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS remoteSensing(
+	remoteSensingId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	gameId INT(8) NOT NULL,
+    teamId INT(1) NOT NULL,
+    positionId INT(4) NOT NULL,
+    roundsLeft INT(2) NOT NULL,
+    FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE
+) AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS insurgency(
+	insurgencyId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	gameId INT(8) NOT NULL,
+    teamId INT(1) NOT NULL,
+    positionId INT(4) NOT NULL,
+    FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE
+) AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS biologicalWeapons(
+	biologicalWeaponsId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	gameId INT(8) NOT NULL,
+    teamId INT(1) NOT NULL,
+    positionId INT(4) NOT NULL,
+    roundsLeft INT(2) NOT NULL,
+    activated INT(1) NOT NULL,
+    FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE
+) AUTO_INCREMENT=1;

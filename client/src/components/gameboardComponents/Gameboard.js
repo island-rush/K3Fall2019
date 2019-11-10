@@ -8,7 +8,8 @@ import ContainerPopup from "./ContainerPopup";
 import RefuelPopup from "./refuel/RefuelPopup";
 import Patterns from "./Patterns";
 import { selectPosition, newsPopupMinimizeToggle } from "../../redux/actions";
-import { TYPE_HIGH_LOW } from "../../gameData/gameConstants";
+import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE } from "../../gameData/gameConstants";
+import { distanceMatrix } from "../../gameData/distanceMatrix";
 
 const gameboardStyle = {
 	backgroundColor: "blue",
@@ -89,11 +90,15 @@ const patternSolver = position => {
 
 class Gameboard extends Component {
 	render() {
-		const { gameboard, selectedPosition, selectPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions, newsPopupMinimizeToggle } = this.props;
+		const { gameboard, gameboardMeta, selectPosition, newsPopupMinimizeToggle } = this.props;
+
+		//prettier-ignore
+		const {confirmedBioWeapons, confirmedInsurgency, confirmedRods, confirmedRemoteSense, selectedPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions } = gameboardMeta;
 
 		let planningPositions = []; //all of the positions part of a plan
 		let containerPositions = []; //specific positions part of a plan of type container
 		let battlePositions = []; //position(s) involved in a battle
+		let remoteSensedPositions = [];
 
 		for (let x = 0; x < planning.moves.length; x++) {
 			const { type, positionId } = planning.moves[x];
@@ -107,10 +112,10 @@ class Gameboard extends Component {
 			}
 		}
 
-		if (selectedPiece !== -1) {
-			if (selectedPiece in confirmedPlans) {
-				for (let z = 0; z < confirmedPlans[selectedPiece].length; z++) {
-					const { type, positionId } = confirmedPlans[selectedPiece][z];
+		if (selectedPiece !== null) {
+			if (selectedPiece.pieceId in confirmedPlans) {
+				for (let z = 0; z < confirmedPlans[selectedPiece.pieceId].length; z++) {
+					const { type, positionId } = confirmedPlans[selectedPiece.pieceId][z];
 					if (type === "move") {
 						planningPositions.push(parseInt(positionId));
 					}
@@ -132,6 +137,16 @@ class Gameboard extends Component {
 			}
 		}
 
+		for (let x = 0; x < confirmedRemoteSense.length; x++) {
+			//need the adjacent by 3 radius positions to be highlighted
+			let remoteSenseCenter = confirmedRemoteSense[x];
+			for (let y = 0; y < distanceMatrix[remoteSenseCenter].length; y++) {
+				if (distanceMatrix[remoteSenseCenter][y] <= REMOTE_SENSING_RANGE) {
+					remoteSensedPositions.push(y);
+				}
+			}
+		}
+
 		const positions = Object.keys(gameboard).map(positionIndex => (
 			<Hexagon
 				key={positionIndex}
@@ -140,6 +155,7 @@ class Gameboard extends Component {
 				r={rIndexSolver(positionIndex)}
 				s={-999}
 				fill={patternSolver(gameboard[positionIndex])}
+				//TODO: change this to always selectPositon(positionindex), instead of sending -1 (more info for the action, let it take care of it)
 				onClick={event => {
 					event.preventDefault();
 					if (parseInt(positionIndex) === parseInt(selectedPosition)) {
@@ -161,6 +177,14 @@ class Gameboard extends Component {
 						? "highlightedPos"
 						: battlePositions.includes(parseInt(positionIndex))
 						? "battlePos"
+						: confirmedRods.includes(parseInt(positionIndex))
+						? "battlePos"
+						: confirmedBioWeapons.includes(parseInt(positionIndex))
+						? "bioWeaponPos"
+						: confirmedInsurgency.includes(parseInt(positionIndex))
+						? "battlePos"
+						: remoteSensedPositions.includes(parseInt(positionIndex))
+						? "remoteSensePos"
 						: ""
 				}
 				someOtherProp={battlePositions.includes(parseInt(positionIndex))}
@@ -178,6 +202,7 @@ class Gameboard extends Component {
 					</HexGrid>
 				</div>
 
+				{/* TODO: more parent level connect to redux, less children connect, pass down relevant functions from here (try not to mix redux and parent passing) */}
 				<NewsPopup news={news} newsPopupMinimizeToggle={newsPopupMinimizeToggle} />
 				<BattlePopup battle={battle} />
 				<RefuelPopup />
@@ -189,28 +214,14 @@ class Gameboard extends Component {
 
 Gameboard.propTypes = {
 	gameboard: PropTypes.array.isRequired,
-	selectedPosition: PropTypes.number.isRequired,
+	gameboardMeta: PropTypes.object.isRequired,
 	selectPosition: PropTypes.func.isRequired,
-	news: PropTypes.object.isRequired,
-	battle: PropTypes.object.isRequired,
-	container: PropTypes.object.isRequired,
-	planning: PropTypes.object.isRequired,
-	selectedPiece: PropTypes.number.isRequired,
-	confirmedPlans: PropTypes.object.isRequired,
-	highlightedPositions: PropTypes.array.isRequired,
 	newsPopupMinimizeToggle: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 	gameboard,
-	selectedPosition: gameboardMeta.selectedPosition,
-	highlightedPositions: gameboardMeta.highlightedPositions,
-	news: gameboardMeta.news,
-	battle: gameboardMeta.battle,
-	container: gameboardMeta.container,
-	planning: gameboardMeta.planning,
-	selectedPiece: gameboardMeta.selectedPiece,
-	confirmedPlans: gameboardMeta.confirmedPlans
+	gameboardMeta
 });
 
 const mapActionsToProps = {

@@ -27,27 +27,19 @@ class Zoombox extends Component {
 		const pieces = !isVisible
 			? null
 			: gameboard[selectedPos].pieces.map((piece, index) => (
-					<Piece pieceClick={selectPiece} selected={selectedPiece === piece.pieceId} topLevel={true} key={index} piece={piece} />
+					<Piece pieceClick={selectPiece} selected={selectedPiece !== null && selectedPiece.pieceId === piece.pieceId} topLevel={true} key={index} piece={piece} />
 			  ));
 
+		const style = isVisible ? { ...zoomboxStyle, ...ZOOMBOX_BACKGROUNDS[gameboard[selectedPos].type] } : invisibleStyle;
+
+		const onClick = event => {
+			event.preventDefault();
+			clearPieceSelection();
+			event.stopPropagation();
+		};
+
 		return (
-			<div
-				style={
-					isVisible
-						? {
-								...zoomboxStyle,
-								...ZOOMBOX_BACKGROUNDS[gameboard[selectedPos].type]
-						  }
-						: invisibleStyle
-				}
-				onClick={event => {
-					event.preventDefault();
-					//close current selected piece?
-					//close any open pieces
-					clearPieceSelection();
-					event.stopPropagation();
-				}}
-			>
+			<div style={style} onClick={onClick}>
 				{pieces}
 			</div>
 		);
@@ -56,7 +48,7 @@ class Zoombox extends Component {
 
 Zoombox.propTypes = {
 	selectedPos: PropTypes.number.isRequired,
-	selectedPiece: PropTypes.number.isRequired,
+	selectedPiece: PropTypes.object,
 	gameboard: PropTypes.array.isRequired,
 	selectPiece: PropTypes.func.isRequired,
 	clearPieceSelection: PropTypes.func.isRequired

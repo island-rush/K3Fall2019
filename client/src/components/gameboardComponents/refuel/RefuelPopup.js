@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { confirmFuelSelections, aircraftClick, tankerClick, undoFuelSelection } from "../../../redux/actions";
+import { refuelPopupMinimizeToggle, confirmFuelSelections, aircraftClick, tankerClick, undoFuelSelection } from "../../../redux/actions";
+import { REFUEL_POPUP_IMAGES } from "../../styleConstants";
 import AircraftPiece from "./AircraftPiece";
 import TankerPiece from "./TankerPiece";
 
@@ -15,6 +16,26 @@ const refuelPopupStyle = {
 	backgroundColor: "white",
 	border: "2px solid black",
 	zIndex: 4
+};
+
+const refuelPopupMinimizeStyle = {
+	position: "absolute",
+	display: "block",
+	width: "7%",
+	height: "12%",
+	top: "0%",
+	left: "-8%",
+	backgroundColor: "white",
+	border: "2px solid black",
+	zIndex: 4,
+	backgroundSize: "100% 100%",
+	backgroundRepeat: "no-repeat"
+};
+
+const isMinimizedStyle = {
+	border: "2px solid red",
+	top: "45%",
+	margin: "2%"
 };
 
 const leftSectionStyle = {
@@ -49,7 +70,7 @@ const invisibleStyle = {
 
 class RefuelPopup extends Component {
 	render() {
-		const { refuel, confirmFuelSelections, aircraftClick, tankerClick, undoFuelSelection } = this.props;
+		const { refuel, confirmFuelSelections, aircraftClick, tankerClick, undoFuelSelection, refuelPopupMinimizeToggle } = this.props;
 
 		const { tankers, aircraft, selectedTankerPieceId } = refuel;
 
@@ -61,19 +82,37 @@ class RefuelPopup extends Component {
 		));
 
 		return (
-			<div style={refuel.active ? refuelPopupStyle : invisibleStyle}>
-				<div style={leftSectionStyle}>Aircraft{aircraftPieces}</div>
-				<div style={rightSectionStyle}>Tankers{tankerPieces}</div>
-				<button
+			<div style={refuel.active ? null : invisibleStyle}>
+				<div style={!refuel.isMinimized ? refuelPopupStyle : invisibleStyle}>
+					<div style={leftSectionStyle}>Aircraft{aircraftPieces}</div>
+					<div style={rightSectionStyle}>Tankers{tankerPieces}</div>
+					<button
+						onClick={event => {
+							event.preventDefault();
+							confirmFuelSelections();
+							event.stopPropagation();
+						}}
+						style={confirmButtonStyle}
+					>
+						Confirm Fuel Selections
+					</button>
+					<div
+						onClick={event => {
+							event.preventDefault();
+							refuelPopupMinimizeToggle();
+							event.stopPropagation();
+						}}
+						style={{ ...refuelPopupMinimizeStyle, ...REFUEL_POPUP_IMAGES.minIcon }}
+					/>
+				</div>
+				<div
+					style={{ ...(refuel.isMinimized ? refuelPopupMinimizeStyle : invisibleStyle), ...REFUEL_POPUP_IMAGES.minIcon, ...isMinimizedStyle}}
 					onClick={event => {
 						event.preventDefault();
-						confirmFuelSelections();
+						refuelPopupMinimizeToggle();
 						event.stopPropagation();
 					}}
-					style={confirmButtonStyle}
-				>
-					Confirm Fuel Selections
-				</button>
+				/>
 			</div>
 		);
 	}
@@ -84,7 +123,8 @@ RefuelPopup.propTypes = {
 	confirmFuelSelections: PropTypes.func.isRequired,
 	tankerClick: PropTypes.func.isRequired,
 	aircraftClick: PropTypes.func.isRequired,
-	undoFuelSelection: PropTypes.func.isRequired
+	undoFuelSelection: PropTypes.func.isRequired,
+	refuelPopupMinimizeToggle: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ gameboardMeta }) => ({
@@ -95,7 +135,8 @@ const mapActionsToProps = {
 	confirmFuelSelections,
 	tankerClick,
 	aircraftClick,
-	undoFuelSelection
+	undoFuelSelection,
+	refuelPopupMinimizeToggle
 };
 
 export default connect(

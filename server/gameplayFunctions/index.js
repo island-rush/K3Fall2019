@@ -18,6 +18,11 @@ const sendUserFeedback = require("./sendUserFeedback");
 const piecePlace = require("./piecePlace");
 const mainButtonClick = require("./mainButtonClick");
 
+const rodsFromGodConfirm = require("./capabilities/rodsFromGodConfirm");
+const remoteSensingConfirm = require("./capabilities/remoteSensingConfirm");
+const insurgencyConfirm = require("./capabilities/insurgencyConfirm");
+const biologicalWeaponsConfirm = require("./capabilities/biologicalWeaponsConfirm");
+
 module.exports = {
 	shopPurchaseRequest,
 	sendUserFeedback,
@@ -28,5 +33,9 @@ module.exports = {
 	piecePlace,
 	mainButtonClick,
 	confirmBattleSelection,
-	confirmFuelSelection
+	confirmFuelSelection,
+	rodsFromGodConfirm,
+	remoteSensingConfirm,
+	insurgencyConfirm,
+	biologicalWeaponsConfirm
 };

@@ -77,7 +77,7 @@ export const TYPE_NAMES = {
 	19: "SOF Team",
 	20: "ATC Scramble",
 	21: "Cyber Dominance",
-	22: "Missile Launch Disruptio",
+	22: "Missile Launch Disruption",
 	23: "Communications Interruption",
 	24: "Remote Sensing",
 	25: "Rods from God",
@@ -230,3 +230,5 @@ export const ATTACK_MATRIX = [
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //c-130
 	[0, 0, 0, 0, 0, 0, 3, 8, 2, 3, 2, 5, 10, 0, 0, 0, 0, 0, 0, 7, 8, 0, 0] //sof team
 ];
+
+export const REMOTE_SENSING_RANGE = 3;

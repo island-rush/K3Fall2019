@@ -1,5 +1,5 @@
 const sendUserFeedback = require("./sendUserFeedback");
-const { Game } = require("../classes");
+const { Game, Capability } = require("../classes");
 import { MAIN_BUTTON_CLICK, PURCHASE_PHASE, COMBAT_PHASE, NEWS_PHASE, SLICE_CHANGE } from "../../client/src/redux/actions/actionTypes";
 import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
@@ -72,9 +72,20 @@ const mainButtonClick = async (socket, payload) => {
 		case 2:
 			if (gameSlice == 0) {
 				await thisGame.setSlice(1);
+
+				//TODO: change payload to reflect what's being sent (confirmedRods = list of positions, confirmedInsurgency = list of pieces to delete)
+				const confirmedRods = await Capability.useRodsFromGod(gameId);
+				const confirmedBioWeapons = await Capability.useBiologicalWeapons(gameId);
+				const { listOfPiecesToKill, listOfEffectedPositions } = await Capability.useInsurgency(gameId);
+
 				serverAction = {
 					type: SLICE_CHANGE,
-					payload: {}
+					payload: {
+						confirmedRods,
+						confirmedBioWeapons,
+						confirmedInsurgencyPos: listOfEffectedPositions,
+						confirmedInsurgencyPieces: listOfPiecesToKill
+					}
 				};
 			} else {
 				await executeStep(socket, thisGame);

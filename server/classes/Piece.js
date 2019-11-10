@@ -1,5 +1,5 @@
 const pool = require("../database");
-import { VISIBILITY_MATRIX, TYPE_MOVES } from "../../client/src/gameData/gameConstants";
+import { VISIBILITY_MATRIX, TYPE_MOVES, REMOTE_SENSING_RANGE, TYPE_NAME_IDS } from "../../client/src/gameData/gameConstants";
 import { distanceMatrix } from "../../client/src/gameData/distanceMatrix";
 
 class Piece {
@@ -61,6 +61,7 @@ class Piece {
 		for (let x = 0; x < pieces.length; x++) {
 			let { pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId } = pieces[x]; //TODO: pieces inside containers can't see rule?
 
+			//TODO: constant instead of 20 (number of pieces, also change it above when constructing the array(s)?)
 			for (let type = 0; type < 20; type++) { //check each type
 				if (VISIBILITY_MATRIX[pieceTypeId][type] !== -1) { //could it ever see this type?
 					for (let position = 0; position < distanceMatrix[piecePositionId].length; position++) { //for all positions
@@ -70,6 +71,28 @@ class Piece {
 							if (!posTypesVisible[otherTeam][type].includes(position)) { //add this position if not already added by another piece somewhere else
 								posTypesVisible[otherTeam][type].push(position);
 							}
+						}
+					}
+				}
+			}
+		}
+
+		//also check remote sensing effects
+		queryString = "SELECT * FROM remoteSensing WHERE gameId = ?";
+		inserts = [gameId];
+		const [results] = await conn.query(queryString, inserts);
+
+		for (let x = 0; x < results.length; x++) {
+			let remoteSenseCenter = results[x].positionId;
+			for (let currentPos = 0; currentPos < distanceMatrix[remoteSenseCenter].length; currentPos++) {
+				if (distanceMatrix[remoteSenseCenter][currentPos] <= REMOTE_SENSING_RANGE) {
+					//put these positions into the posTypesVisible (based on team)
+					let { teamId } = results[x];
+					let otherTeam = teamId === 0 ? 1 : 0;
+					for (let pieceType = 0; pieceType < posTypesVisible[otherTeam].length; pieceType++) {
+						//does not see subs or sof teams
+						if (!posTypesVisible[otherTeam][pieceType].includes(currentPos) && pieceType !== TYPE_NAME_IDS["SOF Team"] && pieceType !== TYPE_NAME_IDS["Submarine"]) { //add this position if not already added by another piece somewhere else
+							posTypesVisible[otherTeam][pieceType].push(currentPos);
 						}
 					}
 				}
@@ -96,6 +119,26 @@ class Piece {
 		//TODO: referencing another table here...(could change to put into the plans class)
 		const deletePlansQuery = "DELETE FROM plans WHERE planGameId = ? AND planMovementOrder = ? AND planSpecialFlag = 0";
 		await conn.query(deletePlansQuery, inserts);
+
+		//handle if the pieces moved into a bio / nuclear place
+		let queryString = "SELECT * FROM biologicalWeapons WHERE gameId = ? AND activated = 1";
+		let moreInserts = [gameId];
+		const [results] = await conn.query(queryString, moreInserts);
+
+		let listOfPositions = [];
+		for (let x = 0; x < results.length; x++) {
+			//delete the pieces in these positions
+			let thisBioWeapon = results[x];
+			let { positionId } = thisBioWeapon;
+			listOfPositions.push(positionId);
+		}
+
+		//TODO: only do this for ground pieces...
+		if (listOfPositions > 0) {
+			queryString = "DELETE FROM pieces WHERE pieceGameId = ? AND piecePositionId in (?)";
+			moreInserts = [gameId, listOfPositions];
+			await conn.query(queryString, moreInserts);
+		}
 
 		conn.release();
 	}
