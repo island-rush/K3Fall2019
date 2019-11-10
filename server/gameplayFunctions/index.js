@@ -20,6 +20,7 @@ const mainButtonClick = require("./mainButtonClick");
 
 const rodsFromGodConfirm = require("./capabilities/rodsFromGodConfirm");
 const remoteSensingConfirm = require("./capabilities/remoteSensingConfirm");
+const insurgencyConfirm = require("./capabilities/insurgencyConfirm");
 
 module.exports = {
 	shopPurchaseRequest,
@@ -33,5 +34,6 @@ module.exports = {
 	confirmBattleSelection,
 	confirmFuelSelection,
 	rodsFromGodConfirm,
-	remoteSensingConfirm
+	remoteSensingConfirm,
+	insurgencyConfirm
 };

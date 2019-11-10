@@ -59,6 +59,89 @@ class Capability {
 		return fullListOfPositions;
 	}
 
+	//TODO: better naming convention for these methods
+	static async insurgencyInsert(gameId, gameTeam, selectedPositionId) {
+		//TODO: this could be 1 query if efficient and do something with UNIQUE or INSERT IGNORE or REPLACE
+		//keeping it simple for now to ensure it works
+		let queryString = "SELECT * FROM insurgency WHERE gameId = ? AND teamId = ? AND positionId = ?";
+		const inserts = [gameId, gameTeam, selectedPositionId];
+		let [results] = await pool.query(queryString, inserts);
+
+		//prevent duplicate entries if possible
+		if (results.length !== 0) {
+			return false;
+		}
+
+		queryString = "INSERT INTO insurgency (gameId, teamId, positionId) VALUES (?, ?, ?)";
+		await pool.query(queryString, inserts);
+		return true;
+	}
+
+	static async getInsurgency(gameId, gameTeam) {
+		const queryString = "SELECT * FROM insurgency WHERE gameId = ? AND teamId = ?";
+		const inserts = [gameId, gameTeam];
+		const [results] = await pool.query(queryString, inserts);
+
+		let listOfPositions = [];
+		for (let x = 0; x < results.length; x++) {
+			listOfPositions.push(results[x].positionId);
+		}
+
+		return listOfPositions;
+	}
+
+	static async useInsurgency(gameId) {
+		let queryString = "SELECT * FROM insurgency WHERE gameId = ?";
+		let inserts = [gameId];
+		const [results] = await pool.query(queryString, inserts);
+
+		if (results.length === 0) {
+			return [];
+		}
+
+		//TODO: make this more efficient using bulk selects/updates/deletes
+
+		let listOfPiecesToKill = [];
+		let listOfPieceIdsToKill = [];
+		let listOfEffectedPositions = [];
+
+		//for each insurgency
+		for (let x = 0; x < results.length; x++) {
+			let { teamId, positionId } = results[x];
+			listOfEffectedPositions.push(positionId);
+			let otherTeam = teamId === 0 ? 1 : 0;
+
+			queryString = "SELECT * FROM pieces WHERE pieceGameId = ? AND pieceTeamId = ? AND piecePositionId = ?";
+			inserts = [gameId, otherTeam, positionId];
+			let [pieceResults] = await pool.query(queryString, inserts);
+
+			//for each piece
+			for (let y = 0; y < pieceResults.length; y++) {
+				let thisPiece = pieceResults[y];
+				let { pieceId } = thisPiece;
+				//TODO: refactor to use constant to calculate the random chance (use a percentage?) in case this chance needs to be changed later (./gameConstants)
+				let randomChance = Math.floor(Math.random() * 3) + 1;
+				//randomChance is either 1, 2, or 3
+				if (randomChance === 2) {
+					listOfPieceIdsToKill.push(pieceId);
+					listOfPiecesToKill.push(thisPiece);
+				}
+			}
+		}
+
+		if (listOfPieceIdsToKill.length > 0) {
+			queryString = "DELETE FROM pieces WHERE pieceId in (?)";
+			inserts = [listOfPieceIdsToKill];
+			await pool.query(queryString, inserts);
+		}
+
+		queryString = "DELETE FROM insurgency WHERE gameId = ?";
+		inserts = [gameId];
+		await pool.query(queryString, inserts);
+
+		return [listOfPiecesToKill, listOfEffectedPositions];
+	}
+
 	static async remoteSensingInsert(gameId, gameTeam, selectedPositionId) {
 		let queryString = "SELECT * FROM remoteSensing WHERE gameId = ? AND teamId = ? AND positionId = ?";
 		let inserts = [gameId, gameTeam, selectedPositionId];

@@ -51,6 +51,15 @@ function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
 			for (let x = 0; x < payload.confirmedRods.length; x++) {
 				stateDeepCopy[payload.confirmedRods[x]].pieces = [];
 			}
+			for (let x = 0; x < payload.confirmedInsurgencyPieces.length; x++) {
+				let currentPiece = payload.confirmedInsurgencyPieces[x];
+				let { piecePositionId, pieceId } = currentPiece;
+
+				//remove specific piece from the stateDeepCopy
+				stateDeepCopy[piecePositionId].pieces = stateDeepCopy[piecePositionId].pieces.filter((piece, index) => {
+					return piece.pieceId !== pieceId;
+				});
+			}
 			return stateDeepCopy;
 		case NO_MORE_EVENTS:
 			if (payload.gameboardPieces) {

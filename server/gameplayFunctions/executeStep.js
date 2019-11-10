@@ -19,7 +19,7 @@ const executeStep = async (socket, thisGame) => {
 
 		await Piece.resetMoves(gameId); //TODO: could move this functionality to Game (no need to pass in the gameId)
 
-		//need to handle remote sense decreasing by round, or getting removed
+		//Decrease game effects that last for x rounds
 		await Capability.decreaseRemoteSensing(gameId);
 
 		const gameboardPiecesList0 = await Piece.getVisiblePieces(gameId, 0);

@@ -73,13 +73,16 @@ const mainButtonClick = async (socket, payload) => {
 			if (gameSlice == 0) {
 				await thisGame.setSlice(1);
 
-				//rods from god happen here, show the players if anything gets removed (highlight positions anyway?)
+				//TODO: change payload to reflect what's being sent (confirmedRods = list of positions, confirmedInsurgency = list of pieces to delete)
 				const confirmedRods = await Capability.useRodsFromGod(gameId);
+				const [listOfPiecesKilled, listOfEffectedPositions] = await Capability.useInsurgency(gameId);
 
 				serverAction = {
 					type: SLICE_CHANGE,
 					payload: {
-						confirmedRods
+						confirmedRods,
+						confirmedInsurgencyPos: listOfEffectedPositions,
+						confirmedInsurgencyPieces: listOfPiecesKilled
 					}
 				};
 			} else {
