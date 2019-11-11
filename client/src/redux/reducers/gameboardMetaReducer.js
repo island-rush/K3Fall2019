@@ -40,7 +40,9 @@ import {
 	INSURGENCY_SELECTED,
 	INSURGENCY_SELECTING,
 	BIO_WEAPON_SELECTED,
-	BIO_WEAPON_SELECTING
+	BIO_WEAPON_SELECTING,
+	RAISE_MORALE_SELECTED,
+	RAISE_MORALE_SELECTING
 } from "../actions/actionTypes";
 
 import { TYPE_FUEL } from "../../gameData/gameConstants";
@@ -81,6 +83,7 @@ const initialGameboardMeta = {
 	planning: {
 		active: false,
 		capability: false,
+		raiseMoralePopupActive: false,
 		invItem: null,
 		moves: []
 	},
@@ -174,6 +177,22 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.planning.capability = true;
 			stateDeepCopy.planning.invItem = payload.invItem;
 			stateDeepCopy.selectedMenuId = 0;
+			break;
+		case RAISE_MORALE_SELECTING:
+			stateDeepCopy.planning.active = true;
+			stateDeepCopy.planning.capability = true;
+			stateDeepCopy.planning.invItem = payload.invItem;
+			stateDeepCopy.planning.raiseMoralePopupActive = true;
+			stateDeepCopy.selectedMenuId = 0;
+			break;
+		case RAISE_MORALE_SELECTED:
+			stateDeepCopy.planning.capability = false;
+			stateDeepCopy.planning.invItem = null;
+			stateDeepCopy.planning.active = false;
+			stateDeepCopy.planning.raiseMoralePopupActive = false;
+
+			//TODO: some sort of feedback that it worked? (or has it active (for these rounds...))
+			// stateDeepCopy.confirmedRods.push(parseInt(payload.selectedPositionId));
 			break;
 		case INSURGENCY_SELECTING:
 			stateDeepCopy.planning.active = true;

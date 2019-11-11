@@ -256,6 +256,12 @@ class Capability {
 		queryString = "DELETE FROM biologicalWeapons WHERE roundsLeft = 0";
 		await pool.query(queryString);
 	}
+
+	static async insertRaiseMorale(gameId, gameTeam, selectedCommanderType) {}
+
+	static async decreaseRaiseMorale(gameId) {}
+
+	static async getRaiseMorale(gameId, gameTeam) {}
 }
 
 module.exports = Capability;

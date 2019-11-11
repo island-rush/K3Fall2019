@@ -1,9 +1,32 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
-// import { CLIENT_SENDING_ACTION } from "../../socketEmits";
+import { RAISE_MORALE_SELECTING } from "../actionTypes";
 
-const raiseMorale = invitem => {
+const raiseMorale = invItem => {
 	return (dispatch, getState, emit) => {
-		dispatch(setUserfeedbackAction("raiseMorale"));
+		const { gameInfo } = getState();
+		const { gamePhase, gameSlice } = gameInfo;
+
+		//TODO: change these gamePhases into constants for better game logic sense
+		if (gamePhase !== 2) {
+			dispatch(setUserfeedbackAction("wrong phase for raise morale dude."));
+			return;
+		}
+
+		//TODO: change gameSlice into named constants...
+		if (gameSlice !== 0) {
+			dispatch(setUserfeedbackAction("must be in planning to use raise morale."));
+			return;
+		}
+
+		//other checks that the player is allowed to select raise morale (do they have it? / game effects...)
+
+		//dispatch that the player is currently selecting which commander type to boost
+		dispatch({
+			type: RAISE_MORALE_SELECTING,
+			payload: {
+				invItem
+			}
+		});
 	};
 };
 

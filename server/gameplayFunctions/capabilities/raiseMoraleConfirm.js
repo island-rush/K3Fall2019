@@ -1,12 +1,11 @@
-const { Game, InvItem, Capability } = require("../../classes");
-import { RODS_FROM_GOD_SELECTED } from "../../../client/src/redux/actions/actionTypes";
+const { Game, InvItem, Capability, Piece } = require("../../classes");
+import { RAISE_MORALE_SELECTED } from "../../../client/src/redux/actions/actionTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG, GAME_DOES_NOT_EXIST } from "../../pages/errorTypes";
 import { TYPE_NAME_IDS } from "../../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 
-//TODO: does this affect all pieces? or only ground since that makes sense....(compare to bio weapons)
-const rodsFromGodConfirm = async (socket, payload) => {
+const raiseMoraleConfirm = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
 	if (payload == null || payload.selectedPositionId == null) {
@@ -14,7 +13,7 @@ const rodsFromGodConfirm = async (socket, payload) => {
 		return;
 	}
 
-	const { selectedPositionId, invItem } = payload;
+	const { selectedCommanderType, invItem } = payload;
 
 	const thisGame = await new Game({ gameId }).init();
 	if (!thisGame) {
@@ -29,19 +28,19 @@ const rodsFromGodConfirm = async (socket, payload) => {
 		return;
 	}
 
-	//gamePhase 2 is only phase for rods from god
+	//gamePhase 2 is only phase for raise morale
 	if (gamePhase != 2) {
 		sendUserFeedback(socket, "Not the right phase...");
 		return;
 	}
 
-	//gameSlice 0 is only slice for rods from god
+	//gameSlice 0 is only slice for raise morale
 	if (gameSlice != 0) {
 		sendUserFeedback(socket, "Not the right slice (must be planning)...");
 		return;
 	}
 
-	//Only the main controller (0) can use rods from god
+	//Only the main controller (0) can use raise morale
 	if (gameController != 0) {
 		sendUserFeedback(socket, "Not the main controller (0)...");
 		return;
@@ -58,34 +57,41 @@ const rodsFromGodConfirm = async (socket, payload) => {
 
 	//verify correct type of inv item
 	const { invItemTypeId } = thisInvItem;
-	if (invItemTypeId != TYPE_NAME_IDS["Rods from God"]) {
-		sendUserFeedback(socket, "Inv Item was not a rods from god type.");
+	if (invItemTypeId != TYPE_NAME_IDS["Raise Morale"]) {
+		sendUserFeedback(socket, "Inv Item was not a raise morale type.");
 		return;
 	}
 
 	//does the position make sense?
-	if (selectedPositionId < 0) {
-		sendUserFeedback(socket, "got a negative position for rods from god.");
+	//TODO: make these individually check against the constants (don't make an arbitrary range)
+	if (selectedCommanderType < 1 || selectedCommanderType > 4) {
+		sendUserFeedback(socket, "got a negative position for raise morale.");
 		return;
 	}
 
-	//insert the 'plan' for rods from god into the db for later use
-	//let the client(team) know that this plan was accepted
-	if (!(await Capability.rodsFromGodInsert(gameId, gameTeam, selectedPositionId))) {
-		sendUserFeedback(socket, "db failed to insert rods from god, likely already an entry for that position.");
-		return;
-	}
+	//insert the raise morale into the db to start using it
 
-	await thisInvItem.delete();
+	// if (!(await Capability.raiseMoraleInsert(gameId, gameTeam, selectedPositionId))) {
+	// 	sendUserFeedback(socket, "db failed to insert raise morale, likely already an entry for that position.");
+	// 	return;
+	// }
 
+	// await thisInvItem.delete();
+
+	// await Piece.updateVisibilities(gameId);
+	// const gameboardPieces = await Piece.getVisiblePieces(gameId, gameTeam);
+	// const confirmedRemoteSense = await Capability.getRemoteSensing(gameId, gameTeam);
+
+	// let the client(team) know that this plan was accepted
 	const serverAction = {
-		type: RODS_FROM_GOD_SELECTED,
+		type: RAISE_MORALE_SELECTED,
 		payload: {
-			invItem: thisInvItem,
-			selectedPositionId
+			invItem: thisInvItem
+			// confirmedRemoteSense,
+			// gameboardPieces
 		}
 	};
 	socket.emit(SERVER_SENDING_ACTION, serverAction);
 };
 
-module.exports = rodsFromGodConfirm;
+module.exports = raiseMoraleConfirm;
