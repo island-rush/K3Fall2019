@@ -8,8 +8,8 @@ const sendUserFeedback = require("../sendUserFeedback");
 const raiseMoraleConfirm = async (socket, payload) => {
 	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	if (payload == null || payload.selectedPositionId == null) {
-		sendUserFeedback(socket, "Server Error: Malformed Payload (missing selectedPositionId)");
+	if (payload == null || payload.selectedCommanderType == null) {
+		sendUserFeedback(socket, "Server Error: Malformed Payload (missing selectedCommanderType)");
 		return;
 	}
 
@@ -71,15 +71,14 @@ const raiseMoraleConfirm = async (socket, payload) => {
 
 	//insert the raise morale into the db to start using it
 
-	// if (!(await Capability.raiseMoraleInsert(gameId, gameTeam, selectedPositionId))) {
-	// 	sendUserFeedback(socket, "db failed to insert raise morale, likely already an entry for that position.");
-	// 	return;
-	// }
+	if (!(await Capability.insertRaiseMorale(gameId, gameTeam, selectedCommanderType))) {
+		sendUserFeedback(socket, "db failed to insert raise morale, likely already an entry for that position.");
+		return;
+	}
 
-	// await thisInvItem.delete();
+	await thisInvItem.delete();
 
-	// await Piece.updateVisibilities(gameId);
-	// const gameboardPieces = await Piece.getVisiblePieces(gameId, gameTeam);
+	const gameboardPieces = await Piece.getVisiblePieces(gameId, gameTeam);
 	const confirmedRaiseMorale = await Capability.getRaiseMorale(gameId, gameTeam);
 
 	// let the client(team) know that this plan was accepted
@@ -87,8 +86,8 @@ const raiseMoraleConfirm = async (socket, payload) => {
 		type: RAISE_MORALE_SELECTED,
 		payload: {
 			invItem: thisInvItem,
-			confirmedRaiseMorale
-			// gameboardPieces
+			confirmedRaiseMorale,
+			gameboardPieces
 		}
 	};
 	socket.emit(SERVER_SENDING_ACTION, serverAction);

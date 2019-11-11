@@ -22,9 +22,15 @@ const buttonStyle = {
 	padding: "5%"
 };
 
+const invisibleStyle = {
+	display: "none"
+};
+
 const SelectCommanderTypePopup = ({ raiseMoraleSelectCommanderType, gameboardMeta }) => {
+	const { raiseMoralePopupActive } = gameboardMeta.planning;
+
 	return (
-		<div style={popupStyle}>
+		<div style={raiseMoralePopupActive ? popupStyle : invisibleStyle}>
 			<div style={titleStyle}>Select a commander type to boost.</div>
 			<div
 				style={buttonStyle}
