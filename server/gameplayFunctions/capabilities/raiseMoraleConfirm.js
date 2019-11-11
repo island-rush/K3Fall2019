@@ -80,14 +80,14 @@ const raiseMoraleConfirm = async (socket, payload) => {
 
 	// await Piece.updateVisibilities(gameId);
 	// const gameboardPieces = await Piece.getVisiblePieces(gameId, gameTeam);
-	// const confirmedRemoteSense = await Capability.getRemoteSensing(gameId, gameTeam);
+	const confirmedRaiseMorale = await Capability.getRaiseMorale(gameId, gameTeam);
 
 	// let the client(team) know that this plan was accepted
 	const serverAction = {
 		type: RAISE_MORALE_SELECTED,
 		payload: {
-			invItem: thisInvItem
-			// confirmedRemoteSense,
+			invItem: thisInvItem,
+			confirmedRaiseMorale
 			// gameboardPieces
 		}
 	};

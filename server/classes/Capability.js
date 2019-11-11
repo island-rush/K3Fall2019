@@ -257,11 +257,44 @@ class Capability {
 		await pool.query(queryString);
 	}
 
-	static async insertRaiseMorale(gameId, gameTeam, selectedCommanderType) {}
+	static async insertRaiseMorale(gameId, gameTeam, selectedCommanderType) {
+		let queryString = "SELECT * FROM raiseMorale WHERE gameId = ? AND teamId = ? AND commanderType = ?";
+		let inserts = [gameId, gameTeam, selectedCommanderType];
+		let [results] = await pool.query(queryString, inserts);
 
-	static async decreaseRaiseMorale(gameId) {}
+		//prevent duplicate entries if possible
+		if (results.length !== 0) {
+			return false;
+		}
 
-	static async getRaiseMorale(gameId, gameTeam) {}
+		queryString = "INSERT INTO raiseMorale (gameId, teamId, commanderType, roundsLeft) VALUES (?, ?, ?, ?)";
+		inserts = [gameId, gameTeam, selectedCommanderType, 9]; //TODO: use a constant, not 9 (9 rounds for bio weapons...)
+		await pool.query(queryString, inserts);
+		return true;
+	}
+
+	static async decreaseRaiseMorale(gameId) {
+		let queryString = "UPDATE raiseMorale SET roundsLeft = roundsLeft - 1 WHERE gameId = ?";
+		const inserts = [gameId];
+		await pool.query(queryString, inserts);
+
+		queryString = "DELETE FROM raiseMorale WHERE roundsLeft = 0";
+		await pool.query(queryString);
+	}
+
+	static async getRaiseMorale(gameId, gameTeam) {
+		//TODO: handle more than 1 raise morale for double boosting (how would this look like when letting client know (object? / array?))
+		const queryString = "SELECT * FROM raiseMorale WHERE gameId = ?";
+		const inserts = [gameId, gameTeam];
+		const [results] = await pool.query(queryString, inserts);
+
+		let listOfCommanders = [];
+		for (let x = 0; x < results.length; x++) {
+			listOfCommanders.push(results[x].positionId);
+		}
+
+		return listOfCommanders;
+	}
 }
 
 module.exports = Capability;

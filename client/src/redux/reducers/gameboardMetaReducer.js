@@ -91,7 +91,8 @@ const initialGameboardMeta = {
 	confirmedRods: [],
 	confirmedRemoteSense: [],
 	confirmedInsurgency: [],
-	confirmedBioWeapons: []
+	confirmedBioWeapons: [],
+	confirmedRaiseMorale: []
 };
 
 function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
@@ -191,8 +192,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
 			stateDeepCopy.planning.active = false;
 			stateDeepCopy.planning.raiseMoralePopupActive = false;
 
-			//TODO: some sort of feedback that it worked? (or has it active (for these rounds...))
-			// stateDeepCopy.confirmedRods.push(parseInt(payload.selectedPositionId));
+			stateDeepCopy.confirmedRaiseMorale = payload.confirmedRaiseMorale;
 			break;
 		case INSURGENCY_SELECTING:
 			stateDeepCopy.planning.active = true;
