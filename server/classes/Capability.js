@@ -282,7 +282,10 @@ class Capability {
 	static async decreaseRaiseMorale(gameId) {
 		const conn = await pool.getConnection();
 
-		let queryString = "UPDATE raiseMorale SET roundsLeft = roundsLeft - 1 WHERE gameId = ?";
+		let queryString = "DELETE FROM raiseMorale WHERE roundsLeft = 0";
+		await conn.query(queryString);
+
+		queryString = "UPDATE raiseMorale SET roundsLeft = roundsLeft - 1 WHERE gameId = ?";
 		let inserts = [gameId];
 		await conn.query(queryString, inserts);
 
@@ -325,9 +328,6 @@ class Capability {
 
 		inserts = [updateArrays[1][TYPE_SPECIAL], gameId, 1, TYPE_OWNERS[TYPE_SPECIAL]];
 		await conn.query(queryString, inserts);
-
-		queryString = "DELETE FROM raiseMorale WHERE roundsLeft = 0";
-		await conn.query(queryString);
 
 		await conn.release();
 	}

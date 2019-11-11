@@ -1,6 +1,8 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { RAISE_MORALE_SELECTING } from "../actionTypes";
 
+//TODO: need to get rid of boost = x from the component when the raise morale is expired
+
 const raiseMorale = invItem => {
 	return (dispatch, getState, emit) => {
 		const { gameInfo } = getState();
