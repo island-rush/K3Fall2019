@@ -6,8 +6,9 @@ import BattlePopup from "./battle/BattlePopup";
 import NewsPopup from "./NewsPopup";
 import ContainerPopup from "./ContainerPopup";
 import RefuelPopup from "./refuel/RefuelPopup";
+import SelectCommanderTypePopup from "./capabilities/SelectCommanderTypePopup";
 import Patterns from "./Patterns";
-import { selectPosition, newsPopupMinimizeToggle } from "../../redux/actions";
+import { selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } from "../../redux/actions";
 import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE } from "../../gameData/gameConstants";
 import { distanceMatrix } from "../../gameData/distanceMatrix";
 
@@ -90,7 +91,7 @@ const patternSolver = position => {
 
 class Gameboard extends Component {
 	render() {
-		const { gameboard, gameboardMeta, selectPosition, newsPopupMinimizeToggle } = this.props;
+		const { gameboard, gameboardMeta, selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } = this.props;
 
 		//prettier-ignore
 		const {confirmedBioWeapons, confirmedInsurgency, confirmedRods, confirmedRemoteSense, selectedPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions } = gameboardMeta;
@@ -206,6 +207,7 @@ class Gameboard extends Component {
 				<NewsPopup news={news} newsPopupMinimizeToggle={newsPopupMinimizeToggle} />
 				<BattlePopup battle={battle} />
 				<RefuelPopup />
+				<SelectCommanderTypePopup gameboardMeta={gameboardMeta} raiseMoraleSelectCommanderType={raiseMoraleSelectCommanderType} />
 				<ContainerPopup container={container} />
 			</div>
 		);
@@ -216,7 +218,8 @@ Gameboard.propTypes = {
 	gameboard: PropTypes.array.isRequired,
 	gameboardMeta: PropTypes.object.isRequired,
 	selectPosition: PropTypes.func.isRequired,
-	newsPopupMinimizeToggle: PropTypes.func.isRequired
+	newsPopupMinimizeToggle: PropTypes.func.isRequired,
+	raiseMoraleSelectCommanderType: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
@@ -226,7 +229,8 @@ const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
 
 const mapActionsToProps = {
 	selectPosition,
-	newsPopupMinimizeToggle
+	newsPopupMinimizeToggle,
+	raiseMoraleSelectCommanderType
 };
 
 export default connect(
