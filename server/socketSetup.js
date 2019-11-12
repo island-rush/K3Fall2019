@@ -19,7 +19,8 @@ import {
 	SERVER_CONFIRM_PLAN,
 	SERVER_SHOP_CONFIRM_PURCHASE,
 	SERVER_SHOP_REFUND_REQUEST,
-	SERVER_SHOP_PURCHASE_REQUEST
+	SERVER_SHOP_PURCHASE_REQUEST,
+	SERVER_RAISE_MORALE_CONFIRM
 } from "../client/src/redux/actions/actionTypes";
 const {
 	sendUserFeedback,
@@ -35,7 +36,8 @@ const {
 	rodsFromGodConfirm,
 	remoteSensingConfirm,
 	insurgencyConfirm,
-	biologicalWeaponsConfirm
+	biologicalWeaponsConfirm,
+	raiseMoraleConfirm
 } = require("./gameplayFunctions");
 
 const socketSetup = async socket => {
@@ -125,6 +127,9 @@ const socketSetup = async socket => {
 					break;
 				case SERVER_BIOLOGICAL_WEAPONS_CONFIRM:
 					biologicalWeaponsConfirm(socket, payload);
+					break;
+				case SERVER_RAISE_MORALE_CONFIRM:
+					raiseMoraleConfirm(socket, payload);
 					break;
 				default:
 					sendUserFeedback(socket, "Did not recognize client socket request type");

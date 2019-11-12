@@ -23,6 +23,7 @@ import seaMines from "./capabilities/seaMines";
 import droneSwarms from "./capabilities/droneSwarms";
 import insurgency from "./capabilities/insurgency";
 import raiseMorale from "./capabilities/raiseMorale";
+import raiseMoraleSelectCommanderType from "./capabilities/raiseMoraleSelectCommanderType";
 
 import airPieceClick from "./inv/airPieceClick";
 import landPieceClick from "./inv/landPieceClick";
@@ -98,5 +99,6 @@ export {
 	droneSwarms,
 	insurgency,
 	raiseMorale,
-	refuelPopupMinimizeToggle
+	refuelPopupMinimizeToggle,
+	raiseMoraleSelectCommanderType
 };

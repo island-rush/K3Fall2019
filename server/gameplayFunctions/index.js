@@ -22,6 +22,7 @@ const rodsFromGodConfirm = require("./capabilities/rodsFromGodConfirm");
 const remoteSensingConfirm = require("./capabilities/remoteSensingConfirm");
 const insurgencyConfirm = require("./capabilities/insurgencyConfirm");
 const biologicalWeaponsConfirm = require("./capabilities/biologicalWeaponsConfirm");
+const raiseMoraleConfirm = require("./capabilities/raiseMoraleConfirm");
 
 module.exports = {
 	shopPurchaseRequest,
@@ -37,5 +38,6 @@ module.exports = {
 	rodsFromGodConfirm,
 	remoteSensingConfirm,
 	insurgencyConfirm,
-	biologicalWeaponsConfirm
+	biologicalWeaponsConfirm,
+	raiseMoraleConfirm
 };

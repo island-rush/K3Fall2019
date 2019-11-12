@@ -1,4 +1,5 @@
 const pool = require("../database");
+import { TYPE_OWNERS, TYPE_SPECIAL, TYPE_AIR, TYPE_LAND, TYPE_SEA } from "../../client/src/gameData/gameConstants";
 
 class Capability {
 	static async rodsFromGodInsert(gameId, gameTeam, selectedPositionId) {
@@ -255,6 +256,94 @@ class Capability {
 
 		queryString = "DELETE FROM biologicalWeapons WHERE roundsLeft = 0";
 		await pool.query(queryString);
+	}
+
+	static async insertRaiseMorale(gameId, gameTeam, selectedCommanderType) {
+		let queryString = "SELECT * FROM raiseMorale WHERE gameId = ? AND teamId = ? AND commanderType = ?";
+		let inserts = [gameId, gameTeam, selectedCommanderType];
+		let [results] = await pool.query(queryString, inserts);
+
+		//prevent duplicate entries if possible
+		if (results.length !== 0) {
+			return false;
+		}
+
+		queryString = "INSERT INTO raiseMorale (gameId, teamId, commanderType, roundsLeft) VALUES (?, ?, ?, ?)";
+		inserts = [gameId, gameTeam, selectedCommanderType, 2]; //TODO: use a constant for this (3 - 1 since already getting the +1 move immediately)
+		await pool.query(queryString, inserts);
+
+		queryString = "UPDATE pieces SET pieceMoves = pieceMoves + 1 WHERE pieceGameId = ? AND pieceTeamId = ? AND pieceTypeId in (?)";
+		inserts = [gameId, gameTeam, TYPE_OWNERS[selectedCommanderType]];
+		await pool.query(queryString, inserts);
+
+		return true;
+	}
+
+	static async decreaseRaiseMorale(gameId) {
+		const conn = await pool.getConnection();
+
+		let queryString = "DELETE FROM raiseMorale WHERE roundsLeft = 0";
+		await conn.query(queryString);
+
+		queryString = "UPDATE raiseMorale SET roundsLeft = roundsLeft - 1 WHERE gameId = ?";
+		let inserts = [gameId];
+		await conn.query(queryString, inserts);
+
+		queryString = "SELECT * from raiseMorale WHERE gameId = ?";
+		const [results] = await conn.query(queryString, inserts);
+
+		//TODO: probably cleaner way of putting this (more explicit with constants...)
+		let updateArrays = [{ 1: 0, 2: 0, 3: 0, 4: 0 }, { 1: 0, 2: 0, 3: 0, 4: 0 }];
+
+		for (let x = 0; x < results.length; x++) {
+			let thisRaiseMorale = results[x];
+			let { teamId, commanderType } = thisRaiseMorale;
+			updateArrays[teamId][commanderType]++;
+		}
+
+		//TODO: do this in 1 statement instead of several (should allow multiple queries in single prepared statement (bulk but would work...(also more efficient if 1 query (but bigger / more complex?))))
+		queryString = "UPDATE pieces SET pieceMoves = pieceMoves + ? WHERE pieceGameId = ? AND pieceTeamId = ? AND pieceTypeId in (?)";
+
+		//TODO: use constants for blue and red team (stop using 0 and 1, make it easier to read...)
+		inserts = [updateArrays[0][TYPE_AIR], gameId, 0, TYPE_OWNERS[TYPE_AIR]];
+		await conn.query(queryString, inserts);
+
+		inserts = [updateArrays[0][TYPE_LAND], gameId, 0, TYPE_OWNERS[TYPE_LAND]];
+		await conn.query(queryString, inserts);
+
+		inserts = [updateArrays[0][TYPE_SEA], gameId, 0, TYPE_OWNERS[TYPE_SEA]];
+		await conn.query(queryString, inserts);
+
+		inserts = [updateArrays[0][TYPE_SPECIAL], gameId, 0, TYPE_OWNERS[TYPE_SPECIAL]];
+		await conn.query(queryString, inserts);
+
+		inserts = [updateArrays[1][TYPE_AIR], gameId, 1, TYPE_OWNERS[TYPE_AIR]];
+		await conn.query(queryString, inserts);
+
+		inserts = [updateArrays[1][TYPE_LAND], gameId, 1, TYPE_OWNERS[TYPE_LAND]];
+		await conn.query(queryString, inserts);
+
+		inserts = [updateArrays[1][TYPE_SEA], gameId, 1, TYPE_OWNERS[TYPE_SEA]];
+		await conn.query(queryString, inserts);
+
+		inserts = [updateArrays[1][TYPE_SPECIAL], gameId, 1, TYPE_OWNERS[TYPE_SPECIAL]];
+		await conn.query(queryString, inserts);
+
+		await conn.release();
+	}
+
+	static async getRaiseMorale(gameId, gameTeam) {
+		//TODO: handle more than 1 raise morale for double boosting (how would this look like when letting client know (object? / array?))
+		const queryString = "SELECT * FROM raiseMorale WHERE gameId = ?";
+		const inserts = [gameId, gameTeam];
+		const [results] = await pool.query(queryString, inserts);
+
+		let listOfCommandersBoosted = [];
+		for (let x = 0; x < results.length; x++) {
+			listOfCommandersBoosted.push(results[x].commanderType);
+		}
+
+		return listOfCommandersBoosted;
 	}
 }
 

@@ -22,6 +22,7 @@ const executeStep = async (socket, thisGame) => {
 		//Decrease game effects that last for x rounds
 		await Capability.decreaseRemoteSensing(gameId);
 		await Capability.decreaseBiologicalWeapons(gameId);
+		await Capability.decreaseRaiseMorale(gameId);
 
 		const gameboardPiecesList0 = await Piece.getVisiblePieces(gameId, 0);
 		const gameboardPiecesList1 = await Piece.getVisiblePieces(gameId, 1);
@@ -31,6 +32,9 @@ const executeStep = async (socket, thisGame) => {
 
 		const bioWeapons0 = await Capability.getBiologicalWeapons(gameId, 0); //any team should work, since all activated at this point?
 		const bioWeapons1 = await Capability.getBiologicalWeapons(gameId, 1);
+
+		const raiseMorale0 = await Capability.getRaiseMorale(gameId, 0);
+		const raiseMorale1 = await Capability.getRaiseMorale(gameId, 0);
 
 		let serverAction0;
 		let serverAction1;
@@ -44,7 +48,8 @@ const executeStep = async (socket, thisGame) => {
 				payload: {
 					gameboardPieces: gameboardPiecesList0,
 					confirmedRemoteSense: remoteSense0,
-					confirmedBioWeapons: bioWeapons0
+					confirmedBioWeapons: bioWeapons0,
+					confirmedRaiseMorale: raiseMorale0
 				}
 			};
 
@@ -53,7 +58,8 @@ const executeStep = async (socket, thisGame) => {
 				payload: {
 					gameboardPieces: gameboardPiecesList1,
 					confirmedRemoteSense: remoteSense1,
-					confirmedBioWeapons: bioWeapons1
+					confirmedBioWeapons: bioWeapons1,
+					confirmedRaiseMorale: raiseMorale1
 				}
 			};
 		} else {
@@ -66,7 +72,8 @@ const executeStep = async (socket, thisGame) => {
 					gameRound: thisGame.gameRound,
 					gameboardPieces: gameboardPiecesList0,
 					confirmedRemoteSense: remoteSense0,
-					confirmedBioWeapons: bioWeapons0
+					confirmedBioWeapons: bioWeapons0,
+					confirmedRaiseMorale: raiseMorale0
 				}
 			};
 
@@ -76,7 +83,8 @@ const executeStep = async (socket, thisGame) => {
 					gameRound: thisGame.gameRound,
 					gameboardPieces: gameboardPiecesList1,
 					confirmedRemoteSense: remoteSense1,
-					confirmedBioWeapons: bioWeapons1
+					confirmedBioWeapons: bioWeapons1,
+					confirmedRaiseMorale: raiseMorale1
 				}
 			};
 		}

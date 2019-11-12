@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import InvItem from "./InvItem";
 //prettier-ignore
 import { airPieceClick, landPieceClick, seaPieceClick, atcScamble, cyberDominance, missileLaunchDisruption, communicationsInterruption, remoteSensing, rodsFromGod, antiSatelliteMissiles, goldenEye, nuclearStrike, biologicalWeapons, seaMines, droneSwarms, insurgency, raiseMorale } from "../../redux/actions";
-import { TYPE_NAME_IDS } from "../../gameData/gameConstants";
+import { TYPE_NAME_IDS, TYPE_AIR, TYPE_SEA, TYPE_SPECIAL, TYPE_LAND } from "../../gameData/gameConstants";
 
 const inventoryStyle = {
 	backgroundColor: "Yellow",
@@ -62,11 +62,15 @@ const warfareItemsContainerStyle = {
 	left: "81%",
 	top: "10%"
 };
+
+const itemCount = (array, value) => {
+	return array.filter(v => v === value).length;
+};
 class InvMenu extends Component {
 	render() {
 		//TODO: selected is a poorly chosen variable name, change to MenuIsVisible or something (since selected is used for other components too)
 		//prettier-ignore
-		const { selected, invItems, airPieceClick, landPieceClick, seaPieceClick, atcScamble, cyberDominance, missileLaunchDisruption, communicationsInterruption, remoteSensing, rodsFromGod, antiSatelliteMissiles, goldenEye, nuclearStrike, biologicalWeapons, seaMines, droneSwarms, insurgency, raiseMorale } = this.props;
+		const { confirmedRaiseMorale, selected, invItems, airPieceClick, landPieceClick, seaPieceClick, atcScamble, cyberDominance, missileLaunchDisruption, communicationsInterruption, remoteSensing, rodsFromGod, antiSatelliteMissiles, goldenEye, nuclearStrike, biologicalWeapons, seaMines, droneSwarms, insurgency, raiseMorale } = this.props;
 
 		const capabilityFunctions = {
 			20: atcScamble,
@@ -115,26 +119,37 @@ class InvMenu extends Component {
 
 		const capabilityItemComponents = capabilityItems.map((invItem, index) => <InvItem key={index} invItem={invItem} invItemClick={capabilityFunctions[invItem.invItemTypeId]} />);
 
+		//number of boosts from raise morale
+		const airItemMoveBoost = itemCount(confirmedRaiseMorale, TYPE_AIR);
+		const landItemMoveBoost = itemCount(confirmedRaiseMorale, TYPE_LAND);
+		const seaItemMoveBoost = itemCount(confirmedRaiseMorale, TYPE_SEA);
+		const specialItemMoveBoost = itemCount(confirmedRaiseMorale, TYPE_SPECIAL);
+
 		return (
 			<div style={selected ? inventoryStyle : invisibleStyle}>
+				{/* TODO: capabilities is first as a div, but last as a style, make these consistent with style? / rearange these to be in correct order */}
 				<div style={warfareItemsContainerStyle}>
 					<div>Capabilities</div>
 					{capabilityItemComponents}
 				</div>
 				<div style={airpieceItemsContainerStyle}>
 					<div> Air Pieces</div>
+					<div> Boost = {airItemMoveBoost}</div>
 					{airInvComponents}
 				</div>
 				<div style={landpieceItemsContainerStyle}>
 					<div>Land Pieces</div>
+					<div> Boost = {landItemMoveBoost}</div>
 					{landInvComponents}
 				</div>
 				<div style={seapieceItemsContainerStyle}>
 					<div>Maritime Pieces</div>
+					<div> Boost = {seaItemMoveBoost}</div>
 					{seaInvComponents}
 				</div>
 				<div style={specialpieceItemsContainerStyle}>
 					<div>SOF Pieces</div>
+					<div> Boost = {specialItemMoveBoost}</div>
 					{specialInvComponents}
 				</div>
 			</div>
@@ -161,11 +176,13 @@ InvMenu.propTypes = {
 	seaMines: PropTypes.func.isRequired,
 	droneSwarms: PropTypes.func.isRequired,
 	insurgency: PropTypes.func.isRequired,
-	raiseMorale: PropTypes.func.isRequired
+	raiseMorale: PropTypes.func.isRequired,
+	confirmedRaiseMorale: PropTypes.array.isRequired
 };
 
-const mapStateToProps = ({ invItems }) => ({
-	invItems
+const mapStateToProps = ({ invItems, gameboardMeta }) => ({
+	invItems,
+	confirmedRaiseMorale: gameboardMeta.confirmedRaiseMorale
 });
 
 const mapActionsToProps = {

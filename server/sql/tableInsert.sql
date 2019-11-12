@@ -165,3 +165,12 @@ CREATE TABLE IF NOT EXISTS biologicalWeapons(
     activated INT(1) NOT NULL,
     FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE
 ) AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS raiseMorale(
+	raiseMoraleId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	gameId INT(8) NOT NULL,
+    teamId INT(1) NOT NULL,
+    commanderType INT(2) NOT NULL,
+    roundsLeft INT(2) NOT NULL,
+    FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE
+) AUTO_INCREMENT=1;

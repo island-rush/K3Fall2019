@@ -32,7 +32,9 @@ import {
 	INSURGENCY_SELECTED,
 	INSURGENCY_SELECTING,
 	BIO_WEAPON_SELECTED,
-	BIO_WEAPON_SELECTING
+	BIO_WEAPON_SELECTING,
+	RAISE_MORALE_SELECTING,
+	RAISE_MORALE_SELECTED
 } from "../actions/actionTypes";
 
 const initialUserFeedback = "Loading...";
@@ -65,6 +67,10 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
 			return "Now select a position to get bio weaponed!";
 		case REMOTE_SENSING_SELECTED:
 			return "selected area to remote sense!";
+		case RAISE_MORALE_SELECTING:
+			return "Now select a commander type to boost with +1 moves.";
+		case RAISE_MORALE_SELECTED:
+			return "selected a commander type to boost.";
 		case REMOTE_SENSING_SELECTING:
 			return "Now select an area to remote sense.";
 		case INSURGENCY_SELECTED:
