@@ -1,43 +1,50 @@
 {
-	"name": "island-rush-v3",
-	"version": "3.2.0",
-	"description": "Island Rush V3 is a Military Strategy Teaching Tool/Game.",
-	"main": "server.js",
-	"scripts": {
-		"start": "node -r esm server.js",
-		"fullInstall": "npm install && cd client && npm install && cd ..",
-		"devBackend": "nodemon -r esm server.js",
-		"devFrontend": "cd client && npm start",
-		"dev": "concurrently \"npm:devBackend\" \"npm:devFrontend\"",
-		"buildClient": "cd client && npm run build && cd .."
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/island-rush/K3.git"
-	},
-	"author": "Spencer Adolph",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/island-rush/K3/issues"
-	},
-	"homepage": "https://github.com/island-rush/K3#readme",
-	"dependencies": {
-		"connect-loki": "^1.1.0",
-		"esm": "^3.2.25",
-		"express": "^4.17.1",
-		"express-session": "^1.16.2",
-		"express-socket.io-session": "^1.3.5",
-		"md5": "^2.2.1",
-		"mysql2": "^1.6.5",
-		"socket.io": "^2.2.0"
-	},
-	"devDependencies": {
-		"concurrently": "^4.1.1",
-		"nodemon": "^1.18.10"
-	},
-	"nodemonConfig": {
-		"ignore": [
-			"client/*"
-		]
-	}
+    "name": "island-rush-v3",
+    "version": "3.2.0",
+    "description": "Island Rush V3 is a Military Strategy Teaching Tool/Game.",
+    "main": "server.js",
+    "scripts": {
+        "start": "node -r esm server.js",
+        "fullInstall": "npm install && cd client && npm install && cd ..",
+        "devBackend": "nodemon -r esm server.js",
+        "devFrontend": "cd client && npm start",
+        "dev": "concurrently \"npm:devBackend\" \"npm:devFrontend\"",
+        "buildClient": "cd client && npm run build && cd .."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/island-rush/K3.git"
+    },
+    "author": "Spencer Adolph",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/island-rush/K3/issues"
+    },
+    "homepage": "https://github.com/island-rush/K3#readme",
+    "dependencies": {
+        "connect-loki": "^1.1.0",
+        "esm": "^3.2.25",
+        "express": "^4.17.1",
+        "express-session": "^1.16.2",
+        "express-socket.io-session": "^1.3.5",
+        "md5": "^2.2.1",
+        "mysql2": "^1.6.5",
+        "socket.io": "^2.2.0"
+    },
+    "devDependencies": {
+        "concurrently": "^4.1.1",
+        "nodemon": "^1.18.10"
+    },
+    "nodemonConfig": {
+        "ignore": [
+            "client/*"
+        ]
+    },
+    "prettier": {
+        "trailingComma": "es5",
+        "tabWidth": 4,
+        "semi": true,
+        "singleQuote": true,
+        "printWidth": 180
+    }
 }

@@ -20,7 +20,8 @@ import {
 	SERVER_SHOP_CONFIRM_PURCHASE,
 	SERVER_SHOP_REFUND_REQUEST,
 	SERVER_SHOP_PURCHASE_REQUEST,
-	SERVER_RAISE_MORALE_CONFIRM
+	SERVER_RAISE_MORALE_CONFIRM,
+	SERVER_COMM_INTERRUPT_CONFIRM
 } from "../client/src/redux/actions/actionTypes";
 const {
 	sendUserFeedback,
@@ -37,7 +38,8 @@ const {
 	remoteSensingConfirm,
 	insurgencyConfirm,
 	biologicalWeaponsConfirm,
-	raiseMoraleConfirm
+	raiseMoraleConfirm,
+	commInterruptConfirm
 } = require("./gameplayFunctions");
 
 const socketSetup = async socket => {
@@ -130,6 +132,9 @@ const socketSetup = async socket => {
 					break;
 				case SERVER_RAISE_MORALE_CONFIRM:
 					raiseMoraleConfirm(socket, payload);
+					break;
+				case SERVER_COMM_INTERRUPT_CONFIRM:
+					commInterruptConfirm(socket, payload);
 					break;
 				default:
 					sendUserFeedback(socket, "Did not recognize client socket request type");

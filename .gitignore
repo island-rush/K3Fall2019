@@ -3,3 +3,4 @@ scratch.sql
 dropTables.sql
 session-store.db
 .vscode
+.prettierignore
