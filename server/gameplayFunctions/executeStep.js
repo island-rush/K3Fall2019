@@ -22,6 +22,7 @@ const executeStep = async (socket, thisGame) => {
         //Decrease game effects that last for x rounds
         await Capability.decreaseRemoteSensing(gameId);
         await Capability.decreaseBiologicalWeapons(gameId);
+        await Capability.decreaseCommInterrupt(gameId);
         await Capability.decreaseRaiseMorale(gameId);
 
         const gameboardPiecesList0 = await Piece.getVisiblePieces(gameId, 0);

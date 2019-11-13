@@ -44,10 +44,10 @@ import {
     RAISE_MORALE_SELECTED,
     RAISE_MORALE_SELECTING,
     COMM_INTERRUP_SELECTED,
-    COMM_INTERRUPT_SELECTING,
-} from '../actions/actionTypes';
+    COMM_INTERRUPT_SELECTING
+} from "../actions/actionTypes";
 
-import { TYPE_FUEL } from '../../gameData/gameConstants';
+import { TYPE_FUEL } from "../../gameData/gameConstants";
 
 const initialGameboardMeta = {
     //TODO: change to selectedPositionId and selectedPieceId to better represent the values (ints) (and also selectedBattlePiece -> selectedBattlePieceId)
@@ -58,8 +58,8 @@ const initialGameboardMeta = {
     news: {
         isMinimized: false,
         active: false,
-        newsTitle: 'Loading Title...',
-        newsInfo: 'Loading Info...',
+        newsTitle: "Loading Title...",
+        newsInfo: "Loading Info..."
     },
     battle: {
         isMinimized: false,
@@ -68,7 +68,7 @@ const initialGameboardMeta = {
         selectedBattlePieceIndex: -1, //helper to find the piece within the array
         masterRecord: null,
         friendlyPieces: [],
-        enemyPieces: [],
+        enemyPieces: []
     },
     refuel: {
         isMinimized: false,
@@ -76,18 +76,18 @@ const initialGameboardMeta = {
         selectedTankerPieceId: -1,
         selectedTankerPieceIndex: -1,
         tankers: [],
-        aircraft: [],
+        aircraft: []
     },
     container: {
         isMinimized: false,
-        active: false,
+        active: false
     },
     planning: {
         active: false,
         capability: false,
         raiseMoralePopupActive: false,
         invItem: null,
-        moves: [],
+        moves: []
     },
     confirmedPlans: {},
     confirmedRods: [],
@@ -95,7 +95,7 @@ const initialGameboardMeta = {
     confirmedInsurgency: [],
     confirmedBioWeapons: [],
     confirmedRaiseMorale: [],
-    confirmedCommInterrupt: [],
+    confirmedCommInterrupt: []
 };
 
 function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
@@ -250,15 +250,15 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
             break;
         case CONTAINER_MOVE:
             stateDeepCopy.planning.moves.push({
-                type: 'container',
-                positionId: payload.selectedPositionId,
+                type: "container",
+                positionId: payload.selectedPositionId
             });
             break;
         case PLANNING_SELECT:
             //TODO: move this to userActions to have more checks there within the thunk
             stateDeepCopy.planning.moves.push({
-                type: 'move',
-                positionId: payload.selectedPositionId,
+                type: "move",
+                positionId: payload.selectedPositionId
             });
             break;
         case PLAN_WAS_CONFIRMED:
@@ -340,7 +340,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
                 selectedBattlePieceIndex: -1, //helper to find the piece within the array
                 masterRecord: null,
                 friendlyPieces: [],
-                enemyPieces: [],
+                enemyPieces: []
             };
             stateDeepCopy.refuel = {
                 isMinimized: false,
@@ -348,7 +348,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
                 selectedTankerPieceId: -1,
                 selectedTankerPieceIndex: -1,
                 tankers: [],
-                aircraft: [],
+                aircraft: []
             };
             // stateDeepCopy.container = initialGameboardMeta.container;
             break;
