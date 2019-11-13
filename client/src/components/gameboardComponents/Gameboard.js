@@ -11,6 +11,7 @@ import Patterns from "./Patterns";
 import { selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } from "../../redux/actions";
 import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE } from "../../gameData/gameConstants";
 import { distanceMatrix } from "../../gameData/distanceMatrix";
+import { ALL_ISLAND_LOCATIONS } from "../../gameData/gameboardConstants";
 
 const gameboardStyle = {
     backgroundColor: "blue",
@@ -62,7 +63,7 @@ const rIndexSolver = index => {
     }
 };
 
-const patternSolver = position => {
+const patternSolver = (position, gameInfo, positionIndex) => {
     const { type, pieces } = position; //position comes from the gameboard state
     const { highPieces, lowPieces } = TYPE_HIGH_LOW;
     let redHigh = 0,
@@ -86,12 +87,20 @@ const patternSolver = position => {
             }
         }
     }
+
+    if (ALL_ISLAND_LOCATIONS.includes(parseInt(positionIndex))) {
+        const islandNum = ALL_ISLAND_LOCATIONS.indexOf(parseInt(positionIndex));
+        const islandOwner = gameInfo["island" + islandNum];
+        const finalType = islandOwner === 0 ? "blue" : islandOwner === 1 ? "red" : "flag";
+        return finalType + redHigh + redLow + blueHigh + blueLow;
+    }
+
     return type + redHigh + redLow + blueHigh + blueLow; //This resolves what image is shown on the board (see ./images/positionImages)
 };
 
 class Gameboard extends Component {
     render() {
-        const { gameboard, gameboardMeta, selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } = this.props;
+        const { gameInfo, gameboard, gameboardMeta, selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } = this.props;
 
         //prettier-ignore
         const {confirmedCommInterrupt, confirmedBioWeapons, confirmedInsurgency, confirmedRods, confirmedRemoteSense, selectedPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions } = gameboardMeta;
@@ -165,7 +174,7 @@ class Gameboard extends Component {
                 q={qIndexSolver(positionIndex)}
                 r={rIndexSolver(positionIndex)}
                 s={-999}
-                fill={patternSolver(gameboard[positionIndex])}
+                fill={patternSolver(gameboard[positionIndex], gameInfo, positionIndex)}
                 //TODO: change this to always selectPositon(positionindex), instead of sending -1 (more info for the action, let it take care of it)
                 onClick={event => {
                     event.preventDefault();
@@ -200,7 +209,7 @@ class Gameboard extends Component {
                         ? "commInterruptPos"
                         : ""
                 }
-                someOtherProp={battlePositions.includes(parseInt(positionIndex))}
+                title={"test title"}
             />
         ));
 
@@ -231,12 +240,14 @@ Gameboard.propTypes = {
     gameboardMeta: PropTypes.object.isRequired,
     selectPosition: PropTypes.func.isRequired,
     newsPopupMinimizeToggle: PropTypes.func.isRequired,
-    raiseMoraleSelectCommanderType: PropTypes.func.isRequired
+    raiseMoraleSelectCommanderType: PropTypes.func.isRequired,
+    gameInfo: PropTypes.object.isRequired
 };
 
-const mapStateToProps = ({ gameboard, gameboardMeta }) => ({
+const mapStateToProps = ({ gameboard, gameboardMeta, gameInfo }) => ({
     gameboard,
-    gameboardMeta
+    gameboardMeta,
+    gameInfo
 });
 
 const mapActionsToProps = {

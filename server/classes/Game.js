@@ -109,7 +109,20 @@ class Game {
             gameRound: this.gameRound,
             gameSlice: this.gameSlice,
             gameStatus: this["game" + gameTeam + "Status"],
-            gamePoints: this["game" + gameTeam + "Points"]
+            gamePoints: this["game" + gameTeam + "Points"],
+            island0: this.island0,
+            island1: this.island1,
+            island2: this.island2,
+            island3: this.island3,
+            island4: this.island4,
+            island5: this.island5,
+            island6: this.island6,
+            island7: this.island7,
+            island8: this.island8,
+            island9: this.island9,
+            island10: this.island10,
+            island11: this.island11,
+            island12: this.island12
         };
 
         serverAction.payload.gameboardMeta = {};
