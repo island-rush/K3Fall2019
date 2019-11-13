@@ -30,5 +30,49 @@ export const ALL_ISLAND_LOCATIONS = [
     ISLAND_12_LOCATION
 ];
 
+export const ALL_ISLAND_NAMES = {
+    0: "Dragon Island",
+    1: "Dragon Island",
+    2: "H.R. Republic",
+    3: "Montaville",
+    4: "Lion Island",
+    5: "Noyarc",
+    6: "Fuler Island",
+    7: "Rico Island",
+    8: "Tamu Island",
+    9: "Shor",
+    10: "Keoni",
+    11: "Eagle Island",
+    12: "Eagle Island"
+};
+
+export const ISLAND_POINTS = {
+    0: 5,
+    1: 5,
+    2: 5,
+    3: 5,
+    4: 5,
+    5: 5,
+    6: 5,
+    7: 5,
+    8: 5,
+    9: 5,
+    10: 5,
+    11: 5,
+    12: 5
+};
+
+export const LAND_TYPE = "land";
+export const WATER_TYPE = "water";
+
+export const AIRFIELD_TYPE = "airfield";
+export const MISSILE_SILO_TYPE = "missile";
+export const FLAG_TYPE = "flag";
+
+export const AIRFIELD_TITLE = "Airfield";
+export const MISSILE_SILO_TITLE = "Missile Silo";
+
+export const IGNORE_TITLE_TYPES = [LAND_TYPE, WATER_TYPE];
+
 //TODO: airfield locations
 //TODO: missile silos

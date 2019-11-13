@@ -9,9 +9,18 @@ import RefuelPopup from "./refuel/RefuelPopup";
 import SelectCommanderTypePopup from "./capabilities/SelectCommanderTypePopup";
 import Patterns from "./Patterns";
 import { selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } from "../../redux/actions";
-import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE } from "../../gameData/gameConstants";
+import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE, TYPE_FUEL } from "../../gameData/gameConstants";
 import { distanceMatrix } from "../../gameData/distanceMatrix";
-import { ALL_ISLAND_LOCATIONS } from "../../gameData/gameboardConstants";
+import {
+    ALL_ISLAND_LOCATIONS,
+    IGNORE_TITLE_TYPES,
+    ALL_ISLAND_NAMES,
+    AIRFIELD_TYPE,
+    AIRFIELD_TITLE,
+    MISSILE_SILO_TYPE,
+    MISSILE_SILO_TITLE,
+    ISLAND_POINTS
+} from "../../gameData/gameboardConstants";
 
 const gameboardStyle = {
     backgroundColor: "blue",
@@ -96,6 +105,34 @@ const patternSolver = (position, gameInfo, positionIndex) => {
     }
 
     return type + redHigh + redLow + blueHigh + blueLow; //This resolves what image is shown on the board (see ./images/positionImages)
+};
+
+const titleSolver = (position, gameInfo, positionIndex) => {
+    const { type } = position;
+    //ignore titles for types 'land' and 'water'
+
+    //TODO: could use constants for these, but heavily tied to gameboard file?
+    if (IGNORE_TITLE_TYPES.includes(type)) {
+        return "";
+    }
+
+    if (!ALL_ISLAND_LOCATIONS.includes(parseInt(positionIndex))) {
+        //No points info, simple titles
+        switch (type) {
+            case AIRFIELD_TYPE:
+                return AIRFIELD_TITLE;
+            case MISSILE_SILO_TYPE:
+                return MISSILE_SILO_TITLE;
+            default:
+                return "";
+        }
+    }
+
+    //need to display island name, and island point value
+    const islandNum = ALL_ISLAND_LOCATIONS.indexOf(parseInt(positionIndex));
+    const islandTitle = ALL_ISLAND_NAMES[islandNum];
+
+    return islandTitle + "\nPoints: " + ISLAND_POINTS[islandNum];
 };
 
 class Gameboard extends Component {
@@ -209,7 +246,7 @@ class Gameboard extends Component {
                         ? "commInterruptPos"
                         : ""
                 }
-                title={"test title"}
+                title={titleSolver(gameboard[positionIndex], gameInfo, positionIndex)}
             />
         ));
 
