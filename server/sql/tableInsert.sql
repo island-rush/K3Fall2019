@@ -30,12 +30,12 @@ CREATE TABLE IF NOT EXISTS games (
     gameRound INT(1) NOT NULL DEFAULT 0, -- 0, 1, 2  rounds of movement
     gameSlice INT(1) NOT NULL DEFAULT 0, -- 0: planning, 1: events/movement
     
-    island0 INT(1) NOT NULL DEFAULT 1, -- Dragon top
-    island1 INT(1) NOT NULL DEFAULT 1, -- Dragon bottom
+    island0 INT(1) NOT NULL DEFAULT 1, -- Dragon bottom
+    island1 INT(1) NOT NULL DEFAULT 1, -- Dragon top
     island2 INT(1) NOT NULL DEFAULT -1, -- HR Republic
     island3 INT(1) NOT NULL DEFAULT -1, -- Montaville
-    island4 INT(1) NOT NULL DEFAULT -1, -- Noyarc
-    island5 INT(1) NOT NULL DEFAULT -1, -- Lion Island
+    island4 INT(1) NOT NULL DEFAULT -1, -- Lion Island
+    island5 INT(1) NOT NULL DEFAULT -1, -- Noyarc
     island6 INT(1) NOT NULL DEFAULT -1, -- Fuler Island
     island7 INT(1) NOT NULL DEFAULT -1, -- Rico Island
     island8 INT(1) NOT NULL DEFAULT -1, -- Tamu Island
