@@ -550,6 +550,16 @@ class Capability {
         // }
         // return masterListOfAllPositions;
     }
+
+    static async decreaseGoldenEye(gameId) {
+        //roundsLeft--
+        let queryString = "UPDATE goldenEye SET roundsLeft = roundsLeft - 1 WHERE gameId = ? AND activated = ?";
+        const inserts = [gameId, ACTIVATED];
+        await pool.query(queryString, inserts);
+
+        queryString = "DELETE FROM goldenEye WHERE roundsLeft = 0";
+        await pool.query(queryString);
+    }
 }
 
 module.exports = Capability;

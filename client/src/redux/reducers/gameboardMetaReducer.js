@@ -249,7 +249,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
             stateDeepCopy.planning.capability = false;
             stateDeepCopy.planning.invItem = null;
             stateDeepCopy.planning.active = false;
-            stateDeepCopy.confirmedGoldenEye = payload.confirmedGoldenEye;
+            stateDeepCopy.confirmedGoldenEye.push(parseInt(payload.selectedPositionId));
             break;
         case CANCEL_PLAN:
             stateDeepCopy.planning.active = false;
