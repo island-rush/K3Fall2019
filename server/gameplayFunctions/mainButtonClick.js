@@ -86,6 +86,7 @@ const mainButtonClick = async (socket, payload) => {
                 //TODO: change payload to reflect what's being sent (confirmedRods = list of positions, confirmedInsurgency = list of pieces to delete)
                 const confirmedRods = await Capability.useRodsFromGod(gameId);
                 const confirmedBioWeapons = await Capability.useBiologicalWeapons(gameId);
+                const confirmedGoldenEye = await Capability.useGoldenEye(gameId);
                 const confirmedCommInterrupt = await Capability.useCommInterrupt(gameId);
                 const { listOfPiecesToKill, listOfEffectedPositions } = await Capability.useInsurgency(gameId);
 
@@ -94,6 +95,7 @@ const mainButtonClick = async (socket, payload) => {
                     payload: {
                         confirmedRods,
                         confirmedBioWeapons,
+                        confirmedGoldenEye,
                         confirmedCommInterrupt,
                         confirmedInsurgencyPos: listOfEffectedPositions,
                         confirmedInsurgencyPieces: listOfPiecesToKill
@@ -104,6 +106,7 @@ const mainButtonClick = async (socket, payload) => {
                     payload: {
                         confirmedRods,
                         confirmedBioWeapons,
+                        confirmedGoldenEye,
                         confirmedCommInterrupt,
                         confirmedInsurgencyPos: listOfEffectedPositions,
                         confirmedInsurgencyPieces: listOfPiecesToKill

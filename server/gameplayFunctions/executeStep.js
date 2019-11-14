@@ -10,8 +10,8 @@ const executeStep = async (socket, thisGame) => {
     const { gameId, gameRound } = thisGame;
 
     //TODO: rename this to 'hadPlans0' or something more descriptive
-    const currentMovementOrder0 = await Plan.getCurrentMovementOrder(gameId, 0);
-    const currentMovementOrder1 = await Plan.getCurrentMovementOrder(gameId, 1);
+    const currentMovementOrder0 = await Plan.getCurrentMovementOrder(gameId, BLUE_TEAM_ID);
+    const currentMovementOrder1 = await Plan.getCurrentMovementOrder(gameId, RED_TEAM_ID);
 
     //No More Plans for either team
     //DOESN'T MAKE PLANS FOR PIECES STILL IN THE SAME POSITION...NEED TO HAVE AT LEAST 1 PLAN FOR ANYTHING TO HAPPEN (pieces in same postion would battle (again?) if there was 1 plan elsewhere...)
@@ -23,23 +23,27 @@ const executeStep = async (socket, thisGame) => {
         //Decrease game effects that last for x rounds
         await Capability.decreaseRemoteSensing(gameId);
         await Capability.decreaseBiologicalWeapons(gameId);
+        await Capability.decreaseGoldenEye(gameId);
         await Capability.decreaseCommInterrupt(gameId);
         await Capability.decreaseRaiseMorale(gameId);
 
-        const gameboardPiecesList0 = await Piece.getVisiblePieces(gameId, 0);
-        const gameboardPiecesList1 = await Piece.getVisiblePieces(gameId, 1);
+        const gameboardPiecesList0 = await Piece.getVisiblePieces(gameId, BLUE_TEAM_ID);
+        const gameboardPiecesList1 = await Piece.getVisiblePieces(gameId, RED_TEAM_ID);
 
-        const remoteSense0 = await Capability.getRemoteSensing(gameId, 0);
-        const remoteSense1 = await Capability.getRemoteSensing(gameId, 1);
+        const remoteSense0 = await Capability.getRemoteSensing(gameId, BLUE_TEAM_ID);
+        const remoteSense1 = await Capability.getRemoteSensing(gameId, RED_TEAM_ID);
 
-        const bioWeapons0 = await Capability.getBiologicalWeapons(gameId, 0); //any team should work, since all activated at this point?
-        const bioWeapons1 = await Capability.getBiologicalWeapons(gameId, 1);
+        const bioWeapons0 = await Capability.getBiologicalWeapons(gameId, BLUE_TEAM_ID); //any team should work, since all activated at this point?
+        const bioWeapons1 = await Capability.getBiologicalWeapons(gameId, RED_TEAM_ID);
 
-        const raiseMorale0 = await Capability.getRaiseMorale(gameId, 0);
-        const raiseMorale1 = await Capability.getRaiseMorale(gameId, 1);
+        const raiseMorale0 = await Capability.getRaiseMorale(gameId, BLUE_TEAM_ID);
+        const raiseMorale1 = await Capability.getRaiseMorale(gameId, RED_TEAM_ID);
 
-        const commInterrupt0 = await Capability.getCommInterrupt(gameId, 0);
-        const commInterrupt1 = await Capability.getCommInterrupt(gameId, 1);
+        const commInterrupt0 = await Capability.getCommInterrupt(gameId, BLUE_TEAM_ID);
+        const commInterrupt1 = await Capability.getCommInterrupt(gameId, RED_TEAM_ID);
+
+        const goldenEye0 = await Capability.getGoldenEye(gameId, BLUE_TEAM_ID);
+        const goldenEye1 = await Capability.getGoldenEye(gameId, RED_TEAM_ID);
 
         let serverAction0;
         let serverAction1;
@@ -55,7 +59,8 @@ const executeStep = async (socket, thisGame) => {
                     confirmedRemoteSense: remoteSense0,
                     confirmedBioWeapons: bioWeapons0,
                     confirmedRaiseMorale: raiseMorale0,
-                    confirmedCommInterrupt: commInterrupt0
+                    confirmedCommInterrupt: commInterrupt0,
+                    confirmedGoldenEye: goldenEye0
                 }
             };
 
@@ -66,7 +71,8 @@ const executeStep = async (socket, thisGame) => {
                     confirmedRemoteSense: remoteSense1,
                     confirmedBioWeapons: bioWeapons1,
                     confirmedRaiseMorale: raiseMorale1,
-                    confirmedCommInterrupt: commInterrupt1
+                    confirmedCommInterrupt: commInterrupt1,
+                    confirmedGoldenEye: goldenEye1
                 }
             };
         } else {
@@ -81,7 +87,8 @@ const executeStep = async (socket, thisGame) => {
                     confirmedRemoteSense: remoteSense0,
                     confirmedBioWeapons: bioWeapons0,
                     confirmedRaiseMorale: raiseMorale0,
-                    confirmedCommInterrupt: commInterrupt0
+                    confirmedCommInterrupt: commInterrupt0,
+                    confirmedGoldenEye: goldenEye0
                 }
             };
 
@@ -93,7 +100,8 @@ const executeStep = async (socket, thisGame) => {
                     confirmedRemoteSense: remoteSense1,
                     confirmedBioWeapons: bioWeapons1,
                     confirmedRaiseMorale: raiseMorale1,
-                    confirmedCommInterrupt: commInterrupt1
+                    confirmedCommInterrupt: commInterrupt1,
+                    confirmedGoldenEye: goldenEye1
                 }
             };
         }
