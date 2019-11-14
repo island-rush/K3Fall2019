@@ -94,6 +94,7 @@ function gameInfoReducer(state = initialGameInfoState, { type, payload }) {
             stateDeepCopy.gameStatus = 0;
             stateDeepCopy.gameRound = 0;
             stateDeepCopy.gameSlice = 0;
+            stateDeepCopy.gamePoints = payload.gamePoints;
             return stateDeepCopy;
         default:
             return state;

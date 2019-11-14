@@ -12,6 +12,18 @@ export const ISLAND_10_LOCATION = 676; //Keoni
 export const ISLAND_11_LOCATION = 670; //Eagle Top
 export const ISLAND_12_LOCATION = 708; //Eagle Botton
 
+export const DRAGON_ISLAND_ID = 0;
+export const HR_REPUBLIC_ISLAND_ID = 1;
+export const MONTAVILLE_ISLAND_ID = 2;
+export const LION_ISLAND_ID = 3;
+export const NOYARC_ISLAND_ID = 4;
+export const FULER_ISLAND_ID = 5;
+export const RICO_ISLAND_ID = 6;
+export const TAMU_ISLAND_ID = 7;
+export const SHOR_ISLAND_ID = 8;
+export const KEONI_ISLAND_ID = 9;
+export const EAGLE_ISLAND_ID = 10;
+
 //TODO: island names / capture point names?
 //TODO: use actual island names in these constants, easier to reset / change later (don't reference numbers if you don't have to)
 //TODO: probably rethink this file, and possible the database naming convention for island (flag) positions?
@@ -48,21 +60,18 @@ export const ALL_ISLAND_NAMES = {
     12: "Eagle Island"
 };
 
-export const ISLAND_POINTS = {
-    0: 5,
-    1: 5,
-    2: 5,
-    3: 5,
-    4: 5,
-    5: 5,
-    6: 5,
-    7: 5,
-    8: 5,
-    9: 5,
-    10: 5,
-    11: 5,
-    12: 5
-};
+export let ISLAND_POINTS = {};
+ISLAND_POINTS[DRAGON_ISLAND_ID] = 5;
+ISLAND_POINTS[HR_REPUBLIC_ISLAND_ID] = 5;
+ISLAND_POINTS[MONTAVILLE_ISLAND_ID] = 5;
+ISLAND_POINTS[LION_ISLAND_ID] = 5;
+ISLAND_POINTS[NOYARC_ISLAND_ID] = 5;
+ISLAND_POINTS[FULER_ISLAND_ID] = 5;
+ISLAND_POINTS[RICO_ISLAND_ID] = 5;
+ISLAND_POINTS[TAMU_ISLAND_ID] = 5;
+ISLAND_POINTS[SHOR_ISLAND_ID] = 5;
+ISLAND_POINTS[KEONI_ISLAND_ID] = 5;
+ISLAND_POINTS[EAGLE_ISLAND_ID] = 5;
 
 export const LAND_TYPE = "land";
 export const WATER_TYPE = "water";

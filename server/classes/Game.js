@@ -2,7 +2,21 @@ const pool = require("../database");
 import { INITIAL_GAMESTATE } from "../../client/src/redux/actions/actionTypes";
 const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("../gameplayFunctions/eventConstants");
 import { AIR_REFUELING_SQUADRON, CAPTURE_TYPES, BLUE_TEAM_ID, RED_TEAM_ID } from "../../client/src/gameData/gameConstants";
-import { ALL_ISLAND_LOCATIONS } from "../../client/src/gameData/gameboardConstants";
+import {
+    ALL_ISLAND_LOCATIONS,
+    ISLAND_POINTS,
+    DRAGON_ISLAND_ID,
+    MONTAVILLE_ISLAND_ID,
+    LION_ISLAND_ID,
+    NOYARC_ISLAND_ID,
+    FULER_ISLAND_ID,
+    RICO_ISLAND_ID,
+    TAMU_ISLAND_ID,
+    SHOR_ISLAND_ID,
+    HR_REPUBLIC_ISLAND_ID,
+    KEONI_ISLAND_ID,
+    EAGLE_ISLAND_ID
+} from "../../client/src/gameData/gameboardConstants";
 
 const InvItem = require("./InvItem");
 const ShopItem = require("./ShopItem");
@@ -90,6 +104,48 @@ class Game {
             newsTitle,
             newsInfo
         };
+    }
+
+    async addPoints() {
+        //add points based on the island ownerships inside this object (game)
+        let bluePoints = this.game0Points;
+        let redPoints = this.game1Points;
+
+        bluePoints += this.island0 === this.island1 && this.island0 === BLUE_TEAM_ID ? ISLAND_POINTS[DRAGON_ISLAND_ID] : 0;
+        redPoints += this.island0 === this.island1 && this.island0 === RED_TEAM_ID ? ISLAND_POINTS[DRAGON_ISLAND_ID] : 0;
+
+        bluePoints += this.island2 === BLUE_TEAM_ID ? ISLAND_POINTS[HR_REPUBLIC_ISLAND_ID] : 0;
+        redPoints += this.island2 === RED_TEAM_ID ? ISLAND_POINTS[HR_REPUBLIC_ISLAND_ID] : 0;
+
+        bluePoints += this.island3 === BLUE_TEAM_ID ? ISLAND_POINTS[MONTAVILLE_ISLAND_ID] : 0;
+        redPoints += this.island3 === RED_TEAM_ID ? ISLAND_POINTS[MONTAVILLE_ISLAND_ID] : 0;
+
+        bluePoints += this.island4 === BLUE_TEAM_ID ? ISLAND_POINTS[LION_ISLAND_ID] : 0;
+        redPoints += this.island4 === RED_TEAM_ID ? ISLAND_POINTS[LION_ISLAND_ID] : 0;
+
+        bluePoints += this.island5 === BLUE_TEAM_ID ? ISLAND_POINTS[NOYARC_ISLAND_ID] : 0;
+        redPoints += this.island5 === RED_TEAM_ID ? ISLAND_POINTS[NOYARC_ISLAND_ID] : 0;
+
+        bluePoints += this.island6 === BLUE_TEAM_ID ? ISLAND_POINTS[FULER_ISLAND_ID] : 0;
+        redPoints += this.island6 === RED_TEAM_ID ? ISLAND_POINTS[FULER_ISLAND_ID] : 0;
+
+        bluePoints += this.island7 === BLUE_TEAM_ID ? ISLAND_POINTS[RICO_ISLAND_ID] : 0;
+        redPoints += this.island7 === RED_TEAM_ID ? ISLAND_POINTS[RICO_ISLAND_ID] : 0;
+
+        bluePoints += this.island8 === BLUE_TEAM_ID ? ISLAND_POINTS[TAMU_ISLAND_ID] : 0;
+        redPoints += this.island8 === RED_TEAM_ID ? ISLAND_POINTS[TAMU_ISLAND_ID] : 0;
+
+        bluePoints += this.island9 === BLUE_TEAM_ID ? ISLAND_POINTS[SHOR_ISLAND_ID] : 0;
+        redPoints += this.island9 === RED_TEAM_ID ? ISLAND_POINTS[SHOR_ISLAND_ID] : 0;
+
+        bluePoints += this.island10 === BLUE_TEAM_ID ? ISLAND_POINTS[KEONI_ISLAND_ID] : 0;
+        redPoints += this.island10 === RED_TEAM_ID ? ISLAND_POINTS[KEONI_ISLAND_ID] : 0;
+
+        bluePoints += this.island11 === this.island12 && this.island11 === BLUE_TEAM_ID ? ISLAND_POINTS[EAGLE_ISLAND_ID] : 0;
+        redPoints += this.island11 === this.island12 && this.island11 === RED_TEAM_ID ? ISLAND_POINTS[EAGLE_ISLAND_ID] : 0;
+
+        await this.setPoints(BLUE_TEAM_ID, bluePoints);
+        await this.setPoints(RED_TEAM_ID, redPoints);
     }
 
     async initialStateAction(gameTeam, gameController) {
