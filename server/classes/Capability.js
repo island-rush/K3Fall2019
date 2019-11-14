@@ -12,7 +12,9 @@ import {
     RAISE_MORALE_ROUNDS,
     REMOTE_SENSING_ROUNDS,
     ACTIVATED,
-    COMM_INTERRUPT_RANGE
+    COMM_INTERRUPT_RANGE,
+    BLUE_TEAM_ID,
+    RED_TEAM_ID
 } from "../../client/src/gameData/gameConstants";
 
 class Capability {
@@ -320,29 +322,28 @@ class Capability {
         //TODO: do this in 1 statement instead of several (should allow multiple queries in single prepared statement (bulk but would work...(also more efficient if 1 query (but bigger / more complex?))))
         queryString = "UPDATE pieces SET pieceMoves = pieceMoves + ? WHERE pieceGameId = ? AND pieceTeamId = ? AND pieceTypeId in (?)";
 
-        //TODO: use constants for blue and red team (stop using 0 and 1, make it easier to read...)
-        inserts = [updateArrays[0][TYPE_AIR], gameId, 0, TYPE_OWNERS[TYPE_AIR]];
+        inserts = [updateArrays[BLUE_TEAM_ID][TYPE_AIR], gameId, BLUE_TEAM_ID, TYPE_OWNERS[TYPE_AIR]];
         await conn.query(queryString, inserts);
 
-        inserts = [updateArrays[0][TYPE_LAND], gameId, 0, TYPE_OWNERS[TYPE_LAND]];
+        inserts = [updateArrays[BLUE_TEAM_ID][TYPE_LAND], gameId, BLUE_TEAM_ID, TYPE_OWNERS[TYPE_LAND]];
         await conn.query(queryString, inserts);
 
-        inserts = [updateArrays[0][TYPE_SEA], gameId, 0, TYPE_OWNERS[TYPE_SEA]];
+        inserts = [updateArrays[BLUE_TEAM_ID][TYPE_SEA], gameId, BLUE_TEAM_ID, TYPE_OWNERS[TYPE_SEA]];
         await conn.query(queryString, inserts);
 
-        inserts = [updateArrays[0][TYPE_SPECIAL], gameId, 0, TYPE_OWNERS[TYPE_SPECIAL]];
+        inserts = [updateArrays[BLUE_TEAM_ID][TYPE_SPECIAL], gameId, BLUE_TEAM_ID, TYPE_OWNERS[TYPE_SPECIAL]];
         await conn.query(queryString, inserts);
 
-        inserts = [updateArrays[1][TYPE_AIR], gameId, 1, TYPE_OWNERS[TYPE_AIR]];
+        inserts = [updateArrays[RED_TEAM_ID][TYPE_AIR], gameId, RED_TEAM_ID, TYPE_OWNERS[TYPE_AIR]];
         await conn.query(queryString, inserts);
 
-        inserts = [updateArrays[1][TYPE_LAND], gameId, 1, TYPE_OWNERS[TYPE_LAND]];
+        inserts = [updateArrays[RED_TEAM_ID][TYPE_LAND], gameId, RED_TEAM_ID, TYPE_OWNERS[TYPE_LAND]];
         await conn.query(queryString, inserts);
 
-        inserts = [updateArrays[1][TYPE_SEA], gameId, 1, TYPE_OWNERS[TYPE_SEA]];
+        inserts = [updateArrays[RED_TEAM_ID][TYPE_SEA], gameId, RED_TEAM_ID, TYPE_OWNERS[TYPE_SEA]];
         await conn.query(queryString, inserts);
 
-        inserts = [updateArrays[1][TYPE_SPECIAL], gameId, 1, TYPE_OWNERS[TYPE_SPECIAL]];
+        inserts = [updateArrays[RED_TEAM_ID][TYPE_SPECIAL], gameId, RED_TEAM_ID, TYPE_OWNERS[TYPE_SPECIAL]];
         await conn.query(queryString, inserts);
 
         await conn.release();

@@ -2,7 +2,7 @@ const { Game, InvItem, Capability } = require("../../classes");
 import { COMM_INTERRUP_SELECTED } from "../../../client/src/redux/actions/actionTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG, GAME_DOES_NOT_EXIST } from "../../pages/errorTypes";
-import { TYPE_NAME_IDS } from "../../../client/src/gameData/gameConstants";
+import { COMMUNICATIONS_INTERRUPTION_TYPE_ID } from "../../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 
 const commInterruptConfirm = async (socket, payload) => {
@@ -57,7 +57,7 @@ const commInterruptConfirm = async (socket, payload) => {
 
     //verify correct type of inv item
     const { invItemTypeId } = thisInvItem;
-    if (invItemTypeId != TYPE_NAME_IDS["Communications Interruption"]) {
+    if (invItemTypeId != COMMUNICATIONS_INTERRUPTION_TYPE_ID) {
         sendUserFeedback(socket, "Inv Item was not a comm interrupt type.");
         return;
     }
