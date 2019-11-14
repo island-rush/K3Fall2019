@@ -9,7 +9,7 @@ import RefuelPopup from "./refuel/RefuelPopup";
 import SelectCommanderTypePopup from "./capabilities/SelectCommanderTypePopup";
 import Patterns from "./Patterns";
 import { selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } from "../../redux/actions";
-import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE, TYPE_FUEL } from "../../gameData/gameConstants";
+import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE } from "../../gameData/gameConstants";
 import { distanceMatrix } from "../../gameData/distanceMatrix";
 import {
     ALL_ISLAND_LOCATIONS,
@@ -111,7 +111,6 @@ const titleSolver = (position, gameInfo, positionIndex) => {
     const { type } = position;
     //ignore titles for types 'land' and 'water'
 
-    //TODO: could use constants for these, but heavily tied to gameboard file?
     if (IGNORE_TITLE_TYPES.includes(type)) {
         return "";
     }

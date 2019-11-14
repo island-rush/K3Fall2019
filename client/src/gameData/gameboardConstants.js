@@ -13,6 +13,7 @@ export const ISLAND_11_LOCATION = 670; //Eagle Top
 export const ISLAND_12_LOCATION = 708; //Eagle Botton
 
 //TODO: island names / capture point names?
+//TODO: use actual island names in these constants, easier to reset / change later (don't reference numbers if you don't have to)
 
 export const ALL_ISLAND_LOCATIONS = [
     ISLAND_0_LOCATION,

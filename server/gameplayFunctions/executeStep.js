@@ -1,8 +1,8 @@
-const { Plan, Piece, Event, Capability } = require('../classes');
-import { PLACE_PHASE, NEW_ROUND, PIECES_MOVE } from '../../client/src/redux/actions/actionTypes';
-import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from '../../client/src/redux/socketEmits';
-const giveNextEvent = require('./giveNextEvent');
-const { BOTH_TEAMS_INDICATOR, POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require('./eventConstants');
+const { Plan, Piece, Event, Capability } = require("../classes");
+import { PLACE_PHASE, NEW_ROUND, PIECES_MOVE } from "../../client/src/redux/actions/actionTypes";
+import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
+const giveNextEvent = require("./giveNextEvent");
+const { BOTH_TEAMS_INDICATOR, POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("./eventConstants");
 
 const executeStep = async (socket, thisGame) => {
     //inserting events here and moving pieces, or changing to new round or something...
@@ -54,8 +54,8 @@ const executeStep = async (socket, thisGame) => {
                     confirmedRemoteSense: remoteSense0,
                     confirmedBioWeapons: bioWeapons0,
                     confirmedRaiseMorale: raiseMorale0,
-                    confirmedCommInterrupt: commInterrupt0,
-                },
+                    confirmedCommInterrupt: commInterrupt0
+                }
             };
 
             serverAction1 = {
@@ -65,8 +65,8 @@ const executeStep = async (socket, thisGame) => {
                     confirmedRemoteSense: remoteSense1,
                     confirmedBioWeapons: bioWeapons1,
                     confirmedRaiseMorale: raiseMorale1,
-                    confirmedCommInterrupt: commInterrupt1,
-                },
+                    confirmedCommInterrupt: commInterrupt1
+                }
             };
         } else {
             //Next Round of Combat
@@ -80,8 +80,8 @@ const executeStep = async (socket, thisGame) => {
                     confirmedRemoteSense: remoteSense0,
                     confirmedBioWeapons: bioWeapons0,
                     confirmedRaiseMorale: raiseMorale0,
-                    confirmedCommInterrupt: commInterrupt0,
-                },
+                    confirmedCommInterrupt: commInterrupt0
+                }
             };
 
             serverAction1 = {
@@ -92,13 +92,13 @@ const executeStep = async (socket, thisGame) => {
                     confirmedRemoteSense: remoteSense1,
                     confirmedBioWeapons: bioWeapons1,
                     confirmedRaiseMorale: raiseMorale1,
-                    confirmedCommInterrupt: commInterrupt1,
-                },
+                    confirmedCommInterrupt: commInterrupt1
+                }
             };
         }
 
-        socket.to('game' + gameId + 'team0').emit(SERVER_SENDING_ACTION, serverAction0);
-        socket.to('game' + gameId + 'team1').emit(SERVER_SENDING_ACTION, serverAction1);
+        socket.to("game" + gameId + "team0").emit(SERVER_SENDING_ACTION, serverAction0);
+        socket.to("game" + gameId + "team1").emit(SERVER_SENDING_ACTION, serverAction1);
 
         const thisSocketsAction = parseInt(socket.handshake.session.ir3.gameTeam) === 0 ? serverAction0 : serverAction1;
         socket.emit(SERVER_SENDING_ACTION, thisSocketsAction);
@@ -138,9 +138,9 @@ const executeStep = async (socket, thisGame) => {
         let keys = Object.keys(allCollideEvents);
         for (let b = 0; b < keys.length; b++) {
             let key = keys[b];
-            eventInserts.push([gameId, BOTH_TEAMS_INDICATOR, COL_BATTLE_EVENT_TYPE, key.split('-')[0], key.split('-')[1]]);
+            eventInserts.push([gameId, BOTH_TEAMS_INDICATOR, COL_BATTLE_EVENT_TYPE, key.split("-")[0], key.split("-")[1]]);
             let eventPieces = allCollideEvents[key];
-            for (let x = 0; x < eventPieces.length; x++) eventItemInserts.push([eventPieces[x], gameId, key.split('-')[0], key.split('-')[1]]);
+            for (let x = 0; x < eventPieces.length; x++) eventItemInserts.push([eventPieces[x], gameId, key.split("-")[0], key.split("-")[1]]);
         }
 
         await Event.bulkInsertEvents(eventInserts);
@@ -179,8 +179,6 @@ const executeStep = async (socket, thisGame) => {
         await Event.bulkInsertEvents(eventInserts);
         await Event.bulkInsertItems(gameId, eventItemInserts);
     }
-
-    // TODO: Refuel Events (special flag? / proximity) (check to see that the piece still exists!*!*) (still have plans from old pieces that used to exist? (but those would delete on cascade probaby...except the events themselves...))
 
     //should not do refuel events if the team didn't have any plans for this step (TODO: prevent refuel stuff for team specific things)
 

@@ -1,7 +1,8 @@
 const pool = require("../database");
 import { INITIAL_GAMESTATE } from "../../client/src/redux/actions/actionTypes";
 const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("../gameplayFunctions/eventConstants");
-import { TYPE_NAMES } from "../../client/src/gameData/gameConstants";
+import { AIR_REFUELING_SQUADRON } from "../../client/src/gameData/gameConstants";
+import { ALL_ISLAND_LOCATIONS } from "../../client/src/gameData/gameboardConstants";
 
 const InvItem = require("./InvItem");
 const ShopItem = require("./ShopItem");
@@ -227,7 +228,7 @@ class Game {
                     for (let x = 0; x < allRefuelItems.length; x++) {
                         let thisRefuelItem = allRefuelItems[x];
                         let { pieceTypeId } = thisRefuelItem;
-                        if (TYPE_NAMES[pieceTypeId] == "Tanker") {
+                        if (pieceTypeId === AIR_REFUELING_SQUADRON) {
                             tankers.push(thisRefuelItem);
                         } else {
                             aircraft.push(thisRefuelItem);
@@ -314,6 +315,18 @@ class Game {
         const inserts = [parseInt(newGameRound), this.gameId];
         await pool.query(queryString, inserts);
         this.gameRound = parseInt(newGameRound);
+    }
+
+    async updateFlags() {
+        //only certain pieces can capture
+        //see if any pieces are currently residing on flags by themselves, and if so, set the island# in the database and update 'this' object correspondingly
+        let queryString = "SELECT * FROM pieces WHERE pieceGameId = ? AND piecePositionId in (?) AND pieceTypeId in (?)";
+        let inserts = [gameId, ALL_ISLAND_LOCATIONS];
+        let [results] = await pool.query(queryString, inserts);
+
+        if (results.length === 0) {
+            return;
+        }
     }
 
     //TODO: Prevent errors with 2 games sharing the same section AND instructor (would never be able to log into them...need to come back with error?)

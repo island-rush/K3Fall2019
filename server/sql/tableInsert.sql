@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS games (
     gameSlice INT(1) NOT NULL DEFAULT 0, -- 0: planning, 1: events/movement
     
     island0 INT(1) NOT NULL DEFAULT 1, -- Dragon bottom
-    island1 INT(1) NOT NULL DEFAULT 1, -- Dragon top
+    island1 INT(1) NOT NULL DEFAULT -1, -- Dragon top
     island2 INT(1) NOT NULL DEFAULT -1, -- HR Republic
     island3 INT(1) NOT NULL DEFAULT -1, -- Montaville
     island4 INT(1) NOT NULL DEFAULT -1, -- Lion Island
