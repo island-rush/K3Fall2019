@@ -3,6 +3,7 @@ const sendUserFeedback = require("../sendUserFeedback");
 import { SHOP_TRANSFER } from "../../../client/src/redux/actions/actionTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
+import { PURCHASE_PHASE_ID, TYPE_MAIN } from "../../../client/src/gameData/gameConstants";
 
 /***
  * TODO: standard function descriptions (author?, arguments, returns, why/when used?)
@@ -10,39 +11,39 @@ import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
  */
 
 const shopConfirmPurchase = async (socket, payload) => {
-	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
-	const thisGame = await new Game({ gameId }).init();
+    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const thisGame = await new Game({ gameId }).init();
 
-	const { gameActive, gamePhase } = thisGame;
+    const { gameActive, gamePhase } = thisGame;
 
-	if (!gameActive) {
-		socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
-		return;
-	}
+    if (!gameActive) {
+        socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
+        return;
+    }
 
-	//gamePhase 1 is only phase for confirming purchase
-	if (gamePhase != 1) {
-		sendUserFeedback(socket, "Not the right phase...");
-		return;
-	}
+    //gamePhase 1 is only phase for confirming purchase
+    if (gamePhase != PURCHASE_PHASE_ID) {
+        sendUserFeedback(socket, "Not the right phase...");
+        return;
+    }
 
-	//Only the main controller (0) can confirm purchase
-	if (gameController != 0) {
-		sendUserFeedback(socket, "Not the main controller (0)...");
-		return;
-	}
+    //Only the main controller (0) can confirm purchase
+    if (gameController != TYPE_MAIN) {
+        sendUserFeedback(socket, "Not the main controller (0)...");
+        return;
+    }
 
-	await InvItem.insertFromShop(gameId, gameTeam);
-	await ShopItem.deleteAll(gameId, gameTeam);
-	const invItems = await InvItem.all(gameId, gameTeam);
+    await InvItem.insertFromShop(gameId, gameTeam);
+    await ShopItem.deleteAll(gameId, gameTeam);
+    const invItems = await InvItem.all(gameId, gameTeam);
 
-	const serverAction = {
-		type: SHOP_TRANSFER,
-		payload: {
-			invItems
-		}
-	};
-	socket.emit(SERVER_SENDING_ACTION, serverAction);
+    const serverAction = {
+        type: SHOP_TRANSFER,
+        payload: {
+            invItems
+        }
+    };
+    socket.emit(SERVER_SENDING_ACTION, serverAction);
 };
 
 module.exports = shopConfirmPurchase;

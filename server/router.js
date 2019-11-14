@@ -7,19 +7,19 @@
 const path = require("path");
 import { DATABASE_TAG, LOGIN_TAG } from "./pages/errorTypes";
 const {
-	gameReset,
-	toggleGameActive,
-	getGameActive,
-	getGames,
-	getNews,
-	insertDatabaseTables,
-	gameDelete,
-	setAdminPassword,
-	setTeamPasswords,
-	gameAdd,
-	gameLoginVerify,
-	adminLoginVerify,
-	databaseStatus
+    gameReset,
+    toggleGameActive,
+    getGameActive,
+    getGames,
+    getNews,
+    insertDatabaseTables,
+    gameDelete,
+    setAdminPassword,
+    setTeamPasswords,
+    gameAdd,
+    gameLoginVerify,
+    adminLoginVerify,
+    databaseStatus
 } = require("./adminFunctions");
 
 const router = require("express").Router();
@@ -29,54 +29,54 @@ const router = require("express").Router();
 // --------------------------------------
 
 router.get("/", (req, res) => {
-	delete req.session.ir3; //anyone on the homepage is considered un-authenticated (doesn't maintain session) (could cause errors when they visit, with another game tab open?)
-	res.sendFile(__dirname + "/pages/index.html");
+    delete req.session.ir3; //anyone on the homepage is considered un-authenticated (doesn't maintain session) (could cause errors when they visit, with another game tab open?)
+    res.sendFile(__dirname + "/pages/index.html");
 });
 
 router.get("/index.html", (req, res) => {
-	delete req.session.ir3;
-	res.sendFile(__dirname + "/pages/index.html");
+    delete req.session.ir3;
+    res.sendFile(__dirname + "/pages/index.html");
 });
 
 router.get("/troubleshoot.html", (req, res) => {
-	delete req.session.ir3;
-	res.sendFile(__dirname + "/pages/troubleshoot.html");
+    delete req.session.ir3;
+    res.sendFile(__dirname + "/pages/troubleshoot.html");
 });
 
 router.get("/credits.html", (req, res) => {
-	delete req.session.ir3;
-	res.sendFile(__dirname + "/pages/credits.html");
+    delete req.session.ir3;
+    res.sendFile(__dirname + "/pages/credits.html");
 });
 
 router.get("/teacher.html", (req, res) => {
-	if (!req.session.ir3 || !req.session.ir3.teacher || !req.session.ir3.gameId) {
-		res.redirect(`/index.html?error=${LOGIN_TAG}`);
-		return;
-	}
+    if (!req.session.ir3 || !req.session.ir3.teacher || !req.session.ir3.gameId) {
+        res.redirect(`/index.html?error=${LOGIN_TAG}`);
+        return;
+    }
 
-	res.sendFile(__dirname + "/pages/teacher.html");
+    res.sendFile(__dirname + "/pages/teacher.html");
 });
 
 router.get("/courseDirector.html", (req, res) => {
-	if (!req.session.ir3 || !req.session.ir3.courseDirector) {
-		res.redirect(`/index.html?error=${LOGIN_TAG}`);
-		return;
-	}
+    if (!req.session.ir3 || !req.session.ir3.courseDirector) {
+        res.redirect(`/index.html?error=${LOGIN_TAG}`);
+        return;
+    }
 
-	res.sendFile(__dirname + "/pages/courseDirector.html");
+    res.sendFile(__dirname + "/pages/courseDirector.html");
 });
 
 router.get("/game.html", (req, res) => {
-	if (!req.session.ir3 || !req.session.ir3.gameId || !req.session.ir3.gameTeam || !req.session.ir3.gameController) {
-		res.redirect(`/index.html?error=${LOGIN_TAG}`);
-		return;
-	}
+    if (!req.session.ir3 || !req.session.ir3.gameId || !req.session.ir3.gameTeam || !req.session.ir3.gameController) {
+        res.redirect(`/index.html?error=${LOGIN_TAG}`);
+        return;
+    }
 
-	if (process.env.NODE_ENV == "production") {
-		res.sendFile(path.join(__dirname, "/../client/build/index.html"));
-	} else {
-		res.redirect("http://localhost:3000"); // Use this redirect while working on react frontend
-	}
+    if (process.env.NODE_ENV == "production") {
+        res.sendFile(path.join(__dirname, "/../client/build/index.html"));
+    } else {
+        res.redirect("http://localhost:3000"); // Use this redirect while working on react frontend
+    }
 });
 
 // --------------------------------------
@@ -84,110 +84,110 @@ router.get("/game.html", (req, res) => {
 // --------------------------------------
 
 router.get("/databaseStatus", (req, res) => {
-	try {
-		databaseStatus(req, res);
-	} catch (error) {
-		console.error(error);
-		res.status(500).send(error.code);
-	}
+    try {
+        databaseStatus(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send(error.code);
+    }
 });
 
 router.post("/adminLoginVerify", (req, res) => {
-	try {
-		adminLoginVerify(req, res);
-	} catch (error) {
-		console.error(error);
-		res.status(500).redirect(`/index.html?error=${DATABASE_TAG}`);
-	}
+    try {
+        adminLoginVerify(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).redirect(`/index.html?error=${DATABASE_TAG}`);
+    }
 });
 
 router.post("/gameLoginVerify", (req, res) => {
-	try {
-		gameLoginVerify(req, res);
-	} catch (error) {
-		console.error(error);
-		res.status(500).redirect(`./index.html?error=${DATABASE_TAG}`);
-	}
+    try {
+        gameLoginVerify(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).redirect(`./index.html?error=${DATABASE_TAG}`);
+    }
 });
 
 router.post("/gameAdd", (req, res) => {
-	try {
-		gameAdd(req, res);
-	} catch (error) {
-		console.error(error);
-		res.redirect(500, "/courseDirector.html?gameAdd=failed");
-	}
+    try {
+        gameAdd(req, res);
+    } catch (error) {
+        console.error(error);
+        res.redirect(500, "/courseDirector.html?gameAdd=failed");
+    }
 });
 
 router.post("/gameDelete", (req, res) => {
-	try {
-		gameDelete(req, res);
-	} catch (error) {
-		console.error(error);
-		res.status(500).redirect("/courseDirector.html?gameDelete=failed");
-	}
+    try {
+        gameDelete(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).redirect("/courseDirector.html?gameDelete=failed");
+    }
 });
 
 router.post("/setAdminPassword", (req, res) => {
-	try {
-		setAdminPassword(req, res);
-	} catch (error) {
-		console.error(error);
-		res.status(500).redirect("/courseDirector.html?setAdminPassword=failed");
-	}
+    try {
+        setAdminPassword(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).redirect("/courseDirector.html?setAdminPassword=failed");
+    }
 });
 
 router.post("/setTeamPasswords", (req, res) => {
-	try {
-		setTeamPasswords(req, res);
-	} catch (error) {
-		console.error(error);
-		res.status(500).redirect("/teacher.html?setTeamPasswords=failed");
-	}
+    try {
+        setTeamPasswords(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).redirect("/teacher.html?setTeamPasswords=failed");
+    }
 });
 
 router.post("/insertDatabaseTables", (req, res) => {
-	try {
-		insertDatabaseTables(req, res);
-	} catch (error) {
-		console.error(error);
-		res.redirect("/courseDirector.html?initializeDatabase=failed");
-	}
+    try {
+        insertDatabaseTables(req, res);
+    } catch (error) {
+        console.error(error);
+        res.redirect("/courseDirector.html?initializeDatabase=failed");
+    }
 });
 
 router.get("/getGames", (req, res) => {
-	getGames(req, res); //try / catch is within this function, higher level catch didn't catch :(
+    getGames(req, res); //TODO: figure this out eventually: -> try / catch is within this function, higher level catch didn't catch :(
 });
 
 router.get("/getNews", (req, res) => {
-	getNews(req, res);
+    getNews(req, res);
 });
 
 router.get("/getGameActive", (req, res) => {
-	try {
-		getGameActive(req, res);
-	} catch (error) {
-		console.error(error);
-		res.sendStatus(500);
-	}
+    try {
+        getGameActive(req, res);
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500);
+    }
 });
 
 router.post("/toggleGameActive", (req, res) => {
-	try {
-		toggleGameActive(req, res);
-	} catch (error) {
-		console.error(error);
-		res.status(500).redirect("/teacher.html?gameReset=failed");
-	}
+    try {
+        toggleGameActive(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).redirect("/teacher.html?gameReset=failed");
+    }
 });
 
 router.post("/gameReset", (req, res) => {
-	try {
-		gameReset(req, res);
-	} catch (error) {
-		console.error(error);
-		res.status(500).redirect("/teacher.html?gameReset=failed");
-	}
+    try {
+        gameReset(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).redirect("/teacher.html?gameReset=failed");
+    }
 });
 
 module.exports = router;

@@ -1,5 +1,32 @@
 const pool = require("../database");
-import { VISIBILITY_MATRIX, TYPE_MOVES, REMOTE_SENSING_RANGE, SOF_TEAM_TYPE_ID, SUBMARINE_TYPE_ID, LIST_ALL_PIECES } from "../../client/src/gameData/gameConstants";
+import {
+    VISIBILITY_MATRIX,
+    TYPE_MOVES,
+    REMOTE_SENSING_RANGE,
+    SOF_TEAM_TYPE_ID,
+    SUBMARINE_TYPE_ID,
+    LIST_ALL_PIECES,
+    BLUE_TEAM_ID,
+    RED_TEAM_ID,
+    BOMBER_TYPE_ID,
+    STEALTH_BOMBER_TYPE_ID,
+    STEALTH_FIGHTER_TYPE_ID,
+    AIR_REFUELING_SQUADRON,
+    TACTICAL_AIRLIFT_SQUADRON_TYPE_ID,
+    AIRBORN_ISR_TYPE_ID,
+    ARMY_INFANTRY_COMPANY_TYPE_ID,
+    ARTILLERY_BATTERY_TYPE_ID,
+    TANK_COMPANY_TYPE_ID,
+    MARINE_INFANTRY_COMPANY_TYPE_ID,
+    ATTACK_HELICOPTER_TYPE_ID,
+    LIGHT_INFANTRY_VEHICLE_CONVOY_TYPE_ID,
+    SAM_SITE_TYPE_ID,
+    DESTROYER_TYPE_ID,
+    A_C_CARRIER_TYPE_ID,
+    TRANSPORT_TYPE_ID,
+    MC_12_TYPE_ID,
+    C_130_TYPE_ID
+} from "../../client/src/gameData/gameConstants";
 import { distanceMatrix } from "../../client/src/gameData/distanceMatrix";
 
 class Piece {
@@ -66,7 +93,7 @@ class Piece {
 				if (VISIBILITY_MATRIX[pieceTypeId][currentPieceType] !== -1) { //could it ever see this type?
 					for (let position = 0; position < distanceMatrix[piecePositionId].length; position++) { //for all positions
 						if (distanceMatrix[piecePositionId][position] <= VISIBILITY_MATRIX[pieceTypeId][currentPieceType]) { //is this position in range for that type?
-							otherTeam = parseInt(pieceTeamId) == 0 ? 1 : 0;
+							otherTeam = parseInt(pieceTeamId) == BLUE_TEAM_ID ? RED_TEAM_ID : BLUE_TEAM_ID;
 
 							if (!posTypesVisible[otherTeam][type].includes(position)) { //add this position if not already added by another piece somewhere else
 								posTypesVisible[otherTeam][type].push(position);
@@ -88,9 +115,10 @@ class Piece {
 				if (distanceMatrix[remoteSenseCenter][currentPos] <= REMOTE_SENSING_RANGE) {
 					//put these positions into the posTypesVisible (based on team)
 					let { teamId } = results[x];
-					let otherTeam = teamId === 0 ? 1 : 0;
+					let otherTeam = teamId === BLUE_TEAM_ID ? RED_TEAM_ID : BLUE_TEAM_ID;
 					for (let pieceType = 0; pieceType < posTypesVisible[otherTeam].length; pieceType++) {
-						//does not see subs or sof teams
+                        //does not see subs or sof teams
+                        //could make a constant for pieces that are excluded from this effect, instead of manually checking each...
 						if (!posTypesVisible[otherTeam][pieceType].includes(currentPos) && pieceType !== SOF_TEAM_TYPE_ID && pieceType !== SUBMARINE_TYPE_ID) { //add this position if not already added by another piece somewhere else
 							posTypesVisible[otherTeam][pieceType].push(currentPos);
 						}
@@ -99,9 +127,11 @@ class Piece {
 			}
 		}
 
-		//Bulk update for all visibilities
+        //Bulk update for all visibilities
+        //TODO: update for radar and missile pieces
+        //TODO: change this into something readable? (could also change the double array into a double object...)
 		queryString = "UPDATE pieces SET pieceVisible = 1 WHERE pieceGameId = ? AND ((pieceTeamId = 0 AND pieceTypeId = 0 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 2 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 3 AND piecePositionId IN (?)) OR (pieceTeamId = 4 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 5 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 6 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 7 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 8 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 9 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 10 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 11 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 12 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 13 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 14 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 15 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 16 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 17 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 18 AND piecePositionId IN (?)) OR (pieceTeamId = 0 AND pieceTypeId = 19 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 0 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 2 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 3 AND piecePositionId IN (?)) OR (pieceTeamId = 4 AND pieceTypeId = 1 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 5 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 6 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 7 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 8 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 9 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 10 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 11 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 12 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 13 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 14 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 15 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 16 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 17 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 18 AND piecePositionId IN (?)) OR (pieceTeamId = 1 AND pieceTypeId = 19 AND piecePositionId IN (?)))";
-		inserts = [gameId, posTypesVisible[0][0], posTypesVisible[0][1], posTypesVisible[0][2], posTypesVisible[0][3], posTypesVisible[0][4], posTypesVisible[0][5], posTypesVisible[0][6], posTypesVisible[0][7], posTypesVisible[0][8], posTypesVisible[0][9], posTypesVisible[0][10], posTypesVisible[0][11], posTypesVisible[0][12], posTypesVisible[0][13], posTypesVisible[0][14], posTypesVisible[0][15], posTypesVisible[0][16], posTypesVisible[0][17], posTypesVisible[0][18], posTypesVisible[0][19], posTypesVisible[1][0], posTypesVisible[1][1], posTypesVisible[1][2], posTypesVisible[1][3], posTypesVisible[1][4], posTypesVisible[1][5], posTypesVisible[1][6], posTypesVisible[1][7], posTypesVisible[1][8], posTypesVisible[1][9], posTypesVisible[1][10], posTypesVisible[1][11], posTypesVisible[1][12], posTypesVisible[1][13], posTypesVisible[1][14], posTypesVisible[1][15], posTypesVisible[1][16], posTypesVisible[1][17], posTypesVisible[1][18], posTypesVisible[1][19]];
+		inserts = [gameId, posTypesVisible[BLUE_TEAM_ID][BOMBER_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][STEALTH_BOMBER_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][STEALTH_FIGHTER_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][AIR_REFUELING_SQUADRON], posTypesVisible[BLUE_TEAM_ID][TACTICAL_AIRLIFT_SQUADRON_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][AIRBORN_ISR_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][ARMY_INFANTRY_COMPANY_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][ARTILLERY_BATTERY_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][TANK_COMPANY_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][MARINE_INFANTRY_COMPANY_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][ATTACK_HELICOPTER_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][LIGHT_INFANTRY_VEHICLE_CONVOY_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][SAM_SITE_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][DESTROYER_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][A_C_CARRIER_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][SUBMARINE_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][TRANSPORT_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][MC_12_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][C_130_TYPE_ID], posTypesVisible[BLUE_TEAM_ID][SOF_TEAM_TYPE_ID], posTypesVisible[RED_TEAM_ID][BOMBER_TYPE_ID], posTypesVisible[RED_TEAM_ID][STEALTH_BOMBER_TYPE_ID], posTypesVisible[RED_TEAM_ID][STEALTH_FIGHTER_TYPE_ID], posTypesVisible[RED_TEAM_ID][AIR_REFUELING_SQUADRON], posTypesVisible[RED_TEAM_ID][TACTICAL_AIRLIFT_SQUADRON_TYPE_ID], posTypesVisible[RED_TEAM_ID][AIRBORN_ISR_TYPE_ID], posTypesVisible[RED_TEAM_ID][ARMY_INFANTRY_COMPANY_TYPE_ID], posTypesVisible[RED_TEAM_ID][ARTILLERY_BATTERY_TYPE_ID], posTypesVisible[RED_TEAM_ID][TANK_COMPANY_TYPE_ID], posTypesVisible[RED_TEAM_ID][MARINE_INFANTRY_COMPANY_TYPE_ID], posTypesVisible[RED_TEAM_ID][ATTACK_HELICOPTER_TYPE_ID], posTypesVisible[RED_TEAM_ID][LIGHT_INFANTRY_VEHICLE_CONVOY_TYPE_ID], posTypesVisible[RED_TEAM_ID][SAM_SITE_TYPE_ID], posTypesVisible[RED_TEAM_ID][DESTROYER_TYPE_ID], posTypesVisible[RED_TEAM_ID][A_C_CARRIER_TYPE_ID], posTypesVisible[RED_TEAM_ID][SUBMARINE_TYPE_ID], posTypesVisible[RED_TEAM_ID][TRANSPORT_TYPE_ID], posTypesVisible[RED_TEAM_ID][MC_12_TYPE_ID], posTypesVisible[RED_TEAM_ID][C_130_TYPE_ID], posTypesVisible[RED_TEAM_ID][SOF_TEAM_TYPE_ID]];
 		await conn.query(queryString, inserts);
 
 		conn.release();

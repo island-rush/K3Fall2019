@@ -1,7 +1,7 @@
 const { Plan, Piece, Event, Capability } = require("../classes");
 import { PLACE_PHASE, NEW_ROUND, PIECES_MOVE, UPDATE_FLAGS } from "../../client/src/redux/actions/actionTypes";
 import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
-import { BLUE_TEAM_ID, RED_TEAM_ID } from "../../client/src/gameData/gameConstants";
+import { BLUE_TEAM_ID, RED_TEAM_ID, PLACE_PHASE_ID, WAITING_STATUS } from "../../client/src/gameData/gameConstants";
 const giveNextEvent = require("./giveNextEvent");
 const { BOTH_TEAMS_INDICATOR, POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("./eventConstants");
 
@@ -47,10 +47,11 @@ const executeStep = async (socket, thisGame) => {
 
         let serverAction0;
         let serverAction1;
+        //TODO: could do constant with 'ROUNDS_PER_COMBAT' although getting excessive
         if (gameRound == 2) {
             //Combat -> Place Phase
             await thisGame.setRound(0);
-            await thisGame.setPhase(3);
+            await thisGame.setPhase(PLACE_PHASE_ID);
 
             serverAction0 = {
                 type: PLACE_PHASE,
@@ -109,7 +110,7 @@ const executeStep = async (socket, thisGame) => {
         socket.to("game" + gameId + "team0").emit(SERVER_SENDING_ACTION, serverAction0);
         socket.to("game" + gameId + "team1").emit(SERVER_SENDING_ACTION, serverAction1);
 
-        const thisSocketsAction = parseInt(socket.handshake.session.ir3.gameTeam) === 0 ? serverAction0 : serverAction1;
+        const thisSocketsAction = parseInt(socket.handshake.session.ir3.gameTeam) === BLUE_TEAM_ID ? serverAction0 : serverAction1;
         socket.emit(SERVER_SENDING_ACTION, thisSocketsAction);
 
         return;
@@ -117,10 +118,10 @@ const executeStep = async (socket, thisGame) => {
 
     //One of the teams may be without plans, keep them waiting
     if (currentMovementOrder0 == null) {
-        await thisGame.setStatus(0, 1);
+        await thisGame.setStatus(BLUE_TEAM_ID, WAITING_STATUS);
     }
     if (currentMovementOrder1 == null) {
-        await thisGame.setStatus(1, 1);
+        await thisGame.setStatus(RED_TEAM_ID, WAITING_STATUS);
     }
 
     let currentMovementOrder = currentMovementOrder0 != null ? currentMovementOrder0 : currentMovementOrder1;
@@ -216,6 +217,7 @@ const executeStep = async (socket, thisGame) => {
     //should not do refuel events if the team didn't have any plans for this step (TODO: prevent refuel stuff for team specific things)
 
     //refueling is team specific (loop through 0 and 1 teamIds)
+    //TODO: could refactor this to be cleaner (easier to read)
     const teamHadPlans = [currentMovementOrder0 == null ? 0 : 1, currentMovementOrder1 == null ? 0 : 1];
     for (let thisTeamNum = 0; thisTeamNum < 2; thisTeamNum++) {
         if (teamHadPlans[thisTeamNum]) {

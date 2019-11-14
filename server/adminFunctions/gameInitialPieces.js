@@ -1,13 +1,14 @@
 const pool = require("../database");
-import { TYPE_MOVES, TYPE_FUEL, TANK_COMPANY_TYPE_ID } from "../../client/src/gameData/GameConstants";
+import { TYPE_MOVES, TYPE_FUEL, TANK_COMPANY_TYPE_ID, BLUE_TEAM_ID, RED_TEAM_ID } from "../../client/src/gameData/GameConstants";
 
 // prettier-ignore
 const piece = (pieceGameId, pieceTeamName, pieceTypeId, piecePositionId, options) => {
 	const pieceOptions = options || {};
+	//TODO: could have constants to indicated pieceVisible and pieceContainer (not in container == -1)
 	const pieceContainerId = pieceOptions.pieceContainerId == undefined ? -1 : pieceOptions.pieceContainerId;
 	const pieceVisible = pieceOptions.pieceVisible == undefined ? 0 : pieceOptions.pieceVisible;
 
-	const pieceTeamId = pieceTeamName == "Blue" ? 0 : 1;
+	const pieceTeamId = pieceTeamName == "Blue" ? BLUE_TEAM_ID : RED_TEAM_ID;
 	const pieceMoves = TYPE_MOVES[pieceTypeId];
 	const pieceFuel = TYPE_FUEL[pieceTypeId];
 

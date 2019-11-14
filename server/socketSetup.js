@@ -24,6 +24,7 @@ import {
     SERVER_COMM_INTERRUPT_CONFIRM,
     SERVER_GOLDEN_EYE_CONFIRM
 } from "../client/src/redux/actions/actionTypes";
+import { ACTIVATED, DEACTIVATED } from "../client/src/gameData/gameConstants";
 const {
     sendUserFeedback,
     shopPurchaseRequest,
@@ -71,7 +72,7 @@ const socketSetup = async socket => {
     } else {
         //probably refreshed, keep them logged in (disconnect logs them out)
         setTimeout(() => {
-            thisGame.setLoggedIn(gameTeam, gameController, 1);
+            thisGame.setLoggedIn(gameTeam, gameController, ACTIVATED);
             socket.handshake.session.ir3 = ir3Session;
         }, 5000);
     }
@@ -154,7 +155,7 @@ const socketSetup = async socket => {
     socket.on("disconnect", async () => {
         try {
             setTimeout(() => {
-                thisGame.setLoggedIn(gameTeam, gameController, 0);
+                thisGame.setLoggedIn(gameTeam, gameController, DEACTIVATED);
                 delete socket.handshake.session.ir3;
             }, 5000);
         } catch (error) {

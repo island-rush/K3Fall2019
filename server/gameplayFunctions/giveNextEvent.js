@@ -1,6 +1,6 @@
 const { Event, Piece } = require("../classes");
 import { EVENT_BATTLE, NO_MORE_EVENTS, EVENT_REFUEL } from "../../client/src/redux/actions/actionTypes";
-import { AIR_REFUELING_SQUADRON } from "../../client/src/gameData/gameConstants";
+import { AIR_REFUELING_SQUADRON, BLUE_TEAM_ID, RED_TEAM_ID } from "../../client/src/gameData/gameConstants";
 import { SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
 const sendUserFeedback = require("./sendUserFeedback");
 const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("./eventConstants");
@@ -9,7 +9,7 @@ const giveNextEvent = async (socket, options) => {
     const { thisGame, gameTeam } = options;
     const { gameId } = thisGame;
 
-    const otherTeam = gameTeam == 0 ? 1 : 0;
+    const otherTeam = gameTeam == BLUE_TEAM_ID ? RED_TEAM_ID : BLUE_TEAM_ID;
 
     let gameboardPiecesList; //if came from 'executeStep', send new piece locations along with actions
     if (options.executingStep) {

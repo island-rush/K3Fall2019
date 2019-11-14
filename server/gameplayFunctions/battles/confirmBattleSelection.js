@@ -2,6 +2,7 @@ const { Game, Event } = require("../../classes");
 import { BATTLE_FIGHT_RESULTS, UPDATE_FLAGS } from "../../../client/src/redux/actions/actionTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
+import { BLUE_TEAM_ID, RED_TEAM_ID, WAITING_STATUS, NOT_WAITING_STATUS } from "../../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 const giveNextEvent = require("../giveNextEvent");
 
@@ -17,11 +18,11 @@ const confirmBattleSelection = async (socket, payload) => {
         return;
     }
 
-    const otherTeam = gameTeam == 0 ? 1 : 0;
-    const thisTeamStatus = gameTeam == 0 ? game0Status : game1Status;
-    const otherTeamStatus = otherTeam == 0 ? game0Status : game1Status;
+    const otherTeam = gameTeam == BLUE_TEAM_ID ? RED_TEAM_ID : BLUE_TEAM_ID;
+    const thisTeamStatus = gameTeam == BLUE_TEAM_ID ? game0Status : game1Status;
+    const otherTeamStatus = otherTeam == BLUE_TEAM_ID ? game0Status : game1Status;
 
-    if (thisTeamStatus == 1 && otherTeamStatus == 0) {
+    if (thisTeamStatus == WAITING_STATUS && otherTeamStatus == NOT_WAITING_STATUS) {
         sendUserFeedback(socket, "still waiting stupid...");
         return;
     }
@@ -31,14 +32,15 @@ const confirmBattleSelection = async (socket, payload) => {
     await thisTeamsCurrentEvent.bulkUpdateTargets(friendlyPieces);
 
     //are we waiting for the other client?
-    if (otherTeamStatus == 0) {
-        await thisGame.setStatus(gameTeam, 1);
+    //and if thisTeamStatus == NOT_WAITING....(maybe make explicit here <-TODO:
+    if (otherTeamStatus == NOT_WAITING_STATUS) {
+        await thisGame.setStatus(gameTeam, WAITING_STATUS);
         sendUserFeedback(socket, "confirmed, now waiting on other team...");
         return;
     }
 
     //if get here, other team was already waiting, need to set them to 0 and handle stuff
-    await thisGame.setStatus(otherTeam, 0);
+    await thisGame.setStatus(otherTeam, NOT_WAITING_STATUS);
 
     //Do the fight!
     const fightResults = await thisTeamsCurrentEvent.fight();

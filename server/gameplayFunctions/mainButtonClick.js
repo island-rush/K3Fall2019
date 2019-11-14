@@ -3,7 +3,19 @@ const { Game, Capability } = require("../classes");
 import { MAIN_BUTTON_CLICK, PURCHASE_PHASE, COMBAT_PHASE, NEWS_PHASE, SLICE_CHANGE } from "../../client/src/redux/actions/actionTypes";
 import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
-import { BLUE_TEAM_ID, RED_TEAM_ID } from "../../client/src/gameData/gameConstants";
+import {
+    BLUE_TEAM_ID,
+    RED_TEAM_ID,
+    TYPE_MAIN,
+    WAITING_STATUS,
+    NOT_WAITING_STATUS,
+    NEWS_PHASE_ID,
+    PURCHASE_PHASE_ID,
+    COMBAT_PHASE_ID,
+    PLACE_PHASE_ID,
+    SLICE_PLANNING_ID,
+    SLICE_EXECUTING_ID
+} from "../../client/src/gameData/gameConstants";
 const executeStep = require("./executeStep"); //big function
 
 const mainButtonClick = async (socket, payload) => {
@@ -18,25 +30,24 @@ const mainButtonClick = async (socket, payload) => {
     }
 
     //Who is allowed to press that button?
-    if (gameController != 0) {
+    if (gameController != TYPE_MAIN) {
         sendUserFeedback(socket, "Wrong Controller to click that button...");
         return;
     }
 
-    const otherTeam = gameTeam == 0 ? 1 : 0;
-    const thisTeamStatus = gameTeam == 0 ? game0Status : game1Status;
-    const otherTeamStatus = otherTeam == 0 ? game0Status : game1Status;
+    const otherTeam = gameTeam == BLUE_TEAM_ID ? RED_TEAM_ID : BLUE_TEAM_ID;
+    const thisTeamStatus = gameTeam == BLUE_TEAM_ID ? game0Status : game1Status;
+    const otherTeamStatus = otherTeam == BLUE_TEAM_ID ? game0Status : game1Status;
 
-    //Still Waiting
-    if (thisTeamStatus == 1) {
+    if (thisTeamStatus == WAITING_STATUS) {
         //might fail with race condition (they press at the same time...but they just need to keep pressing...)
         sendUserFeedback(socket, "Still waiting on other team...");
         return;
     }
 
     //Now Waiting
-    if (otherTeamStatus == 0) {
-        await thisGame.setStatus(gameTeam, 1);
+    if (otherTeamStatus == NOT_WAITING_STATUS) {
+        await thisGame.setStatus(gameTeam, WAITING_STATUS);
         let serverAction = {
             type: MAIN_BUTTON_CLICK,
             payload: {}
@@ -45,16 +56,15 @@ const mainButtonClick = async (socket, payload) => {
         return;
     }
 
-    await thisGame.setStatus(otherTeam, 0);
-    await thisGame.setStatus(gameTeam, 0);
+    await thisGame.setStatus(otherTeam, NOT_WAITING_STATUS);
+    await thisGame.setStatus(gameTeam, NOT_WAITING_STATUS);
 
     let serverAction0;
     let serverAction1;
 
     switch (gamePhase) {
-        //News -> Purchase
-        case 0:
-            await thisGame.setPhase(1);
+        case NEWS_PHASE_ID:
+            await thisGame.setPhase(PURCHASE_PHASE_ID);
             serverAction0 = {
                 type: PURCHASE_PHASE,
                 payload: {}
@@ -65,9 +75,8 @@ const mainButtonClick = async (socket, payload) => {
             };
             break;
 
-        //Purchase -> Combat
-        case 1:
-            await thisGame.setPhase(2);
+        case PURCHASE_PHASE_ID:
+            await thisGame.setPhase(COMBAT_PHASE_ID);
             serverAction0 = {
                 type: COMBAT_PHASE,
                 payload: {}
@@ -79,9 +88,9 @@ const mainButtonClick = async (socket, payload) => {
             break;
 
         //Combat Phase -> Slice, Round, Place Troops... (stepping through)
-        case 2:
-            if (gameSlice == 0) {
-                await thisGame.setSlice(1);
+        case COMBAT_PHASE_ID:
+            if (gameSlice == SLICE_PLANNING_ID) {
+                await thisGame.setSlice(SLICE_EXECUTING_ID);
 
                 //TODO: change payload to reflect what's being sent (confirmedRods = list of positions, confirmedInsurgency = list of pieces to delete)
                 const confirmedRods = await Capability.useRodsFromGod(gameId);
@@ -119,9 +128,9 @@ const mainButtonClick = async (socket, payload) => {
             break;
 
         //Place Troops -> News
-        case 3:
+        case PLACE_PHASE_ID:
             await thisGame.addPoints();
-            await thisGame.setPhase(0);
+            await thisGame.setPhase(NEWS_PHASE_ID);
             const news = await thisGame.getNextNews();
             serverAction0 = {
                 type: NEWS_PHASE,

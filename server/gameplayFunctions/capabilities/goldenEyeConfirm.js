@@ -2,7 +2,7 @@ const { Game, InvItem, Capability } = require("../../classes");
 import { GOLDEN_EYE_SELECTED } from "../../../client/src/redux/actions/actionTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG, GAME_DOES_NOT_EXIST } from "../../pages/errorTypes";
-import { GOLDEN_EYE_TYPE_ID } from "../../../client/src/gameData/gameConstants";
+import { GOLDEN_EYE_TYPE_ID, COMBAT_PHASE_ID, SLICE_PLANNING_ID, TYPE_MAIN } from "../../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 
 const biologicalWeaponsConfirm = async (socket, payload) => {
@@ -29,19 +29,19 @@ const biologicalWeaponsConfirm = async (socket, payload) => {
     }
 
     //gamePhase 2 is only phase for golden eye
-    if (gamePhase != 2) {
+    if (gamePhase != COMBAT_PHASE_ID) {
         sendUserFeedback(socket, "Not the right phase...");
         return;
     }
 
     //gameSlice 0 is only slice for golden eye
-    if (gameSlice != 0) {
+    if (gameSlice != SLICE_PLANNING_ID) {
         sendUserFeedback(socket, "Not the right slice (must be planning)...");
         return;
     }
 
     //Only the main controller (0) can use golden eye
-    if (gameController != 0) {
+    if (gameController != TYPE_MAIN) {
         sendUserFeedback(socket, "Not the main controller (0)...");
         return;
     }

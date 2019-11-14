@@ -2,7 +2,7 @@ const { Game, InvItem, Capability, Piece } = require("../../classes");
 import { RAISE_MORALE_SELECTED } from "../../../client/src/redux/actions/actionTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG, GAME_DOES_NOT_EXIST } from "../../pages/errorTypes";
-import { RAISE_MORALE_TYPE_ID, ALL_COMMANDER_TYPES } from "../../../client/src/gameData/gameConstants";
+import { RAISE_MORALE_TYPE_ID, ALL_COMMANDER_TYPES, COMBAT_PHASE_ID, SLICE_PLANNING_ID, TYPE_MAIN } from "../../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 
 const raiseMoraleConfirm = async (socket, payload) => {
@@ -29,19 +29,19 @@ const raiseMoraleConfirm = async (socket, payload) => {
     }
 
     //gamePhase 2 is only phase for raise morale
-    if (gamePhase != 2) {
+    if (gamePhase != COMBAT_PHASE_ID) {
         sendUserFeedback(socket, "Not the right phase...");
         return;
     }
 
     //gameSlice 0 is only slice for raise morale
-    if (gameSlice != 0) {
+    if (gameSlice != SLICE_PLANNING_ID) {
         sendUserFeedback(socket, "Not the right slice (must be planning)...");
         return;
     }
 
     //Only the main controller (0) can use raise morale
-    if (gameController != 0) {
+    if (gameController != TYPE_MAIN) {
         sendUserFeedback(socket, "Not the main controller (0)...");
         return;
     }
