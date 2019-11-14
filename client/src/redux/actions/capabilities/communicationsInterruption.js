@@ -1,24 +1,19 @@
-import setUserfeedbackAction from '../setUserfeedbackAction';
-import { COMM_INTERRUPT_SELECTING } from '../actionTypes';
+import setUserfeedbackAction from "../setUserfeedbackAction";
+import { COMM_INTERRUPT_SELECTING } from "../actionTypes";
+import { COMBAT_PHASE_ID, SLICE_PLANNING_ID } from "../../../gameData/gameConstants";
 
 const communicationsInterruption = invItem => {
     return (dispatch, getState, emit) => {
         const { gameInfo } = getState();
         const { gamePhase, gameSlice } = gameInfo;
 
-        if (gamePhase !== 2) {
-            dispatch(
-                setUserfeedbackAction('wrong phase for comm interrupt dude.')
-            );
+        if (gamePhase !== COMBAT_PHASE_ID) {
+            dispatch(setUserfeedbackAction("wrong phase for comm interrupt dude."));
             return;
         }
 
-        if (gameSlice !== 0) {
-            dispatch(
-                setUserfeedbackAction(
-                    'must be in planning to use comm interrupt.'
-                )
-            );
+        if (gameSlice !== SLICE_PLANNING_ID) {
+            dispatch(setUserfeedbackAction("must be in planning to use comm interrupt."));
             return;
         }
 
@@ -28,8 +23,8 @@ const communicationsInterruption = invItem => {
         dispatch({
             type: COMM_INTERRUPT_SELECTING,
             payload: {
-                invItem,
-            },
+                invItem
+            }
         });
     };
 };

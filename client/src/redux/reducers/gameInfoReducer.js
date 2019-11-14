@@ -14,6 +14,16 @@ import {
     NO_MORE_EVENTS,
     UPDATE_FLAGS
 } from "../actions/actionTypes";
+import {
+    PURCHASE_PHASE_ID,
+    NOT_WAITING_STATUS,
+    WAITING_STATUS,
+    COMBAT_PHASE_ID,
+    SLICE_PLANNING_ID,
+    SLICE_EXECUTING_ID,
+    PLACE_PHASE_ID,
+    NEWS_PHASE_ID
+} from "../../gameData/gameConstants";
 
 const initialGameInfoState = {
     gameSection: "Loading...",
@@ -55,26 +65,26 @@ function gameInfoReducer(state = initialGameInfoState, { type, payload }) {
             state.gamePoints += payload.pointsAdded;
             return state;
         case PURCHASE_PHASE:
-            stateDeepCopy.gamePhase = 1;
-            stateDeepCopy.gameStatus = 0;
+            stateDeepCopy.gamePhase = PURCHASE_PHASE_ID;
+            stateDeepCopy.gameStatus = NOT_WAITING_STATUS;
             return stateDeepCopy;
         case UPDATE_FLAGS:
             Object.assign(stateDeepCopy, payload);
             return stateDeepCopy;
         case MAIN_BUTTON_CLICK:
-            stateDeepCopy.gameStatus = 1;
+            stateDeepCopy.gameStatus = WAITING_STATUS;
             return stateDeepCopy;
         case COMBAT_PHASE:
-            stateDeepCopy.gameStatus = 0;
-            stateDeepCopy.gamePhase = 2;
+            stateDeepCopy.gameStatus = NOT_WAITING_STATUS;
+            stateDeepCopy.gamePhase = COMBAT_PHASE_ID;
             return stateDeepCopy;
         case SLICE_CHANGE:
-            stateDeepCopy.gameStatus = 0;
-            stateDeepCopy.gameSlice = 1;
+            stateDeepCopy.gameStatus = NOT_WAITING_STATUS;
+            stateDeepCopy.gameSlice = SLICE_EXECUTING_ID;
             return stateDeepCopy;
         case PLACE_PHASE:
-            stateDeepCopy.gamePhase = 3;
-            stateDeepCopy.gameStatus = 0;
+            stateDeepCopy.gamePhase = PLACE_PHASE_ID;
+            stateDeepCopy.gameStatus = NOT_WAITING_STATUS;
             return stateDeepCopy;
         case PIECES_MOVE:
             stateDeepCopy.gameStatus = payload.gameStatus;
@@ -86,14 +96,14 @@ function gameInfoReducer(state = initialGameInfoState, { type, payload }) {
             return stateDeepCopy;
         case NEW_ROUND:
             stateDeepCopy.gameRound = payload.gameRound;
-            stateDeepCopy.gameStatus = 0;
-            stateDeepCopy.gameSlice = 0;
+            stateDeepCopy.gameStatus = NOT_WAITING_STATUS;
+            stateDeepCopy.gameSlice = SLICE_PLANNING_ID;
             return stateDeepCopy;
         case NEWS_PHASE:
-            stateDeepCopy.gamePhase = 0;
-            stateDeepCopy.gameStatus = 0;
+            stateDeepCopy.gamePhase = NEWS_PHASE_ID;
+            stateDeepCopy.gameStatus = NOT_WAITING_STATUS;
             stateDeepCopy.gameRound = 0;
-            stateDeepCopy.gameSlice = 0;
+            stateDeepCopy.gameSlice = SLICE_PLANNING_ID;
             stateDeepCopy.gamePoints = payload.gamePoints;
             return stateDeepCopy;
         default:

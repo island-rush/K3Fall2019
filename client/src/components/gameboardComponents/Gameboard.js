@@ -9,7 +9,7 @@ import RefuelPopup from "./refuel/RefuelPopup";
 import SelectCommanderTypePopup from "./capabilities/SelectCommanderTypePopup";
 import Patterns from "./Patterns";
 import { selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } from "../../redux/actions";
-import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE, GOLDEN_EYE_RANGE } from "../../gameData/gameConstants";
+import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE, GOLDEN_EYE_RANGE, RED_TEAM_ID, BLUE_TEAM_ID } from "../../gameData/gameConstants";
 import { distanceMatrix } from "../../gameData/distanceMatrix";
 import {
     ALL_ISLAND_LOCATIONS,
@@ -82,16 +82,16 @@ const patternSolver = (position, gameInfo, positionIndex) => {
     if (pieces) {
         for (let x = 0; x < pieces.length; x++) {
             let thisPiece = pieces[x];
-            if (thisPiece.pieceTeamId === 1 && highPieces.includes(thisPiece.pieceTypeId)) {
+            if (thisPiece.pieceTeamId === RED_TEAM_ID && highPieces.includes(thisPiece.pieceTypeId)) {
                 redHigh = 1;
             }
-            if (thisPiece.pieceTeamId === 1 && lowPieces.includes(thisPiece.pieceTypeId)) {
+            if (thisPiece.pieceTeamId === RED_TEAM_ID && lowPieces.includes(thisPiece.pieceTypeId)) {
                 redLow = 1;
             }
-            if (thisPiece.pieceTeamId === 0 && highPieces.includes(thisPiece.pieceTypeId)) {
+            if (thisPiece.pieceTeamId === BLUE_TEAM_ID && highPieces.includes(thisPiece.pieceTypeId)) {
                 blueHigh = 1;
             }
-            if (thisPiece.pieceTeamId === 0 && lowPieces.includes(thisPiece.pieceTypeId)) {
+            if (thisPiece.pieceTeamId === BLUE_TEAM_ID && lowPieces.includes(thisPiece.pieceTypeId)) {
                 blueLow = 1;
             }
         }
@@ -100,7 +100,7 @@ const patternSolver = (position, gameInfo, positionIndex) => {
     if (ALL_ISLAND_LOCATIONS.includes(parseInt(positionIndex))) {
         const islandNum = ALL_ISLAND_LOCATIONS.indexOf(parseInt(positionIndex));
         const islandOwner = gameInfo["island" + islandNum];
-        const finalType = islandOwner === 0 ? "blue" : islandOwner === 1 ? "red" : "flag";
+        const finalType = islandOwner === BLUE_TEAM_ID ? "blue" : islandOwner === RED_TEAM_ID ? "red" : "flag";
         return finalType + redHigh + redLow + blueHigh + blueLow;
     }
 

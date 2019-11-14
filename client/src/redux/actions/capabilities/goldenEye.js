@@ -1,17 +1,18 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { GOLDEN_EYE_SELECTING } from "../actionTypes";
+import { COMBAT_PHASE_ID, SLICE_PLANNING_ID } from "../../../gameData/gameConstants";
 
 const goldenEye = invItem => {
     return (dispatch, getState, emit) => {
         const { gameInfo } = getState();
         const { gamePhase, gameSlice } = gameInfo;
 
-        if (gamePhase !== 2) {
+        if (gamePhase !== COMBAT_PHASE_ID) {
             dispatch(setUserfeedbackAction("wrong phase for golden eye dude."));
             return;
         }
 
-        if (gameSlice !== 0) {
+        if (gameSlice !== SLICE_PLANNING_ID) {
             dispatch(setUserfeedbackAction("must be in planning to use golden eye."));
             return;
         }

@@ -1,40 +1,41 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { CLIENT_SENDING_ACTION } from "../../socketEmits";
 import { SERVER_PIECE_PLACE } from "../actionTypes";
+import { PLACE_PHASE_ID } from "../../../gameData/gameConstants";
 
 const landPieceClick = invItem => {
-	return (dispatch, getState, emit) => {
-		const { gameboardMeta, gameInfo } = getState();
+    return (dispatch, getState, emit) => {
+        const { gameboardMeta, gameInfo } = getState();
 
-		const { gamePhase } = gameInfo;
+        const { gamePhase } = gameInfo;
 
-		if (gamePhase !== 3) {
-			dispatch(setUserfeedbackAction("wrong phase to place land inv item."));
-			return;
-		}
+        if (gamePhase !== PLACE_PHASE_ID) {
+            dispatch(setUserfeedbackAction("wrong phase to place land inv item."));
+            return;
+        }
 
-		const { selectedPosition } = gameboardMeta;
+        const { selectedPosition } = gameboardMeta;
 
-		if (selectedPosition === -1) {
-			dispatch(setUserfeedbackAction("Must select a position before using an inv item..."));
-			return;
-		}
+        if (selectedPosition === -1) {
+            dispatch(setUserfeedbackAction("Must select a position before using an inv item..."));
+            return;
+        }
 
-		//TODO: Is this position a land position or island we own?
-		//other game effects that might prevent placing it...
+        //TODO: Is this position a land position or island we own?
+        //other game effects that might prevent placing it...
 
-		const { invItemId } = invItem; //TODO: send the whole item anyway? (even though the server only uses the id, consistent...)
+        const { invItemId } = invItem; //TODO: send the whole item anyway? (even though the server only uses the id, consistent...)
 
-		const clientAction = {
-			type: SERVER_PIECE_PLACE,
-			payload: {
-				invItemId,
-				selectedPosition
-			}
-		};
+        const clientAction = {
+            type: SERVER_PIECE_PLACE,
+            payload: {
+                invItemId,
+                selectedPosition
+            }
+        };
 
-		emit(CLIENT_SENDING_ACTION, clientAction);
-	};
+        emit(CLIENT_SENDING_ACTION, clientAction);
+    };
 };
 
 export default landPieceClick;
