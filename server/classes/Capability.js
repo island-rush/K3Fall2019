@@ -14,7 +14,8 @@ import {
     ACTIVATED,
     COMM_INTERRUPT_RANGE,
     BLUE_TEAM_ID,
-    RED_TEAM_ID
+    RED_TEAM_ID,
+    GOLDEN_EYE_ROUNDS
 } from "../../client/src/gameData/gameConstants";
 
 class Capability {
@@ -255,6 +256,7 @@ class Capability {
 
         if (fullListOfPositions.length > 0) {
             //now delete pieces with this position
+            //TODO: " (does not include aircraft (that are taken off))"
             queryString = "DELETE FROM pieces WHERE pieceGameId = ? AND piecePositionId in (?)";
             inserts = [gameId, fullListOfPositions];
             await pool.query(queryString, inserts);
@@ -440,8 +442,6 @@ class Capability {
             }
         }
 
-        console.log(positionsInTheseRanges0);
-        console.log(positionsInTheseRanges1);
         queryString = "DELETE FROM plans WHERE planPieceId IN (SELECT pieceId FROM pieces WHERE pieceGameId = ? AND pieceTeamId = ? AND piecePositionId in (?))";
         if (positionsInTheseRanges0.length > 0) {
             inserts = [gameId, 0, positionsInTheseRanges0];
@@ -463,6 +463,92 @@ class Capability {
 
         queryString = "DELETE FROM commInterrupt WHERE roundsLeft = 0";
         await pool.query(queryString);
+    }
+
+    static async getGoldenEye(gameId, gameTeam) {
+        //select from golden eye table
+        const queryString = "SELECT * FROM goldenEye WHERE gameId = ? AND (activated = ? OR teamId = ?)";
+        const inserts = [gameId, ACTIVATED, gameTeam];
+        const [results] = await pool.query(queryString, inserts);
+
+        let listOfGoldenEye = [];
+        for (let x = 0; x < results.length; x++) {
+            listOfGoldenEye.push(results[x].positionId);
+        }
+
+        return listOfGoldenEye;
+    }
+
+    static async insertGoldenEye(gameId, gameTeam, selectedPositionId) {
+        //insert golden eye into the table
+        let queryString = "SELECT * FROM goldenEye WHERE gameId = ? AND teamId = ? AND positionId = ?";
+        let inserts = [gameId, gameTeam, selectedPositionId];
+        let [results] = await pool.query(queryString, inserts);
+
+        //prevent duplicate entries if possible
+        if (results.length !== 0) {
+            return false;
+        }
+
+        queryString = "INSERT INTO goldenEye (gameId, teamId, positionId, roundsLeft, activated) VALUES (?, ?, ?, ?, ?)";
+        inserts = [gameId, gameTeam, selectedPositionId, GOLDEN_EYE_ROUNDS, DEACTIVATED];
+        await pool.query(queryString, inserts);
+        return true;
+    }
+
+    static async useGoldenEye(gameId) {
+        //activate the golden eye and remove pieces?
+        // let queryString = "UPDATE goldenEye SET activated = ? WHERE gameId = ?";
+        // let inserts = [ACTIVATED, gameId];
+        // await pool.query(queryString, inserts);
+        // queryString = "SELECT * FROM goldenEye WHERE gameId = ?"; //all should be activated, no need to specify
+        // inserts = [gameId];
+        // const [results] = await pool.query(queryString, inserts);
+        // if (results.length === 0) {
+        //     return [];
+        // }
+        // //need the positions anyway to give back to the clients for updating
+        // let fullListOfPositions0 = [];
+        // let fullListOfPositions1 = [];
+        // let masterListOfAllPositions = [];
+        // for (let x = 0; x < results.length; x++) {
+        //     let thisResult = results[x];
+        //     let { positionId, teamId } = thisResult;
+        //     if (teamId == 0) {
+        //         fullListOfPositions0.push(positionId);
+        //     } else {
+        //         fullListOfPositions1.push(positionId);
+        //     }
+        //     masterListOfAllPositions.push(positionId);
+        // }
+        // let positionsInTheseRanges0 = [];
+        // for (let y = 0; y < fullListOfPositions0.length; y++) {
+        //     let currentCenterPosition = fullListOfPositions0[y];
+        //     for (let z = 0; z < distanceMatrix[currentCenterPosition].length; z++) {
+        //         if (distanceMatrix[currentCenterPosition][z] <= COMM_INTERRUPT_RANGE) {
+        //             positionsInTheseRanges0.push(z);
+        //         }
+        //     }
+        // }
+        // let positionsInTheseRanges1 = [];
+        // for (let y = 0; y < fullListOfPositions1.length; y++) {
+        //     let currentCenterPosition = fullListOfPositions1[y];
+        //     for (let z = 0; z < distanceMatrix[currentCenterPosition].length; z++) {
+        //         if (distanceMatrix[currentCenterPosition][z] <= COMM_INTERRUPT_RANGE) {
+        //             positionsInTheseRanges1.push(z);
+        //         }
+        //     }
+        // }
+        // queryString = "DELETE FROM plans WHERE planPieceId IN (SELECT pieceId FROM pieces WHERE pieceGameId = ? AND pieceTeamId = ? AND piecePositionId in (?))";
+        // if (positionsInTheseRanges0.length > 0) {
+        //     inserts = [gameId, BLUE_TEAM_ID, positionsInTheseRanges0];
+        //     await pool.query(queryString, inserts);
+        // }
+        // if (positionsInTheseRanges1.length > 0) {
+        //     inserts = [gameId, RED_TEAM_ID, positionsInTheseRanges1];
+        //     await pool.query(queryString, inserts);
+        // }
+        // return masterListOfAllPositions;
     }
 }
 

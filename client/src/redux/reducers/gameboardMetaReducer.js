@@ -44,7 +44,9 @@ import {
     RAISE_MORALE_SELECTED,
     RAISE_MORALE_SELECTING,
     COMM_INTERRUP_SELECTED,
-    COMM_INTERRUPT_SELECTING
+    COMM_INTERRUPT_SELECTING,
+    GOLDEN_EYE_SELECTING,
+    GOLDEN_EYE_SELECTED
 } from "../actions/actionTypes";
 
 import { TYPE_FUEL } from "../../gameData/gameConstants";
@@ -95,7 +97,8 @@ const initialGameboardMeta = {
     confirmedInsurgency: [],
     confirmedBioWeapons: [],
     confirmedRaiseMorale: [],
-    confirmedCommInterrupt: []
+    confirmedCommInterrupt: [],
+    confirmedGoldenEye: []
 };
 
 function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
@@ -112,11 +115,13 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
             stateDeepCopy.confirmedRods = [];
             stateDeepCopy.confirmedInsurgency = [];
             stateDeepCopy.confirmedRemoteSense = payload.confirmedRemoteSense;
+            stateDeepCopy.confirmedGoldenEye = payload.confirmedGoldenEye;
             stateDeepCopy.confirmedBioWeapons = payload.confirmedBioWeapons;
             stateDeepCopy.confirmedCommInterrupt = payload.confirmedCommInterrupt;
             break;
         case PLACE_PHASE:
             stateDeepCopy.confirmedRemoteSense = payload.confirmedRemoteSense;
+            stateDeepCopy.confirmedGoldenEye = payload.confirmedGoldenEye;
             stateDeepCopy.confirmedBioWeapons = payload.confirmedBioWeapons;
             stateDeepCopy.confirmedCommInterrupt = payload.confirmedCommInterrupt;
             break;
@@ -198,6 +203,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
         case BIO_WEAPON_SELECTING:
         case COMM_INTERRUPT_SELECTING:
         case RODS_FROM_GOD_SELECTING:
+        case GOLDEN_EYE_SELECTING:
         case REMOTE_SENSING_SELECTING:
             stateDeepCopy.planning.active = true;
             stateDeepCopy.planning.capability = true;
@@ -238,6 +244,12 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
             stateDeepCopy.planning.invItem = null;
             stateDeepCopy.planning.active = false;
             stateDeepCopy.confirmedRemoteSense = payload.confirmedRemoteSense;
+            break;
+        case GOLDEN_EYE_SELECTED:
+            stateDeepCopy.planning.capability = false;
+            stateDeepCopy.planning.invItem = null;
+            stateDeepCopy.planning.active = false;
+            stateDeepCopy.confirmedGoldenEye = payload.confirmedGoldenEye;
             break;
         case CANCEL_PLAN:
             stateDeepCopy.planning.active = false;

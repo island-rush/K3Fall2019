@@ -190,6 +190,7 @@ class Game {
         serverAction.payload.gameboardMeta.confirmedBioWeapons = await Capability.getBiologicalWeapons(this.gameId, gameTeam);
         serverAction.payload.gameboardMeta.confirmedRaiseMorale = await Capability.getRaiseMorale(this.gameId, gameTeam);
         serverAction.payload.gameboardMeta.confirmedCommInterrupt = await Capability.getCommInterrupt(this.gameId, gameTeam);
+        serverAction.payload.gameboardMeta.confirmedGoldenEye = await Capability.getGoldenEye(this.gameId, gameTeam);
 
         //Could put news into its own object, but don't really use it much...(TODO: figure out if need to refactor this...)
         if (this.gamePhase == 0) {

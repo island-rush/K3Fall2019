@@ -71,3 +71,7 @@ svg g polygon {
     stroke: rgb(236, 232, 0);
     stroke-width: 0.9;
 }
+.goldenEyePos polygon {
+    stroke: rgb(236, 55, 0);
+    stroke-width: 0.9;
+}

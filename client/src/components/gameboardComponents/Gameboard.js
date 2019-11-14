@@ -139,7 +139,7 @@ class Gameboard extends Component {
         const { gameInfo, gameboard, gameboardMeta, selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } = this.props;
 
         //prettier-ignore
-        const {confirmedCommInterrupt, confirmedBioWeapons, confirmedInsurgency, confirmedRods, confirmedRemoteSense, selectedPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions } = gameboardMeta;
+        const {confirmedGoldenEye, confirmedCommInterrupt, confirmedBioWeapons, confirmedInsurgency, confirmedRods, confirmedRemoteSense, selectedPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions } = gameboardMeta;
 
         let planningPositions = []; //all of the positions part of a plan
         let containerPositions = []; //specific positions part of a plan of type container
@@ -243,6 +243,8 @@ class Gameboard extends Component {
                         ? "remoteSensePos"
                         : commInterruptPositions.includes(parseInt(positionIndex))
                         ? "commInterruptPos"
+                        : confirmedGoldenEye.includes(parseInt(positionIndex))
+                        ? "goldenEyePos"
                         : ""
                 }
                 title={titleSolver(gameboard[positionIndex], gameInfo, positionIndex)}
