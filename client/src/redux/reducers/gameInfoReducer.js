@@ -11,7 +11,8 @@ import {
     NEW_ROUND,
     NEWS_PHASE,
     EVENT_BATTLE,
-    NO_MORE_EVENTS
+    NO_MORE_EVENTS,
+    UPDATE_FLAGS
 } from "../actions/actionTypes";
 
 const initialGameInfoState = {
@@ -56,6 +57,9 @@ function gameInfoReducer(state = initialGameInfoState, { type, payload }) {
         case PURCHASE_PHASE:
             stateDeepCopy.gamePhase = 1;
             stateDeepCopy.gameStatus = 0;
+            return stateDeepCopy;
+        case UPDATE_FLAGS:
+            Object.assign(stateDeepCopy, payload);
             return stateDeepCopy;
         case MAIN_BUTTON_CLICK:
             stateDeepCopy.gameStatus = 1;

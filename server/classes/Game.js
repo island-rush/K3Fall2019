@@ -1,7 +1,7 @@
 const pool = require("../database");
 import { INITIAL_GAMESTATE } from "../../client/src/redux/actions/actionTypes";
 const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("../gameplayFunctions/eventConstants");
-import { AIR_REFUELING_SQUADRON } from "../../client/src/gameData/gameConstants";
+import { AIR_REFUELING_SQUADRON, CAPTURE_TYPES, BLUE_TEAM_ID, RED_TEAM_ID } from "../../client/src/gameData/gameConstants";
 import { ALL_ISLAND_LOCATIONS } from "../../client/src/gameData/gameboardConstants";
 
 const InvItem = require("./InvItem");
@@ -318,15 +318,43 @@ class Game {
     }
 
     async updateFlags() {
+        let didUpdateFlags = false;
         //only certain pieces can capture
         //see if any pieces are currently residing on flags by themselves, and if so, set the island# in the database and update 'this' object correspondingly
         let queryString = "SELECT * FROM pieces WHERE pieceGameId = ? AND piecePositionId in (?) AND pieceTypeId in (?)";
-        let inserts = [gameId, ALL_ISLAND_LOCATIONS];
+        let inserts = [this.gameId, ALL_ISLAND_LOCATIONS, CAPTURE_TYPES];
         let [results] = await pool.query(queryString, inserts);
 
         if (results.length === 0) {
             return;
         }
+
+        //need to set all positions that have pieces on them (that are different from current values?)
+        //update if only 1 team's pieces there, AND if not already the other team? (or update anyway if all 1 team)
+
+        //TODO: need major refactoring here, this is quick and dirty (but should work)
+        let eachIslandsTeams = [[], [], [], [], [], [], [], [], [], [], [], [], []];
+        for (let x = 0; x < results.length; x++) {
+            let thisPiece = results[x];
+            let { piecePositionId, pieceTeamId } = thisPiece;
+            let islandNum = ALL_ISLAND_LOCATIONS.indexOf(piecePositionId);
+            eachIslandsTeams[islandNum].push(pieceTeamId);
+        }
+
+        for (let y = 0; y < eachIslandsTeams.length; y++) {
+            let thisIslandsTeams = eachIslandsTeams[y];
+            if (thisIslandsTeams.length === 0) continue;
+            if (thisIslandsTeams.includes(BLUE_TEAM_ID) && thisIslandsTeams.includes(RED_TEAM_ID)) continue;
+            //else update this thing
+            this["island" + y] = thisIslandsTeams[0];
+            //sql update
+            queryString = "UPDATE games SET ?? = ? WHERE gameId = ?";
+            inserts = ["island" + y, thisIslandsTeams[0], this.gameId];
+            await pool.query(queryString, inserts);
+            didUpdateFlags = true;
+        }
+
+        return didUpdateFlags;
     }
 
     //TODO: Prevent errors with 2 games sharing the same section AND instructor (would never be able to log into them...need to come back with error?)

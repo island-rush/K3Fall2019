@@ -1,9 +1,9 @@
-const sendUserFeedback = require('./sendUserFeedback');
-const { Game, Capability } = require('../classes');
-import { MAIN_BUTTON_CLICK, PURCHASE_PHASE, COMBAT_PHASE, NEWS_PHASE, SLICE_CHANGE } from '../../client/src/redux/actions/actionTypes';
-import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from '../../client/src/redux/socketEmits';
-import { GAME_INACTIVE_TAG } from '../pages/errorTypes';
-const executeStep = require('./executeStep'); //big function
+const sendUserFeedback = require("./sendUserFeedback");
+const { Game, Capability } = require("../classes");
+import { MAIN_BUTTON_CLICK, PURCHASE_PHASE, COMBAT_PHASE, NEWS_PHASE, SLICE_CHANGE } from "../../client/src/redux/actions/actionTypes";
+import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
+import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
+const executeStep = require("./executeStep"); //big function
 
 const mainButtonClick = async (socket, payload) => {
     const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
@@ -18,7 +18,7 @@ const mainButtonClick = async (socket, payload) => {
 
     //Who is allowed to press that button?
     if (gameController != 0) {
-        sendUserFeedback(socket, 'Wrong Controller to click that button...');
+        sendUserFeedback(socket, "Wrong Controller to click that button...");
         return;
     }
 
@@ -29,7 +29,7 @@ const mainButtonClick = async (socket, payload) => {
     //Still Waiting
     if (thisTeamStatus == 1) {
         //might fail with race condition (they press at the same time...but they just need to keep pressing...)
-        sendUserFeedback(socket, 'Still waiting on other team...');
+        sendUserFeedback(socket, "Still waiting on other team...");
         return;
     }
 
@@ -38,7 +38,7 @@ const mainButtonClick = async (socket, payload) => {
         await thisGame.setStatus(gameTeam, 1);
         let serverAction = {
             type: MAIN_BUTTON_CLICK,
-            payload: {},
+            payload: {}
         };
         socket.emit(SERVER_SENDING_ACTION, serverAction);
         return;
@@ -55,7 +55,7 @@ const mainButtonClick = async (socket, payload) => {
             await thisGame.setPhase(1);
             serverAction = {
                 type: PURCHASE_PHASE,
-                payload: {},
+                payload: {}
             };
             break;
 
@@ -64,7 +64,7 @@ const mainButtonClick = async (socket, payload) => {
             await thisGame.setPhase(2);
             serverAction = {
                 type: COMBAT_PHASE,
-                payload: {},
+                payload: {}
             };
             break;
 
@@ -86,8 +86,8 @@ const mainButtonClick = async (socket, payload) => {
                         confirmedBioWeapons,
                         confirmedCommInterrupt,
                         confirmedInsurgencyPos: listOfEffectedPositions,
-                        confirmedInsurgencyPieces: listOfPiecesToKill,
-                    },
+                        confirmedInsurgencyPieces: listOfPiecesToKill
+                    }
                 };
             } else {
                 await executeStep(socket, thisGame);
@@ -102,18 +102,18 @@ const mainButtonClick = async (socket, payload) => {
             serverAction = {
                 type: NEWS_PHASE,
                 payload: {
-                    news,
-                },
+                    news
+                }
             };
             break;
 
         default:
-            sendUserFeedback(socket, 'Backend Failure, unkown gamePhase...');
+            sendUserFeedback(socket, "Backend Failure, unkown gamePhase...");
             return;
     }
 
     //Send to all clients
-    socket.to('game' + gameId).emit(SERVER_SENDING_ACTION, serverAction);
+    socket.to("game" + gameId).emit(SERVER_SENDING_ACTION, serverAction);
     socket.emit(SERVER_SENDING_ACTION, serverAction);
 };
 

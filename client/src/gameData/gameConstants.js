@@ -272,6 +272,7 @@ const ATTACK_MATRIX = [
 
 const BLUE_TEAM_ID = 0;
 const RED_TEAM_ID = 1;
+const NEUTRAL_TEAM_ID = -1;
 
 export {
     BOMBER_TYPE_ID,
@@ -342,5 +343,6 @@ export {
     SLICE_PLANNING_ID,
     BLUE_TEAM_ID,
     RED_TEAM_ID,
-    ALL_COMMANDER_TYPES
+    ALL_COMMANDER_TYPES,
+    NEUTRAL_TEAM_ID
 };

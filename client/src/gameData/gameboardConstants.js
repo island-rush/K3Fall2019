@@ -14,6 +14,7 @@ export const ISLAND_12_LOCATION = 708; //Eagle Botton
 
 //TODO: island names / capture point names?
 //TODO: use actual island names in these constants, easier to reset / change later (don't reference numbers if you don't have to)
+//TODO: probably rethink this file, and possible the database naming convention for island (flag) positions?
 
 export const ALL_ISLAND_LOCATIONS = [
     ISLAND_0_LOCATION,

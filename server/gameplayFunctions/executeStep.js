@@ -1,6 +1,7 @@
 const { Plan, Piece, Event, Capability } = require("../classes");
-import { PLACE_PHASE, NEW_ROUND, PIECES_MOVE } from "../../client/src/redux/actions/actionTypes";
+import { PLACE_PHASE, NEW_ROUND, PIECES_MOVE, UPDATE_FLAGS } from "../../client/src/redux/actions/actionTypes";
 import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
+import { BLUE_TEAM_ID, RED_TEAM_ID } from "../../client/src/gameData/gameConstants";
 const giveNextEvent = require("./giveNextEvent");
 const { BOTH_TEAMS_INDICATOR, POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("./eventConstants");
 
@@ -150,6 +151,30 @@ const executeStep = async (socket, thisGame) => {
     await Piece.move(gameId, currentMovementOrder); //changes the piecePositionId, deletes the plan, all for specialflag = 0
     await Piece.updateVisibilities(gameId);
 
+    const didUpdateFlags = await thisGame.updateFlags();
+    if (didUpdateFlags) {
+        const updateFlagAction = {
+            type: UPDATE_FLAGS,
+            payload: {
+                island0: thisGame.island0,
+                island1: thisGame.island1,
+                island2: thisGame.island2,
+                island3: thisGame.island3,
+                island4: thisGame.island4,
+                island5: thisGame.island5,
+                island6: thisGame.island6,
+                island7: thisGame.island7,
+                island8: thisGame.island8,
+                island9: thisGame.island9,
+                island10: thisGame.island10,
+                island11: thisGame.island11,
+                island12: thisGame.island12
+            }
+        };
+        socket.to("game" + gameId).emit(SERVER_SENDING_ACTION, updateFlagAction);
+        socket.emit(SERVER_SENDING_ACTION, updateFlagAction);
+    }
+
     //Position Battle Events
     const allPositionCombinations = await Plan.getPositionCombinations(gameId);
     if (allPositionCombinations.length > 0) {
@@ -223,9 +248,8 @@ const executeStep = async (socket, thisGame) => {
     // Note: All non-move (specialflag != 0) plans should result in events (refuel/container)...
     // If there is now an event, send to user instead of PIECES_MOVE
 
-    // await giveNextEvent(socket, { thisGame, executingStep: true });
-    await giveNextEvent(socket, { thisGame, executingStep: true, gameTeam: 0 });
-    await giveNextEvent(socket, { thisGame, executingStep: true, gameTeam: 1 });
+    await giveNextEvent(socket, { thisGame, executingStep: true, gameTeam: BLUE_TEAM_ID });
+    await giveNextEvent(socket, { thisGame, executingStep: true, gameTeam: RED_TEAM_ID });
 };
 
 module.exports = executeStep;

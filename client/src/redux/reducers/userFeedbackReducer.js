@@ -37,88 +37,91 @@ import {
     RAISE_MORALE_SELECTED,
     COMM_INTERRUPT_SELECTING,
     COMM_INTERRUP_SELECTED,
-} from '../actions/actionTypes';
+    UPDATE_FLAGS
+} from "../actions/actionTypes";
 
-const initialUserFeedback = 'Loading...';
+const initialUserFeedback = "Loading...";
 
 function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
     switch (type) {
         case SET_USERFEEDBACK:
             return payload.userFeedback;
         case INITIAL_GAMESTATE:
-            return 'Welcome to Island Rush!';
+            return "Welcome to Island Rush!";
         case SHOP_REFUND:
-            return 'Refunded the purchase!';
+            return "Refunded the purchase!";
         case SHOP_PURCHASE:
-            return 'Purchased the item!';
+            return "Purchased the item!";
         case SHOP_TRANSFER:
-            return 'Confirmed the purchases...check the inventory!';
+            return "Confirmed the purchases...check the inventory!";
         case START_PLAN:
-            return 'Now Planning: Select positions to create the plan...';
+            return "Now Planning: Select positions to create the plan...";
         case CANCEL_PLAN:
-            return 'Cancelled the plan...';
+            return "Cancelled the plan...";
         case DELETE_PLAN:
-            return 'Deleted the confirmed plan...';
+            return "Deleted the confirmed plan...";
         case RODS_FROM_GOD_SELECTING:
-            return 'Now select a position to be obliterated.';
+            return "Now select a position to be obliterated.";
         case RODS_FROM_GOD_SELECTED:
-            return 'selected position to kill!';
+            return "selected position to kill!";
         case BIO_WEAPON_SELECTED:
-            return 'selected position to deploy bio weapons to';
+            return "selected position to deploy bio weapons to";
         case BIO_WEAPON_SELECTING:
-            return 'Now select a position to get bio weaponed!';
+            return "Now select a position to get bio weaponed!";
         case REMOTE_SENSING_SELECTED:
-            return 'selected area to remote sense!';
+            return "selected area to remote sense!";
         case RAISE_MORALE_SELECTING:
-            return 'Now select a commander type to boost with +1 moves.';
+            return "Now select a commander type to boost with +1 moves.";
         case RAISE_MORALE_SELECTED:
-            return 'selected a commander type to boost.';
+            return "selected a commander type to boost.";
         case REMOTE_SENSING_SELECTING:
-            return 'Now select an area to remote sense.';
+            return "Now select an area to remote sense.";
         case INSURGENCY_SELECTED:
-            return 'selected position to start insurgency!';
+            return "selected position to start insurgency!";
         case INSURGENCY_SELECTING:
-            return 'Now select a position to start an insurgency!';
+            return "Now select a position to start an insurgency!";
         case COMM_INTERRUP_SELECTED:
-            return 'selected an area to interrupt communication.';
+            return "selected an area to interrupt communication.";
         case COMM_INTERRUPT_SELECTING:
-            return 'Now select an area to start interrupting communication!';
+            return "Now select an area to start interrupting communication!";
         case AIRCRAFT_CLICK:
-            return 'transferring fuel planned...';
+            return "transferring fuel planned...";
         case PLAN_WAS_CONFIRMED:
-            return 'Plan was confirmed!';
+            return "Plan was confirmed!";
         case MAIN_BUTTON_CLICK:
-            return 'Waiting on the other team...';
+            return "Waiting on the other team...";
         case PURCHASE_PHASE:
-            return 'Switched to the purchase phase....check out the shop and buy stuff...';
+            return "Switched to the purchase phase....check out the shop and buy stuff...";
+        case UPDATE_FLAGS:
+            return "island was captured btw";
         case COMBAT_PHASE:
-            return 'Switched to the combat phase...start to plan your turn by clicking on pieces!';
+            return "Switched to the combat phase...start to plan your turn by clicking on pieces!";
         case SLICE_CHANGE:
-            return 'Done planning, click main button to execute the plan...';
+            return "Done planning, click main button to execute the plan...";
         case NEWS_PHASE:
-            return 'Switched to the news phase...';
+            return "Switched to the news phase...";
         case NEW_ROUND:
-            return 'New Round of Combat!...';
+            return "New Round of Combat!...";
         case PLACE_PHASE:
-            return 'Place troops onto the board from inventory...';
+            return "Place troops onto the board from inventory...";
         case PIECES_MOVE:
-            return 'Executed a step!';
+            return "Executed a step!";
         case BATTLE_PIECE_SELECT:
-            return 'Selected Piece to attack with...';
+            return "Selected Piece to attack with...";
         case TARGET_PIECE_SELECT:
-            return 'Target piece clicked?';
+            return "Target piece clicked?";
         case ENEMY_PIECE_SELECT:
-            return 'Enemy piece clicked?';
+            return "Enemy piece clicked?";
         case MENU_SELECT:
-            return 'selected the menu';
+            return "selected the menu";
         case NO_MORE_EVENTS:
-            return 'ready to execute next step!';
+            return "ready to execute next step!";
         case BATTLE_FIGHT_RESULTS:
-            return 'got results of the battle...';
+            return "got results of the battle...";
         case EVENT_BATTLE:
-            return 'battle has started!';
+            return "battle has started!";
         case EVENT_REFUEL:
-            return 'got a refuel event for ya, please handle it...';
+            return "got a refuel event for ya, please handle it...";
         default:
             return state;
     }

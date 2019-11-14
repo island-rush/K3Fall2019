@@ -16,8 +16,6 @@ const giveNextEvent = async (socket, options) => {
         gameboardPiecesList = await Piece.getVisiblePieces(gameId, gameTeam);
     }
 
-    await thisGame.updateFlags();
-
     let serverAction = {}; //store the action, send at the end
 
     const gameEvent = await Event.getNext(gameId, gameTeam);
