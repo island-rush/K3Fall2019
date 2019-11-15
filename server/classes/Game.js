@@ -1,6 +1,6 @@
 const pool = require("../database");
 import { INITIAL_GAMESTATE } from "../../client/src/redux/actions/actionTypes";
-const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("../gameplayFunctions/eventConstants");
+const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("../actions/eventConstants");
 import { AIR_REFUELING_SQUADRON, CAPTURE_TYPES, BLUE_TEAM_ID, RED_TEAM_ID, NEWS_PHASE_ID } from "../../client/src/gameData/gameConstants";
 import {
     ALL_ISLAND_LOCATIONS,

@@ -1,8 +1,8 @@
-const { Game, InvItem } = require("../classes");
-const sendUserFeedback = require("./sendUserFeedback");
-import { PIECE_PLACE, PLACE_PHASE } from "../../client/src/redux/actions/actionTypes";
-import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
-import { BAD_REQUEST_TAG, GAME_INACTIVE_TAG } from "../pages/errorTypes";
+const { Game, InvItem } = require("../../classes");
+const sendUserFeedback = require("../sendUserFeedback");
+import { PIECE_PLACE, PLACE_PHASE } from "../../../client/src/redux/actions/actionTypes";
+import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
+import { BAD_REQUEST_TAG, GAME_INACTIVE_TAG } from "../../pages/errorTypes";
 
 const piecePlace = async (socket, payload) => {
     const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
@@ -22,15 +22,13 @@ const piecePlace = async (socket, payload) => {
         return;
     }
 
-    // TODO: Different controllers place their own piece types? TODO: make this part of the checks...
-
     const thisInvItem = await new InvItem(invItemId).init();
     if (!thisInvItem) {
         sendUserFeedback(socket, "Inv Item did not exist...");
         return;
     }
 
-    const { invItemGameId, invItemTeamId } = thisInvItem;
+    const { invItemGameId, invItemTeamId, invItemTypeId } = thisInvItem;
 
     //Do they own this item?
     if (invItemGameId != gameId || invItemTeamId != gameTeam) {
@@ -38,8 +36,32 @@ const piecePlace = async (socket, payload) => {
         return;
     }
 
-    //Other checks go here.......TODO: more checks...(position types and piece types...blah blah blah...)
-    //does this positionId even exist? (lots of weird things could happen....(but probably won't...))
+    //Could be multiple controller
+    let atLeast1Owner = false;
+    for (let gameController of gameControllers) {
+        if (TYPE_OWNERS[gameController].includes(pieceTypeId)) {
+            atLeast1Owner = true;
+            break;
+        }
+    }
+
+    if (!atLeast1Owner) {
+        sendUserFeedback(socket, "Piece doesn't fall under your control");
+        return;
+    }
+
+    //valid position on the board?
+    if (selectedPosition < 0) {
+        sendUserFeedback(socket, "Not a valid position on the board (negative)");
+        return;
+    }
+
+    //valid terrain for this piece?
+    let { type } = initialGameboardEmpty[selectedPosition];
+    if (!TYPE_TERRAIN[invItemTypeId].includes(type)) {
+        sendUserFeedback(socket, "can't go on that terrain with this piece type");
+        return;
+    }
 
     const newPiece = await thisInvItem.placeOnBoard(selectedPosition); //should also check that this piece actually got created, could return null (should return null if it failed...TODO: return null if failed...)
 

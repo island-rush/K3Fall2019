@@ -14,10 +14,6 @@ const confirmBattleSelection = require("./battles/confirmBattleSelection");
 
 const confirmFuelSelection = require("./refuel/confirmFuelSelection");
 
-const sendUserFeedback = require("./sendUserFeedback");
-const piecePlace = require("./piecePlace");
-const mainButtonClick = require("./mainButtonClick");
-
 const rodsFromGodConfirm = require("./capabilities/rodsFromGodConfirm");
 const remoteSensingConfirm = require("./capabilities/remoteSensingConfirm");
 const insurgencyConfirm = require("./capabilities/insurgencyConfirm");
@@ -25,6 +21,11 @@ const biologicalWeaponsConfirm = require("./capabilities/biologicalWeaponsConfir
 const raiseMoraleConfirm = require("./capabilities/raiseMoraleConfirm");
 const commInterruptConfirm = require("./capabilities/commInterruptionConfirm");
 const goldenEyeConfirm = require("./capabilities/goldenEyeConfirm");
+
+const piecePlace = require("./inv/piecePlace");
+
+const sendUserFeedback = require("./sendUserFeedback");
+const mainButtonClick = require("./mainButtonClick");
 
 module.exports = {
     shopPurchaseRequest,

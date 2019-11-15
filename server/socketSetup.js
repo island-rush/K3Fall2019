@@ -43,7 +43,7 @@ const {
     raiseMoraleConfirm,
     commInterruptConfirm,
     goldenEyeConfirm
-} = require("./gameplayFunctions");
+} = require("./actions");
 
 const socketSetup = async socket => {
     //Verify that this user is authenticated / known
