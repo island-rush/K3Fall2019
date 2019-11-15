@@ -8,7 +8,8 @@ import {
     INSURGENCY_TYPE_ID,
     BIOLOGICAL_WEAPONS_TYPE_ID,
     GOLDEN_EYE_TYPE_ID,
-    GOLDEN_EYE_RANGE
+    GOLDEN_EYE_RANGE,
+    TYPE_TERRAIN
 } from "../../gameData/gameConstants";
 import {
     POSITION_SELECT,
@@ -23,6 +24,7 @@ import {
 } from "./actionTypes";
 import { CLIENT_SENDING_ACTION } from "../socketEmits";
 import setUserFeedbackAction from "./setUserfeedbackAction";
+import { initialGameboardEmpty } from "../reducers/initialGameboardEmpty";
 
 const selectPosition = selectedPositionId => {
     return (dispatch, getState, emit) => {
@@ -169,6 +171,14 @@ const selectPosition = selectedPositionId => {
 
         if (distanceMatrix[lastSelectedPosition][selectedPositionId] !== 1) {
             dispatch(setUserFeedbackAction("Must select adjacent position..."));
+            return;
+        }
+
+        //if we are planning (a non-capability), we assume there is a selectedPiece in the meta
+        const { pieceTypeId } = gameboardMeta.selectedPiece;
+        const { type } = initialGameboardEmpty[selectedPositionId];
+        if (!TYPE_TERRAIN[pieceTypeId].includes(type)) {
+            dispatch(setUserFeedbackAction("Wrong terrain type for this piece..."));
             return;
         }
 

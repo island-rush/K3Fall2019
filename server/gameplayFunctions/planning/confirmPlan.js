@@ -3,8 +3,9 @@ const sendUserFeedback = require("../sendUserFeedback");
 import { PLAN_WAS_CONFIRMED } from "../../../client/src/redux/actions/actionTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
-import { CONTAINER_TYPES, TYPE_MOVES, COMBAT_PHASE_ID, SLICE_PLANNING_ID } from "../../../client/src/gameData/gameConstants";
+import { CONTAINER_TYPES, COMBAT_PHASE_ID, SLICE_PLANNING_ID, TYPE_TERRAIN, TYPE_OWNERS } from "../../../client/src/gameData/gameConstants";
 import { distanceMatrix } from "../../../client/src/gameData/distanceMatrix";
+import { initialGameboardEmpty } from "../../../client/src/redux/reducers/initialGameboardEmpty";
 
 const confirmPlan = async (socket, payload) => {
     const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
@@ -41,7 +42,7 @@ const confirmPlan = async (socket, payload) => {
 
     //Could be multiple controller
     let atLeast1Owner = false;
-    for (gameController of gameControllers) {
+    for (let gameController of gameControllers) {
         if (TYPE_OWNERS[gameController].includes(pieceTypeId)) {
             atLeast1Owner = true;
             break;
@@ -64,6 +65,12 @@ const confirmPlan = async (socket, payload) => {
         //other checks...piece type and number of moves?
 
         const { type, positionId } = plan[x];
+
+        let positionTerrain = initialGameboardEmpty[positionId].type;
+        if (!TYPE_TERRAIN[pieceTypeId].includes(positionTerrain)) {
+            sendUserFeedback(socket, "can't go on that terrain with this piece type");
+            return;
+        }
 
         //make sure positions are equal for container type
         //TODO: constants for this, if done this way
