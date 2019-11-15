@@ -58,8 +58,8 @@ class MainButton extends Component {
 }
 
 MainButton.propTypes = {
-    mainButtonClick: PropTypes.func.isRequired,
-    gameInfo: PropTypes.object.isRequired
+    mainButtonClick: PropTypes.func.isRequired, //from parent
+    gameInfo: PropTypes.object.isRequired //from parent
 };
 
 export default MainButton;

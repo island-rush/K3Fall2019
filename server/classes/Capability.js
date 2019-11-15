@@ -127,7 +127,7 @@ class Capability {
         for (let x = 0; x < results.length; x++) {
             let { teamId, positionId } = results[x];
             listOfEffectedPositions.push(positionId);
-            let otherTeam = teamId === 0 ? 1 : 0;
+            let otherTeam = teamId === BLUE_TEAM_ID ? RED_TEAM_ID : BLUE_TEAM_ID;
 
             queryString = "SELECT * FROM pieces WHERE pieceGameId = ? AND pieceTeamId = ? AND piecePositionId = ?";
             inserts = [gameId, otherTeam, positionId];

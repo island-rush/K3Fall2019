@@ -1,7 +1,7 @@
 const pool = require("../database");
 import { INITIAL_GAMESTATE } from "../../client/src/redux/actions/actionTypes";
 const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("../actions/eventConstants");
-import { AIR_REFUELING_SQUADRON, CAPTURE_TYPES, BLUE_TEAM_ID, RED_TEAM_ID, NEWS_PHASE_ID } from "../../client/src/constants/gameConstants";
+import { AIR_REFUELING_SQUADRON_ID, CAPTURE_TYPES, BLUE_TEAM_ID, RED_TEAM_ID, NEWS_PHASE_ID } from "../../client/src/constants/gameConstants";
 import {
     ALL_ISLAND_LOCATIONS,
     ISLAND_POINTS,
@@ -285,7 +285,7 @@ class Game {
                     for (let x = 0; x < allRefuelItems.length; x++) {
                         let thisRefuelItem = allRefuelItems[x];
                         let { pieceTypeId } = thisRefuelItem;
-                        if (pieceTypeId === AIR_REFUELING_SQUADRON) {
+                        if (pieceTypeId === AIR_REFUELING_SQUADRON_ID) {
                             tankers.push(thisRefuelItem);
                         } else {
                             aircraft.push(thisRefuelItem);

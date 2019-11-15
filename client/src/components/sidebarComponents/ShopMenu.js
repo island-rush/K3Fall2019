@@ -94,7 +94,7 @@ class ShopMenu extends Component {
 
 ShopMenu.propTypes = {
     shopItems: PropTypes.array.isRequired,
-    selected: PropTypes.bool.isRequired, //TODO: make notes as to where these come from (if they come from parent...)
+    selected: PropTypes.bool.isRequired, //from parent
     purchase: PropTypes.func.isRequired,
     refund: PropTypes.func.isRequired,
     points: PropTypes.number.isRequired,
