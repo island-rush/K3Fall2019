@@ -159,7 +159,7 @@ const selectPosition = selectedPositionId => {
             }
         }
 
-        if (trueMoveCount > TYPE_MOVES[gameboardMeta.selectedPiece.pieceTypeId] - 1) {
+        if (trueMoveCount >= gameboardMeta.selectedPiece.pieceMoves) {
             dispatch(setUserFeedbackAction("Must move piece within range..."));
             return;
         }

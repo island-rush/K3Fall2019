@@ -31,7 +31,7 @@ const confirmPlan = async (socket, payload) => {
         return;
     }
 
-    const { piecePositionId, pieceTypeId, pieceGameId, pieceTeamId } = thisPiece;
+    const { piecePositionId, pieceTypeId, pieceGameId, pieceTeamId, pieceMoves } = thisPiece;
 
     //Is this piece ours? (TODO: could also check pieceType with gameControllers)
     if (pieceGameId != gameId || pieceTeamId != gameTeam) {
@@ -81,7 +81,7 @@ const confirmPlan = async (socket, payload) => {
 
     //Is the plan length less than or equal to the max moves of the piece?
     //TODO: should use the moves from the database for the piece instead of the type_moves, because could be getting a boost
-    if (trueMoveCount > TYPE_MOVES[pieceTypeId]) {
+    if (trueMoveCount > pieceMoves) {
         sendUserFeedback(socket, "sent a bad plan, piece was moved more than its range...");
         return;
     }
