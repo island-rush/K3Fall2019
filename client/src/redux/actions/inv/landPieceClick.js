@@ -1,5 +1,5 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
-import { CLIENT_SENDING_ACTION } from "../../socketEmits";
+import { SOCKET_CLIENT_SENDING_ACTION } from "../../../gameData/otherConstants";
 import { SERVER_PIECE_PLACE } from "../actionTypes";
 import { PLACE_PHASE_ID } from "../../../gameData/gameConstants";
 
@@ -34,7 +34,7 @@ const landPieceClick = invItem => {
             }
         };
 
-        emit(CLIENT_SENDING_ACTION, clientAction);
+        emit(SOCKET_CLIENT_SENDING_ACTION, clientAction);
     };
 };
 

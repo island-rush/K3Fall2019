@@ -1,7 +1,7 @@
 const { Event, Piece } = require("../classes");
 import { EVENT_BATTLE, NO_MORE_EVENTS, EVENT_REFUEL } from "../../client/src/redux/actions/actionTypes";
 import { AIR_REFUELING_SQUADRON, BLUE_TEAM_ID, RED_TEAM_ID } from "../../client/src/gameData/gameConstants";
-import { SERVER_SENDING_ACTION } from "../../client/src/redux/socketEmits";
+import { SOCKET_SERVER_SENDING_ACTION } from "../../client/src/gameData/otherConstants";
 const sendUserFeedback = require("./sendUserFeedback");
 const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("./eventConstants");
 
@@ -98,10 +98,10 @@ const giveNextEvent = async (socket, options) => {
     }
 
     //sending the event that we got, or "no more events"? (but also sending piece moves after this
-    socket.to("game" + gameId + "team" + gameTeam).emit(SERVER_SENDING_ACTION, serverAction);
+    socket.to("game" + gameId + "team" + gameTeam).emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
 
     if (socket.handshake.session.ir3.gameTeam == gameTeam) {
-        socket.emit(SERVER_SENDING_ACTION, serverAction);
+        socket.emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
     }
 };
 

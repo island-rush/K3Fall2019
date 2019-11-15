@@ -1,7 +1,7 @@
 const { Game, ShopItem } = require("../../classes");
 const sendUserFeedback = require("../sendUserFeedback");
 import { SHOP_REFUND } from "../../../client/src/redux/actions/actionTypes";
-import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../../client/src/redux/socketEmits";
+import { SOCKET_SERVER_SENDING_ACTION, SOCKET_SERVER_REDIRECT } from "../../../client/src/gameData/otherConstants";
 import { GAME_INACTIVE_TAG, BAD_REQUEST_TAG } from "../../pages/errorTypes";
 import { TYPE_COSTS, PURCHASE_PHASE_ID, TYPE_MAIN, BLUE_TEAM_ID } from "../../../client/src/gameData/gameConstants";
 
@@ -12,7 +12,7 @@ const shopRefundRequest = async (socket, payload) => {
     const { gameActive, gamePhase, game0Points, game1Points } = thisGame;
 
     if (!gameActive) {
-        socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
+        socket.emit(SOCKET_SERVER_REDIRECT, GAME_INACTIVE_TAG);
         return;
     }
 
@@ -40,7 +40,7 @@ const shopRefundRequest = async (socket, payload) => {
 
     //Do they own the shop item?
     if (shopItemGameId != gameId || shopItemTeamId != gameTeam) {
-        socket.emit(SERVER_REDIRECT, BAD_REQUEST_TAG);
+        socket.emit(SOCKET_SERVER_REDIRECT, BAD_REQUEST_TAG);
         return;
     }
 
@@ -59,7 +59,7 @@ const shopRefundRequest = async (socket, payload) => {
             pointsAdded: itemCost
         }
     };
-    socket.emit(SERVER_SENDING_ACTION, serverAction);
+    socket.emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
 };
 
 module.exports = shopRefundRequest;

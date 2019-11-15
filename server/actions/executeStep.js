@@ -1,6 +1,6 @@
 const { Plan, Piece, Event, Capability } = require("../classes");
 import { PLACE_PHASE, NEW_ROUND, PIECES_MOVE, UPDATE_FLAGS } from "../../client/src/redux/actions/actionTypes";
-import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
+import { SOCKET_SERVER_SENDING_ACTION, SOCKET_SERVER_REDIRECT } from "../../client/src/gameData/otherConstants";
 import { BLUE_TEAM_ID, RED_TEAM_ID, PLACE_PHASE_ID, WAITING_STATUS } from "../../client/src/gameData/gameConstants";
 const giveNextEvent = require("./giveNextEvent");
 const { BOTH_TEAMS_INDICATOR, POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("./eventConstants");
@@ -107,11 +107,11 @@ const executeStep = async (socket, thisGame) => {
             };
         }
 
-        socket.to("game" + gameId + "team0").emit(SERVER_SENDING_ACTION, serverAction0);
-        socket.to("game" + gameId + "team1").emit(SERVER_SENDING_ACTION, serverAction1);
+        socket.to("game" + gameId + "team0").emit(SOCKET_SERVER_SENDING_ACTION, serverAction0);
+        socket.to("game" + gameId + "team1").emit(SOCKET_SERVER_SENDING_ACTION, serverAction1);
 
         const thisSocketsAction = parseInt(socket.handshake.session.ir3.gameTeam) === BLUE_TEAM_ID ? serverAction0 : serverAction1;
-        socket.emit(SERVER_SENDING_ACTION, thisSocketsAction);
+        socket.emit(SOCKET_SERVER_SENDING_ACTION, thisSocketsAction);
 
         return;
     }
@@ -180,8 +180,8 @@ const executeStep = async (socket, thisGame) => {
                 island12: thisGame.island12
             }
         };
-        socket.to("game" + gameId).emit(SERVER_SENDING_ACTION, updateFlagAction);
-        socket.emit(SERVER_SENDING_ACTION, updateFlagAction);
+        socket.to("game" + gameId).emit(SOCKET_SERVER_SENDING_ACTION, updateFlagAction);
+        socket.emit(SOCKET_SERVER_SENDING_ACTION, updateFlagAction);
     }
 
     //Position Battle Events

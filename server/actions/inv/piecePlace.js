@@ -1,7 +1,7 @@
 const { Game, InvItem } = require("../../classes");
 const sendUserFeedback = require("../sendUserFeedback");
 import { PIECE_PLACE, PLACE_PHASE } from "../../../client/src/redux/actions/actionTypes";
-import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/gameData/otherConstants";
 import { BAD_REQUEST_TAG, GAME_INACTIVE_TAG } from "../../pages/errorTypes";
 
 const piecePlace = async (socket, payload) => {
@@ -12,7 +12,7 @@ const piecePlace = async (socket, payload) => {
     const { gameActive, gamePhase } = thisGame;
 
     if (!gameActive) {
-        socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
+        socket.emit(SOCKET_SERVER_REDIRECT, GAME_INACTIVE_TAG);
         return;
     }
 
@@ -32,7 +32,7 @@ const piecePlace = async (socket, payload) => {
 
     //Do they own this item?
     if (invItemGameId != gameId || invItemTeamId != gameTeam) {
-        socket.emit(SERVER_REDIRECT, BAD_REQUEST_TAG);
+        socket.emit(SOCKET_SERVER_REDIRECT, BAD_REQUEST_TAG);
         return;
     }
 
@@ -78,8 +78,8 @@ const piecePlace = async (socket, payload) => {
     };
 
     //need to send this to the whole team
-    socket.to("game" + gameId + "team" + gameTeam).emit(SERVER_SENDING_ACTION, serverAction);
-    socket.emit(SERVER_SENDING_ACTION, serverAction);
+    socket.to("game" + gameId + "team" + gameTeam).emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
+    socket.emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
 };
 
 module.exports = piecePlace;

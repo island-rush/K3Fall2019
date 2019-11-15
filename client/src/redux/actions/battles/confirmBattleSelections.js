@@ -1,5 +1,5 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
-import { CLIENT_SENDING_ACTION } from "../../socketEmits";
+import { SOCKET_CLIENT_SENDING_ACTION } from "../../../gameData/otherConstants";
 import { SERVER_CONFIRM_BATTLE_SELECTION } from "../actionTypes";
 import { WAITING_STATUS } from "../../../gameData/gameConstants";
 
@@ -26,7 +26,7 @@ const confirmBattleSelections = () => {
             }
         };
 
-        emit(CLIENT_SENDING_ACTION, clientAction);
+        emit(SOCKET_CLIENT_SENDING_ACTION, clientAction);
     };
 };
 

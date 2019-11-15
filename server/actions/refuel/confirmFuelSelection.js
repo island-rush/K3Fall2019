@@ -1,6 +1,6 @@
 const { Game, Event } = require("../../classes");
 import { REFUEL_RESULTS } from "../../../client/src/redux/actions/actionTypes";
-import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/gameData/otherConstants";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
 import { TYPE_FUEL } from "../../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
@@ -13,7 +13,7 @@ const confirmFuelSelection = async (socket, payload) => {
     const { gameActive, gamePhase, game0Status, game1Status } = thisGame;
 
     if (!gameActive) {
-        socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
+        socket.emit(SOCKET_SERVER_REDIRECT, GAME_INACTIVE_TAG);
         return;
     }
 
@@ -87,8 +87,8 @@ const confirmFuelSelection = async (socket, payload) => {
             };
 
             //sending results and no matter what, going to next event (refuel isn't multiple things, its 1 and done)
-            socket.to("game" + gameId + "team" + gameTeam).emit(SERVER_SENDING_ACTION, serverAction);
-            socket.emit(SERVER_SENDING_ACTION, serverAction);
+            socket.to("game" + gameId + "team" + gameTeam).emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
+            socket.emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
         }
     }
 

@@ -1,7 +1,7 @@
 const sendUserFeedback = require("./sendUserFeedback");
 const { Game, Capability } = require("../classes");
 import { MAIN_BUTTON_CLICK, PURCHASE_PHASE, COMBAT_PHASE, NEWS_PHASE, SLICE_CHANGE } from "../../client/src/redux/actions/actionTypes";
-import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
+import { SOCKET_SERVER_SENDING_ACTION, SOCKET_SERVER_REDIRECT } from "../../client/src/gameData/otherConstants";
 import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
 import {
     BLUE_TEAM_ID,
@@ -25,7 +25,7 @@ const mainButtonClick = async (socket, payload) => {
     const { gameActive, gamePhase, gameRound, gameSlice, game0Status, game1Status } = thisGame;
 
     if (!gameActive) {
-        socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
+        socket.emit(SOCKET_SERVER_REDIRECT, GAME_INACTIVE_TAG);
         return;
     }
 
@@ -52,7 +52,7 @@ const mainButtonClick = async (socket, payload) => {
             type: MAIN_BUTTON_CLICK,
             payload: {}
         };
-        socket.emit(SERVER_SENDING_ACTION, serverAction);
+        socket.emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
         return;
     }
 
@@ -154,9 +154,9 @@ const mainButtonClick = async (socket, payload) => {
     }
 
     //Send to all clients (could be different from getting points)
-    socket.to("game" + gameId + "team" + BLUE_TEAM_ID).emit(SERVER_SENDING_ACTION, serverAction0);
-    socket.to("game" + gameId + "team" + RED_TEAM_ID).emit(SERVER_SENDING_ACTION, serverAction1);
-    socket.emit(SERVER_SENDING_ACTION, gameTeam === BLUE_TEAM_ID ? serverAction0 : serverAction1);
+    socket.to("game" + gameId + "team" + BLUE_TEAM_ID).emit(SOCKET_SERVER_SENDING_ACTION, serverAction0);
+    socket.to("game" + gameId + "team" + RED_TEAM_ID).emit(SOCKET_SERVER_SENDING_ACTION, serverAction1);
+    socket.emit(SOCKET_SERVER_SENDING_ACTION, gameTeam === BLUE_TEAM_ID ? serverAction0 : serverAction1);
 };
 
 module.exports = mainButtonClick;

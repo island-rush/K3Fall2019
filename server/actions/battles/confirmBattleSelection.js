@@ -1,6 +1,6 @@
 const { Game, Event } = require("../../classes");
 import { BATTLE_FIGHT_RESULTS, UPDATE_FLAGS } from "../../../client/src/redux/actions/actionTypes";
-import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/gameData/otherConstants";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
 import { BLUE_TEAM_ID, RED_TEAM_ID, WAITING_STATUS, NOT_WAITING_STATUS } from "../../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
@@ -14,7 +14,7 @@ const confirmBattleSelection = async (socket, payload) => {
     const { gameActive, gamePhase, game0Status, game1Status } = thisGame;
 
     if (!gameActive) {
-        socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
+        socket.emit(SOCKET_SERVER_REDIRECT, GAME_INACTIVE_TAG);
         return;
     }
 
@@ -53,8 +53,8 @@ const confirmBattleSelection = async (socket, payload) => {
             }
         };
 
-        socket.to("game" + gameId).emit(SERVER_SENDING_ACTION, serverAction);
-        socket.emit(SERVER_SENDING_ACTION, serverAction);
+        socket.to("game" + gameId).emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
+        socket.emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
         return;
     }
 
@@ -80,8 +80,8 @@ const confirmBattleSelection = async (socket, payload) => {
                 island12: thisGame.island12
             }
         };
-        socket.to("game" + gameId).emit(SERVER_SENDING_ACTION, updateFlagAction);
-        socket.emit(SERVER_SENDING_ACTION, updateFlagAction);
+        socket.to("game" + gameId).emit(SOCKET_SERVER_SENDING_ACTION, updateFlagAction);
+        socket.emit(SOCKET_SERVER_SENDING_ACTION, updateFlagAction);
     }
 
     await giveNextEvent(socket, { thisGame, gameTeam: 0 }); //not putting executingStep in options to let it know not to send pieceMove

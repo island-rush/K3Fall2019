@@ -1,7 +1,7 @@
 const { Game, InvItem, ShopItem } = require("../../classes");
 const sendUserFeedback = require("../sendUserFeedback");
 import { SHOP_TRANSFER } from "../../../client/src/redux/actions/actionTypes";
-import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/gameData/otherConstants";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
 import { PURCHASE_PHASE_ID, TYPE_MAIN } from "../../../client/src/gameData/gameConstants";
 
@@ -17,7 +17,7 @@ const shopConfirmPurchase = async (socket, payload) => {
     const { gameActive, gamePhase } = thisGame;
 
     if (!gameActive) {
-        socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
+        socket.emit(SOCKET_SERVER_REDIRECT, GAME_INACTIVE_TAG);
         return;
     }
 
@@ -43,7 +43,7 @@ const shopConfirmPurchase = async (socket, payload) => {
             invItems
         }
     };
-    socket.emit(SERVER_SENDING_ACTION, serverAction);
+    socket.emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
 };
 
 module.exports = shopConfirmPurchase;

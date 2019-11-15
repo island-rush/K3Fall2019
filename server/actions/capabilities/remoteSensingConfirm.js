@@ -1,6 +1,6 @@
 const { Game, InvItem, Capability, Piece } = require("../../classes");
 import { REMOTE_SENSING_SELECTED } from "../../../client/src/redux/actions/actionTypes";
-import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/gameData/otherConstants";
 import { GAME_INACTIVE_TAG, GAME_DOES_NOT_EXIST } from "../../pages/errorTypes";
 import { REMOTE_SENSING_TYPE_ID, COMBAT_PHASE_ID, SLICE_PLANNING_ID, TYPE_MAIN } from "../../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
@@ -17,14 +17,14 @@ const remoteSensingConfirm = async (socket, payload) => {
 
     const thisGame = await new Game({ gameId }).init();
     if (!thisGame) {
-        socket.emit(SERVER_REDIRECT, GAME_DOES_NOT_EXIST);
+        socket.emit(SOCKET_SERVER_REDIRECT, GAME_DOES_NOT_EXIST);
         return;
     }
 
     const { gameActive, gamePhase, gameSlice, game0Points, game1Points } = thisGame;
 
     if (!gameActive) {
-        socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
+        socket.emit(SOCKET_SERVER_REDIRECT, GAME_INACTIVE_TAG);
         return;
     }
 
@@ -90,7 +90,7 @@ const remoteSensingConfirm = async (socket, payload) => {
             gameboardPieces
         }
     };
-    socket.emit(SERVER_SENDING_ACTION, serverAction);
+    socket.emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
 };
 
 module.exports = remoteSensingConfirm;

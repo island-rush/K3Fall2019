@@ -5,7 +5,7 @@
 
 const { Game } = require("./classes");
 import { BAD_SESSION, GAME_DOES_NOT_EXIST, NOT_LOGGED_IN_TAG } from "./pages/errorTypes";
-import { SERVER_REDIRECT, SERVER_SENDING_ACTION, CLIENT_SENDING_ACTION } from "../client/src/redux/socketEmits";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION, SOCKET_CLIENT_SENDING_ACTION } from "../client/src/gameData/otherConstants";
 import {
     SERVER_BIOLOGICAL_WEAPONS_CONFIRM,
     SERVER_INSURGENCY_CONFIRM,
@@ -48,7 +48,7 @@ const {
 const socketSetup = async socket => {
     //Verify that this user is authenticated / known
     if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameControllers) {
-        socket.emit(SERVER_REDIRECT, BAD_SESSION);
+        socket.emit(SOCKET_SERVER_REDIRECT, BAD_SESSION);
         return;
     }
 
@@ -59,7 +59,7 @@ const socketSetup = async socket => {
 
     if (!thisGame) {
         //unlikely, since we just came from gameLogin successfully
-        socket.emit(SERVER_REDIRECT, GAME_DOES_NOT_EXIST);
+        socket.emit(SOCKET_SERVER_REDIRECT, GAME_DOES_NOT_EXIST);
         return;
     }
 
@@ -69,7 +69,7 @@ const socketSetup = async socket => {
 
         //Session doesn't match DB, another player could login again as this controller (since login only checks db values)
         if (!loggedIn) {
-            socket.emit(SERVER_REDIRECT, NOT_LOGGED_IN_TAG);
+            socket.emit(SOCKET_SERVER_REDIRECT, NOT_LOGGED_IN_TAG);
             return;
         } else {
             //probably refreshed, keep them logged in (disconnect logs them out)
@@ -92,10 +92,10 @@ const socketSetup = async socket => {
 
     //Send the client intial game state data
     const serverAction = await thisGame.initialStateAction(gameTeam, gameControllers);
-    socket.emit(SERVER_SENDING_ACTION, serverAction); //sends the data
+    socket.emit(SOCKET_SERVER_SENDING_ACTION, serverAction); //sends the data
 
     //Setup the socket functions to respond to client requests
-    socket.on(CLIENT_SENDING_ACTION, ({ type, payload }) => {
+    socket.on(SOCKET_CLIENT_SENDING_ACTION, ({ type, payload }) => {
         try {
             switch (type) {
                 case SERVER_SHOP_PURCHASE_REQUEST:

@@ -22,7 +22,7 @@ import {
     SERVER_COMM_INTERRUPT_CONFIRM,
     SERVER_GOLDEN_EYE_CONFIRM
 } from "./actionTypes";
-import { CLIENT_SENDING_ACTION } from "../socketEmits";
+import { SOCKET_CLIENT_SENDING_ACTION } from "../../gameData/otherConstants";
 import setUserFeedbackAction from "./setUserfeedbackAction";
 import { initialGameboardEmpty } from "../reducers/initialGameboardEmpty";
 
@@ -138,7 +138,7 @@ const selectPosition = selectedPositionId => {
                     }
                 };
 
-                emit(CLIENT_SENDING_ACTION, clientAction);
+                emit(SOCKET_CLIENT_SENDING_ACTION, clientAction);
                 return;
             }
 
