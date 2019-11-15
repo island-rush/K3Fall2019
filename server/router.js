@@ -67,7 +67,7 @@ router.get("/courseDirector.html", (req, res) => {
 });
 
 router.get("/game.html", (req, res) => {
-	if (!req.session.ir3 || !req.session.ir3.gameId || !req.session.ir3.gameTeam || !req.session.ir3.gameController) {
+	if (!req.session.ir3 || !req.session.ir3.gameId || !req.session.ir3.gameTeam || !req.session.ir3.gameControllers) {
 		res.redirect(`/index.html?error=${LOGIN_TAG}`);
 		return;
 	}

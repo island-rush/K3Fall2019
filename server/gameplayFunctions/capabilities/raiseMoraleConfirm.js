@@ -2,95 +2,93 @@ const { Game, InvItem, Capability, Piece } = require("../../classes");
 import { RAISE_MORALE_SELECTED } from "../../../client/src/redux/actions/actionTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG, GAME_DOES_NOT_EXIST } from "../../pages/errorTypes";
-import { TYPE_NAME_IDS } from "../../../client/src/gameData/gameConstants";
+import { RAISE_MORALE_TYPE_ID, ALL_COMMANDER_TYPES } from "../../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 
 const raiseMoraleConfirm = async (socket, payload) => {
-	const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
 
-	if (payload == null || payload.selectedCommanderType == null) {
-		sendUserFeedback(socket, "Server Error: Malformed Payload (missing selectedCommanderType)");
-		return;
-	}
+    if (payload == null || payload.selectedCommanderType == null) {
+        sendUserFeedback(socket, "Server Error: Malformed Payload (missing selectedCommanderType)");
+        return;
+    }
 
-	const { selectedCommanderType, invItem } = payload;
+    const { selectedCommanderType, invItem } = payload;
 
-	const thisGame = await new Game({ gameId }).init();
-	if (!thisGame) {
-		socket.emit(SERVER_REDIRECT, GAME_DOES_NOT_EXIST);
-		return;
-	}
+    const thisGame = await new Game({ gameId }).init();
+    if (!thisGame) {
+        socket.emit(SERVER_REDIRECT, GAME_DOES_NOT_EXIST);
+        return;
+    }
 
-	const { gameActive, gamePhase, gameSlice, game0Points, game1Points } = thisGame;
+    const { gameActive, gamePhase, gameSlice, game0Points, game1Points } = thisGame;
 
-	if (!gameActive) {
-		socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
-		return;
-	}
+    if (!gameActive) {
+        socket.emit(SERVER_REDIRECT, GAME_INACTIVE_TAG);
+        return;
+    }
 
-	//gamePhase 2 is only phase for raise morale
-	if (gamePhase != 2) {
-		sendUserFeedback(socket, "Not the right phase...");
-		return;
-	}
+    //gamePhase 2 is only phase for raise morale
+    if (gamePhase != 2) {
+        sendUserFeedback(socket, "Not the right phase...");
+        return;
+    }
 
-	//gameSlice 0 is only slice for raise morale
-	if (gameSlice != 0) {
-		sendUserFeedback(socket, "Not the right slice (must be planning)...");
-		return;
-	}
+    //gameSlice 0 is only slice for raise morale
+    if (gameSlice != 0) {
+        sendUserFeedback(socket, "Not the right slice (must be planning)...");
+        return;
+    }
 
-	//Only the main controller (0) can use raise morale
-	if (gameController != 0) {
-		sendUserFeedback(socket, "Not the main controller (0)...");
-		return;
-	}
+    //Only the main controller (0) can use raise morale
+    if (gameController != 0) {
+        sendUserFeedback(socket, "Not the main controller (0)...");
+        return;
+    }
 
-	const { invItemId } = invItem;
+    const { invItemId } = invItem;
 
-	//Does the invItem exist for it?
-	const thisInvItem = await new InvItem(invItemId).init();
-	if (!thisInvItem) {
-		sendUserFeedback(socket, "Did not have the invItem to complete this request.");
-		return;
-	}
+    //Does the invItem exist for it?
+    const thisInvItem = await new InvItem(invItemId).init();
+    if (!thisInvItem) {
+        sendUserFeedback(socket, "Did not have the invItem to complete this request.");
+        return;
+    }
 
-	//verify correct type of inv item
-	const { invItemTypeId } = thisInvItem;
-	if (invItemTypeId != TYPE_NAME_IDS["Raise Morale"]) {
-		sendUserFeedback(socket, "Inv Item was not a raise morale type.");
-		return;
-	}
+    //verify correct type of inv item
+    const { invItemTypeId } = thisInvItem;
+    if (invItemTypeId != RAISE_MORALE_TYPE_ID) {
+        sendUserFeedback(socket, "Inv Item was not a raise morale type.");
+        return;
+    }
 
-	//does the position make sense?
-	//TODO: make these individually check against the constants (don't make an arbitrary range)
-	if (selectedCommanderType < 1 || selectedCommanderType > 4) {
-		sendUserFeedback(socket, "got a negative position for raise morale.");
-		return;
-	}
+    //does the commander selection make sense?
+    if (!ALL_COMMANDER_TYPES.includes(selectedCommanderType)) {
+        sendUserFeedback(socket, "got a negative position for raise morale.");
+        return;
+    }
 
-	//insert the raise morale into the db to start using it
+    //insert the raise morale into the db to start using it
+    if (!(await Capability.insertRaiseMorale(gameId, gameTeam, selectedCommanderType))) {
+        sendUserFeedback(socket, "db failed to insert raise morale, likely already an entry for that position.");
+        return;
+    }
 
-	if (!(await Capability.insertRaiseMorale(gameId, gameTeam, selectedCommanderType))) {
-		sendUserFeedback(socket, "db failed to insert raise morale, likely already an entry for that position.");
-		return;
-	}
+    await thisInvItem.delete();
 
-	await thisInvItem.delete();
+    const gameboardPieces = await Piece.getVisiblePieces(gameId, gameTeam);
+    const confirmedRaiseMorale = await Capability.getRaiseMorale(gameId, gameTeam);
 
-	const gameboardPieces = await Piece.getVisiblePieces(gameId, gameTeam);
-	const confirmedRaiseMorale = await Capability.getRaiseMorale(gameId, gameTeam);
-
-	// let the client(team) know that this plan was accepted
-	const serverAction = {
-		type: RAISE_MORALE_SELECTED,
-		payload: {
-			invItem: thisInvItem,
-			confirmedRaiseMorale,
-			gameboardPieces
-		}
-	};
-	socket.emit(SERVER_SENDING_ACTION, serverAction);
+    // let the client(team) know that this plan was accepted
+    const serverAction = {
+        type: RAISE_MORALE_SELECTED,
+        payload: {
+            invItem: thisInvItem,
+            confirmedRaiseMorale,
+            gameboardPieces
+        }
+    };
+    socket.emit(SERVER_SENDING_ACTION, serverAction);
 };
 
 module.exports = raiseMoraleConfirm;

@@ -15,10 +15,12 @@ CREATE TABLE IF NOT EXISTS games (
     game0Controller1 INT(1) NOT NULL DEFAULT 0,
     game0Controller2 INT(1) NOT NULL DEFAULT 0,
     game0Controller3 INT(1) NOT NULL DEFAULT 0,
+    game0Controller4 INT(1) NOT NULL DEFAULT 0,
     game1Controller0 INT(1) NOT NULL DEFAULT 0,
     game1Controller1 INT(1) NOT NULL DEFAULT 0,
     game1Controller2 INT(1) NOT NULL DEFAULT 0,
     game1Controller3 INT(1) NOT NULL DEFAULT 0,
+    game1Controller4 INT(1) NOT NULL DEFAULT 0,
     
 	game0Status INT(1) NOT NULL DEFAULT 0,  -- 0: still active, 1: waiting for other player
 	game1Status INT(1) NOT NULL DEFAULT 0,
@@ -28,7 +30,21 @@ CREATE TABLE IF NOT EXISTS games (
     
     gamePhase INT(1) NOT NULL DEFAULT 0, -- 0: news, 1: buy, 2: combat, 3: place inv
     gameRound INT(1) NOT NULL DEFAULT 0, -- 0, 1, 2  rounds of movement
-    gameSlice INT(1) NOT NULL DEFAULT 0 -- 0: planning, 1: events/movement
+    gameSlice INT(1) NOT NULL DEFAULT 0, -- 0: planning, 1: events/movement
+    
+    island0 INT(1) NOT NULL DEFAULT 1, -- Dragon bottom
+    island1 INT(1) NOT NULL DEFAULT 1, -- Dragon top
+    island2 INT(1) NOT NULL DEFAULT 1, -- HR Republic
+    island3 INT(1) NOT NULL DEFAULT -1, -- Montaville
+    island4 INT(1) NOT NULL DEFAULT 1, -- Lion Island
+    island5 INT(1) NOT NULL DEFAULT -1, -- Noyarc
+    island6 INT(1) NOT NULL DEFAULT -1, -- Fuler Island
+    island7 INT(1) NOT NULL DEFAULT -1, -- Rico Island
+    island8 INT(1) NOT NULL DEFAULT 0, -- Tamu Island
+    island9 INT(1) NOT NULL DEFAULT 0, -- Shor
+    island10 INT(1) NOT NULL DEFAULT -1, -- Keoni
+    island11 INT(1) NOT NULL DEFAULT 0, -- Eagle Top
+    island12 INT(1) NOT NULL DEFAULT 0 -- Eagle Bottom
 ) AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS shopItems (
@@ -172,5 +188,15 @@ CREATE TABLE IF NOT EXISTS raiseMorale(
     teamId INT(1) NOT NULL,
     commanderType INT(2) NOT NULL,
     roundsLeft INT(2) NOT NULL,
+    FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE
+) AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS commInterrupt(
+	commInterruptId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	gameId INT(8) NOT NULL,
+    teamId INT(1) NOT NULL,
+    positionId INT(2) NOT NULL,
+    roundsLeft INT(2) NOT NULL,
+    activated INT(1) NOT NULL,
     FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE
 ) AUTO_INCREMENT=1;
