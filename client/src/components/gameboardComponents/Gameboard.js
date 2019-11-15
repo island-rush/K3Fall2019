@@ -9,7 +9,7 @@ import RefuelPopup from "./refuel/RefuelPopup";
 import SelectCommanderTypePopup from "./capabilities/SelectCommanderTypePopup";
 import Patterns from "./Patterns";
 import { selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } from "../../redux/actions";
-import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE } from "../../gameData/gameConstants";
+import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE, GOLDEN_EYE_RANGE, RED_TEAM_ID, BLUE_TEAM_ID } from "../../gameData/gameConstants";
 import { distanceMatrix } from "../../gameData/distanceMatrix";
 import {
     ALL_ISLAND_LOCATIONS,
@@ -82,16 +82,16 @@ const patternSolver = (position, gameInfo, positionIndex) => {
     if (pieces) {
         for (let x = 0; x < pieces.length; x++) {
             let thisPiece = pieces[x];
-            if (thisPiece.pieceTeamId === 1 && highPieces.includes(thisPiece.pieceTypeId)) {
+            if (thisPiece.pieceTeamId === RED_TEAM_ID && highPieces.includes(thisPiece.pieceTypeId)) {
                 redHigh = 1;
             }
-            if (thisPiece.pieceTeamId === 1 && lowPieces.includes(thisPiece.pieceTypeId)) {
+            if (thisPiece.pieceTeamId === RED_TEAM_ID && lowPieces.includes(thisPiece.pieceTypeId)) {
                 redLow = 1;
             }
-            if (thisPiece.pieceTeamId === 0 && highPieces.includes(thisPiece.pieceTypeId)) {
+            if (thisPiece.pieceTeamId === BLUE_TEAM_ID && highPieces.includes(thisPiece.pieceTypeId)) {
                 blueHigh = 1;
             }
-            if (thisPiece.pieceTeamId === 0 && lowPieces.includes(thisPiece.pieceTypeId)) {
+            if (thisPiece.pieceTeamId === BLUE_TEAM_ID && lowPieces.includes(thisPiece.pieceTypeId)) {
                 blueLow = 1;
             }
         }
@@ -100,7 +100,7 @@ const patternSolver = (position, gameInfo, positionIndex) => {
     if (ALL_ISLAND_LOCATIONS.includes(parseInt(positionIndex))) {
         const islandNum = ALL_ISLAND_LOCATIONS.indexOf(parseInt(positionIndex));
         const islandOwner = gameInfo["island" + islandNum];
-        const finalType = islandOwner === 0 ? "blue" : islandOwner === 1 ? "red" : "flag";
+        const finalType = islandOwner === BLUE_TEAM_ID ? "blue" : islandOwner === RED_TEAM_ID ? "red" : "flag";
         return finalType + redHigh + redLow + blueHigh + blueLow;
     }
 
@@ -131,7 +131,7 @@ const titleSolver = (position, gameInfo, positionIndex) => {
     const islandNum = ALL_ISLAND_LOCATIONS.indexOf(parseInt(positionIndex));
     const islandTitle = ALL_ISLAND_NAMES[islandNum];
 
-    return islandTitle + "\nPoints: " + ISLAND_POINTS[islandNum];
+    return "Island Flag\n" + islandTitle + "\nPoints: " + ISLAND_POINTS[islandNum];
 };
 
 class Gameboard extends Component {
@@ -139,13 +139,14 @@ class Gameboard extends Component {
         const { gameInfo, gameboard, gameboardMeta, selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } = this.props;
 
         //prettier-ignore
-        const {confirmedCommInterrupt, confirmedBioWeapons, confirmedInsurgency, confirmedRods, confirmedRemoteSense, selectedPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions } = gameboardMeta;
+        const {confirmedGoldenEye, confirmedCommInterrupt, confirmedBioWeapons, confirmedInsurgency, confirmedRods, confirmedRemoteSense, selectedPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions } = gameboardMeta;
 
         let planningPositions = []; //all of the positions part of a plan
         let containerPositions = []; //specific positions part of a plan of type container
         let battlePositions = []; //position(s) involved in a battle
         let remoteSensedPositions = [];
         let commInterruptPositions = [];
+        let goldenEyePositions = [];
 
         for (let x = 0; x < planning.moves.length; x++) {
             const { type, positionId } = planning.moves[x];
@@ -203,6 +204,15 @@ class Gameboard extends Component {
             }
         }
 
+        for (let x = 0; x < confirmedGoldenEye.length; x++) {
+            let goldenEyeCenter = confirmedGoldenEye[x];
+            for (let y = 0; y < distanceMatrix[goldenEyeCenter].length; y++) {
+                if (distanceMatrix[goldenEyeCenter][y] <= GOLDEN_EYE_RANGE) {
+                    goldenEyePositions.push(y);
+                }
+            }
+        }
+
         const positions = Object.keys(gameboard).map(positionIndex => (
             <Hexagon
                 key={positionIndex}
@@ -222,6 +232,7 @@ class Gameboard extends Component {
                     event.stopPropagation();
                 }}
                 //These are found in the Game.css
+                //TODO: highlight according to some priority list
                 className={
                     parseInt(selectedPosition) === parseInt(positionIndex)
                         ? "selectedPos"
@@ -243,8 +254,11 @@ class Gameboard extends Component {
                         ? "remoteSensePos"
                         : commInterruptPositions.includes(parseInt(positionIndex))
                         ? "commInterruptPos"
+                        : goldenEyePositions.includes(parseInt(positionIndex))
+                        ? "goldenEyePos"
                         : ""
                 }
+                //TODO: pass down what the highlighting means into the title
                 title={titleSolver(gameboard[positionIndex], gameInfo, positionIndex)}
             />
         ));

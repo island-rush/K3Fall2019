@@ -1,7 +1,7 @@
 const { Plan, Piece, Event, Capability } = require("../classes");
 import { PLACE_PHASE, NEW_ROUND, PIECES_MOVE, UPDATE_FLAGS } from "../../client/src/redux/actions/actionTypes";
 import { SERVER_SENDING_ACTION, SERVER_REDIRECT } from "../../client/src/redux/socketEmits";
-import { BLUE_TEAM_ID, RED_TEAM_ID } from "../../client/src/gameData/gameConstants";
+import { BLUE_TEAM_ID, RED_TEAM_ID, PLACE_PHASE_ID, WAITING_STATUS } from "../../client/src/gameData/gameConstants";
 const giveNextEvent = require("./giveNextEvent");
 const { BOTH_TEAMS_INDICATOR, POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("./eventConstants");
 
@@ -10,8 +10,8 @@ const executeStep = async (socket, thisGame) => {
     const { gameId, gameRound } = thisGame;
 
     //TODO: rename this to 'hadPlans0' or something more descriptive
-    const currentMovementOrder0 = await Plan.getCurrentMovementOrder(gameId, 0);
-    const currentMovementOrder1 = await Plan.getCurrentMovementOrder(gameId, 1);
+    const currentMovementOrder0 = await Plan.getCurrentMovementOrder(gameId, BLUE_TEAM_ID);
+    const currentMovementOrder1 = await Plan.getCurrentMovementOrder(gameId, RED_TEAM_ID);
 
     //No More Plans for either team
     //DOESN'T MAKE PLANS FOR PIECES STILL IN THE SAME POSITION...NEED TO HAVE AT LEAST 1 PLAN FOR ANYTHING TO HAPPEN (pieces in same postion would battle (again?) if there was 1 plan elsewhere...)
@@ -23,30 +23,35 @@ const executeStep = async (socket, thisGame) => {
         //Decrease game effects that last for x rounds
         await Capability.decreaseRemoteSensing(gameId);
         await Capability.decreaseBiologicalWeapons(gameId);
+        await Capability.decreaseGoldenEye(gameId);
         await Capability.decreaseCommInterrupt(gameId);
         await Capability.decreaseRaiseMorale(gameId);
 
-        const gameboardPiecesList0 = await Piece.getVisiblePieces(gameId, 0);
-        const gameboardPiecesList1 = await Piece.getVisiblePieces(gameId, 1);
+        const gameboardPiecesList0 = await Piece.getVisiblePieces(gameId, BLUE_TEAM_ID);
+        const gameboardPiecesList1 = await Piece.getVisiblePieces(gameId, RED_TEAM_ID);
 
-        const remoteSense0 = await Capability.getRemoteSensing(gameId, 0);
-        const remoteSense1 = await Capability.getRemoteSensing(gameId, 1);
+        const remoteSense0 = await Capability.getRemoteSensing(gameId, BLUE_TEAM_ID);
+        const remoteSense1 = await Capability.getRemoteSensing(gameId, RED_TEAM_ID);
 
-        const bioWeapons0 = await Capability.getBiologicalWeapons(gameId, 0); //any team should work, since all activated at this point?
-        const bioWeapons1 = await Capability.getBiologicalWeapons(gameId, 1);
+        const bioWeapons0 = await Capability.getBiologicalWeapons(gameId, BLUE_TEAM_ID); //any team should work, since all activated at this point?
+        const bioWeapons1 = await Capability.getBiologicalWeapons(gameId, RED_TEAM_ID);
 
-        const raiseMorale0 = await Capability.getRaiseMorale(gameId, 0);
-        const raiseMorale1 = await Capability.getRaiseMorale(gameId, 1);
+        const raiseMorale0 = await Capability.getRaiseMorale(gameId, BLUE_TEAM_ID);
+        const raiseMorale1 = await Capability.getRaiseMorale(gameId, RED_TEAM_ID);
 
-        const commInterrupt0 = await Capability.getCommInterrupt(gameId, 0);
-        const commInterrupt1 = await Capability.getCommInterrupt(gameId, 1);
+        const commInterrupt0 = await Capability.getCommInterrupt(gameId, BLUE_TEAM_ID);
+        const commInterrupt1 = await Capability.getCommInterrupt(gameId, RED_TEAM_ID);
+
+        const goldenEye0 = await Capability.getGoldenEye(gameId, BLUE_TEAM_ID);
+        const goldenEye1 = await Capability.getGoldenEye(gameId, RED_TEAM_ID);
 
         let serverAction0;
         let serverAction1;
+        //TODO: could do constant with 'ROUNDS_PER_COMBAT' although getting excessive
         if (gameRound == 2) {
             //Combat -> Place Phase
             await thisGame.setRound(0);
-            await thisGame.setPhase(3);
+            await thisGame.setPhase(PLACE_PHASE_ID);
 
             serverAction0 = {
                 type: PLACE_PHASE,
@@ -55,7 +60,8 @@ const executeStep = async (socket, thisGame) => {
                     confirmedRemoteSense: remoteSense0,
                     confirmedBioWeapons: bioWeapons0,
                     confirmedRaiseMorale: raiseMorale0,
-                    confirmedCommInterrupt: commInterrupt0
+                    confirmedCommInterrupt: commInterrupt0,
+                    confirmedGoldenEye: goldenEye0
                 }
             };
 
@@ -66,7 +72,8 @@ const executeStep = async (socket, thisGame) => {
                     confirmedRemoteSense: remoteSense1,
                     confirmedBioWeapons: bioWeapons1,
                     confirmedRaiseMorale: raiseMorale1,
-                    confirmedCommInterrupt: commInterrupt1
+                    confirmedCommInterrupt: commInterrupt1,
+                    confirmedGoldenEye: goldenEye1
                 }
             };
         } else {
@@ -81,7 +88,8 @@ const executeStep = async (socket, thisGame) => {
                     confirmedRemoteSense: remoteSense0,
                     confirmedBioWeapons: bioWeapons0,
                     confirmedRaiseMorale: raiseMorale0,
-                    confirmedCommInterrupt: commInterrupt0
+                    confirmedCommInterrupt: commInterrupt0,
+                    confirmedGoldenEye: goldenEye0
                 }
             };
 
@@ -93,7 +101,8 @@ const executeStep = async (socket, thisGame) => {
                     confirmedRemoteSense: remoteSense1,
                     confirmedBioWeapons: bioWeapons1,
                     confirmedRaiseMorale: raiseMorale1,
-                    confirmedCommInterrupt: commInterrupt1
+                    confirmedCommInterrupt: commInterrupt1,
+                    confirmedGoldenEye: goldenEye1
                 }
             };
         }
@@ -101,7 +110,7 @@ const executeStep = async (socket, thisGame) => {
         socket.to("game" + gameId + "team0").emit(SERVER_SENDING_ACTION, serverAction0);
         socket.to("game" + gameId + "team1").emit(SERVER_SENDING_ACTION, serverAction1);
 
-        const thisSocketsAction = parseInt(socket.handshake.session.ir3.gameTeam) === 0 ? serverAction0 : serverAction1;
+        const thisSocketsAction = parseInt(socket.handshake.session.ir3.gameTeam) === BLUE_TEAM_ID ? serverAction0 : serverAction1;
         socket.emit(SERVER_SENDING_ACTION, thisSocketsAction);
 
         return;
@@ -109,10 +118,10 @@ const executeStep = async (socket, thisGame) => {
 
     //One of the teams may be without plans, keep them waiting
     if (currentMovementOrder0 == null) {
-        await thisGame.setStatus(0, 1);
+        await thisGame.setStatus(BLUE_TEAM_ID, WAITING_STATUS);
     }
     if (currentMovementOrder1 == null) {
-        await thisGame.setStatus(1, 1);
+        await thisGame.setStatus(RED_TEAM_ID, WAITING_STATUS);
     }
 
     let currentMovementOrder = currentMovementOrder0 != null ? currentMovementOrder0 : currentMovementOrder1;
@@ -208,6 +217,7 @@ const executeStep = async (socket, thisGame) => {
     //should not do refuel events if the team didn't have any plans for this step (TODO: prevent refuel stuff for team specific things)
 
     //refueling is team specific (loop through 0 and 1 teamIds)
+    //TODO: could refactor this to be cleaner (easier to read)
     const teamHadPlans = [currentMovementOrder0 == null ? 0 : 1, currentMovementOrder1 == null ? 0 : 1];
     for (let thisTeamNum = 0; thisTeamNum < 2; thisTeamNum++) {
         if (teamHadPlans[thisTeamNum]) {

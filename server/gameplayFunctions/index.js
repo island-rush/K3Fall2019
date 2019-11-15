@@ -23,23 +23,25 @@ const remoteSensingConfirm = require("./capabilities/remoteSensingConfirm");
 const insurgencyConfirm = require("./capabilities/insurgencyConfirm");
 const biologicalWeaponsConfirm = require("./capabilities/biologicalWeaponsConfirm");
 const raiseMoraleConfirm = require("./capabilities/raiseMoraleConfirm");
-const commInterruptConfirm = require('./capabilities/commInterruptionConfirm');
+const commInterruptConfirm = require("./capabilities/commInterruptionConfirm");
+const goldenEyeConfirm = require("./capabilities/goldenEyeConfirm");
 
 module.exports = {
-	shopPurchaseRequest,
-	sendUserFeedback,
-	shopRefundRequest,
-	shopConfirmPurchase,
-	confirmPlan,
-	deletePlan,
-	piecePlace,
-	mainButtonClick,
-	confirmBattleSelection,
-	confirmFuelSelection,
-	rodsFromGodConfirm,
-	remoteSensingConfirm,
-	insurgencyConfirm,
-	biologicalWeaponsConfirm,
-	raiseMoraleConfirm,
-	commInterruptConfirm
+    shopPurchaseRequest,
+    sendUserFeedback,
+    shopRefundRequest,
+    shopConfirmPurchase,
+    confirmPlan,
+    deletePlan,
+    piecePlace,
+    mainButtonClick,
+    confirmBattleSelection,
+    confirmFuelSelection,
+    rodsFromGodConfirm,
+    remoteSensingConfirm,
+    insurgencyConfirm,
+    biologicalWeaponsConfirm,
+    raiseMoraleConfirm,
+    commInterruptConfirm,
+    goldenEyeConfirm
 };

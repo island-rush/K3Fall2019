@@ -8,7 +8,8 @@ import {
     BIO_WEAPON_SELECTED,
     RAISE_MORALE_SELECTED,
     COMM_INTERRUP_SELECTED,
-} from '../actions/actionTypes';
+    GOLDEN_EYE_SELECTED
+} from "../actions/actionTypes";
 
 const initialInvState = [];
 
@@ -28,6 +29,7 @@ function invReducer(state = initialInvState, { type, payload }) {
         case INSURGENCY_SELECTED:
         case BIO_WEAPON_SELECTED:
         case RAISE_MORALE_SELECTED:
+        case GOLDEN_EYE_SELECTED:
         case COMM_INTERRUP_SELECTED:
             return state.filter(invItem => {
                 return invItem.invItemId !== payload.invItem.invItemId;

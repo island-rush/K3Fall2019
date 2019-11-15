@@ -7,7 +7,9 @@ import {
     COMMUNICATIONS_INTERRUPTION_TYPE_ID,
     RODS_FROM_GOD_TYPE_ID,
     INSURGENCY_TYPE_ID,
-    BIOLOGICAL_WEAPONS_TYPE_ID
+    BIOLOGICAL_WEAPONS_TYPE_ID,
+    GOLDEN_EYE_TYPE_ID,
+    GOLDEN_EYE_RANGE
 } from "../../gameData/gameConstants";
 import {
     POSITION_SELECT,
@@ -17,7 +19,8 @@ import {
     SERVER_REMOTE_SENSING_CONFIRM,
     SERVER_RODS_FROM_GOD_CONFIRM,
     SERVER_BIOLOGICAL_WEAPONS_CONFIRM,
-    SERVER_COMM_INTERRUPT_CONFIRM
+    SERVER_COMM_INTERRUPT_CONFIRM,
+    SERVER_GOLDEN_EYE_CONFIRM
 } from "./actionTypes";
 import { CLIENT_SENDING_ACTION } from "../socketEmits";
 import setUserFeedbackAction from "./setUserfeedbackAction";
@@ -76,6 +79,21 @@ const selectPosition = selectedPositionId => {
                 });
             }
 
+            if (gameboardMeta.planning.invItem.invItemTypeId === GOLDEN_EYE_TYPE_ID) {
+                let clickedPosition = selectedPositionId !== -1 ? selectedPositionId : gameboardMeta.selectedPosition;
+                let highlightedPositions = [];
+                for (let x = 0; x < distanceMatrix[clickedPosition].length; x++) {
+                    if (distanceMatrix[clickedPosition][x] <= GOLDEN_EYE_RANGE) highlightedPositions.push(x);
+                }
+
+                dispatch({
+                    type: HIGHLIGHT_POSITIONS,
+                    payload: {
+                        highlightedPositions
+                    }
+                });
+            }
+
             // eslint-disable-next-line no-restricted-globals
             if (confirm("Are you sure you want to use capability on this position?")) {
                 let type;
@@ -94,6 +112,9 @@ const selectPosition = selectedPositionId => {
                         break;
                     case COMMUNICATIONS_INTERRUPTION_TYPE_ID:
                         type = SERVER_COMM_INTERRUPT_CONFIRM;
+                        break;
+                    case GOLDEN_EYE_TYPE_ID:
+                        type = SERVER_GOLDEN_EYE_CONFIRM;
                         break;
                     default:
                         dispatch(setUserFeedbackAction("unkown/not yet implemented invItemTypeId functionality (capability)"));

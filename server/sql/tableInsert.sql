@@ -15,10 +15,12 @@ CREATE TABLE IF NOT EXISTS games (
     game0Controller1 INT(1) NOT NULL DEFAULT 0,
     game0Controller2 INT(1) NOT NULL DEFAULT 0,
     game0Controller3 INT(1) NOT NULL DEFAULT 0,
+    game0Controller4 INT(1) NOT NULL DEFAULT 0,
     game1Controller0 INT(1) NOT NULL DEFAULT 0,
     game1Controller1 INT(1) NOT NULL DEFAULT 0,
     game1Controller2 INT(1) NOT NULL DEFAULT 0,
     game1Controller3 INT(1) NOT NULL DEFAULT 0,
+    game1Controller4 INT(1) NOT NULL DEFAULT 0,
     
 	game0Status INT(1) NOT NULL DEFAULT 0,  -- 0: still active, 1: waiting for other player
 	game1Status INT(1) NOT NULL DEFAULT 0,
@@ -191,6 +193,16 @@ CREATE TABLE IF NOT EXISTS raiseMorale(
 
 CREATE TABLE IF NOT EXISTS commInterrupt(
 	commInterruptId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	gameId INT(8) NOT NULL,
+    teamId INT(1) NOT NULL,
+    positionId INT(2) NOT NULL,
+    roundsLeft INT(2) NOT NULL,
+    activated INT(1) NOT NULL,
+    FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE
+) AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS goldenEye(
+	goldenEyeId INT(8) PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	gameId INT(8) NOT NULL,
     teamId INT(1) NOT NULL,
     positionId INT(2) NOT NULL,

@@ -2,11 +2,11 @@ const { Game, InvItem, Capability } = require("../../classes");
 import { INSURGENCY_SELECTED } from "../../../client/src/redux/actions/actionTypes";
 import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../../client/src/redux/socketEmits";
 import { GAME_INACTIVE_TAG, GAME_DOES_NOT_EXIST } from "../../pages/errorTypes";
-import { INSURGENCY_TYPE_ID } from "../../../client/src/gameData/gameConstants";
+import { INSURGENCY_TYPE_ID, COMBAT_PHASE_ID, SLICE_PLANNING_ID, TYPE_MAIN } from "../../../client/src/gameData/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 
 const insurgencyConfirm = async (socket, payload) => {
-    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
 
     if (payload == null || payload.selectedPositionId == null) {
         sendUserFeedback(socket, "Server Error: Malformed Payload (missing selectedPositionId)");
@@ -29,19 +29,19 @@ const insurgencyConfirm = async (socket, payload) => {
     }
 
     //gamePhase 2 is only phase for insurgency
-    if (gamePhase != 2) {
+    if (gamePhase != COMBAT_PHASE_ID) {
         sendUserFeedback(socket, "Not the right phase...");
         return;
     }
 
     //gameSlice 0 is only slice for insurgency
-    if (gameSlice != 0) {
+    if (gameSlice != SLICE_PLANNING_ID) {
         sendUserFeedback(socket, "Not the right slice (must be planning)...");
         return;
     }
 
     //Only the main controller (0) can use insurgency
-    if (gameController != 0) {
+    if (!gameControllers.includes(TYPE_MAIN)) {
         sendUserFeedback(socket, "Not the main controller (0)...");
         return;
     }

@@ -1,7 +1,7 @@
 const pool = require("../database");
 import { INITIAL_GAMESTATE } from "../../client/src/redux/actions/actionTypes";
 const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("../gameplayFunctions/eventConstants");
-import { AIR_REFUELING_SQUADRON, CAPTURE_TYPES, BLUE_TEAM_ID, RED_TEAM_ID } from "../../client/src/gameData/gameConstants";
+import { AIR_REFUELING_SQUADRON, CAPTURE_TYPES, BLUE_TEAM_ID, RED_TEAM_ID, NEWS_PHASE_ID } from "../../client/src/gameData/gameConstants";
 import {
     ALL_ISLAND_LOCATIONS,
     ISLAND_POINTS,
@@ -190,9 +190,10 @@ class Game {
         serverAction.payload.gameboardMeta.confirmedBioWeapons = await Capability.getBiologicalWeapons(this.gameId, gameTeam);
         serverAction.payload.gameboardMeta.confirmedRaiseMorale = await Capability.getRaiseMorale(this.gameId, gameTeam);
         serverAction.payload.gameboardMeta.confirmedCommInterrupt = await Capability.getCommInterrupt(this.gameId, gameTeam);
+        serverAction.payload.gameboardMeta.confirmedGoldenEye = await Capability.getGoldenEye(this.gameId, gameTeam);
 
         //Could put news into its own object, but don't really use it much...(TODO: figure out if need to refactor this...)
-        if (this.gamePhase == 0) {
+        if (this.gamePhase == NEWS_PHASE_ID) {
             let queryString = "SELECT newsTitle, newsInfo FROM news WHERE newsGameId = ? ORDER BY newsOrder ASC LIMIT 1";
             let inserts = [this.gameId];
             const [resultNews] = await pool.query(queryString, inserts);
@@ -216,8 +217,8 @@ class Game {
             switch (eventTypeId) {
                 case POS_BATTLE_EVENT_TYPE:
                 case COL_BATTLE_EVENT_TYPE:
-                    let friendlyPiecesList = await currentEvent.getTeamItems(gameTeam == 0 ? 0 : 1);
-                    let enemyPiecesList = await currentEvent.getTeamItems(gameTeam == 0 ? 1 : 0);
+                    let friendlyPiecesList = await currentEvent.getTeamItems(gameTeam == BLUE_TEAM_ID ? RED_TEAM_ID : BLUE_TEAM_ID);
+                    let enemyPiecesList = await currentEvent.getTeamItems(gameTeam == BLUE_TEAM_ID ? RED_TEAM_ID : BLUE_TEAM_ID);
                     let friendlyPieces = [];
                     let enemyPieces = [];
 
@@ -309,7 +310,7 @@ class Game {
 
     async setGameActive(newValue) {
         const queryString =
-            "UPDATE games SET gameActive = ?, game0Controller0 = 0, game0Controller1 = 0, game0Controller2 = 0, game0Controller3 = 0, game1Controller0 = 0, game1Controller1 = 0, game1Controller2 = 0, game1Controller3 = 0 WHERE gameId = ?";
+            "UPDATE games SET gameActive = ?, game0Controller0 = 0, game0Controller1 = 0, game0Controller2 = 0, game0Controller3 = 0, game0Controller4 = 0, game1Controller0 = 0, game1Controller1 = 0, game1Controller2 = 0, game1Controller3 = 0, game1Controller4 = 0 WHERE gameId = ?";
         const inserts = [newValue, this.gameId];
         await pool.query(queryString, inserts);
         const updatedInfo = {
@@ -317,11 +318,14 @@ class Game {
             game0Controller0: 0,
             game0Controller1: 0,
             game0Controller2: 0,
-            game0Controller3: 0,
+			game0Controller3: 0,
+			game0Controller4: 0,
             game1Controller0: 0,
             game1Controller1: 0,
             game1Controller2: 0,
-            game1Controller3: 0
+			game1Controller3: 0,
+			game1Controller4: 0,
+
         };
         Object.assign(this, updatedInfo); //very unlikely we would need the updated info on this object...
     }

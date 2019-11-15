@@ -37,7 +37,9 @@ import {
     RAISE_MORALE_SELECTED,
     COMM_INTERRUPT_SELECTING,
     COMM_INTERRUP_SELECTED,
-    UPDATE_FLAGS
+    UPDATE_FLAGS,
+    GOLDEN_EYE_SELECTED,
+    GOLDEN_EYE_SELECTING
 } from "../actions/actionTypes";
 
 const initialUserFeedback = "Loading...";
@@ -84,6 +86,10 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
             return "selected an area to interrupt communication.";
         case COMM_INTERRUPT_SELECTING:
             return "Now select an area to start interrupting communication!";
+        case GOLDEN_EYE_SELECTED:
+            return "selected an area to 'golden eye' thing";
+        case GOLDEN_EYE_SELECTING:
+            return "Now select an area to 'golden eye' thing";
         case AIRCRAFT_CLICK:
             return "transferring fuel planned...";
         case PLAN_WAS_CONFIRMED:
