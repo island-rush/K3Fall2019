@@ -7,7 +7,7 @@ const sendUserFeedback = require("../sendUserFeedback");
 const giveNextEvent = require("../giveNextEvent");
 
 const confirmBattleSelection = async (socket, payload) => {
-    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
     const { friendlyPieces } = payload;
 
     const thisGame = await new Game({ gameId }).init();

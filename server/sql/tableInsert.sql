@@ -15,10 +15,12 @@ CREATE TABLE IF NOT EXISTS games (
     game0Controller1 INT(1) NOT NULL DEFAULT 0,
     game0Controller2 INT(1) NOT NULL DEFAULT 0,
     game0Controller3 INT(1) NOT NULL DEFAULT 0,
+    game0Controller4 INT(1) NOT NULL DEFAULT 0,
     game1Controller0 INT(1) NOT NULL DEFAULT 0,
     game1Controller1 INT(1) NOT NULL DEFAULT 0,
     game1Controller2 INT(1) NOT NULL DEFAULT 0,
     game1Controller3 INT(1) NOT NULL DEFAULT 0,
+    game1Controller4 INT(1) NOT NULL DEFAULT 0,
     
 	game0Status INT(1) NOT NULL DEFAULT 0,  -- 0: still active, 1: waiting for other player
 	game1Status INT(1) NOT NULL DEFAULT 0,

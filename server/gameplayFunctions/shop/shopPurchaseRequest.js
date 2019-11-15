@@ -6,7 +6,7 @@ import { TYPE_COSTS, PURCHASE_PHASE_ID, TYPE_MAIN, BLUE_TEAM_ID } from "../../..
 const sendUserFeedback = require("../sendUserFeedback");
 
 const shopPurchaseRequest = async (socket, payload) => {
-    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
 
     if (payload == null || payload.shopItemTypeId == null) {
         sendUserFeedback(socket, "Server Error: Malformed Payload (missing shopItemTypeId)");
@@ -30,7 +30,7 @@ const shopPurchaseRequest = async (socket, payload) => {
     }
 
     //Only the main controller (0) can buy things
-    if (gameController != TYPE_MAIN) {
+    if (!gameControllers.includes(TYPE_MAIN)) {
         sendUserFeedback(socket, "Not the main controller (0)...");
         return;
     }

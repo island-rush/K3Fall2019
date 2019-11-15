@@ -19,7 +19,7 @@ import {
 const executeStep = require("./executeStep"); //big function
 
 const mainButtonClick = async (socket, payload) => {
-    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
 
     const thisGame = await new Game({ gameId }).init();
     const { gameActive, gamePhase, gameRound, gameSlice, game0Status, game1Status } = thisGame;
@@ -30,7 +30,7 @@ const mainButtonClick = async (socket, payload) => {
     }
 
     //Who is allowed to press that button?
-    if (gameController != TYPE_MAIN) {
+    if (!gameControllers.includes(TYPE_MAIN)) {
         sendUserFeedback(socket, "Wrong Controller to click that button...");
         return;
     }

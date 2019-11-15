@@ -11,7 +11,7 @@ import { PURCHASE_PHASE_ID, TYPE_MAIN } from "../../../client/src/gameData/gameC
  */
 
 const shopConfirmPurchase = async (socket, payload) => {
-    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
     const thisGame = await new Game({ gameId }).init();
 
     const { gameActive, gamePhase } = thisGame;
@@ -28,7 +28,7 @@ const shopConfirmPurchase = async (socket, payload) => {
     }
 
     //Only the main controller (0) can confirm purchase
-    if (gameController != TYPE_MAIN) {
+    if (!gameControllers.includes(TYPE_MAIN)) {
         sendUserFeedback(socket, "Not the main controller (0)...");
         return;
     }

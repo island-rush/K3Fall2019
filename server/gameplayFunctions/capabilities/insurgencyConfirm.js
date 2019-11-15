@@ -6,7 +6,7 @@ import { INSURGENCY_TYPE_ID, COMBAT_PHASE_ID, SLICE_PLANNING_ID, TYPE_MAIN } fro
 const sendUserFeedback = require("../sendUserFeedback");
 
 const insurgencyConfirm = async (socket, payload) => {
-    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
 
     if (payload == null || payload.selectedPositionId == null) {
         sendUserFeedback(socket, "Server Error: Malformed Payload (missing selectedPositionId)");
@@ -41,7 +41,7 @@ const insurgencyConfirm = async (socket, payload) => {
     }
 
     //Only the main controller (0) can use insurgency
-    if (gameController != TYPE_MAIN) {
+    if (!gameControllers.includes(TYPE_MAIN)) {
         sendUserFeedback(socket, "Not the main controller (0)...");
         return;
     }

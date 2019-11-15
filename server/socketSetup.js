@@ -47,13 +47,13 @@ const {
 
 const socketSetup = async socket => {
     //Verify that this user is authenticated / known
-    if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameController) {
+    if (!socket.handshake.session.ir3 || !socket.handshake.session.ir3.gameId || !socket.handshake.session.ir3.gameTeam || !socket.handshake.session.ir3.gameControllers) {
         socket.emit(SERVER_REDIRECT, BAD_SESSION);
         return;
     }
 
     const ir3Session = socket.handshake.session.ir3;
-    const { gameId, gameTeam, gameController } = ir3Session; //get the user's information
+    const { gameId, gameTeam, gameControllers } = ir3Session; //get the user's information
 
     const thisGame = await new Game({ gameId }).init(); //get the Game
 
@@ -63,18 +63,21 @@ const socketSetup = async socket => {
         return;
     }
 
-    const loggedIn = thisGame["game" + gameTeam + "Controller" + gameController];
+    let gameController;
+    for (gameController of gameControllers) {
+        let loggedIn = thisGame["game" + gameTeam + "Controller" + gameController];
 
-    //Session doesn't match DB, another player could login again as this controller (since login only checks db values)
-    if (!loggedIn) {
-        socket.emit(SERVER_REDIRECT, NOT_LOGGED_IN_TAG);
-        return;
-    } else {
-        //probably refreshed, keep them logged in (disconnect logs them out)
-        setTimeout(() => {
-            thisGame.setLoggedIn(gameTeam, gameController, ACTIVATED);
-            socket.handshake.session.ir3 = ir3Session;
-        }, 5000);
+        //Session doesn't match DB, another player could login again as this controller (since login only checks db values)
+        if (!loggedIn) {
+            socket.emit(SERVER_REDIRECT, NOT_LOGGED_IN_TAG);
+            return;
+        } else {
+            //probably refreshed, keep them logged in (disconnect logs them out)
+            setTimeout(() => {
+                thisGame.setLoggedIn(gameTeam, gameController, 1);
+                socket.handshake.session.ir3 = ir3Session;
+            }, 5000);
+        }
     }
 
     //Socket Room for the Game
@@ -84,7 +87,8 @@ const socketSetup = async socket => {
     socket.join("game" + gameId + "team" + gameTeam);
 
     //Socket Room for the Indiviual Controller
-    socket.join("game" + gameId + "team" + gameTeam + "controller" + gameController);
+    //TODO: multiple rooms for a single socket if logged in as multiple controllers (is this needed in the game?)
+    // socket.join("game" + gameId + "team" + gameTeam + "controller" + gameController);
 
     //Send the client intial game state data
     const serverAction = await thisGame.initialStateAction(gameTeam, gameController);
@@ -155,7 +159,9 @@ const socketSetup = async socket => {
     socket.on("disconnect", async () => {
         try {
             setTimeout(() => {
-                thisGame.setLoggedIn(gameTeam, gameController, DEACTIVATED);
+                for (gameController in gameControllers) {
+                    thisGame.setLoggedIn(gameTeam, gameController, 0);
+                }
                 delete socket.handshake.session.ir3;
             }, 5000);
         } catch (error) {

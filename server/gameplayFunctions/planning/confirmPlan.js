@@ -7,7 +7,7 @@ import { CONTAINER_TYPES, TYPE_MOVES, COMBAT_PHASE_ID, SLICE_PLANNING_ID } from 
 import { distanceMatrix } from "../../../client/src/gameData/distanceMatrix";
 
 const confirmPlan = async (socket, payload) => {
-    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
     const { pieceId, plan } = payload;
     const thisGame = await new Game({ gameId }).init();
 
@@ -33,7 +33,7 @@ const confirmPlan = async (socket, payload) => {
 
     const { piecePositionId, pieceTypeId, pieceGameId, pieceTeamId } = thisPiece;
 
-    //Is this piece ours? (TODO: could also check pieceType with gameController)
+    //Is this piece ours? (TODO: could also check pieceType with gameControllers)
     if (pieceGameId != gameId || pieceTeamId != gameTeam) {
         sendUserFeedback(socket, "Piece did not belong to your team...(or this game)");
         return;

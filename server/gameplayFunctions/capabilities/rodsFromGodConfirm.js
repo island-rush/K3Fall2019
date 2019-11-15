@@ -7,7 +7,7 @@ const sendUserFeedback = require("../sendUserFeedback");
 
 //TODO: does this affect all pieces? or only ground since that makes sense....(compare to bio weapons)
 const rodsFromGodConfirm = async (socket, payload) => {
-    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
 
     if (payload == null || payload.selectedPositionId == null) {
         sendUserFeedback(socket, "Server Error: Malformed Payload (missing selectedPositionId)");
@@ -42,7 +42,7 @@ const rodsFromGodConfirm = async (socket, payload) => {
     }
 
     //Only the main controller (0) can use rods from god
-    if (gameController != TYPE_MAIN) {
+    if (!gameControllers.includes(TYPE_MAIN)) {
         sendUserFeedback(socket, "Not the main controller (0)...");
         return;
     }

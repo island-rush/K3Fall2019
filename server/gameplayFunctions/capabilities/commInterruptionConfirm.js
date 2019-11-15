@@ -6,7 +6,7 @@ import { COMMUNICATIONS_INTERRUPTION_TYPE_ID, COMBAT_PHASE_ID, SLICE_PLANNING_ID
 const sendUserFeedback = require("../sendUserFeedback");
 
 const commInterruptConfirm = async (socket, payload) => {
-    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
 
     if (payload == null || payload.selectedPositionId == null) {
         sendUserFeedback(socket, "Server Error: Malformed Payload (missing selectedPositionId)");
@@ -41,7 +41,7 @@ const commInterruptConfirm = async (socket, payload) => {
     }
 
     //Only the main controller (0) can use comm interrupt
-    if (gameController != TYPE_MAIN) {
+    if (!gameControllers.includes(TYPE_MAIN)) {
         sendUserFeedback(socket, "Not the main controller (0)...");
         return;
     }

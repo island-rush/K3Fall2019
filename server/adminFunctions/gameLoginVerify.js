@@ -3,9 +3,9 @@ import { BAD_REQUEST_TAG, GAME_DOES_NOT_EXIST, ALREADY_IN_TAG, LOGIN_TAG, GAME_I
 const md5 = require("md5");
 
 const gameLoginVerify = async (req, res) => {
-    const { gameSection, gameInstructor, gameTeam, gameTeamPassword, gameController } = req.body;
+    const { gameSection, gameInstructor, gameTeam, gameTeamPassword, gameControllers } = req.body;
 
-    if (!gameSection || !gameInstructor || !gameTeam || !gameTeamPassword || !gameController) {
+    if (!gameSection || !gameInstructor || !gameTeam || !gameTeamPassword || !gameControllers) {
         res.redirect(`/index.html?error=${BAD_REQUEST_TAG}`);
         return;
     }
@@ -16,18 +16,10 @@ const gameLoginVerify = async (req, res) => {
         res.redirect(`/index.html?error=${GAME_DOES_NOT_EXIST}`);
         return;
     }
-
     const { gameActive, gameId } = thisGame;
 
     if (!gameActive) {
         res.redirect(`/index.html?error=${GAME_INACTIVE_TAG}`);
-        return;
-    }
-
-    const commanderLoginField = "game" + gameTeam + "Controller" + gameController; //ex: 'game0Controller0'
-    //TODO: constants for LOGGED_IN and NOT_LOGGED_IN
-    if (thisGame[commanderLoginField] != 0) {
-        res.redirect(`/index.html?error=${ALREADY_IN_TAG}`);
         return;
     }
 
@@ -38,12 +30,23 @@ const gameLoginVerify = async (req, res) => {
         return;
     }
 
-    await thisGame.setLoggedIn(gameTeam, gameController, 1);
+    for (let x = 0; x < gameControllers.length; x++) {
+        let gameController = parseInt(gameControllers[x]);
+        let commanderLoginField = "game" + gameTeam + "Controller" + gameController;
+        if (thisGame[commanderLoginField] != 0) {
+            res.redirect(`/index.html?error=${ALREADY_IN_TAG}`);
+            return;
+        }
+    }
+
+    for (let x = 0; x < gameControllers.length; x++) {
+        await thisGame.setLoggedIn(gameTeam, gameControllers[x], 1);
+    }
 
     req.session.ir3 = {
         gameId,
         gameTeam,
-        gameController
+        gameControllers
     };
 
     res.redirect("/game.html");

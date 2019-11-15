@@ -5,7 +5,7 @@ import { SERVER_REDIRECT, SERVER_SENDING_ACTION } from "../../client/src/redux/s
 import { BAD_REQUEST_TAG, GAME_INACTIVE_TAG } from "../pages/errorTypes";
 
 const piecePlace = async (socket, payload) => {
-    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
     const { invItemId, selectedPosition } = payload;
 
     const thisGame = await new Game({ gameId }).init();
@@ -22,11 +22,7 @@ const piecePlace = async (socket, payload) => {
         return;
     }
 
-    // Different controllers place their own piece types? TODO: make this part of the checks...
-    // if (gameController != 0) {
-    // 	sendUserFeedback(socket, "Not the main controller (0)...");
-    // 	return;
-    // }
+    // TODO: Different controllers place their own piece types? TODO: make this part of the checks...
 
     const thisInvItem = await new InvItem(invItemId).init();
     if (!thisInvItem) {

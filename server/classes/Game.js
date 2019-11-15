@@ -310,7 +310,7 @@ class Game {
 
     async setGameActive(newValue) {
         const queryString =
-            "UPDATE games SET gameActive = ?, game0Controller0 = 0, game0Controller1 = 0, game0Controller2 = 0, game0Controller3 = 0, game1Controller0 = 0, game1Controller1 = 0, game1Controller2 = 0, game1Controller3 = 0 WHERE gameId = ?";
+            "UPDATE games SET gameActive = ?, game0Controller0 = 0, game0Controller1 = 0, game0Controller2 = 0, game0Controller3 = 0, game0Controller4 = 0, game1Controller0 = 0, game1Controller1 = 0, game1Controller2 = 0, game1Controller3 = 0, game1Controller4 = 0 WHERE gameId = ?";
         const inserts = [newValue, this.gameId];
         await pool.query(queryString, inserts);
         const updatedInfo = {
@@ -318,11 +318,14 @@ class Game {
             game0Controller0: 0,
             game0Controller1: 0,
             game0Controller2: 0,
-            game0Controller3: 0,
+			game0Controller3: 0,
+			game0Controller4: 0,
             game1Controller0: 0,
             game1Controller1: 0,
             game1Controller2: 0,
-            game1Controller3: 0
+			game1Controller3: 0,
+			game1Controller4: 0,
+
         };
         Object.assign(this, updatedInfo); //very unlikely we would need the updated info on this object...
     }

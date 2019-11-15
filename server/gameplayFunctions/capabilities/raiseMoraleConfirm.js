@@ -6,7 +6,7 @@ import { RAISE_MORALE_TYPE_ID, ALL_COMMANDER_TYPES, COMBAT_PHASE_ID, SLICE_PLANN
 const sendUserFeedback = require("../sendUserFeedback");
 
 const raiseMoraleConfirm = async (socket, payload) => {
-    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
 
     if (payload == null || payload.selectedCommanderType == null) {
         sendUserFeedback(socket, "Server Error: Malformed Payload (missing selectedCommanderType)");
@@ -41,7 +41,7 @@ const raiseMoraleConfirm = async (socket, payload) => {
     }
 
     //Only the main controller (0) can use raise morale
-    if (gameController != TYPE_MAIN) {
+    if (!gameControllers.includes(TYPE_MAIN)) {
         sendUserFeedback(socket, "Not the main controller (0)...");
         return;
     }

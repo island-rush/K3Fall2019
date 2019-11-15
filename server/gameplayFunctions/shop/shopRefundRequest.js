@@ -6,7 +6,7 @@ import { GAME_INACTIVE_TAG, BAD_REQUEST_TAG } from "../../pages/errorTypes";
 import { TYPE_COSTS, PURCHASE_PHASE_ID, TYPE_MAIN, BLUE_TEAM_ID } from "../../../client/src/gameData/gameConstants";
 
 const shopRefundRequest = async (socket, payload) => {
-    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
     const thisGame = await new Game({ gameId }).init();
 
     const { gameActive, gamePhase, game0Points, game1Points } = thisGame;
@@ -23,7 +23,7 @@ const shopRefundRequest = async (socket, payload) => {
     }
 
     //Only the main controller (0) can refund things
-    if (gameController != TYPE_MAIN) {
+    if (!gameControllers.includes(TYPE_MAIN)) {
         sendUserFeedback(socket, "Not the main controller (0)...");
         return;
     }

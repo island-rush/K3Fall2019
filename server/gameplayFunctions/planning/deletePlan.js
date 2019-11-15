@@ -6,7 +6,7 @@ import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
 import { COMBAT_PHASE_ID, SLICE_PLANNING_ID } from "../../../client/src/gameData/gameConstants";
 
 const deletePlan = async (socket, payload) => {
-    const { gameId, gameTeam, gameController } = socket.handshake.session.ir3;
+    const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
     const { pieceId } = payload;
     const thisGame = await new Game({ gameId }).init();
 
