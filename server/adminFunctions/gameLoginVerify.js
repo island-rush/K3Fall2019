@@ -3,6 +3,7 @@ import { BAD_REQUEST_TAG, GAME_DOES_NOT_EXIST, ALREADY_IN_TAG, LOGIN_TAG, GAME_I
 const md5 = require("md5");
 
 const gameLoginVerify = async (req, res) => {
+    //TODO: probably check these before grabbing them for safety
     const { gameSection, gameInstructor, gameTeam, gameTeamPassword, gameControllers } = req.body;
 
     if (!gameSection || !gameInstructor || !gameTeam || !gameTeamPassword || !gameControllers) {
@@ -39,14 +40,16 @@ const gameLoginVerify = async (req, res) => {
         }
     }
 
+    let gameControllersInt = [];
     for (let x = 0; x < gameControllers.length; x++) {
         await thisGame.setLoggedIn(gameTeam, gameControllers[x], 1);
+        gameControllersInt.push(parseInt(gameControllers[x]));
     }
 
     req.session.ir3 = {
         gameId,
         gameTeam,
-        gameControllers
+        gameControllers: gameControllersInt
     };
 
     res.redirect("/game.html");
