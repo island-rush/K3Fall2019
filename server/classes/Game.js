@@ -9,7 +9,7 @@ import {
     MONTAVILLE_ISLAND_ID,
     LION_ISLAND_ID,
     NOYARC_ISLAND_ID,
-    FULER_ISLAND_ID,
+    FULLER_ISLAND_ID,
     RICO_ISLAND_ID,
     TAMU_ISLAND_ID,
     SHOR_ISLAND_ID,
@@ -126,8 +126,8 @@ class Game {
         bluePoints += this.island5 === BLUE_TEAM_ID ? ISLAND_POINTS[NOYARC_ISLAND_ID] : 0;
         redPoints += this.island5 === RED_TEAM_ID ? ISLAND_POINTS[NOYARC_ISLAND_ID] : 0;
 
-        bluePoints += this.island6 === BLUE_TEAM_ID ? ISLAND_POINTS[FULER_ISLAND_ID] : 0;
-        redPoints += this.island6 === RED_TEAM_ID ? ISLAND_POINTS[FULER_ISLAND_ID] : 0;
+        bluePoints += this.island6 === BLUE_TEAM_ID ? ISLAND_POINTS[FULLER_ISLAND_ID] : 0;
+        redPoints += this.island6 === RED_TEAM_ID ? ISLAND_POINTS[FULLER_ISLAND_ID] : 0;
 
         bluePoints += this.island7 === BLUE_TEAM_ID ? ISLAND_POINTS[RICO_ISLAND_ID] : 0;
         redPoints += this.island7 === RED_TEAM_ID ? ISLAND_POINTS[RICO_ISLAND_ID] : 0;
