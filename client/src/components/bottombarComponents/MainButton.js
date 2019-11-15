@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { WAITING_STATUS, NEWS_PHASE_ID, PURCHASE_PHASE_ID, COMBAT_PHASE_ID, SLICE_PLANNING_ID, PLACE_PHASE_ID } from "../../gameData/gameConstants";
+import { WAITING_STATUS, NEWS_PHASE_ID, PURCHASE_PHASE_ID, COMBAT_PHASE_ID, SLICE_PLANNING_ID, PLACE_PHASE_ID } from "../../constants/gameConstants";
 
 const mainButtonStyle = {
     backgroundColor: "grey",

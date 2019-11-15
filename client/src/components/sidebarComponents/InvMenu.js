@@ -26,7 +26,7 @@ import {
     DRONE_SWARMS_TYPE_ID,
     INSURGENCY_TYPE_ID,
     RAISE_MORALE_TYPE_ID
-} from "../../gameData/gameConstants";
+} from "../../constants/gameConstants";
 
 const inventoryStyle = {
     backgroundColor: "Yellow",

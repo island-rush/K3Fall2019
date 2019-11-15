@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { TYPE_OWNER_NAMES } from "../../gameData/gameConstants";
+import { TYPE_OWNER_NAMES } from "../../constants/gameConstants";
 
 const gameinfoStyle = {
     backgroundColor: "Yellow",

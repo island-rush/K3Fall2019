@@ -1,4 +1,4 @@
-import { distanceMatrix } from "../../gameData/distanceMatrix";
+import { distanceMatrix } from "../../constants/distanceMatrix";
 import {
     REMOTE_SENSING_RANGE,
     COMM_INTERRUPT_RANGE,
@@ -10,7 +10,7 @@ import {
     GOLDEN_EYE_TYPE_ID,
     GOLDEN_EYE_RANGE,
     TYPE_TERRAIN
-} from "../../gameData/gameConstants";
+} from "../../constants/gameConstants";
 import {
     POSITION_SELECT,
     PLANNING_SELECT,
@@ -22,7 +22,7 @@ import {
     SERVER_COMM_INTERRUPT_CONFIRM,
     SERVER_GOLDEN_EYE_CONFIRM
 } from "./actionTypes";
-import { SOCKET_CLIENT_SENDING_ACTION } from "../../gameData/otherConstants";
+import { SOCKET_CLIENT_SENDING_ACTION } from "../../constants/otherConstants";
 import setUserFeedbackAction from "./setUserfeedbackAction";
 import { initialGameboardEmpty } from "../reducers/initialGameboardEmpty";
 

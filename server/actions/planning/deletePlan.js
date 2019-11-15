@@ -1,9 +1,9 @@
 const { Game, Piece } = require("../../classes");
 const sendUserFeedback = require("../sendUserFeedback");
 import { DELETE_PLAN } from "../../../client/src/redux/actions/actionTypes";
-import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/gameData/otherConstants";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/constants/otherConstants";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
-import { COMBAT_PHASE_ID, SLICE_PLANNING_ID } from "../../../client/src/gameData/gameConstants";
+import { COMBAT_PHASE_ID, SLICE_PLANNING_ID } from "../../../client/src/constants/gameConstants";
 
 const deletePlan = async (socket, payload) => {
     const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;

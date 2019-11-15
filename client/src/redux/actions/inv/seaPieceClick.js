@@ -1,7 +1,7 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
-import { SOCKET_CLIENT_SENDING_ACTION } from "../../../gameData/otherConstants";
+import { SOCKET_CLIENT_SENDING_ACTION } from "../../../constants/otherConstants";
 import { SERVER_PIECE_PLACE } from "../actionTypes";
-import { PLACE_PHASE_ID } from "../../../gameData/gameConstants";
+import { PLACE_PHASE_ID } from "../../../constants/gameConstants";
 
 const seaPieceClick = invItem => {
     return (dispatch, getState, emit) => {

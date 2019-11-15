@@ -1,8 +1,8 @@
 const { Game, InvItem, Capability } = require("../../classes");
 import { RODS_FROM_GOD_SELECTED } from "../../../client/src/redux/actions/actionTypes";
-import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/gameData/otherConstants";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/constants/otherConstants";
 import { GAME_INACTIVE_TAG, GAME_DOES_NOT_EXIST } from "../../pages/errorTypes";
-import { RODS_FROM_GOD_TYPE_ID, COMBAT_PHASE_ID, SLICE_PLANNING_ID, TYPE_MAIN } from "../../../client/src/gameData/gameConstants";
+import { RODS_FROM_GOD_TYPE_ID, COMBAT_PHASE_ID, SLICE_PLANNING_ID, TYPE_MAIN } from "../../../client/src/constants/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 
 //TODO: does this affect all pieces? or only ground since that makes sense....(compare to bio weapons)

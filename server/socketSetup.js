@@ -5,7 +5,7 @@
 
 const { Game } = require("./classes");
 import { BAD_SESSION, GAME_DOES_NOT_EXIST, NOT_LOGGED_IN_TAG } from "./pages/errorTypes";
-import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION, SOCKET_CLIENT_SENDING_ACTION } from "../client/src/gameData/otherConstants";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION, SOCKET_CLIENT_SENDING_ACTION } from "../client/src/constants/otherConstants";
 import {
     SERVER_BIOLOGICAL_WEAPONS_CONFIRM,
     SERVER_INSURGENCY_CONFIRM,
@@ -24,7 +24,7 @@ import {
     SERVER_COMM_INTERRUPT_CONFIRM,
     SERVER_GOLDEN_EYE_CONFIRM
 } from "../client/src/redux/actions/actionTypes";
-import { ACTIVATED, DEACTIVATED } from "../client/src/gameData/gameConstants";
+import { ACTIVATED, DEACTIVATED } from "../client/src/constants/gameConstants";
 const {
     sendUserFeedback,
     shopPurchaseRequest,

@@ -1,6 +1,6 @@
 import { CANCEL_PLAN, SERVER_DELETE_PLAN } from "../actionTypes";
 import setUserfeedbackAction from "../setUserfeedbackAction";
-import { SOCKET_CLIENT_SENDING_ACTION } from "../../../gameData/otherConstants";
+import { SOCKET_CLIENT_SENDING_ACTION } from "../../../constants/otherConstants";
 
 //TODO: rename cancelPlan to deletePlan to match the server side function (possibly match all client/server functions with each other...)
 const cancelPlan = () => {

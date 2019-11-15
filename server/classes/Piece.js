@@ -26,8 +26,8 @@ import {
     TRANSPORT_TYPE_ID,
     MC_12_TYPE_ID,
     C_130_TYPE_ID
-} from "../../client/src/gameData/gameConstants";
-import { distanceMatrix } from "../../client/src/gameData/distanceMatrix";
+} from "../../client/src/constants/gameConstants";
+import { distanceMatrix } from "../../client/src/constants/distanceMatrix";
 
 class Piece {
     constructor(pieceId, options) {

@@ -1,4 +1,4 @@
-import { SOCKET_CLIENT_SENDING_ACTION } from "../../../gameData/otherConstants";
+import { SOCKET_CLIENT_SENDING_ACTION } from "../../../constants/otherConstants";
 import { SERVER_SHOP_CONFIRM_PURCHASE } from "../actionTypes";
 
 //TODO: more checks on if they can purchase before sending to backend (don't waste network)

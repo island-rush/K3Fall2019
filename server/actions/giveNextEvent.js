@@ -1,7 +1,7 @@
 const { Event, Piece } = require("../classes");
 import { EVENT_BATTLE, NO_MORE_EVENTS, EVENT_REFUEL } from "../../client/src/redux/actions/actionTypes";
-import { AIR_REFUELING_SQUADRON, BLUE_TEAM_ID, RED_TEAM_ID } from "../../client/src/gameData/gameConstants";
-import { SOCKET_SERVER_SENDING_ACTION } from "../../client/src/gameData/otherConstants";
+import { AIR_REFUELING_SQUADRON, BLUE_TEAM_ID, RED_TEAM_ID } from "../../client/src/constants/gameConstants";
+import { SOCKET_SERVER_SENDING_ACTION } from "../../client/src/constants/otherConstants";
 const sendUserFeedback = require("./sendUserFeedback");
 const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("./eventConstants");
 

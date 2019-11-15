@@ -9,8 +9,8 @@ import RefuelPopup from "./refuel/RefuelPopup";
 import SelectCommanderTypePopup from "./capabilities/SelectCommanderTypePopup";
 import Patterns from "./Patterns";
 import { selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } from "../../redux/actions";
-import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE, GOLDEN_EYE_RANGE, RED_TEAM_ID, BLUE_TEAM_ID } from "../../gameData/gameConstants";
-import { distanceMatrix } from "../../gameData/distanceMatrix";
+import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE, GOLDEN_EYE_RANGE, RED_TEAM_ID, BLUE_TEAM_ID } from "../../constants/gameConstants";
+import { distanceMatrix } from "../../constants/distanceMatrix";
 import {
     ALL_ISLAND_LOCATIONS,
     IGNORE_TITLE_TYPES,
@@ -20,7 +20,7 @@ import {
     MISSILE_SILO_TYPE,
     MISSILE_SILO_TITLE,
     ISLAND_POINTS
-} from "../../gameData/gameboardConstants";
+} from "../../constants/gameboardConstants";
 
 const gameboardStyle = {
     backgroundColor: "blue",

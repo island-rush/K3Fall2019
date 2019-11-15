@@ -1,6 +1,6 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { GOLDEN_EYE_SELECTING } from "../actionTypes";
-import { COMBAT_PHASE_ID, SLICE_PLANNING_ID } from "../../../gameData/gameConstants";
+import { COMBAT_PHASE_ID, SLICE_PLANNING_ID } from "../../../constants/gameConstants";
 
 const goldenEye = invItem => {
     return (dispatch, getState, emit) => {

@@ -1,9 +1,9 @@
 const { Game, InvItem, ShopItem } = require("../../classes");
 const sendUserFeedback = require("../sendUserFeedback");
 import { SHOP_TRANSFER } from "../../../client/src/redux/actions/actionTypes";
-import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/gameData/otherConstants";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/constants/otherConstants";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
-import { PURCHASE_PHASE_ID, TYPE_MAIN } from "../../../client/src/gameData/gameConstants";
+import { PURCHASE_PHASE_ID, TYPE_MAIN } from "../../../client/src/constants/gameConstants";
 
 /***
  * TODO: standard function descriptions (author?, arguments, returns, why/when used?)

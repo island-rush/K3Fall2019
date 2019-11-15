@@ -1,10 +1,10 @@
 const { Game, Piece, Plan } = require("../../classes");
 const sendUserFeedback = require("../sendUserFeedback");
 import { PLAN_WAS_CONFIRMED } from "../../../client/src/redux/actions/actionTypes";
-import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/gameData/otherConstants";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/constants/otherConstants";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
-import { CONTAINER_TYPES, COMBAT_PHASE_ID, SLICE_PLANNING_ID, TYPE_TERRAIN, TYPE_OWNERS } from "../../../client/src/gameData/gameConstants";
-import { distanceMatrix } from "../../../client/src/gameData/distanceMatrix";
+import { CONTAINER_TYPES, COMBAT_PHASE_ID, SLICE_PLANNING_ID, TYPE_TERRAIN, TYPE_OWNERS } from "../../../client/src/constants/gameConstants";
+import { distanceMatrix } from "../../../client/src/constants/distanceMatrix";
 import { initialGameboardEmpty } from "../../../client/src/redux/reducers/initialGameboardEmpty";
 
 const confirmPlan = async (socket, payload) => {

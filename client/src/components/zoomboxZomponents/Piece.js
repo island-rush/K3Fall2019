@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Container from "./Container";
 import { TYPE_IMAGES, TYPE_TEAM_BORDERS } from "../styleConstants";
-import { TYPE_NAMES } from "../../gameData/gameConstants";
+import { TYPE_NAMES } from "../../constants/gameConstants";
 
 const pieceStyle = {
 	backgroundColor: "grey",

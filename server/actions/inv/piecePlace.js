@@ -1,7 +1,7 @@
 const { Game, InvItem } = require("../../classes");
 const sendUserFeedback = require("../sendUserFeedback");
 import { PIECE_PLACE, PLACE_PHASE } from "../../../client/src/redux/actions/actionTypes";
-import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/gameData/otherConstants";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/constants/otherConstants";
 import { BAD_REQUEST_TAG, GAME_INACTIVE_TAG } from "../../pages/errorTypes";
 
 const piecePlace = async (socket, payload) => {

@@ -1,5 +1,5 @@
 import { SET_USERFEEDBACK } from "../../client/src/redux/actions/actionTypes";
-import { SOCKET_SERVER_SENDING_ACTION } from "../../client/src/gameData/otherConstants";
+import { SOCKET_SERVER_SENDING_ACTION } from "../../client/src/constants/otherConstants";
 
 const sendUserFeedback = async (socket, userFeedback) => {
     const serverAction = {

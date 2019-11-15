@@ -1,4 +1,4 @@
-import { SOCKET_CLIENT_SENDING_ACTION } from "../../gameData/otherConstants";
+import { SOCKET_CLIENT_SENDING_ACTION } from "../../constants/otherConstants";
 import { SERVER_MAIN_BUTTON_CLICK } from "./actionTypes";
 
 const mainButtonClick = () => {

@@ -49,7 +49,7 @@ import {
     GOLDEN_EYE_SELECTED
 } from "../actions/actionTypes";
 
-import { TYPE_FUEL } from "../../gameData/gameConstants";
+import { TYPE_FUEL } from "../../constants/gameConstants";
 
 const initialGameboardMeta = {
     //TODO: change to selectedPositionId and selectedPieceId to better represent the values (ints) (and also selectedBattlePiece -> selectedBattlePieceId)

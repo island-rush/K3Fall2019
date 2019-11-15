@@ -23,7 +23,7 @@ import {
     SLICE_EXECUTING_ID,
     PLACE_PHASE_ID,
     NEWS_PHASE_ID
-} from "../../gameData/gameConstants";
+} from "../../constants/gameConstants";
 
 const initialGameInfoState = {
     gameSection: "Loading...",

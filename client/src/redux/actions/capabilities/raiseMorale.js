@@ -1,6 +1,6 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { RAISE_MORALE_SELECTING } from "../actionTypes";
-import { COMBAT_PHASE_ID, SLICE_PLANNING_ID } from "../../../gameData/gameConstants";
+import { COMBAT_PHASE_ID, SLICE_PLANNING_ID } from "../../../constants/gameConstants";
 
 //TODO: need to get rid of boost = x from the component when the raise morale is expired
 

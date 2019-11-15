@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import PurchaseableItem from "./PurchaseableItem";
 import ShopItem from "./ShopItem";
 import { shopRefundRequest, shopPurchaseRequest, shopConfirmPurchase } from "../../redux/actions";
-import { TYPE_OWNERS, TYPE_AIR, TYPE_LAND, TYPE_SEA, TYPE_SPECIAL, LIST_ALL_CAPABILITIES } from "../../gameData/gameConstants";
+import { TYPE_OWNERS, TYPE_AIR, TYPE_LAND, TYPE_SEA, TYPE_SPECIAL, LIST_ALL_CAPABILITIES } from "../../constants/gameConstants";
 
 const shopStyle = {
     backgroundColor: "Yellow",

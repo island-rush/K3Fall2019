@@ -1,7 +1,7 @@
 const pool = require("../database");
 import { INITIAL_GAMESTATE } from "../../client/src/redux/actions/actionTypes";
 const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("../actions/eventConstants");
-import { AIR_REFUELING_SQUADRON, CAPTURE_TYPES, BLUE_TEAM_ID, RED_TEAM_ID, NEWS_PHASE_ID } from "../../client/src/gameData/gameConstants";
+import { AIR_REFUELING_SQUADRON, CAPTURE_TYPES, BLUE_TEAM_ID, RED_TEAM_ID, NEWS_PHASE_ID } from "../../client/src/constants/gameConstants";
 import {
     ALL_ISLAND_LOCATIONS,
     ISLAND_POINTS,
@@ -16,7 +16,7 @@ import {
     HR_REPUBLIC_ISLAND_ID,
     KEONI_ISLAND_ID,
     EAGLE_ISLAND_ID
-} from "../../client/src/gameData/gameboardConstants";
+} from "../../client/src/constants/gameboardConstants";
 
 const InvItem = require("./InvItem");
 const ShopItem = require("./ShopItem");

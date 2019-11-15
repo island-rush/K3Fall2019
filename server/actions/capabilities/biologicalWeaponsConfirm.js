@@ -1,8 +1,8 @@
 const { Game, InvItem, Capability } = require("../../classes");
 import { BIO_WEAPON_SELECTED } from "../../../client/src/redux/actions/actionTypes";
-import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/gameData/otherConstants";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/constants/otherConstants";
 import { GAME_INACTIVE_TAG, GAME_DOES_NOT_EXIST } from "../../pages/errorTypes";
-import { BIOLOGICAL_WEAPONS_TYPE_ID, COMBAT_PHASE_ID, SLICE_PLANNING_ID, TYPE_MAIN } from "../../../client/src/gameData/gameConstants";
+import { BIOLOGICAL_WEAPONS_TYPE_ID, COMBAT_PHASE_ID, SLICE_PLANNING_ID, TYPE_MAIN } from "../../../client/src/constants/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 
 const biologicalWeaponsConfirm = async (socket, payload) => {

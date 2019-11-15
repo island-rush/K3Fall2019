@@ -1,8 +1,8 @@
 const { Game, Event } = require("../../classes");
 import { REFUEL_RESULTS } from "../../../client/src/redux/actions/actionTypes";
-import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/gameData/otherConstants";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/constants/otherConstants";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
-import { TYPE_FUEL } from "../../../client/src/gameData/gameConstants";
+import { TYPE_FUEL } from "../../../client/src/constants/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 const giveNextEvent = require("../giveNextEvent");
 

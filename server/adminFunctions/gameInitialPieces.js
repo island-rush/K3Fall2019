@@ -1,5 +1,5 @@
 const pool = require("../database");
-import { TYPE_MOVES, TYPE_FUEL, TANK_COMPANY_TYPE_ID, BLUE_TEAM_ID, RED_TEAM_ID } from "../../client/src/gameData/GameConstants";
+import { TYPE_MOVES, TYPE_FUEL, TANK_COMPANY_TYPE_ID, BLUE_TEAM_ID, RED_TEAM_ID } from "../../client/src/constants/gameConstants";
 
 // prettier-ignore
 const piece = (pieceGameId, pieceTeamName, pieceTypeId, piecePositionId, options) => {

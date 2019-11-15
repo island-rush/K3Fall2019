@@ -1,5 +1,5 @@
 import io from "socket.io-client";
-import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../gameData/otherConstants";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../constants/otherConstants";
 
 const socket = io(window.location.hostname);
 

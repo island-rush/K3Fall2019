@@ -1,7 +1,7 @@
 const sendUserFeedback = require("./sendUserFeedback");
 const { Game, Capability } = require("../classes");
 import { MAIN_BUTTON_CLICK, PURCHASE_PHASE, COMBAT_PHASE, NEWS_PHASE, SLICE_CHANGE } from "../../client/src/redux/actions/actionTypes";
-import { SOCKET_SERVER_SENDING_ACTION, SOCKET_SERVER_REDIRECT } from "../../client/src/gameData/otherConstants";
+import { SOCKET_SERVER_SENDING_ACTION, SOCKET_SERVER_REDIRECT } from "../../client/src/constants/otherConstants";
 import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
 import {
     BLUE_TEAM_ID,
@@ -15,7 +15,7 @@ import {
     PLACE_PHASE_ID,
     SLICE_PLANNING_ID,
     SLICE_EXECUTING_ID
-} from "../../client/src/gameData/gameConstants";
+} from "../../client/src/constants/gameConstants";
 const executeStep = require("./executeStep"); //big function
 
 const mainButtonClick = async (socket, payload) => {

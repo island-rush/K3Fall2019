@@ -1,8 +1,8 @@
 const { Game, Event } = require("../../classes");
 import { BATTLE_FIGHT_RESULTS, UPDATE_FLAGS } from "../../../client/src/redux/actions/actionTypes";
-import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/gameData/otherConstants";
+import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/constants/otherConstants";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
-import { BLUE_TEAM_ID, RED_TEAM_ID, WAITING_STATUS, NOT_WAITING_STATUS } from "../../../client/src/gameData/gameConstants";
+import { BLUE_TEAM_ID, RED_TEAM_ID, WAITING_STATUS, NOT_WAITING_STATUS } from "../../../client/src/constants/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 const giveNextEvent = require("../giveNextEvent");
 

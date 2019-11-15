@@ -1,7 +1,7 @@
 const { Plan, Piece, Event, Capability } = require("../classes");
 import { PLACE_PHASE, NEW_ROUND, PIECES_MOVE, UPDATE_FLAGS } from "../../client/src/redux/actions/actionTypes";
-import { SOCKET_SERVER_SENDING_ACTION, SOCKET_SERVER_REDIRECT } from "../../client/src/gameData/otherConstants";
-import { BLUE_TEAM_ID, RED_TEAM_ID, PLACE_PHASE_ID, WAITING_STATUS } from "../../client/src/gameData/gameConstants";
+import { SOCKET_SERVER_SENDING_ACTION, SOCKET_SERVER_REDIRECT } from "../../client/src/constants/otherConstants";
+import { BLUE_TEAM_ID, RED_TEAM_ID, PLACE_PHASE_ID, WAITING_STATUS } from "../../client/src/constants/gameConstants";
 const giveNextEvent = require("./giveNextEvent");
 const { BOTH_TEAMS_INDICATOR, POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("./eventConstants");
 

@@ -1,6 +1,6 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { COMM_INTERRUPT_SELECTING } from "../actionTypes";
-import { COMBAT_PHASE_ID, SLICE_PLANNING_ID } from "../../../gameData/gameConstants";
+import { COMBAT_PHASE_ID, SLICE_PLANNING_ID } from "../../../constants/gameConstants";
 
 const communicationsInterruption = invItem => {
     return (dispatch, getState, emit) => {

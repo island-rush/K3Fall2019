@@ -1,5 +1,5 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
-import { SOCKET_CLIENT_SENDING_ACTION } from "../../../gameData/otherConstants";
+import { SOCKET_CLIENT_SENDING_ACTION } from "../../../constants/otherConstants";
 import { SERVER_CONFIRM_PLAN } from "../actionTypes";
 
 const confirmPlan = () => {

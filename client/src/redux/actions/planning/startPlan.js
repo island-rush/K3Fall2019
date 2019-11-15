@@ -1,6 +1,6 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { START_PLAN } from "../actionTypes";
-import { TYPE_OWNERS } from "../../../gameData/gameConstants";
+import { TYPE_OWNERS } from "../../../constants/gameConstants";
 
 //TODO: need more checks on all the frontend planning functions (gamePhase/gameSlice...)
 const startPlan = () => {

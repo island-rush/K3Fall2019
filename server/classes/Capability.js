@@ -1,5 +1,5 @@
 const pool = require("../database");
-import { distanceMatrix } from "../../client/src/gameData/distanceMatrix";
+import { distanceMatrix } from "../../client/src/constants/distanceMatrix";
 import {
     TYPE_OWNERS,
     TYPE_SPECIAL,
@@ -16,7 +16,7 @@ import {
     BLUE_TEAM_ID,
     RED_TEAM_ID,
     GOLDEN_EYE_ROUNDS
-} from "../../client/src/gameData/gameConstants";
+} from "../../client/src/constants/gameConstants";
 
 class Capability {
     static async rodsFromGodInsert(gameId, gameTeam, selectedPositionId) {

@@ -5,7 +5,7 @@ const diceImagePath = "./images/diceImages";
 const graphicsPath = "./images/graphics";
 const buttonImagesPath = "./images/buttonImages";
 
-//TODO: change to format used in ./gameData/gameConstants
+//TODO: change to format used in ./constants/gameConstants
 export const TYPE_IMAGES = {
     //TypeId: ImageUrlCSS
     0: { backgroundImage: `url("${unitImagesPath}/bomber.png")` },
@@ -87,7 +87,7 @@ export const ZOOMBOX_BACKGROUNDS = {
     blue: { backgroundColor: "green" }
 };
 
-//TODO: change based on ./gameData/gameConstants
+//TODO: change based on ./constants/gameConstants
 export const TYPE_TEAM_BORDERS = {
     0: { boxShadow: "0px 0px 0px 2px rgba(0, 111, 255, 0.67) inset" }, //blue
     1: { boxShadow: "0px 0px 0px 2px rgba(255, 0, 0, 0.55) inset" } //red
