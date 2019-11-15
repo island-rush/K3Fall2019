@@ -20,7 +20,7 @@ const TRANSPORT_TYPE_ID = 16;
 const MC_12_TYPE_ID = 17;
 const C_130_TYPE_ID = 18;
 const SOF_TEAM_TYPE_ID = 19;
-const RADAR_TYPE_ID = 34;
+const RADAR_TYPE_ID = 34; //TODO: could change to RADAR_STATION_TYPE_ID to be consistent with other names? (not important)
 const MISSILE_TYPE_ID = 35;
 const ATC_SCRAMBLE_TYPE_ID = 20;
 const CYBER_DOMINANCE_TYPE_ID = 21;
@@ -212,11 +212,19 @@ TYPE_OWNER_NAMES[TYPE_SPECIAL] = "JFSOCC";
 let TYPE_OWNERS = {};
 //prettier-ignore
 TYPE_OWNERS[TYPE_MAIN] = [BOMBER_TYPE_ID,STEALTH_BOMBER_TYPE_ID,STEALTH_FIGHTER_TYPE_ID,AIR_REFUELING_SQUADRON_ID,TACTICAL_AIRLIFT_SQUADRON_TYPE_ID,AIRBORN_ISR_TYPE_ID,ARMY_INFANTRY_COMPANY_TYPE_ID,ARTILLERY_BATTERY_TYPE_ID,TANK_COMPANY_TYPE_ID,MARINE_INFANTRY_COMPANY_TYPE_ID,ATTACK_HELICOPTER_TYPE_ID,LIGHT_INFANTRY_VEHICLE_CONVOY_TYPE_ID,SAM_SITE_TYPE_ID,DESTROYER_TYPE_ID,A_C_CARRIER_TYPE_ID,SUBMARINE_TYPE_ID,TRANSPORT_TYPE_ID,MC_12_TYPE_ID,C_130_TYPE_ID,SOF_TEAM_TYPE_ID,ATC_SCRAMBLE_TYPE_ID,CYBER_DOMINANCE_TYPE_ID,MISSILE_LAUNCH_DISRUPTION_TYPE_ID,COMMUNICATIONS_INTERRUPTION_TYPE_ID,REMOTE_SENSING_TYPE_ID,RODS_FROM_GOD_TYPE_ID,ANTI_SATELLITE_MISSILES_TYPE_ID,GOLDEN_EYE_TYPE_ID,NUCLEAR_STRIKE_TYPE_ID,BIOLOGICAL_WEAPONS_TYPE_ID,SEA_MINES_TYPE_ID,DRONE_SWARMS_TYPE_ID,INSURGENCY_TYPE_ID,RAISE_MORALE_TYPE_ID,RADAR_TYPE_ID,MISSILE_TYPE_ID];
-TYPE_OWNERS[TYPE_AIR] = [BOMBER_TYPE_ID, STEALTH_BOMBER_TYPE_ID, STEALTH_FIGHTER_TYPE_ID, AIR_REFUELING_SQUADRON_ID, TACTICAL_AIRLIFT_SQUADRON_TYPE_ID, AIRBORN_ISR_TYPE_ID];
+TYPE_OWNERS[TYPE_AIR] = [
+    RADAR_TYPE_ID,
+    BOMBER_TYPE_ID,
+    STEALTH_BOMBER_TYPE_ID,
+    STEALTH_FIGHTER_TYPE_ID,
+    AIR_REFUELING_SQUADRON_ID,
+    TACTICAL_AIRLIFT_SQUADRON_TYPE_ID,
+    AIRBORN_ISR_TYPE_ID
+];
 //prettier-ignore
 TYPE_OWNERS[TYPE_LAND] = [ARMY_INFANTRY_COMPANY_TYPE_ID,ARTILLERY_BATTERY_TYPE_ID,TANK_COMPANY_TYPE_ID,MARINE_INFANTRY_COMPANY_TYPE_ID,ATTACK_HELICOPTER_TYPE_ID,LIGHT_INFANTRY_VEHICLE_CONVOY_TYPE_ID,SAM_SITE_TYPE_ID];
 TYPE_OWNERS[TYPE_SEA] = [DESTROYER_TYPE_ID, A_C_CARRIER_TYPE_ID, SUBMARINE_TYPE_ID, TRANSPORT_TYPE_ID];
-TYPE_OWNERS[TYPE_SPECIAL] = [MC_12_TYPE_ID, C_130_TYPE_ID, SOF_TEAM_TYPE_ID, RADAR_TYPE_ID, MISSILE_TYPE_ID];
+TYPE_OWNERS[TYPE_SPECIAL] = [MC_12_TYPE_ID, C_130_TYPE_ID, SOF_TEAM_TYPE_ID, MISSILE_TYPE_ID];
 
 const CONTAINER_TYPES = [TACTICAL_AIRLIFT_SQUADRON_TYPE_ID, A_C_CARRIER_TYPE_ID, TRANSPORT_TYPE_ID, C_130_TYPE_ID];
 const CAPTURE_TYPES = [
@@ -259,52 +267,52 @@ const SLICE_EXECUTING_ID = 1;
 // used the updated units excel at https://docs.google.com/spreadsheets/d/1kiMLv05oK6IZKtiYdErvD4Kp5tI3lXLL2-qbO3ZqHAI/edit#gid=306372336
 //TODO: fix for radar and missile (late additions)
 const VISIBILITY_MATRIX = [
-    [1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, -1, 2, 1, 1, -1, -1, -1], //bomber
-    [1, 0, -1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, -1, 2, 1, 1, -1, -1, -1], //stealth bomber
-    [1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, -1, 2, 1, 1, -1, -1, -1], //stealth fighter
-    [0, -1, -1, 0, 1, 0, 0, -1, -1, -1, 0, -1, -1, 0, 0, -1, 0, 0, 1, -1, -1, -1], //tanker
-    [0, -1, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 1, -1, -1, -1], //air transport
-    [2, 0, 0, 2, 2, 2, -1, -1, -1, -1, 2, -1, -1, 0, 0, -1, 0, 2, 2, -1, -1, -1], //air isr
-    [-1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, -1, -1, 0, -1, -1], //infantry (army)
-    [-1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 0, 0, -1, 0, -1, -1, 0, -1, -1], //artillery
-    [-1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, -1, -1, 0, -1, -1], //tank
-    [-1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, -1, -1, 0, -1, -1], //infantry (marine)
-    [-1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, 1, 0, 1, 0, -1, -1], //attack helicopter
-    [-1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, -1, -1, 0, -1, -1], //LAV
+    [1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, -1, 2, 1, 1, -1, 2, -1], //bomber
+    [1, 0, -1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, -1, 2, 1, 1, -1, 2, -1], //stealth bomber
+    [1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, -1, 2, 1, 1, -1, 2, -1], //stealth fighter
+    [0, -1, -1, 0, 1, 0, 0, -1, -1, -1, 0, -1, -1, 0, 0, -1, 0, 0, 1, -1, 0, -1], //tanker
+    [0, -1, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 1, -1, 0, -1], //air transport
+    [2, 0, 0, 2, 2, 2, -1, -1, -1, -1, 2, -1, -1, 0, 0, -1, 0, 2, 2, -1, 0, -1], //air isr
+    [-1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, -1, -1, 0, 1, -1], //infantry (army)
+    [-1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 0, 0, -1, 0, -1, -1, 0, 1, -1], //artillery
+    [-1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, -1, -1, 0, 1, -1], //tank
+    [-1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, -1, -1, 0, 1, -1], //infantry (marine)
+    [-1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, 1, 0, 1, 0, 2, -1], //attack helicopter
+    [-1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, -1, -1, 0, 1, -1], //LAV
     [2, 0, 0, 2, 2, 2, -1, -1, -1, -1, 2, -1, 0, -1, -1, -1, -1, 1, 2, -1, -1, -1], //SAM
-    [0, -1, -1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, -1, -1, -1], //destroyer
-    [0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, -1, 1, 0, 1, -1, -1, -1], //a.c. carrier
+    [0, -1, -1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, -1, 1, -1], //destroyer
+    [0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, -1, 1, 0, 1, -1, 0, -1], //a.c. carrier
     [-1, -1, -1, -1, -1, -1, 0, 0, 0, 0, -1, 0, 0, 1, 1, 1, 1, -1, -1, -1, -1, -1], //submarine
-    [0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1, -1, -1], //transport
-    [-1, -1, -1, -1, -1, -1, 2, 2, 2, 2, 1, 2, 2, 2, 2, -1, 2, 1, 0, 1, -1, -1], //mc-12
-    [0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, -1, 1, 1, 1, -1, -1, -1], //c-130
-    [-1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 0, 0, -1, 0, 0, 0, 0, -1, -1], //sof team
-    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], //radar
+    [0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1, 0, -1], //transport
+    [-1, -1, -1, -1, -1, -1, 2, 2, 2, 2, 1, 2, 2, 2, 2, -1, 2, 1, 0, 1, 3, -1], //mc-12
+    [0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, -1, 1, 1, 1, -1, 1, -1], //c-130
+    [-1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 0, 0, -1, 0, 0, 0, 0, 1, -1], //sof team
+    [3, 1, 1, 3, 3, 3, 1, 2, 2, 1, 2, 2, 2, 3, 3, -1, 3, 2, 2, 0, 3, -1], //radar
     [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1] //missile
 ];
 
 //TODO: fix for radar and missile (late additions)
 const ATTACK_MATRIX = [
-    [0, 0, 0, 0, 0, 0, 11, 11, 10, 11, 0, 10, 3, 10, 9, 0, 8, 0, 0, 8, 11, 0, 0, 0, 0], //bomber
-    [0, 0, 0, 0, 0, 0, 10, 10, 9, 10, 0, 9, 8, 9, 8, 0, 8, 0, 0, 8, 11, 0, 0, 0, 0], //stealth bomber
-    [10, 4, 3, 11, 10, 11, 5, 5, 4, 5, 9, 6, 7, 4, 3, 0, 6, 10, 9, 8, 8, 0, 0, 0, 0], //stealth fighter
+    [0, 0, 0, 0, 0, 0, 11, 11, 10, 11, 0, 10, 3, 10, 9, 0, 8, 0, 0, 8, 11, 0, 0, 11, 0], //bomber
+    [0, 0, 0, 0, 0, 0, 10, 10, 9, 10, 0, 9, 8, 9, 8, 0, 8, 0, 0, 8, 11, 0, 0, 11, 0], //stealth bomber
+    [10, 4, 3, 11, 10, 11, 5, 5, 4, 5, 9, 6, 7, 4, 3, 0, 6, 10, 9, 8, 8, 0, 0, 8, 0], //stealth fighter
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //tanker
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //air transport
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //air isr
-    [0, 0, 0, 0, 0, 0, 7, 8, 4, 8, 6, 6, 10, 0, 0, 0, 0, 2, 2, 9, 6, 0, 0, 0, 0], //infantry (army)
-    [0, 0, 0, 0, 0, 0, 8, 8, 6, 7, 0, 7, 10, 0, 0, 0, 0, 0, 0, 10, 9, 0, 0, 0, 0], //artillery
-    [0, 0, 0, 0, 0, 0, 7, 10, 7, 7, 2, 8, 11, 0, 0, 0, 0, 0, 0, 10, 10, 0, 0, 0, 0], //tank
-    [0, 0, 0, 0, 0, 0, 8, 9, 5, 7, 3, 6, 10, 0, 0, 0, 0, 2, 2, 9, 7, 0, 0, 0, 0], //infantry (marine)
-    [0, 0, 0, 0, 0, 0, 9, 10, 8, 9, 2, 10, 9, 6, 5, 0, 5, 8, 7, 10, 9, 0, 0, 0, 0], //attack helicopter
-    [0, 0, 0, 0, 0, 0, 8, 8, 6, 8, 4, 7, 10, 0, 0, 0, 0, 3, 2, 9, 8, 0, 0, 0, 0], //LAV
+    [0, 0, 0, 0, 0, 0, 7, 8, 4, 8, 6, 6, 10, 0, 0, 0, 0, 2, 2, 9, 6, 0, 0, 6, 0], //infantry (army)
+    [0, 0, 0, 0, 0, 0, 8, 8, 6, 7, 0, 7, 10, 0, 0, 0, 0, 0, 0, 10, 9, 0, 0, 9, 0], //artillery
+    [0, 0, 0, 0, 0, 0, 7, 10, 7, 7, 2, 8, 11, 0, 0, 0, 0, 0, 0, 10, 10, 0, 0, 10, 0], //tank
+    [0, 0, 0, 0, 0, 0, 8, 9, 5, 7, 3, 6, 10, 0, 0, 0, 0, 2, 2, 9, 7, 0, 0, 7, 0], //infantry (marine)
+    [0, 0, 0, 0, 0, 0, 9, 10, 8, 9, 2, 10, 9, 6, 5, 0, 5, 8, 7, 10, 9, 0, 0, 9, 0], //attack helicopter
+    [0, 0, 0, 0, 0, 0, 8, 8, 6, 8, 4, 7, 10, 0, 0, 0, 0, 3, 2, 9, 8, 0, 0, 8, 0], //LAV
     [10, 8, 7, 11, 10, 10, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0], //SAM
-    [9, 0, 0, 5, 5, 5, 6, 7, 6, 6, 6, 4, 7, 7, 8, 9, 8, 3, 3, 3, 9, 0, 0, 0, 0], //destroyer
+    [9, 0, 0, 5, 5, 5, 6, 7, 6, 6, 6, 4, 7, 7, 8, 9, 8, 3, 3, 3, 9, 0, 0, 9, 0], //destroyer
     [9, 1, 1, 3, 2, 4, 0, 0, 0, 0, 3, 0, 0, 2, 4, 2, 4, 6, 5, 0, 0, 0, 0, 0, 0], //a.c. carrier
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 9, 7, 8, 0, 0, 0, 0, 0, 0, 0, 0], //submarine
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //transport
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //mc-12
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //c-130
-    [0, 0, 0, 0, 0, 0, 3, 8, 2, 3, 2, 5, 10, 0, 0, 0, 0, 0, 0, 7, 8, 0, 0, 0, 0], //sof team
+    [0, 0, 0, 0, 0, 0, 3, 8, 2, 3, 2, 5, 10, 0, 0, 0, 0, 0, 0, 7, 8, 0, 0, 8, 0], //sof team
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //rader
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] //missile
 ];

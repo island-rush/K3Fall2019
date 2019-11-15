@@ -63,6 +63,12 @@ const piecePlace = async (socket, payload) => {
         return;
     }
 
+    //TODO: need to make sure pieces are put onto main island (or surrounding waters)
+
+    //for radars (and possibly other units)
+    //need to verify that island is owned by us
+    //need to verify that there is another ground unit on the hex (and no other enemy units)
+
     const newPiece = await thisInvItem.placeOnBoard(selectedPosition); //should also check that this piece actually got created, could return null (should return null if it failed...TODO: return null if failed...)
 
     //TODO: Should probably also write down how the state is stored on the frontend eventually, so others know how it works
