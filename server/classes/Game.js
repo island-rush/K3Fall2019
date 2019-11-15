@@ -3,7 +3,6 @@ import { INITIAL_GAMESTATE } from "../../client/src/redux/actions/actionTypes";
 const { POS_BATTLE_EVENT_TYPE, COL_BATTLE_EVENT_TYPE, REFUEL_EVENT_TYPE } = require("../actions/eventConstants");
 import { AIR_REFUELING_SQUADRON_ID, CAPTURE_TYPES, BLUE_TEAM_ID, RED_TEAM_ID, NEWS_PHASE_ID } from "../../client/src/constants/gameConstants";
 import {
-    ALL_ISLAND_LOCATIONS,
     ISLAND_POINTS,
     DRAGON_ISLAND_ID,
     MONTAVILLE_ISLAND_ID,
@@ -17,6 +16,7 @@ import {
     KEONI_ISLAND_ID,
     EAGLE_ISLAND_ID
 } from "../../client/src/constants/gameboardConstants";
+import { ALL_FLAG_LOCATIONS } from "/Users/Spencer/Documents/Projects/K3/client/src/constants/gameboardConstants";
 
 const InvItem = require("./InvItem");
 const ShopItem = require("./ShopItem");
@@ -111,38 +111,38 @@ class Game {
         let bluePoints = this.game0Points;
         let redPoints = this.game1Points;
 
-        bluePoints += this.island0 === this.island1 && this.island0 === BLUE_TEAM_ID ? ISLAND_POINTS[DRAGON_ISLAND_ID] : 0;
-        redPoints += this.island0 === this.island1 && this.island0 === RED_TEAM_ID ? ISLAND_POINTS[DRAGON_ISLAND_ID] : 0;
+        bluePoints += this.flag0 === this.flag1 && this.flag0 === BLUE_TEAM_ID ? ISLAND_POINTS[DRAGON_ISLAND_ID] : 0;
+        redPoints += this.flag0 === this.flag1 && this.flag0 === RED_TEAM_ID ? ISLAND_POINTS[DRAGON_ISLAND_ID] : 0;
 
-        bluePoints += this.island2 === BLUE_TEAM_ID ? ISLAND_POINTS[HR_REPUBLIC_ISLAND_ID] : 0;
-        redPoints += this.island2 === RED_TEAM_ID ? ISLAND_POINTS[HR_REPUBLIC_ISLAND_ID] : 0;
+        bluePoints += this.flag2 === BLUE_TEAM_ID ? ISLAND_POINTS[HR_REPUBLIC_ISLAND_ID] : 0;
+        redPoints += this.flag2 === RED_TEAM_ID ? ISLAND_POINTS[HR_REPUBLIC_ISLAND_ID] : 0;
 
-        bluePoints += this.island3 === BLUE_TEAM_ID ? ISLAND_POINTS[MONTAVILLE_ISLAND_ID] : 0;
-        redPoints += this.island3 === RED_TEAM_ID ? ISLAND_POINTS[MONTAVILLE_ISLAND_ID] : 0;
+        bluePoints += this.flag3 === BLUE_TEAM_ID ? ISLAND_POINTS[MONTAVILLE_ISLAND_ID] : 0;
+        redPoints += this.flag3 === RED_TEAM_ID ? ISLAND_POINTS[MONTAVILLE_ISLAND_ID] : 0;
 
-        bluePoints += this.island4 === BLUE_TEAM_ID ? ISLAND_POINTS[LION_ISLAND_ID] : 0;
-        redPoints += this.island4 === RED_TEAM_ID ? ISLAND_POINTS[LION_ISLAND_ID] : 0;
+        bluePoints += this.flag4 === BLUE_TEAM_ID ? ISLAND_POINTS[LION_ISLAND_ID] : 0;
+        redPoints += this.flag4 === RED_TEAM_ID ? ISLAND_POINTS[LION_ISLAND_ID] : 0;
 
-        bluePoints += this.island5 === BLUE_TEAM_ID ? ISLAND_POINTS[NOYARC_ISLAND_ID] : 0;
-        redPoints += this.island5 === RED_TEAM_ID ? ISLAND_POINTS[NOYARC_ISLAND_ID] : 0;
+        bluePoints += this.flag5 === BLUE_TEAM_ID ? ISLAND_POINTS[NOYARC_ISLAND_ID] : 0;
+        redPoints += this.flag5 === RED_TEAM_ID ? ISLAND_POINTS[NOYARC_ISLAND_ID] : 0;
 
-        bluePoints += this.island6 === BLUE_TEAM_ID ? ISLAND_POINTS[FULLER_ISLAND_ID] : 0;
-        redPoints += this.island6 === RED_TEAM_ID ? ISLAND_POINTS[FULLER_ISLAND_ID] : 0;
+        bluePoints += this.flag6 === BLUE_TEAM_ID ? ISLAND_POINTS[FULLER_ISLAND_ID] : 0;
+        redPoints += this.flag6 === RED_TEAM_ID ? ISLAND_POINTS[FULLER_ISLAND_ID] : 0;
 
-        bluePoints += this.island7 === BLUE_TEAM_ID ? ISLAND_POINTS[RICO_ISLAND_ID] : 0;
-        redPoints += this.island7 === RED_TEAM_ID ? ISLAND_POINTS[RICO_ISLAND_ID] : 0;
+        bluePoints += this.flag7 === BLUE_TEAM_ID ? ISLAND_POINTS[RICO_ISLAND_ID] : 0;
+        redPoints += this.flag7 === RED_TEAM_ID ? ISLAND_POINTS[RICO_ISLAND_ID] : 0;
 
-        bluePoints += this.island8 === BLUE_TEAM_ID ? ISLAND_POINTS[TAMU_ISLAND_ID] : 0;
-        redPoints += this.island8 === RED_TEAM_ID ? ISLAND_POINTS[TAMU_ISLAND_ID] : 0;
+        bluePoints += this.flag8 === BLUE_TEAM_ID ? ISLAND_POINTS[TAMU_ISLAND_ID] : 0;
+        redPoints += this.flag8 === RED_TEAM_ID ? ISLAND_POINTS[TAMU_ISLAND_ID] : 0;
 
-        bluePoints += this.island9 === BLUE_TEAM_ID ? ISLAND_POINTS[SHOR_ISLAND_ID] : 0;
-        redPoints += this.island9 === RED_TEAM_ID ? ISLAND_POINTS[SHOR_ISLAND_ID] : 0;
+        bluePoints += this.flag9 === BLUE_TEAM_ID ? ISLAND_POINTS[SHOR_ISLAND_ID] : 0;
+        redPoints += this.flag9 === RED_TEAM_ID ? ISLAND_POINTS[SHOR_ISLAND_ID] : 0;
 
-        bluePoints += this.island10 === BLUE_TEAM_ID ? ISLAND_POINTS[KEONI_ISLAND_ID] : 0;
-        redPoints += this.island10 === RED_TEAM_ID ? ISLAND_POINTS[KEONI_ISLAND_ID] : 0;
+        bluePoints += this.flag10 === BLUE_TEAM_ID ? ISLAND_POINTS[KEONI_ISLAND_ID] : 0;
+        redPoints += this.flag10 === RED_TEAM_ID ? ISLAND_POINTS[KEONI_ISLAND_ID] : 0;
 
-        bluePoints += this.island11 === this.island12 && this.island11 === BLUE_TEAM_ID ? ISLAND_POINTS[EAGLE_ISLAND_ID] : 0;
-        redPoints += this.island11 === this.island12 && this.island11 === RED_TEAM_ID ? ISLAND_POINTS[EAGLE_ISLAND_ID] : 0;
+        bluePoints += this.flag11 === this.flag12 && this.flag11 === BLUE_TEAM_ID ? ISLAND_POINTS[EAGLE_ISLAND_ID] : 0;
+        redPoints += this.flag11 === this.flag12 && this.flag11 === RED_TEAM_ID ? ISLAND_POINTS[EAGLE_ISLAND_ID] : 0;
 
         await this.setPoints(BLUE_TEAM_ID, bluePoints);
         await this.setPoints(RED_TEAM_ID, redPoints);
@@ -167,19 +167,19 @@ class Game {
             gameSlice: this.gameSlice,
             gameStatus: this["game" + gameTeam + "Status"],
             gamePoints: this["game" + gameTeam + "Points"],
-            island0: this.island0,
-            island1: this.island1,
-            island2: this.island2,
-            island3: this.island3,
-            island4: this.island4,
-            island5: this.island5,
-            island6: this.island6,
-            island7: this.island7,
-            island8: this.island8,
-            island9: this.island9,
-            island10: this.island10,
-            island11: this.island11,
-            island12: this.island12
+            flag0: this.flag0,
+            flag1: this.flag1,
+            flag2: this.flag2,
+            flag3: this.flag3,
+            flag4: this.flag4,
+            flag5: this.flag5,
+            flag6: this.flag6,
+            flag7: this.flag7,
+            flag8: this.flag8,
+            flag9: this.flag9,
+            flag10: this.flag10,
+            flag11: this.flag11,
+            flag12: this.flag12
         };
 
         serverAction.payload.gameboardMeta = {};
@@ -381,7 +381,7 @@ class Game {
         //only certain pieces can capture
         //see if any pieces are currently residing on flags by themselves, and if so, set the island# in the database and update 'this' object correspondingly
         let queryString = "SELECT * FROM pieces WHERE pieceGameId = ? AND piecePositionId in (?) AND pieceTypeId in (?)";
-        let inserts = [this.gameId, ALL_ISLAND_LOCATIONS, CAPTURE_TYPES];
+        let inserts = [this.gameId, ALL_FLAG_LOCATIONS, CAPTURE_TYPES];
         let [results] = await pool.query(queryString, inserts);
 
         if (results.length === 0) {
@@ -392,23 +392,23 @@ class Game {
         //update if only 1 team's pieces there, AND if not already the other team? (or update anyway if all 1 team)
 
         //TODO: need major refactoring here, this is quick and dirty (but should work)
-        let eachIslandsTeams = [[], [], [], [], [], [], [], [], [], [], [], [], []];
+        let eachFlagsTeams = [[], [], [], [], [], [], [], [], [], [], [], [], []];
         for (let x = 0; x < results.length; x++) {
             let thisPiece = results[x];
             let { piecePositionId, pieceTeamId } = thisPiece;
-            let islandNum = ALL_ISLAND_LOCATIONS.indexOf(piecePositionId);
-            eachIslandsTeams[islandNum].push(pieceTeamId);
+            let flagNum = ALL_FLAG_LOCATIONS.indexOf(piecePositionId);
+            eachFlagsTeams[flagNum].push(pieceTeamId);
         }
 
-        for (let y = 0; y < eachIslandsTeams.length; y++) {
-            let thisIslandsTeams = eachIslandsTeams[y];
-            if (thisIslandsTeams.length === 0) continue;
-            if (thisIslandsTeams.includes(BLUE_TEAM_ID) && thisIslandsTeams.includes(RED_TEAM_ID)) continue;
+        for (let y = 0; y < eachFlagsTeams.length; y++) {
+            let thisFlagsTeams = eachFlagsTeams[y];
+            if (thisFlagsTeams.length === 0) continue;
+            if (thisFlagsTeams.includes(BLUE_TEAM_ID) && thisFlagsTeams.includes(RED_TEAM_ID)) continue;
             //else update this thing
-            this["island" + y] = thisIslandsTeams[0];
+            this["flag" + y] = thisFlagsTeams[0];
             //sql update
             queryString = "UPDATE games SET ?? = ? WHERE gameId = ?";
-            inserts = ["island" + y, thisIslandsTeams[0], this.gameId];
+            inserts = ["flag" + y, thisFlagsTeams[0], this.gameId];
             await pool.query(queryString, inserts);
             didUpdateFlags = true;
         }

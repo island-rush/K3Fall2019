@@ -27,8 +27,8 @@ const piece = (pieceGameId, pieceTeamName, pieceTypeId, piecePositionId, options
 //prettier-ignore
 const gameInitialPieces = async gameId => {
 	const firstPieces = [
-		piece(gameId, "Blue", TANK_COMPANY_TYPE_ID, 49),
-		piece(gameId, "Red", TANK_COMPANY_TYPE_ID, 48)
+		piece(gameId, "Blue", TANK_COMPANY_TYPE_ID, 0),
+		piece(gameId, "Red", TANK_COMPANY_TYPE_ID, 1)
 	];
 
 	const queryString = "INSERT INTO pieces (pieceGameId, pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId, pieceVisible, pieceMoves, pieceFuel) VALUES ?";

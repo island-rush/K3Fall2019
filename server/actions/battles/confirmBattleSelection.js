@@ -65,19 +65,19 @@ const confirmBattleSelection = async (socket, payload) => {
         const updateFlagAction = {
             type: UPDATE_FLAGS,
             payload: {
-                island0: thisGame.island0,
-                island1: thisGame.island1,
-                island2: thisGame.island2,
-                island3: thisGame.island3,
-                island4: thisGame.island4,
-                island5: thisGame.island5,
-                island6: thisGame.island6,
-                island7: thisGame.island7,
-                island8: thisGame.island8,
-                island9: thisGame.island9,
-                island10: thisGame.island10,
-                island11: thisGame.island11,
-                island12: thisGame.island12
+                flag0: thisGame.flag0,
+                flag1: thisGame.flag1,
+                flag2: thisGame.flag2,
+                flag3: thisGame.flag3,
+                flag4: thisGame.flag4,
+                flag5: thisGame.flag5,
+                flag6: thisGame.flag6,
+                flag7: thisGame.flag7,
+                flag8: thisGame.flag8,
+                flag9: thisGame.flag9,
+                flag10: thisGame.flag10,
+                flag11: thisGame.flag11,
+                flag12: thisGame.flag12
             }
         };
         socket.to("game" + gameId).emit(SOCKET_SERVER_SENDING_ACTION, updateFlagAction);

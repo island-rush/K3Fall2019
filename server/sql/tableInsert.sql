@@ -32,19 +32,19 @@ CREATE TABLE IF NOT EXISTS games (
     gameRound INT(1) NOT NULL DEFAULT 0, -- 0, 1, 2  rounds of movement
     gameSlice INT(1) NOT NULL DEFAULT 0, -- 0: planning, 1: events/movement
     
-    island0 INT(1) NOT NULL DEFAULT 1, -- Dragon bottom
-    island1 INT(1) NOT NULL DEFAULT 1, -- Dragon top
-    island2 INT(1) NOT NULL DEFAULT 1, -- HR Republic
-    island3 INT(1) NOT NULL DEFAULT -1, -- Montaville
-    island4 INT(1) NOT NULL DEFAULT 1, -- Lion Island
-    island5 INT(1) NOT NULL DEFAULT -1, -- Noyarc
-    island6 INT(1) NOT NULL DEFAULT -1, -- Fuler Island
-    island7 INT(1) NOT NULL DEFAULT -1, -- Rico Island
-    island8 INT(1) NOT NULL DEFAULT 0, -- Tamu Island
-    island9 INT(1) NOT NULL DEFAULT 0, -- Shor
-    island10 INT(1) NOT NULL DEFAULT -1, -- Keoni
-    island11 INT(1) NOT NULL DEFAULT 0, -- Eagle Top
-    island12 INT(1) NOT NULL DEFAULT 0 -- Eagle Bottom
+    flag0 INT(1) NOT NULL DEFAULT 1, -- Dragon bottom
+    flag1 INT(1) NOT NULL DEFAULT 1, -- Dragon top
+    flag2 INT(1) NOT NULL DEFAULT 1, -- HR Republic
+    flag3 INT(1) NOT NULL DEFAULT -1, -- Montaville
+    flag4 INT(1) NOT NULL DEFAULT 1, -- Lion Island
+    flag5 INT(1) NOT NULL DEFAULT -1, -- Noyarc
+    flag6 INT(1) NOT NULL DEFAULT -1, -- Fuler Island
+    flag7 INT(1) NOT NULL DEFAULT -1, -- Rico Island
+    flag8 INT(1) NOT NULL DEFAULT 0, -- Tamu Island
+    flag9 INT(1) NOT NULL DEFAULT 0, -- Shor
+    flag10 INT(1) NOT NULL DEFAULT -1, -- Keoni
+    flag11 INT(1) NOT NULL DEFAULT 0, -- Eagle Top
+    flag12 INT(1) NOT NULL DEFAULT 0 -- Eagle Bottom
 ) AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS shopItems (
