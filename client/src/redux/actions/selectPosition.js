@@ -1,6 +1,5 @@
 import { distanceMatrix } from "../../gameData/distanceMatrix";
 import {
-    TYPE_MOVES,
     REMOTE_SENSING_RANGE,
     COMM_INTERRUPT_RANGE,
     REMOTE_SENSING_TYPE_ID,

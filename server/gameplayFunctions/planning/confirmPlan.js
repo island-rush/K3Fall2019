@@ -39,6 +39,20 @@ const confirmPlan = async (socket, payload) => {
         return;
     }
 
+    //Could be multiple controller
+    let atLeast1Owner = false;
+    for (gameController of gameControllers) {
+        if (TYPE_OWNERS[gameController].includes(pieceTypeId)) {
+            atLeast1Owner = true;
+            break;
+        }
+    }
+
+    if (!atLeast1Owner) {
+        sendUserFeedback(socket, "Piece doesn't fall under your control");
+        return;
+    }
+
     const isContainer = CONTAINER_TYPES.includes(pieceTypeId);
 
     //Check adjacency and other parts of the plan to make sure the whole thing makes sense

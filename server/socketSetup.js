@@ -91,7 +91,7 @@ const socketSetup = async socket => {
     // socket.join("game" + gameId + "team" + gameTeam + "controller" + gameController);
 
     //Send the client intial game state data
-    const serverAction = await thisGame.initialStateAction(gameTeam, gameController);
+    const serverAction = await thisGame.initialStateAction(gameTeam, gameControllers);
     socket.emit(SERVER_SENDING_ACTION, serverAction); //sends the data
 
     //Setup the socket functions to respond to client requests
@@ -159,7 +159,7 @@ const socketSetup = async socket => {
     socket.on("disconnect", async () => {
         try {
             setTimeout(() => {
-                for (gameController in gameControllers) {
+                for (gameController of gameControllers) {
                     thisGame.setLoggedIn(gameTeam, gameController, 0);
                 }
                 delete socket.handshake.session.ir3;

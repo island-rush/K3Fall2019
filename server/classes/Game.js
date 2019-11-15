@@ -148,7 +148,7 @@ class Game {
         await this.setPoints(RED_TEAM_ID, redPoints);
     }
 
-    async initialStateAction(gameTeam, gameController) {
+    async initialStateAction(gameTeam, gameControllers) {
         let serverAction = {
             type: INITIAL_GAMESTATE,
             payload: {}
@@ -161,7 +161,7 @@ class Game {
         serverAction.payload.gameInfo = {
             gameSection: this.gameSection,
             gameInstructor: this.gameInstructor,
-            gameController,
+            gameControllers,
             gamePhase: this.gamePhase,
             gameRound: this.gameRound,
             gameSlice: this.gameSlice,
@@ -318,14 +318,13 @@ class Game {
             game0Controller0: 0,
             game0Controller1: 0,
             game0Controller2: 0,
-			game0Controller3: 0,
-			game0Controller4: 0,
+            game0Controller3: 0,
+            game0Controller4: 0,
             game1Controller0: 0,
             game1Controller1: 0,
             game1Controller2: 0,
-			game1Controller3: 0,
-			game1Controller4: 0,
-
+            game1Controller3: 0,
+            game1Controller4: 0
         };
         Object.assign(this, updatedInfo); //very unlikely we would need the updated info on this object...
     }
