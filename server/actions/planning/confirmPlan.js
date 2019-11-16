@@ -32,7 +32,7 @@ const confirmPlan = async (socket, payload) => {
         return;
     }
 
-    const { piecePositionId, pieceTypeId, pieceGameId, pieceTeamId, pieceMoves } = thisPiece;
+    const { piecePositionId, pieceTypeId, pieceGameId, pieceTeamId, pieceMoves, pieceDisabled } = thisPiece;
 
     //Is this piece ours? (TODO: could also check pieceType with gameControllers)
     if (pieceGameId != gameId || pieceTeamId != gameTeam) {
@@ -51,6 +51,11 @@ const confirmPlan = async (socket, payload) => {
 
     if (!atLeast1Owner) {
         sendUserFeedback(socket, "Piece doesn't fall under your control");
+        return;
+    }
+
+    if (pieceDisabled) {
+        sendUserFeedback(socket, "Piece is disabled from game effect (probably golden eye)");
         return;
     }
 

@@ -39,16 +39,27 @@ class Piece {
     }
 
     async init() {
-        const queryString = "SELECT * FROM pieces WHERE pieceId = ?";
-        const inserts = [this.pieceId];
+        let queryString = "SELECT * FROM pieces WHERE pieceId = ?";
+        let inserts = [this.pieceId];
         const [results] = await pool.query(queryString, inserts);
 
         if (results.length != 1) {
             return null;
-        } else {
-            Object.assign(this, results[0]);
-            return this;
         }
+
+        Object.assign(this, results[0]);
+
+        queryString = "SELECT * FROM goldenEyePieces WHERE pieceId = ?";
+        inserts = [this.pieceId];
+        const [results2] = await pool.query(queryString, inserts);
+
+        if (results2.length === 0) {
+            Object.assign(this, { pieceDisabled: false });
+        } else {
+            Object.assign(this, { pieceDisabled: true });
+        }
+
+        return this;
     }
 
     async delete() {

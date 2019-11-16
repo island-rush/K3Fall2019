@@ -1,6 +1,7 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { START_PLAN } from "../actionTypes";
 import { TYPE_OWNERS } from "../../../constants/gameConstants";
+import setUserFeedbackAction from "../setUserfeedbackAction";
 
 //TODO: need more checks on all the frontend planning functions (gamePhase/gameSlice...)
 const startPlan = () => {
@@ -25,6 +26,11 @@ const startPlan = () => {
 
         if (!atLeast1Owner) {
             dispatch(setUserfeedbackAction("Piece doesn't fall under your control"));
+            return;
+        }
+
+        if (selectedPiece.pieceDisabled) {
+            dispatch(setUserFeedbackAction("Piece is disabled from something (probably goldeneye)"));
             return;
         }
 
