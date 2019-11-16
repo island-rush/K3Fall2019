@@ -174,14 +174,27 @@ class Piece {
     }
 
     static async getVisiblePieces(gameId, gameTeam) {
-        const queryString = "SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = ? OR pieceVisible = 1) ORDER BY pieceContainerId, pieceTeamId ASC";
-        const inserts = [gameId, gameTeam];
+        let queryString = "SELECT * FROM pieces WHERE pieceGameId = ? AND (pieceTeamId = ? OR pieceVisible = 1) ORDER BY pieceContainerId, pieceTeamId ASC";
+        let inserts = [gameId, gameTeam];
         const [results] = await pool.query(queryString, inserts);
+
+        queryString = "SELECT pieceId FROM goldenEyePieces NATURAL JOIN pieces WHERE goldenEyePieces.pieceId = pieces.pieceId AND pieces.pieceGameId = ?";
+        inserts = [gameId];
+        const [pieceIdsStuck] = await pool.query(queryString, inserts);
+        let allPieceIdsStuck = [];
+        for (let x = 0; x < pieceIdsStuck.length; x++) {
+            allPieceIdsStuck.push(pieceIdsStuck[x].pieceId);
+        }
 
         //format for the client state
         let allPieces = {};
         for (let x = 0; x < results.length; x++) {
             let currentPiece = results[x];
+            if (allPieceIdsStuck.includes(currentPiece.pieceId)) {
+                currentPiece.pieceDisabled = true;
+            } else {
+                currentPiece.pieceDisabled = false;
+            }
             currentPiece.pieceContents = { pieces: [] };
             if (!allPieces[currentPiece.piecePositionId]) {
                 allPieces[currentPiece.piecePositionId] = [];

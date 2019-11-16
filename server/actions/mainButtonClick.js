@@ -1,5 +1,5 @@
 const sendUserFeedback = require("./sendUserFeedback");
-const { Game, Capability } = require("../classes");
+const { Game, Capability, Piece } = require("../classes");
 import { MAIN_BUTTON_CLICK, PURCHASE_PHASE, COMBAT_PHASE, NEWS_PHASE, SLICE_CHANGE } from "../../client/src/redux/actions/actionTypes";
 import { SOCKET_SERVER_SENDING_ACTION, SOCKET_SERVER_REDIRECT } from "../../client/src/constants/otherConstants";
 import { GAME_INACTIVE_TAG } from "../pages/errorTypes";
@@ -107,7 +107,8 @@ const mainButtonClick = async (socket, payload) => {
                         confirmedGoldenEye,
                         confirmedCommInterrupt,
                         confirmedInsurgencyPos: listOfEffectedPositions,
-                        confirmedInsurgencyPieces: listOfPiecesToKill
+                        confirmedInsurgencyPieces: listOfPiecesToKill,
+                        gameboardPieces: await Piece.getVisiblePieces(gameId, BLUE_TEAM_ID)
                     }
                 };
                 serverAction1 = {
@@ -118,7 +119,8 @@ const mainButtonClick = async (socket, payload) => {
                         confirmedGoldenEye,
                         confirmedCommInterrupt,
                         confirmedInsurgencyPos: listOfEffectedPositions,
-                        confirmedInsurgencyPieces: listOfPiecesToKill
+                        confirmedInsurgencyPieces: listOfPiecesToKill,
+                        gameboardPieces: await Piece.getVisiblePieces(gameId, RED_TEAM_ID)
                     }
                 };
             } else {
@@ -156,7 +158,7 @@ const mainButtonClick = async (socket, payload) => {
     //Send to all clients (could be different from getting points)
     socket.to("game" + gameId + "team" + BLUE_TEAM_ID).emit(SOCKET_SERVER_SENDING_ACTION, serverAction0);
     socket.to("game" + gameId + "team" + RED_TEAM_ID).emit(SOCKET_SERVER_SENDING_ACTION, serverAction1);
-    socket.emit(SOCKET_SERVER_SENDING_ACTION, gameTeam === BLUE_TEAM_ID ? serverAction0 : serverAction1);
+    socket.emit(SOCKET_SERVER_SENDING_ACTION, parseInt(gameTeam) === BLUE_TEAM_ID ? serverAction0 : serverAction1);
 };
 
 module.exports = mainButtonClick;

@@ -210,3 +210,11 @@ CREATE TABLE IF NOT EXISTS goldenEye(
     activated INT(1) NOT NULL,
     FOREIGN KEY (gameId) REFERENCES games (gameId) ON DELETE CASCADE
 ) AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS goldenEyePieces(
+	goldenEyeId INT(8) NOT NULL,
+    pieceId INT(8) NOT NULL,
+    FOREIGN KEY (goldenEyeId) REFERENCES goldenEye (goldenEyeId) ON DELETE CASCADE,
+    FOREIGN KEY (pieceId) REFERENCES pieces (pieceId) ON DELETE CASCADE,
+    PRIMARY KEY (goldenEyeId, pieceId)
+);

@@ -15,7 +15,10 @@ import {
     COMM_INTERRUPT_RANGE,
     BLUE_TEAM_ID,
     RED_TEAM_ID,
-    GOLDEN_EYE_ROUNDS
+    GOLDEN_EYE_ROUNDS,
+    TYPE_AIR_PIECES,
+    GOLDEN_EYE_RANGE,
+    TYPE_GROUND_PIECES
 } from "../../client/src/constants/gameConstants";
 
 class Capability {
@@ -496,59 +499,61 @@ class Capability {
         return true;
     }
 
+    //TODO: could use more bulk sql statements for better efficiency (future task, efficient enough for now)
     static async useGoldenEye(gameId) {
-        //activate the golden eye and remove pieces?
-        // let queryString = "UPDATE goldenEye SET activated = ? WHERE gameId = ?";
-        // let inserts = [ACTIVATED, gameId];
-        // await pool.query(queryString, inserts);
-        // queryString = "SELECT * FROM goldenEye WHERE gameId = ?"; //all should be activated, no need to specify
-        // inserts = [gameId];
-        // const [results] = await pool.query(queryString, inserts);
-        // if (results.length === 0) {
-        //     return [];
-        // }
-        // //need the positions anyway to give back to the clients for updating
-        // let fullListOfPositions0 = [];
-        // let fullListOfPositions1 = [];
-        // let masterListOfAllPositions = [];
-        // for (let x = 0; x < results.length; x++) {
-        //     let thisResult = results[x];
-        //     let { positionId, teamId } = thisResult;
-        //     if (teamId == 0) {
-        //         fullListOfPositions0.push(positionId);
-        //     } else {
-        //         fullListOfPositions1.push(positionId);
-        //     }
-        //     masterListOfAllPositions.push(positionId);
-        // }
-        // let positionsInTheseRanges0 = [];
-        // for (let y = 0; y < fullListOfPositions0.length; y++) {
-        //     let currentCenterPosition = fullListOfPositions0[y];
-        //     for (let z = 0; z < distanceMatrix[currentCenterPosition].length; z++) {
-        //         if (distanceMatrix[currentCenterPosition][z] <= COMM_INTERRUPT_RANGE) {
-        //             positionsInTheseRanges0.push(z);
-        //         }
-        //     }
-        // }
-        // let positionsInTheseRanges1 = [];
-        // for (let y = 0; y < fullListOfPositions1.length; y++) {
-        //     let currentCenterPosition = fullListOfPositions1[y];
-        //     for (let z = 0; z < distanceMatrix[currentCenterPosition].length; z++) {
-        //         if (distanceMatrix[currentCenterPosition][z] <= COMM_INTERRUPT_RANGE) {
-        //             positionsInTheseRanges1.push(z);
-        //         }
-        //     }
-        // }
-        // queryString = "DELETE FROM plans WHERE planPieceId IN (SELECT pieceId FROM pieces WHERE pieceGameId = ? AND pieceTeamId = ? AND piecePositionId in (?))";
-        // if (positionsInTheseRanges0.length > 0) {
-        //     inserts = [gameId, BLUE_TEAM_ID, positionsInTheseRanges0];
-        //     await pool.query(queryString, inserts);
-        // }
-        // if (positionsInTheseRanges1.length > 0) {
-        //     inserts = [gameId, RED_TEAM_ID, positionsInTheseRanges1];
-        //     await pool.query(queryString, inserts);
-        // }
-        // return masterListOfAllPositions;
+        //activate golden eye
+        let queryString = "UPDATE goldenEye SET activated = ? WHERE gameId = ?";
+        let inserts = [ACTIVATED, gameId];
+        await pool.query(queryString, inserts);
+
+        //get goldenEye to delete pieces
+        queryString = "SELECT * FROM goldenEye WHERE gameId = ?";
+        inserts = [gameId];
+        const [allGoldenEye] = await pool.query(queryString, inserts);
+
+        if (allGoldenEye.length === 0) {
+            return [];
+        }
+
+        let listOfEffectedPositions = [];
+
+        for (let x = 0; x < allGoldenEye.length; x++) {
+            let thisGoldenEye = allGoldenEye[x];
+            let { goldenEyeId, teamId, positionId, roundsLeft } = thisGoldenEye;
+
+            listOfEffectedPositions.push(positionId);
+
+            const otherTeam = teamId === BLUE_TEAM_ID ? RED_TEAM_ID : BLUE_TEAM_ID;
+
+            //roundsLeft === 9 -> first time executing, need to delete the pieces
+            if (roundsLeft === GOLDEN_EYE_ROUNDS) {
+                let allEffectedPositions = [];
+                for (let y = 0; y < distanceMatrix[positionId].length; y++) {
+                    if (distanceMatrix[positionId][y] <= GOLDEN_EYE_RANGE) {
+                        allEffectedPositions.push(y);
+                    }
+                }
+
+                //delete air pieces
+                queryString = "DELETE FROM pieces WHERE pieceGameId = ? AND pieceTeamId = ? AND pieceTypeId in (?) AND piecePositionId in (?)";
+                inserts = [gameId, otherTeam, TYPE_AIR_PIECES, allEffectedPositions];
+                await pool.query(queryString, inserts);
+
+                //insert ground pieces into goldenEyePieces
+                queryString =
+                    "INSERT INTO goldenEyePieces SELECT ?, pieceId FROM pieces WHERE pieceGameId = ? AND pieceTeamId = ? AND pieceTypeId in (?) AND piecePositionId in (?)";
+                inserts = [goldenEyeId, gameId, otherTeam, TYPE_GROUND_PIECES, allEffectedPositions];
+                await pool.query(queryString, inserts);
+            }
+        }
+
+        //delete plans from pieces that are in goldenEyePieces
+        queryString =
+            "DELETE FROM plans WHERE planPieceId in (SELECT p.pieceId FROM pieces AS p NATURAL JOIN goldenEye AS ge NATURAL JOIN goldenEyePieces AS gep WHERE ge.goldenEyeId = gep.goldenEyeId AND gep.pieceId = p.pieceId AND ge.gameId = ?)";
+        inserts = [gameId];
+        await pool.query(queryString, inserts);
+
+        return listOfEffectedPositions;
     }
 
     static async decreaseGoldenEye(gameId) {

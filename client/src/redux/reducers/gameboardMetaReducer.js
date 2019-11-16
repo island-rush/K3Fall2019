@@ -308,6 +308,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
             stateDeepCopy.confirmedBioWeapons = payload.confirmedBioWeapons;
             stateDeepCopy.confirmedCommInterrupt = payload.confirmedCommInterrupt;
             stateDeepCopy.confirmedInsurgency = payload.confirmedInsurgencyPos;
+            stateDeepCopy.confirmedGoldenEye = payload.confirmedGoldenEye;
             break;
         case BATTLE_PIECE_SELECT:
             //select if different, unselect if was the same
