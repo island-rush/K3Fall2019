@@ -49,23 +49,12 @@ function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
             }
             return freshBoard;
         case SLICE_CHANGE:
-            for (let x = 0; x < payload.confirmedRods.length; x++) {
-                stateDeepCopy[payload.confirmedRods[x]].pieces = [];
+            freshBoard = JSON.parse(JSON.stringify(initialGameboardEmpty));
+            positions = Object.keys(payload.gameboardPieces);
+            for (let x = 0; x < positions.length; x++) {
+                freshBoard[positions[x]].pieces = payload.gameboardPieces[positions[x]];
             }
-            //TODO: " (does not include aircraft (that are taken off))"
-            for (let x = 0; x < payload.confirmedBioWeapons.length; x++) {
-                stateDeepCopy[payload.confirmedBioWeapons[x]].pieces = [];
-            }
-            for (let x = 0; x < payload.confirmedInsurgencyPieces.length; x++) {
-                let currentPiece = payload.confirmedInsurgencyPieces[x];
-                let { piecePositionId, pieceId } = currentPiece;
-
-                //remove specific piece from the stateDeepCopy
-                stateDeepCopy[piecePositionId].pieces = stateDeepCopy[piecePositionId].pieces.filter((piece, index) => {
-                    return piece.pieceId !== pieceId;
-                });
-            }
-            return stateDeepCopy;
+            return freshBoard;
         case NO_MORE_EVENTS:
             if (payload.gameboardPieces) {
                 //this would happen on the 1st event (from executeStep)

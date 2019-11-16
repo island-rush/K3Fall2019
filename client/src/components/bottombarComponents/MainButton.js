@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { WAITING_STATUS, NEWS_PHASE_ID, PURCHASE_PHASE_ID, COMBAT_PHASE_ID, SLICE_PLANNING_ID, PLACE_PHASE_ID } from "../../gameData/gameConstants";
+import { WAITING_STATUS, NEWS_PHASE_ID, PURCHASE_PHASE_ID, COMBAT_PHASE_ID, SLICE_PLANNING_ID, PLACE_PHASE_ID } from "../../constants/gameConstants";
 
 const mainButtonStyle = {
     backgroundColor: "grey",
@@ -58,8 +58,8 @@ class MainButton extends Component {
 }
 
 MainButton.propTypes = {
-    mainButtonClick: PropTypes.func.isRequired,
-    gameInfo: PropTypes.object.isRequired
+    mainButtonClick: PropTypes.func.isRequired, //from parent
+    gameInfo: PropTypes.object.isRequired //from parent
 };
 
 export default MainButton;

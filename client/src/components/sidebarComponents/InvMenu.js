@@ -26,7 +26,7 @@ import {
     DRONE_SWARMS_TYPE_ID,
     INSURGENCY_TYPE_ID,
     RAISE_MORALE_TYPE_ID
-} from "../../gameData/gameConstants";
+} from "../../constants/gameConstants";
 
 const inventoryStyle = {
     backgroundColor: "Yellow",
@@ -147,11 +147,6 @@ class InvMenu extends Component {
 
         return (
             <div style={selected ? inventoryStyle : invisibleStyle}>
-                {/* TODO: capabilities is first as a div, but last as a style, make these consistent with style? / rearange these to be in correct order */}
-                <div style={warfareItemsContainerStyle}>
-                    <div>Capabilities</div>
-                    {capabilityItemComponents}
-                </div>
                 <div style={airpieceItemsContainerStyle}>
                     <div> Air Pieces</div>
                     <div> Boost = {airItemMoveBoost}</div>
@@ -171,6 +166,10 @@ class InvMenu extends Component {
                     <div>SOF Pieces</div>
                     <div> Boost = {specialItemMoveBoost}</div>
                     {specialInvComponents}
+                </div>
+                <div style={warfareItemsContainerStyle}>
+                    <div>Capabilities</div>
+                    {capabilityItemComponents}
                 </div>
             </div>
         );

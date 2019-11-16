@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { TYPE_IMAGES } from "../../styleConstants";
-import { TYPE_FUEL, AIR_REFUELING_SQUADRON } from "../../../gameData/gameConstants";
+import { TYPE_FUEL, AIR_REFUELING_SQUADRON_ID } from "../../../constants/gameConstants";
 
 const aircraftPieceStyle = {
     backgroundColor: "white",
@@ -37,7 +37,7 @@ class AircraftPiece extends Component {
         const tankerDisplay =
             aircraftPiece.tankerPieceIndex == null ? null : (
                 <div
-                    style={{ ...boxStyle, ...TYPE_IMAGES[AIR_REFUELING_SQUADRON] }}
+                    style={{ ...boxStyle, ...TYPE_IMAGES[AIR_REFUELING_SQUADRON_ID] }}
                     onClick={event => {
                         event.preventDefault();
                         undoFuelSelection(aircraftPiece, aircraftPieceIndex);

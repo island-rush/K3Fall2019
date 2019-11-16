@@ -23,30 +23,30 @@ import {
     SLICE_EXECUTING_ID,
     PLACE_PHASE_ID,
     NEWS_PHASE_ID
-} from "../../gameData/gameConstants";
+} from "../../constants/gameConstants";
 
 const initialGameInfoState = {
     gameSection: "Loading...",
     gameInstructor: "Loading...",
-    gameController: "Loading...",
+    gameControllers: [],
     gamePhase: -1,
     gameRound: -1,
     gameSlice: -1,
     gameStatus: -1,
     gamePoints: -1,
-    island0: -1,
-    island1: -1,
-    island2: -1,
-    island3: -1,
-    island4: -1,
-    island5: -1,
-    island6: -1,
-    island7: -1,
-    island8: -1,
-    island9: -1,
-    island10: -1,
-    island11: -1,
-    island12: -1
+    flag0: -1,
+    flag1: -1,
+    flag2: -1,
+    flag3: -1,
+    flag4: -1,
+    flag5: -1,
+    flag6: -1,
+    flag7: -1,
+    flag8: -1,
+    flag9: -1,
+    flag10: -1,
+    flag11: -1,
+    flag12: -1
 };
 
 function gameInfoReducer(state = initialGameInfoState, { type, payload }) {

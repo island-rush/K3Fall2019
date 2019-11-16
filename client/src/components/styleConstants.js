@@ -1,3 +1,6 @@
+//prettier-ignore
+import { BOMBER_TYPE_ID,STEALTH_BOMBER_TYPE_ID,STEALTH_FIGHTER_TYPE_ID,AIR_REFUELING_SQUADRON_ID,TACTICAL_AIRLIFT_SQUADRON_TYPE_ID,AIRBORN_ISR_TYPE_ID,ARMY_INFANTRY_COMPANY_TYPE_ID,ARTILLERY_BATTERY_TYPE_ID,TANK_COMPANY_TYPE_ID,MARINE_INFANTRY_COMPANY_TYPE_ID,ATTACK_HELICOPTER_TYPE_ID,LIGHT_INFANTRY_VEHICLE_CONVOY_TYPE_ID,SAM_SITE_TYPE_ID,DESTROYER_TYPE_ID,A_C_CARRIER_TYPE_ID,SUBMARINE_TYPE_ID,TRANSPORT_TYPE_ID,MC_12_TYPE_ID,C_130_TYPE_ID,SOF_TEAM_TYPE_ID,ATC_SCRAMBLE_TYPE_ID,CYBER_DOMINANCE_TYPE_ID,MISSILE_LAUNCH_DISRUPTION_TYPE_ID,COMMUNICATIONS_INTERRUPTION_TYPE_ID,REMOTE_SENSING_TYPE_ID,RODS_FROM_GOD_TYPE_ID,ANTI_SATELLITE_MISSILES_TYPE_ID,GOLDEN_EYE_TYPE_ID,NUCLEAR_STRIKE_TYPE_ID,BIOLOGICAL_WEAPONS_TYPE_ID,SEA_MINES_TYPE_ID,DRONE_SWARMS_TYPE_ID,INSURGENCY_TYPE_ID,RAISE_MORALE_TYPE_ID,RADAR_TYPE_ID,MISSILE_TYPE_ID, BLUE_TEAM_ID, RED_TEAM_ID } from "../constants/gameConstants";
+
 //These paths are relative to the ./public directory
 const unitImagesPath = "./images/unitImages";
 const diceImagePath = "./images/diceImages";
@@ -5,48 +8,45 @@ const diceImagePath = "./images/diceImages";
 const graphicsPath = "./images/graphics";
 const buttonImagesPath = "./images/buttonImages";
 
-//TODO: change to format used in ./gameData/gameConstants
-export const TYPE_IMAGES = {
-    //TypeId: ImageUrlCSS
-    0: { backgroundImage: `url("${unitImagesPath}/bomber.png")` },
-    1: { backgroundImage: `url("${unitImagesPath}/stealthBomber.png")` },
-    2: { backgroundImage: `url("${unitImagesPath}/fighter.png")` },
-    3: { backgroundImage: `url("${unitImagesPath}/tanker.png")` },
-    4: { backgroundImage: `url("${unitImagesPath}/c17.png")` },
-    5: { backgroundImage: `url("${unitImagesPath}/e3.png")` },
-    6: { backgroundImage: `url("${unitImagesPath}/infantry.png")` },
-    7: { backgroundImage: `url("${unitImagesPath}/artillery.png")` },
-    8: { backgroundImage: `url("${unitImagesPath}/tank.png")` },
-    9: { backgroundImage: `url("${unitImagesPath}/marine.png")` },
-    10: { backgroundImage: `url("${unitImagesPath}/attackHeli.png")` },
-    11: { backgroundImage: `url("${unitImagesPath}/convoy.png")` },
-    12: { backgroundImage: `url("${unitImagesPath}/sam.png")` },
-    13: { backgroundImage: `url("${unitImagesPath}/destroyer.png")` },
-    14: { backgroundImage: `url("${unitImagesPath}/aircraftCarrier.png")` },
-    15: { backgroundImage: `url("${unitImagesPath}/submarine.png")` },
-    16: { backgroundImage: `url("${unitImagesPath}/transport.png")` },
-    17: { backgroundImage: `url("${unitImagesPath}/mc12.png")` },
-    18: { backgroundImage: `url("${unitImagesPath}/c130.png")` },
-    19: { backgroundImage: `url("${unitImagesPath}/sofTeam.png")` },
-    20: { backgroundImage: `url("${unitImagesPath}/ATCScramble.png")` },
-    21: { backgroundImage: `url("${unitImagesPath}/cyberDominance.png")` },
-    22: { backgroundImage: `url("${unitImagesPath}/missileLaunchDisruption.png")` },
-    23: { backgroundImage: `url("${unitImagesPath}/communicationsInterruption.png")` },
-    24: { backgroundImage: `url("${unitImagesPath}/remoteSensing.png")` },
-    25: { backgroundImage: `url("${unitImagesPath}/rodsFromGod.png")` },
-    26: { backgroundImage: `url("${unitImagesPath}/antiSatelliteMissiles.png")` },
-    27: { backgroundImage: `url("${unitImagesPath}/goldenEye.png")` },
-    28: { backgroundImage: `url("${unitImagesPath}/nuclearStrike.png")` },
-    29: { backgroundImage: `url("${unitImagesPath}/biologicalWeapons.png")` },
-    30: { backgroundImage: `url("${unitImagesPath}/seaMines.png")` },
-    31: { backgroundImage: `url("${unitImagesPath}/droneSwarm.png")` },
-    32: { backgroundImage: `url("${unitImagesPath}/insurgency.png")` },
-    33: { backgroundImage: `url("${unitImagesPath}/raiseMorale.png")` }
-};
+let TYPE_IMAGES = {};
+TYPE_IMAGES[BOMBER_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/bomber.png")` };
+TYPE_IMAGES[STEALTH_BOMBER_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/stealthBomber.png")` };
+TYPE_IMAGES[STEALTH_FIGHTER_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/fighter.png")` };
+TYPE_IMAGES[AIR_REFUELING_SQUADRON_ID] = { backgroundImage: `url("${unitImagesPath}/tanker.png")` };
+TYPE_IMAGES[TACTICAL_AIRLIFT_SQUADRON_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/c17.png")` };
+TYPE_IMAGES[AIRBORN_ISR_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/e3.png")` };
+TYPE_IMAGES[ARMY_INFANTRY_COMPANY_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/infantry.png")` };
+TYPE_IMAGES[ARTILLERY_BATTERY_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/artillery.png")` };
+TYPE_IMAGES[TANK_COMPANY_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/tank.png")` };
+TYPE_IMAGES[MARINE_INFANTRY_COMPANY_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/marine.png")` };
+TYPE_IMAGES[ATTACK_HELICOPTER_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/attackHeli.png")` };
+TYPE_IMAGES[LIGHT_INFANTRY_VEHICLE_CONVOY_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/convoy.png")` };
+TYPE_IMAGES[SAM_SITE_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/sam.png")` };
+TYPE_IMAGES[DESTROYER_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/destroyer.png")` };
+TYPE_IMAGES[A_C_CARRIER_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/aircraftCarrier.png")` };
+TYPE_IMAGES[SUBMARINE_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/submarine.png")` };
+TYPE_IMAGES[TRANSPORT_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/transport.png")` };
+TYPE_IMAGES[MC_12_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/mc12.png")` };
+TYPE_IMAGES[C_130_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/c130.png")` };
+TYPE_IMAGES[SOF_TEAM_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/sofTeam.png")` };
+TYPE_IMAGES[RADAR_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/radar.png")` };
+TYPE_IMAGES[MISSILE_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/antiSatelliteMissiles.png")` }; //TODO: change to a different image
+TYPE_IMAGES[ATC_SCRAMBLE_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/ATCScramble.png")` };
+TYPE_IMAGES[CYBER_DOMINANCE_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/cyberDominance.png")` };
+TYPE_IMAGES[MISSILE_LAUNCH_DISRUPTION_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/missileLaunchDisruption.png")` };
+TYPE_IMAGES[COMMUNICATIONS_INTERRUPTION_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/communicationsInterruption.png")` };
+TYPE_IMAGES[REMOTE_SENSING_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/remoteSensing.png")` };
+TYPE_IMAGES[RODS_FROM_GOD_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/rodsFromGod.png")` };
+TYPE_IMAGES[ANTI_SATELLITE_MISSILES_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/antiSatelliteMissiles.png")` };
+TYPE_IMAGES[GOLDEN_EYE_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/goldenEye.png")` };
+TYPE_IMAGES[NUCLEAR_STRIKE_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/nuclearStrike.png")` };
+TYPE_IMAGES[BIOLOGICAL_WEAPONS_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/biologicalWeapons.png")` };
+TYPE_IMAGES[SEA_MINES_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/seaMines.png")` };
+TYPE_IMAGES[DRONE_SWARMS_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/droneSwarm.png")` };
+TYPE_IMAGES[INSURGENCY_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/insurgency.png")` };
+TYPE_IMAGES[RAISE_MORALE_TYPE_ID] = { backgroundImage: `url("${unitImagesPath}/raiseMorale.png")` };
 
-export const DICE_IMAGES = {
-    //TODO: use actual dice images instead of unit images
-    // 0 => no dice roll yet
+const DICE_IMAGES = {
     1: { backgroundImage: `url("${diceImagePath}/1.png")` },
     2: { backgroundImage: `url("${diceImagePath}/2.png")` },
     3: { backgroundImage: `url("${diceImagePath}/3.png")` },
@@ -55,7 +55,11 @@ export const DICE_IMAGES = {
     6: { backgroundImage: `url("${diceImagePath}/6.png")` }
 };
 
-export const LEFT_CONTROLS_IMAGES = {
+const ARROW_IMAGE = {
+    backgroundImage: `url("${graphicsPath}/arrow.png")`
+};
+
+const LEFT_CONTROLS_IMAGES = {
     start: { backgroundImage: `url("${buttonImagesPath}/iconPlanning.png")` },
     undo: { backgroundImage: `url("${buttonImagesPath}/iconUndo.png")` },
     cancel: { backgroundImage: `url("${buttonImagesPath}/iconCancel.png")` },
@@ -65,19 +69,20 @@ export const LEFT_CONTROLS_IMAGES = {
     }
 };
 
-export const BATTLE_POPUP_IMAGES = {
+const BATTLE_POPUP_IMAGES = {
     minIcon: { backgroundImage: `url("${graphicsPath}/battleIcon.png")` }
 };
 
-export const NEWS_POPUP_IMAGES = {
+const NEWS_POPUP_IMAGES = {
     minIcon: { backgroundImage: `url("${graphicsPath}/newsIcon.png")` }
 };
 
-export const REFUEL_POPUP_IMAGES = {
+const REFUEL_POPUP_IMAGES = {
     minIcon: { backgroundImage: `url("${graphicsPath}/refuelIcon.png")` }
 };
 
-export const ZOOMBOX_BACKGROUNDS = {
+//TODO: change to be based on gameboardConstants
+const ZOOMBOX_BACKGROUNDS = {
     land: { backgroundColor: "green" },
     water: { backgroundColor: "cyan" },
     airfield: { backgroundColor: "green" },
@@ -87,8 +92,24 @@ export const ZOOMBOX_BACKGROUNDS = {
     blue: { backgroundColor: "green" }
 };
 
-//TODO: change based on ./gameData/gameConstants
-export const TYPE_TEAM_BORDERS = {
-    0: { boxShadow: "0px 0px 0px 2px rgba(0, 111, 255, 0.67) inset" }, //blue
-    1: { boxShadow: "0px 0px 0px 2px rgba(255, 0, 0, 0.55) inset" } //red
+let TYPE_TEAM_BORDERS = {};
+TYPE_TEAM_BORDERS[BLUE_TEAM_ID] = { boxShadow: "0px 0px 0px 2px rgba(0, 111, 255, 0.67) inset" };
+TYPE_TEAM_BORDERS[RED_TEAM_ID] = { boxShadow: "0px 0px 0px 2px rgba(255, 0, 0, 0.55) inset" };
+
+const SELECTED_BORDERS = [
+    { border: "2px solid red" }, //selected
+    { border: "2px solid black" } //not selected
+];
+
+export {
+    SELECTED_BORDERS,
+    TYPE_TEAM_BORDERS,
+    ZOOMBOX_BACKGROUNDS,
+    REFUEL_POPUP_IMAGES,
+    NEWS_POPUP_IMAGES,
+    BATTLE_POPUP_IMAGES,
+    LEFT_CONTROLS_IMAGES,
+    ARROW_IMAGE,
+    DICE_IMAGES,
+    TYPE_IMAGES
 };

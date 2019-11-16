@@ -49,7 +49,7 @@ import {
     GOLDEN_EYE_SELECTED
 } from "../actions/actionTypes";
 
-import { TYPE_FUEL } from "../../gameData/gameConstants";
+import { TYPE_FUEL } from "../../constants/gameConstants";
 
 const initialGameboardMeta = {
     //TODO: change to selectedPositionId and selectedPieceId to better represent the values (ints) (and also selectedBattlePiece -> selectedBattlePieceId)
@@ -308,6 +308,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
             stateDeepCopy.confirmedBioWeapons = payload.confirmedBioWeapons;
             stateDeepCopy.confirmedCommInterrupt = payload.confirmedCommInterrupt;
             stateDeepCopy.confirmedInsurgency = payload.confirmedInsurgencyPos;
+            stateDeepCopy.confirmedGoldenEye = payload.confirmedGoldenEye;
             break;
         case BATTLE_PIECE_SELECT:
             //select if different, unselect if was the same

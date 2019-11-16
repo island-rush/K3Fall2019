@@ -1,6 +1,5 @@
-import { distanceMatrix } from "../../gameData/distanceMatrix";
+import { distanceMatrix } from "../../constants/distanceMatrix";
 import {
-    TYPE_MOVES,
     REMOTE_SENSING_RANGE,
     COMM_INTERRUPT_RANGE,
     REMOTE_SENSING_TYPE_ID,
@@ -9,8 +8,9 @@ import {
     INSURGENCY_TYPE_ID,
     BIOLOGICAL_WEAPONS_TYPE_ID,
     GOLDEN_EYE_TYPE_ID,
-    GOLDEN_EYE_RANGE
-} from "../../gameData/gameConstants";
+    GOLDEN_EYE_RANGE,
+    TYPE_TERRAIN
+} from "../../constants/gameConstants";
 import {
     POSITION_SELECT,
     PLANNING_SELECT,
@@ -22,8 +22,9 @@ import {
     SERVER_COMM_INTERRUPT_CONFIRM,
     SERVER_GOLDEN_EYE_CONFIRM
 } from "./actionTypes";
-import { CLIENT_SENDING_ACTION } from "../socketEmits";
+import { SOCKET_CLIENT_SENDING_ACTION } from "../../constants/otherConstants";
 import setUserFeedbackAction from "./setUserfeedbackAction";
+import { initialGameboardEmpty } from "../reducers/initialGameboardEmpty";
 
 const selectPosition = selectedPositionId => {
     return (dispatch, getState, emit) => {
@@ -137,7 +138,7 @@ const selectPosition = selectedPositionId => {
                     }
                 };
 
-                emit(CLIENT_SENDING_ACTION, clientAction);
+                emit(SOCKET_CLIENT_SENDING_ACTION, clientAction);
                 return;
             }
 
@@ -159,7 +160,7 @@ const selectPosition = selectedPositionId => {
             }
         }
 
-        if (trueMoveCount > TYPE_MOVES[gameboardMeta.selectedPiece.pieceTypeId] - 1) {
+        if (trueMoveCount >= gameboardMeta.selectedPiece.pieceMoves) {
             dispatch(setUserFeedbackAction("Must move piece within range..."));
             return;
         }
@@ -170,6 +171,14 @@ const selectPosition = selectedPositionId => {
 
         if (distanceMatrix[lastSelectedPosition][selectedPositionId] !== 1) {
             dispatch(setUserFeedbackAction("Must select adjacent position..."));
+            return;
+        }
+
+        //if we are planning (a non-capability), we assume there is a selectedPiece in the meta
+        const { pieceTypeId } = gameboardMeta.selectedPiece;
+        const { type } = initialGameboardEmpty[selectedPositionId];
+        if (!TYPE_TERRAIN[pieceTypeId].includes(type)) {
+            dispatch(setUserFeedbackAction("Wrong terrain type for this piece..."));
             return;
         }
 

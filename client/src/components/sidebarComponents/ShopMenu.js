@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import PurchaseableItem from "./PurchaseableItem";
 import ShopItem from "./ShopItem";
 import { shopRefundRequest, shopPurchaseRequest, shopConfirmPurchase } from "../../redux/actions";
-import { TYPE_OWNERS, TYPE_AIR, TYPE_LAND, TYPE_SEA, TYPE_SPECIAL, LIST_ALL_CAPABILITIES } from "../../gameData/gameConstants";
+import { TYPE_OWNERS, TYPE_AIR, TYPE_LAND, TYPE_SEA, TYPE_SPECIAL, LIST_ALL_CAPABILITIES } from "../../constants/gameConstants";
 
 const shopStyle = {
     backgroundColor: "Yellow",
@@ -94,7 +94,7 @@ class ShopMenu extends Component {
 
 ShopMenu.propTypes = {
     shopItems: PropTypes.array.isRequired,
-    selected: PropTypes.bool.isRequired, //TODO: make notes as to where these come from (if they come from parent...)
+    selected: PropTypes.bool.isRequired, //from parent
     purchase: PropTypes.func.isRequired,
     refund: PropTypes.func.isRequired,
     points: PropTypes.number.isRequired,

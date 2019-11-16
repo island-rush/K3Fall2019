@@ -1,7 +1,7 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { SERVER_RAISE_MORALE_CONFIRM } from "../actionTypes";
-import { CLIENT_SENDING_ACTION } from "../../socketEmits";
-import { ALL_COMMANDER_TYPES } from "../../../gameData/gameConstants";
+import { SOCKET_CLIENT_SENDING_ACTION } from "../../../constants/otherConstants";
+import { ALL_COMMANDER_TYPES } from "../../../constants/gameConstants";
 
 const raiseMoraleSelectCommanderType = selectedCommanderType => {
     return (dispatch, getState, emit) => {
@@ -20,7 +20,7 @@ const raiseMoraleSelectCommanderType = selectedCommanderType => {
                 selectedCommanderType
             }
         };
-        emit(CLIENT_SENDING_ACTION, clientAction);
+        emit(SOCKET_CLIENT_SENDING_ACTION, clientAction);
         return;
     };
 };

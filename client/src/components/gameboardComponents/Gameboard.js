@@ -9,18 +9,19 @@ import RefuelPopup from "./refuel/RefuelPopup";
 import SelectCommanderTypePopup from "./capabilities/SelectCommanderTypePopup";
 import Patterns from "./Patterns";
 import { selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } from "../../redux/actions";
-import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE, GOLDEN_EYE_RANGE, RED_TEAM_ID, BLUE_TEAM_ID } from "../../gameData/gameConstants";
-import { distanceMatrix } from "../../gameData/distanceMatrix";
+import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE, GOLDEN_EYE_RANGE, RED_TEAM_ID, BLUE_TEAM_ID } from "../../constants/gameConstants";
+import { distanceMatrix } from "../../constants/distanceMatrix";
 import {
-    ALL_ISLAND_LOCATIONS,
     IGNORE_TITLE_TYPES,
     ALL_ISLAND_NAMES,
     AIRFIELD_TYPE,
     AIRFIELD_TITLE,
     MISSILE_SILO_TYPE,
     MISSILE_SILO_TITLE,
-    ISLAND_POINTS
-} from "../../gameData/gameboardConstants";
+    ISLAND_POINTS,
+    ALL_FLAG_LOCATIONS,
+    FLAG_ISLAND_OWNERSHIP
+} from "../../constants/gameboardConstants";
 
 const gameboardStyle = {
     backgroundColor: "blue",
@@ -97,9 +98,9 @@ const patternSolver = (position, gameInfo, positionIndex) => {
         }
     }
 
-    if (ALL_ISLAND_LOCATIONS.includes(parseInt(positionIndex))) {
-        const islandNum = ALL_ISLAND_LOCATIONS.indexOf(parseInt(positionIndex));
-        const islandOwner = gameInfo["island" + islandNum];
+    if (ALL_FLAG_LOCATIONS.includes(parseInt(positionIndex))) {
+        const flagNum = ALL_FLAG_LOCATIONS.indexOf(parseInt(positionIndex));
+        const islandOwner = gameInfo["flag" + flagNum];
         const finalType = islandOwner === BLUE_TEAM_ID ? "blue" : islandOwner === RED_TEAM_ID ? "red" : "flag";
         return finalType + redHigh + redLow + blueHigh + blueLow;
     }
@@ -115,7 +116,7 @@ const titleSolver = (position, gameInfo, positionIndex) => {
         return "";
     }
 
-    if (!ALL_ISLAND_LOCATIONS.includes(parseInt(positionIndex))) {
+    if (!ALL_FLAG_LOCATIONS.includes(parseInt(positionIndex))) {
         //No points info, simple titles
         switch (type) {
             case AIRFIELD_TYPE:
@@ -128,7 +129,7 @@ const titleSolver = (position, gameInfo, positionIndex) => {
     }
 
     //need to display island name, and island point value
-    const islandNum = ALL_ISLAND_LOCATIONS.indexOf(parseInt(positionIndex));
+    const islandNum = FLAG_ISLAND_OWNERSHIP[positionIndex];
     const islandTitle = ALL_ISLAND_NAMES[islandNum];
 
     return "Island Flag\n" + islandTitle + "\nPoints: " + ISLAND_POINTS[islandNum];
