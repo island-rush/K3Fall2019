@@ -14,9 +14,9 @@ import {
     SHOR_ISLAND_ID,
     HR_REPUBLIC_ISLAND_ID,
     KEONI_ISLAND_ID,
-    EAGLE_ISLAND_ID
+    EAGLE_ISLAND_ID,
+    ALL_FLAG_LOCATIONS
 } from "../../client/src/constants/gameboardConstants";
-import { ALL_FLAG_LOCATIONS } from "/Users/Spencer/Documents/Projects/K3/client/src/constants/gameboardConstants";
 
 const InvItem = require("./InvItem");
 const ShopItem = require("./ShopItem");
