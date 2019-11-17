@@ -5,7 +5,7 @@
     "main": "server.js",
     "scripts": {
         "start": "node -r esm server.js",
-        "fullInstall": "echo Both current (root) directory and ./client directory need to run 'npm install'",
+        "fullInstall": "echo Both current (root) directory and ./client directory need to run 'npm install' && echo Node may run out of memory. To solve this run 'export NODE_OPTIONS=--max_old_space_size=4096'",
         "clientInstall": "cd .. && npm install",
         "serverInstall": "npm install",
         "devBackend": "nodemon -r esm server.js",
