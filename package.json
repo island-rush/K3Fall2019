@@ -5,7 +5,9 @@
     "main": "server.js",
     "scripts": {
         "start": "node -r esm server.js",
-        "fullInstall": "npm install && cd client && npm install && cd ..",
+        "fullInstall": "echo Both current (root) directory and ./client directory need to run 'npm install'",
+        "clientInstall": "cd .. && npm install",
+        "serverInstall": "npm install",
         "devBackend": "nodemon -r esm server.js",
         "devFrontend": "cd client && npm start",
         "dev": "concurrently \"npm:devBackend\" \"npm:devFrontend\"",
