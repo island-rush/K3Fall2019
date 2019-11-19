@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import ShopMenu from "./ShopMenu";
 import InvMenu from "./InvMenu";
 import Gameinfo from "./Gameinfo";
+import SpaceArea from "./SpaceArea";
 import { menuSelect } from "../../redux/actions";
 
 const sidebarStyle = {
@@ -11,7 +12,7 @@ const sidebarStyle = {
 	position: "absolute",
 	top: "0%",
 	left: "0%",
-	height: "30%",
+	height: "40%",
 	width: "5%"
 };
 
@@ -26,16 +27,20 @@ const buttonStyle = {
 };
 
 const shopButtonStyle = {
-	top: "5%"
+	top: "4%"
 };
 
 const invButtonStyle = {
-	top: "37.5%"
+	top: "28%"
+};
+
+const spaceButtonStyle = {
+	top: "52%"
 };
 
 const infoButtonStyle = {
 	backgroundImage: 'url("./images/graphics/infoIcon.png")',
-	top: "70%"
+	top: "76%"
 };
 
 const selectedButtonStyle = {
@@ -56,7 +61,8 @@ class Sidebar extends Component {
 			>
 				<ShopMenu selected={selectedMenu === 1} />
 				<InvMenu selected={selectedMenu === 2} />
-				<Gameinfo gameInfo={gameInfo} selected={selectedMenu === 3} />
+				<SpaceArea selected={selectedMenu === 3} />
+				<Gameinfo gameInfo={gameInfo} selected={selectedMenu === 4} />
 				<div
 					onClick={event => {
 						event.preventDefault();
@@ -81,6 +87,7 @@ class Sidebar extends Component {
 						...(selectedMenu === 2 ? selectedButtonStyle : "")
 					}}
 				/>
+				
 				<div
 					onClick={event => {
 						event.preventDefault();
@@ -89,8 +96,20 @@ class Sidebar extends Component {
 					}}
 					style={{
 						...buttonStyle,
-						...infoButtonStyle,
+						...spaceButtonStyle,
 						...(selectedMenu === 3 ? selectedButtonStyle : "")
+					}}
+				/>
+				<div
+					onClick={event => {
+						event.preventDefault();
+						menuSelect(4);
+						event.stopPropagation();
+					}}
+					style={{
+						...buttonStyle,
+						...infoButtonStyle,
+						...(selectedMenu === 4 ? selectedButtonStyle : "")
 					}}
 				/>
 			</div>
