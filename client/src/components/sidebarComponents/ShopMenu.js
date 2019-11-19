@@ -51,7 +51,8 @@ class ShopMenu extends Component {
         const shopItemComponents = shopItems.map((shopItem, index) => <ShopItem key={index} shopItem={shopItem} refund={shopItemId => refund(shopItemId)} />);
 
         return (
-            <div style={selected ? shopStyle : invisibleStyle}>
+            <div style={selected ? shopStyle : invisibleStyle}>                
+                <div>Shop Menu</div>
                 <div>Points: {points}</div>
                 <div style={purchaseableItemsContainerStyle}>
                     <div>Air</div>

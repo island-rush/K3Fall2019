@@ -146,7 +146,10 @@ class InvMenu extends Component {
         const specialItemMoveBoost = itemCount(confirmedRaiseMorale, TYPE_SPECIAL);
 
         return (
+            
+           
             <div style={selected ? inventoryStyle : invisibleStyle}>
+                <div>Inventory Section for Purchased Items</div>
                 <div style={airpieceItemsContainerStyle}>
                     <div> Air Pieces</div>
                     <div> Boost = {airItemMoveBoost}</div>
