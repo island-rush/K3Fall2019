@@ -1,8 +1,10 @@
 const { Game, InvItem } = require("../../classes");
 const sendUserFeedback = require("../sendUserFeedback");
-import { PIECE_PLACE, PLACE_PHASE } from "../../../client/src/redux/actions/actionTypes";
+import { PIECE_PLACE } from "../../../client/src/redux/actions/actionTypes";
 import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/constants/otherConstants";
 import { BAD_REQUEST_TAG, GAME_INACTIVE_TAG } from "../../pages/errorTypes";
+import { PLACE_PHASE_ID, TYPE_OWNERS, TYPE_TERRAIN } from "../../../client/src/constants/gameConstants";
+import { initialGameboardEmpty } from "../../../client/src/redux/reducers/initialGameboardEmpty";
 
 const piecePlace = async (socket, payload) => {
     const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
@@ -17,7 +19,7 @@ const piecePlace = async (socket, payload) => {
     }
 
     //Can only place pieces from inv during 'place reinforcements phase' (3)
-    if (gamePhase != PLACE_PHASE) {
+    if (gamePhase != PLACE_PHASE_ID) {
         sendUserFeedback(socket, "Not the right phase...");
         return;
     }
@@ -39,7 +41,7 @@ const piecePlace = async (socket, payload) => {
     //Could be multiple controller
     let atLeast1Owner = false;
     for (let gameController of gameControllers) {
-        if (TYPE_OWNERS[gameController].includes(pieceTypeId)) {
+        if (TYPE_OWNERS[gameController].includes(invItemTypeId)) {
             atLeast1Owner = true;
             break;
         }
