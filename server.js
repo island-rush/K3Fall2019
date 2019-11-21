@@ -14,10 +14,10 @@ const LokiStore = require("connect-loki")(session);
 const lokiOptions = {};
 const secret = process.env.SESSION_SECRET || "@d$f4%ggGG4_*7FGkdkjlk";
 const fullSession = session({
-	store: new LokiStore(lokiOptions),
-	secret,
-	resave: false,
-	saveUninitialized: false
+    store: new LokiStore(lokiOptions),
+    secret,
+    resave: false,
+    saveUninitialized: false
 });
 
 app.use(fullSession); //App has access to sessions
@@ -33,11 +33,11 @@ const io = require("socket.io")(server);
 io.use(require("express-socket.io-session")(fullSession)); //Socket has access to sessions
 const socketSetup = require("./server/socketSetup");
 io.sockets.on("connection", socket => {
-	socketSetup(socket);
+    socketSetup(socket);
 });
 
 //Start the server
 const port = process.env.PORT || 80;
 server.listen(port, () => {
-	console.log(`Listening on port ${port}...`);
+    console.log(`Listening on port ${port}...`);
 });

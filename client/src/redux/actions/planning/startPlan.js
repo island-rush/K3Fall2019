@@ -1,6 +1,6 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { START_PLAN } from "../actionTypes";
-import { TYPE_OWNERS } from "../../../constants/gameConstants";
+import { TYPE_OWNERS, COMBAT_PHASE_ID } from "../../../constants/gameConstants";
 import setUserFeedbackAction from "../setUserfeedbackAction";
 
 //TODO: need more checks on all the frontend planning functions (gamePhase/gameSlice...)
@@ -13,7 +13,12 @@ const startPlan = () => {
             return;
         }
         const { selectedPiece } = gameboardMeta;
-        const { gameControllers } = gameInfo;
+        const { gamePhase, gameControllers } = gameInfo;
+
+        if (gamePhase !== COMBAT_PHASE_ID) {
+            dispatch(setUserFeedbackAction("Not the right phase for planning..."));
+            return;
+        }
 
         let atLeast1Owner = false;
         for (let x = 0; x < gameControllers.length; x++) {
