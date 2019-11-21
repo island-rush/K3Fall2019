@@ -1,6 +1,6 @@
 import setUserfeedbackAction from "../setUserfeedbackAction";
 import { START_PLAN } from "../actionTypes";
-import { TYPE_OWNERS, COMBAT_PHASE_ID } from "../../../constants/gameConstants";
+import { TYPE_OWNERS, COMBAT_PHASE_ID, SLICE_PLANNING_ID } from "../../../constants/gameConstants";
 import setUserFeedbackAction from "../setUserfeedbackAction";
 
 //TODO: need more checks on all the frontend planning functions (gamePhase/gameSlice...)
@@ -13,10 +13,15 @@ const startPlan = () => {
             return;
         }
         const { selectedPiece } = gameboardMeta;
-        const { gamePhase, gameControllers } = gameInfo;
+        const { gamePhase, gameControllers, gameTeam, gameSlice } = gameInfo;
 
         if (gamePhase !== COMBAT_PHASE_ID) {
             dispatch(setUserFeedbackAction("Not the right phase for planning..."));
+            return;
+        }
+
+        if (gameSlice !== SLICE_PLANNING_ID) {
+            dispatch(setUserFeedbackAction("Already Executing, wait for next planning slice."));
             return;
         }
 
@@ -29,7 +34,7 @@ const startPlan = () => {
             }
         }
 
-        if (!atLeast1Owner) {
+        if (!atLeast1Owner || parseInt(selectedPiece.pieceTeamId) !== parseInt(gameTeam)) {
             dispatch(setUserfeedbackAction("Piece doesn't fall under your control"));
             return;
         }

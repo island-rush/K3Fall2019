@@ -161,6 +161,7 @@ class Game {
         serverAction.payload.gameInfo = {
             gameSection: this.gameSection,
             gameInstructor: this.gameInstructor,
+            gameTeam,
             gameControllers,
             gamePhase: this.gamePhase,
             gameRound: this.gameRound,
