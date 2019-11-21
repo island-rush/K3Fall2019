@@ -155,10 +155,15 @@ class Piece {
         //movement based on plans (for this order/step)
         const conn = await pool.getConnection();
 
-        const inserts = [gameId, movementOrder];
-        const movePiecesQuery =
+        let inserts = [gameId, movementOrder];
+        let movePiecesQuery =
             "UPDATE pieces, plans SET pieces.piecePositionId = plans.planPositionId, pieces.pieceMoves = pieces.pieceMoves - 1 WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
         await conn.query(movePiecesQuery, inserts);
+
+        inserts = [gameId, movementOrder];
+        let removeFuel =
+            "UPDATE pieces, plans SET pieces.pieceFuel = pieces.pieceFuel - 1 WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
+        await conn.query(removeFuel, inserts);
 
         //TODO: referencing another table here...(could change to put into the plans class)
         const deletePlansQuery = "DELETE FROM plans WHERE planGameId = ? AND planMovementOrder = ? AND planSpecialFlag = 0";
@@ -178,6 +183,7 @@ class Piece {
         }
 
         //TODO: only do this for ground pieces...
+        //TODO: only for ground pieces?
         if (listOfPositions > 0) {
             queryString = "DELETE FROM pieces WHERE pieceGameId = ? AND piecePositionId in (?)";
             moreInserts = [gameId, listOfPositions];
