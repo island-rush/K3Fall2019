@@ -2,7 +2,7 @@ const { Game, Event } = require("../../classes");
 import { REFUEL_RESULTS } from "../../../client/src/redux/actions/actionTypes";
 import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/constants/otherConstants";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
-import { TYPE_FUEL } from "../../../client/src/constants/gameConstants";
+import { TYPE_FUEL, TYPE_AIR, COMBAT_PHASE_ID } from "../../../client/src/constants/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 const giveNextEvent = require("../giveNextEvent");
 
@@ -14,6 +14,16 @@ const confirmFuelSelection = async (socket, payload) => {
 
     if (!gameActive) {
         socket.emit(SOCKET_SERVER_REDIRECT, GAME_INACTIVE_TAG);
+        return;
+    }
+
+    if (gamePhase != COMBAT_PHASE_ID) {
+        sendUserFeedback(socket, "Wrong phase for refueling.");
+        return;
+    }
+
+    if (!gameControllers.includes(TYPE_AIR)) {
+        sendUserFeedback(socket, "Need to be air commander.");
         return;
     }
 

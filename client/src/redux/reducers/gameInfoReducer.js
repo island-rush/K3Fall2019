@@ -28,6 +28,7 @@ import {
 const initialGameInfoState = {
     gameSection: "Loading...",
     gameInstructor: "Loading...",
+    gameTeam: -1,
     gameControllers: [],
     gamePhase: -1,
     gameRound: -1,

@@ -2,7 +2,7 @@ const { Game, Event } = require("../../classes");
 import { BATTLE_FIGHT_RESULTS, UPDATE_FLAGS } from "../../../client/src/redux/actions/actionTypes";
 import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/constants/otherConstants";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
-import { BLUE_TEAM_ID, RED_TEAM_ID, WAITING_STATUS, NOT_WAITING_STATUS } from "../../../client/src/constants/gameConstants";
+import { BLUE_TEAM_ID, RED_TEAM_ID, WAITING_STATUS, NOT_WAITING_STATUS, TYPE_MAIN, COMBAT_PHASE_ID } from "../../../client/src/constants/gameConstants";
 const sendUserFeedback = require("../sendUserFeedback");
 const giveNextEvent = require("../giveNextEvent");
 
@@ -15,6 +15,16 @@ const confirmBattleSelection = async (socket, payload) => {
 
     if (!gameActive) {
         socket.emit(SOCKET_SERVER_REDIRECT, GAME_INACTIVE_TAG);
+        return;
+    }
+
+    if (gamePhase != COMBAT_PHASE_ID) {
+        sendUserFeedback(socket, "Not the right phase for battle selections.");
+        return;
+    }
+
+    if (!gameControllers.includes(TYPE_MAIN)) {
+        sendUserFeedback(socket, "Need to be air commander.");
         return;
     }
 
