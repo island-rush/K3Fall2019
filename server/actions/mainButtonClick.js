@@ -77,13 +77,21 @@ const mainButtonClick = async (socket, payload) => {
 
         case PURCHASE_PHASE_ID:
             await thisGame.setPhase(COMBAT_PHASE_ID);
+
+            //probably do this again anyway (pieces have been placed and could be seeing things now)
+            await Piece.updateVisibilities(gameId);
+
             serverAction0 = {
                 type: COMBAT_PHASE,
-                payload: {}
+                payload: {
+                    gameboardPieces: await Piece.getVisiblePieces(gameId, BLUE_TEAM_ID)
+                }
             };
             serverAction1 = {
                 type: COMBAT_PHASE,
-                payload: {}
+                payload: {
+                    gameboardPieces: await Piece.getVisiblePieces(gameId, RED_TEAM_ID)
+                }
             };
             break;
 

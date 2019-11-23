@@ -161,6 +161,7 @@ class Game {
         serverAction.payload.gameInfo = {
             gameSection: this.gameSection,
             gameInstructor: this.gameInstructor,
+            gameTeam,
             gameControllers,
             gamePhase: this.gamePhase,
             gameRound: this.gameRound,
@@ -217,7 +218,7 @@ class Game {
             switch (eventTypeId) {
                 case POS_BATTLE_EVENT_TYPE:
                 case COL_BATTLE_EVENT_TYPE:
-                    let friendlyPiecesList = await currentEvent.getTeamItems(gameTeam == BLUE_TEAM_ID ? RED_TEAM_ID : BLUE_TEAM_ID);
+                    let friendlyPiecesList = await currentEvent.getTeamItems(gameTeam == BLUE_TEAM_ID ? BLUE_TEAM_ID : RED_TEAM_ID);
                     let enemyPiecesList = await currentEvent.getTeamItems(gameTeam == BLUE_TEAM_ID ? RED_TEAM_ID : BLUE_TEAM_ID);
                     let friendlyPieces = [];
                     let enemyPieces = [];

@@ -144,7 +144,7 @@ class Event {
             let { pieceId, newFuel } = fuelUpdates[x]; //assuming this is what is inside of it, should probably check
             let newInsert = [pieceId, this.eventGameId, gameTeam, newFuel];
             allInserts.push(newInsert);
-            console.log(newInsert);
+            // console.log(newInsert);
         }
 
         let queryString = "INSERT INTO pieceRefuelTemp (pieceId, gameId, teamId, newFuel) VALUES ?";
