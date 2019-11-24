@@ -27,6 +27,9 @@ const piecePlace = require("./inv/piecePlace");
 const sendUserFeedback = require("./sendUserFeedback");
 const mainButtonClick = require("./mainButtonClick");
 
+const enterContainer = require("./container/enterContainer");
+const exitContainer = require("./container/exitContainer");
+
 module.exports = {
     shopPurchaseRequest,
     sendUserFeedback,
@@ -44,5 +47,7 @@ module.exports = {
     biologicalWeaponsConfirm,
     raiseMoraleConfirm,
     commInterruptConfirm,
-    goldenEyeConfirm
+    goldenEyeConfirm,
+    enterContainer,
+    exitContainer
 };

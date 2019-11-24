@@ -46,7 +46,11 @@ import {
     COMM_INTERRUP_SELECTED,
     COMM_INTERRUPT_SELECTING,
     GOLDEN_EYE_SELECTING,
-    GOLDEN_EYE_SELECTED
+    GOLDEN_EYE_SELECTED,
+    PIECE_OPEN_ACTION,
+    PIECE_CLOSE_ACTION,
+    OUTER_PIECE_CLICK_ACTION,
+    INNER_PIECE_CLICK_ACTION
 } from "../actions/actionTypes";
 
 import { TYPE_FUEL } from "../../constants/gameConstants";
@@ -81,8 +85,9 @@ const initialGameboardMeta = {
         aircraft: []
     },
     container: {
-        isMinimized: false,
-        active: false
+        active: false,
+        containerPiece: null,
+        outerPieces: []
     },
     planning: {
         active: false,
@@ -137,6 +142,37 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
             let lastSelectedTankerId = stateDeepCopy.refuel.selectedTankerPieceId;
             stateDeepCopy.refuel.selectedTankerPieceId = payload.tankerPiece.pieceId === lastSelectedTankerId ? -1 : payload.tankerPiece.pieceId;
             stateDeepCopy.refuel.selectedTankerPieceIndex = payload.tankerPiece.pieceId === lastSelectedTankerId ? -1 : payload.tankerPieceIndex;
+            break;
+        case PIECE_OPEN_ACTION:
+            stateDeepCopy.container.active = true;
+            stateDeepCopy.container.containerPiece = payload.selectedPiece;
+            let selectedPiecePosition = payload.selectedPiece.piecePositionId;
+            stateDeepCopy.container.outerPieces = payload.gameboard[selectedPiecePosition].pieces.filter((piece, index) => {
+                return piece.pieceId !== payload.selectedPiece.pieceId;
+            });
+            break;
+        case PIECE_CLOSE_ACTION:
+            stateDeepCopy.container.active = false;
+            stateDeepCopy.container.containerPiece = null;
+            stateDeepCopy.container.outerPieces = [];
+            break;
+        case OUTER_PIECE_CLICK_ACTION:
+            //need the piece to go inside the container
+            //remove from outerpieces
+            //add to innerpieces
+            stateDeepCopy.container.outerPieces = stateDeepCopy.container.outerPieces.filter((piece, index) => {
+                return piece.pieceId !== payload.selectedPiece.pieceId;
+            });
+            stateDeepCopy.container.containerPiece.pieceContents.pieces.push(payload.selectedPiece);
+            break;
+        case INNER_PIECE_CLICK_ACTION:
+            //need the piece to go outside the container
+            //remove from the container piece
+            //add to the outer pieces
+            stateDeepCopy.container.containerPiece.pieceContents.pieces = stateDeepCopy.container.containerPiece.pieceContents.pieces.filter((piece, index) => {
+                return piece.pieceId !== payload.selectedPiece.pieceId;
+            });
+            stateDeepCopy.container.outerPieces.push(payload.selectedPiece);
             break;
         case AIRCRAFT_CLICK:
             //show which tanker is giving the aircraft...

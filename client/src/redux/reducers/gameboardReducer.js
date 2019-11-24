@@ -12,7 +12,9 @@ import {
     SLICE_CHANGE,
     REMOTE_SENSING_SELECTED,
     RAISE_MORALE_SELECTED,
-    COMBAT_PHASE
+    COMBAT_PHASE,
+    OUTER_PIECE_CLICK_ACTION,
+    INNER_PIECE_CLICK_ACTION
 } from "../actions/actionTypes";
 import { initialGameboardEmpty } from "./initialGameboardEmpty";
 
@@ -96,6 +98,8 @@ function gameboardReducer(state = initialGameboardEmpty, { type, payload }) {
                 return stateDeepCopy;
             }
         case COMBAT_PHASE:
+        case OUTER_PIECE_CLICK_ACTION:
+        case INNER_PIECE_CLICK_ACTION:
         case EVENT_REFUEL:
             if (payload.gameboardPieces) {
                 //this would happen on the 1st event (from executeStep)

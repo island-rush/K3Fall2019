@@ -4,11 +4,11 @@ import { connect } from "react-redux";
 import { HexGrid, Layout, Hexagon } from "react-hexgrid";
 import BattlePopup from "./battle/BattlePopup";
 import NewsPopup from "./NewsPopup";
-import ContainerPopup from "./ContainerPopup";
+import ContainerPopup from "./container/ContainerPopup";
 import RefuelPopup from "./refuel/RefuelPopup";
 import SelectCommanderTypePopup from "./capabilities/SelectCommanderTypePopup";
 import Patterns from "./Patterns";
-import { selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } from "../../redux/actions";
+import { outerPieceClick, innerPieceClick, selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType, pieceClose } from "../../redux/actions";
 import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE, GOLDEN_EYE_RANGE, RED_TEAM_ID, BLUE_TEAM_ID } from "../../constants/gameConstants";
 import { distanceMatrix } from "../../constants/distanceMatrix";
 import {
@@ -137,7 +137,17 @@ const titleSolver = (position, gameInfo, positionIndex) => {
 
 class Gameboard extends Component {
     render() {
-        const { gameInfo, gameboard, gameboardMeta, selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType } = this.props;
+        const {
+            gameInfo,
+            gameboard,
+            gameboardMeta,
+            selectPosition,
+            newsPopupMinimizeToggle,
+            raiseMoraleSelectCommanderType,
+            pieceClose,
+            outerPieceClick,
+            innerPieceClick
+        } = this.props;
 
         //prettier-ignore
         const {confirmedGoldenEye, confirmedCommInterrupt, confirmedBioWeapons, confirmedInsurgency, confirmedRods, confirmedRemoteSense, selectedPosition, news, battle, container, planning, selectedPiece, confirmedPlans, highlightedPositions } = gameboardMeta;
@@ -280,7 +290,7 @@ class Gameboard extends Component {
                 <BattlePopup battle={battle} />
                 <RefuelPopup />
                 <SelectCommanderTypePopup gameboardMeta={gameboardMeta} raiseMoraleSelectCommanderType={raiseMoraleSelectCommanderType} />
-                <ContainerPopup container={container} />
+                <ContainerPopup innerPieceClick={innerPieceClick} outerPieceClick={outerPieceClick} container={container} pieceClose={pieceClose} />
             </div>
         );
     }
@@ -292,7 +302,10 @@ Gameboard.propTypes = {
     selectPosition: PropTypes.func.isRequired,
     newsPopupMinimizeToggle: PropTypes.func.isRequired,
     raiseMoraleSelectCommanderType: PropTypes.func.isRequired,
-    gameInfo: PropTypes.object.isRequired
+    gameInfo: PropTypes.object.isRequired,
+    pieceClose: PropTypes.func.isRequired,
+    outerPieceClick: PropTypes.func.isRequired,
+    innerPieceClick: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ gameboard, gameboardMeta, gameInfo }) => ({
@@ -304,7 +317,10 @@ const mapStateToProps = ({ gameboard, gameboardMeta, gameInfo }) => ({
 const mapActionsToProps = {
     selectPosition,
     newsPopupMinimizeToggle,
-    raiseMoraleSelectCommanderType
+    raiseMoraleSelectCommanderType,
+    pieceClose,
+    outerPieceClick,
+    innerPieceClick
 };
 
 export default connect(mapStateToProps, mapActionsToProps)(Gameboard);

@@ -39,7 +39,11 @@ import {
     COMM_INTERRUP_SELECTED,
     UPDATE_FLAGS,
     GOLDEN_EYE_SELECTED,
-    GOLDEN_EYE_SELECTING
+    GOLDEN_EYE_SELECTING,
+    PIECE_OPEN_ACTION,
+    PIECE_CLOSE_ACTION,
+    OUTER_PIECE_CLICK_ACTION,
+    INNER_PIECE_CLICK_ACTION
 } from "../actions/actionTypes";
 
 const initialUserFeedback = "Loading...";
@@ -128,6 +132,14 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
             return "battle has started!";
         case EVENT_REFUEL:
             return "got a refuel event for ya, please handle it...";
+        case OUTER_PIECE_CLICK_ACTION:
+            return "clicked outer piece";
+        case PIECE_OPEN_ACTION:
+            return "openned the piece container thing.";
+        case PIECE_CLOSE_ACTION:
+            return "closed the piece container thing.";
+        case INNER_PIECE_CLICK_ACTION:
+            return "clicked inner piece";
         default:
             return state;
     }
