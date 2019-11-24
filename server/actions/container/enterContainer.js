@@ -19,10 +19,10 @@ const enterContainer = async (socket, payload) => {
 
     //need to let client(s) know about the container change (send them full pieces update if lazy)
 
-    const containerPieceId = containerPiece.pieceId;
-    const selectedPieceId = selectedPiece.pieceId;
+    // const containerPieceId = containerPiece.pieceId;
+    // const selectedPieceId = selectedPiece.pieceId;
 
-    await Piece.putInsideContainer(selectedPieceId, containerPieceId);
+    await Piece.putInsideContainer(selectedPiece, containerPiece);
 
     const serverAction = {
         type: OUTER_PIECE_CLICK_ACTION,

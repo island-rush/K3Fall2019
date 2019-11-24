@@ -8,7 +8,15 @@ import ContainerPopup from "./container/ContainerPopup";
 import RefuelPopup from "./refuel/RefuelPopup";
 import SelectCommanderTypePopup from "./capabilities/SelectCommanderTypePopup";
 import Patterns from "./Patterns";
-import { outerPieceClick, innerPieceClick, selectPosition, newsPopupMinimizeToggle, raiseMoraleSelectCommanderType, pieceClose } from "../../redux/actions";
+import {
+    innerTransportPieceClick,
+    outerPieceClick,
+    innerPieceClick,
+    selectPosition,
+    newsPopupMinimizeToggle,
+    raiseMoraleSelectCommanderType,
+    pieceClose
+} from "../../redux/actions";
 import { TYPE_HIGH_LOW, REMOTE_SENSING_RANGE, COMM_INTERRUPT_RANGE, GOLDEN_EYE_RANGE, RED_TEAM_ID, BLUE_TEAM_ID } from "../../constants/gameConstants";
 import { distanceMatrix } from "../../constants/distanceMatrix";
 import {
@@ -146,7 +154,8 @@ class Gameboard extends Component {
             raiseMoraleSelectCommanderType,
             pieceClose,
             outerPieceClick,
-            innerPieceClick
+            innerPieceClick,
+            innerTransportPieceClick
         } = this.props;
 
         //prettier-ignore
@@ -290,7 +299,13 @@ class Gameboard extends Component {
                 <BattlePopup battle={battle} />
                 <RefuelPopup />
                 <SelectCommanderTypePopup gameboardMeta={gameboardMeta} raiseMoraleSelectCommanderType={raiseMoraleSelectCommanderType} />
-                <ContainerPopup innerPieceClick={innerPieceClick} outerPieceClick={outerPieceClick} container={container} pieceClose={pieceClose} />
+                <ContainerPopup
+                    innerTransportPieceClick={innerTransportPieceClick}
+                    innerPieceClick={innerPieceClick}
+                    outerPieceClick={outerPieceClick}
+                    container={container}
+                    pieceClose={pieceClose}
+                />
             </div>
         );
     }
@@ -305,7 +320,8 @@ Gameboard.propTypes = {
     gameInfo: PropTypes.object.isRequired,
     pieceClose: PropTypes.func.isRequired,
     outerPieceClick: PropTypes.func.isRequired,
-    innerPieceClick: PropTypes.func.isRequired
+    innerPieceClick: PropTypes.func.isRequired,
+    innerTransportPieceClick: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ gameboard, gameboardMeta, gameInfo }) => ({
@@ -320,7 +336,8 @@ const mapActionsToProps = {
     raiseMoraleSelectCommanderType,
     pieceClose,
     outerPieceClick,
-    innerPieceClick
+    innerPieceClick,
+    innerTransportPieceClick
 };
 
 export default connect(mapStateToProps, mapActionsToProps)(Gameboard);

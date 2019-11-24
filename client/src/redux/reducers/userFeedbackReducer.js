@@ -43,7 +43,8 @@ import {
     PIECE_OPEN_ACTION,
     PIECE_CLOSE_ACTION,
     OUTER_PIECE_CLICK_ACTION,
-    INNER_PIECE_CLICK_ACTION
+    INNER_PIECE_CLICK_ACTION,
+    INNER_TRANSPORT_PIECE_CLICK_ACTION
 } from "../actions/actionTypes";
 
 const initialUserFeedback = "Loading...";
@@ -56,6 +57,8 @@ function userFeedbackReducer(state = initialUserFeedback, { type, payload }) {
             return "Welcome to Island Rush!";
         case SHOP_REFUND:
             return "Refunded the purchase!";
+        case INNER_TRANSPORT_PIECE_CLICK_ACTION:
+            return "Clicked a piece that was in a transport piece";
         case SHOP_PURCHASE:
             return "Purchased the item!";
         case SHOP_TRANSFER:

@@ -242,13 +242,14 @@ class Piece {
         return results;
     }
 
-    static async putInsideContainer(selectedPieceId, containerPieceId) {
-        let queryString = "UPDATE pieces SET pieceContainerId = ? WHERE pieceId = ?";
-        let inserts = [containerPieceId, selectedPieceId];
+    static async putInsideContainer(selectedPiece, containerPiece) {
+        let queryString = "UPDATE pieces SET pieceContainerId = ?, piecePositionId = ? WHERE pieceId = ?";
+        let inserts = [containerPiece.pieceId, containerPiece.piecePositionId, selectedPiece.pieceId];
         await pool.query(queryString, inserts);
     }
 
     static async putOutsideContainer(selectedPieceId) {
+        //TODO: deal with inner transport pieces (need to also set the piecePositionId)
         let queryString = "UPDATE pieces SET pieceContainerId = -1 WHERE pieceId = ?";
         let inserts = [selectedPieceId];
         await pool.query(queryString, inserts);

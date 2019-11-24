@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import ContainerPiece from "./ContainerPiece";
+import { TRANSPORT_TYPE_ID } from "../../../constants/gameConstants";
 
 const containerPopupStyle = {
     position: "absolute",
@@ -53,40 +55,34 @@ const invisibleStyle = {
 
 class ContainerPopup extends Component {
     render() {
-        const { container, pieceClose, outerPieceClick, innerPieceClick } = this.props;
+        const { container, pieceClose, outerPieceClick, innerPieceClick, innerTransportPieceClick } = this.props;
 
-        const outsidePieces = container.outerPieces.map((piece, index) => (
-            <div
-                key={index}
-                onClick={event => {
-                    event.preventDefault();
-                    outerPieceClick(piece, container.containerPiece);
-                    event.stopPropagation();
-                }}
-            >
-                Outer Piece
-            </div>
-        ));
+        //Don't need to check for null (probably should) since empty array is still valid
+        const outsidePieces = container.outerPieces.map((piece, index) => <ContainerPiece key={index} piece={piece} container={container} clickFunction={outerPieceClick} />);
+
         const innerPieces =
             container.containerPiece === null
                 ? null
                 : container.containerPiece.pieceContents.pieces.map((piece, index) => (
-                      <div
+                      <ContainerPiece
                           key={index}
-                          onClick={event => {
-                              event.preventDefault();
-                              innerPieceClick(piece, container.containerPiece);
-                              event.stopPropagation();
-                          }}
-                      >
-                          Inner Piece
-                      </div>
+                          piece={piece}
+                          container={container}
+                          //could need extra stuff for tanks in transport (need extra step to select the hex to go in)
+                          clickFunction={container.containerPiece.pieceTypeId === TRANSPORT_TYPE_ID ? innerTransportPieceClick : innerPieceClick}
+                      />
                   ));
 
         return (
             <div style={container.active ? containerPopupStyle : invisibleStyle}>
-                <div style={leftSectionStyle}>Outside Pieces{outsidePieces}</div>
-                <div style={rightSectionStyle}>Inner Pieces{innerPieces}</div>
+                <div style={leftSectionStyle}>
+                    <div>Outer Pieces</div>
+                    {outsidePieces}
+                </div>
+                <div style={rightSectionStyle}>
+                    <div>Inner Pieces</div>
+                    {innerPieces}
+                </div>
                 <div
                     onClick={event => {
                         event.preventDefault();
@@ -104,7 +100,8 @@ ContainerPopup.propTypes = {
     container: PropTypes.object.isRequired, //from the gameboardMeta (parent Gameboard gives this)
     pieceClose: PropTypes.func.isRequired,
     outerPieceClick: PropTypes.func.isRequired,
-    innerPieceClick: PropTypes.func.isRequired
+    innerPieceClick: PropTypes.func.isRequired,
+    innerTransportPieceClick: PropTypes.func.isRequired
 };
 
 export default ContainerPopup;

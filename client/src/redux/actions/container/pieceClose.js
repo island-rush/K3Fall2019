@@ -2,16 +2,15 @@ import { PIECE_CLOSE_ACTION } from "../actionTypes";
 
 const pieceClose = selectedPiece => {
     return (dispatch, getState, emit) => {
-        const { gameboardMeta } = getState();
+        // const { gameboardMeta } = getState();
 
-        if (!gameboardMeta.planning.active) {
-            dispatch({
-                type: PIECE_CLOSE_ACTION,
-                payload: {
-                    selectedPiece
-                }
-            });
-        }
+        //probably want ability to close that popup/menu at any point (even if open maliciously)
+        dispatch({
+            type: PIECE_CLOSE_ACTION,
+            payload: {
+                selectedPiece
+            }
+        });
     };
 };
 

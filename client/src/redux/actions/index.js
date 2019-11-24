@@ -52,6 +52,7 @@ import pieceOpen from "./container/pieceOpen";
 import pieceClose from "./container/pieceClose";
 import outerPieceClick from "./container/outerPieceClick";
 import innerPieceClick from "./container/innerPieceClick";
+import innerTransportPieceClick from "./container/innerTransportPieceClick";
 
 import menuSelect from "./menuSelect";
 
@@ -108,5 +109,6 @@ export {
     pieceOpen,
     pieceClose,
     outerPieceClick,
-    innerPieceClick
+    innerPieceClick,
+    innerTransportPieceClick
 };
