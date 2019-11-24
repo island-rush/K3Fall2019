@@ -248,10 +248,10 @@ class Piece {
         await pool.query(queryString, inserts);
     }
 
-    static async putOutsideContainer(selectedPieceId) {
+    static async putOutsideContainer(selectedPieceId, newPositionId) {
         //TODO: deal with inner transport pieces (need to also set the piecePositionId)
-        let queryString = "UPDATE pieces SET pieceContainerId = -1 WHERE pieceId = ?";
-        let inserts = [selectedPieceId];
+        let queryString = "UPDATE pieces SET pieceContainerId = -1, piecePositionId = ? WHERE pieceId = ?";
+        let inserts = [newPositionId, selectedPieceId];
         await pool.query(queryString, inserts);
     }
 

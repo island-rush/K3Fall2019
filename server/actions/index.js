@@ -29,6 +29,7 @@ const mainButtonClick = require("./mainButtonClick");
 
 const enterContainer = require("./container/enterContainer");
 const exitContainer = require("./container/exitContainer");
+const exitTransportContainer = require("./container/exitTransportContainer");
 
 module.exports = {
     shopPurchaseRequest,
@@ -49,5 +50,6 @@ module.exports = {
     commInterruptConfirm,
     goldenEyeConfirm,
     enterContainer,
-    exitContainer
+    exitContainer,
+    exitTransportContainer
 };

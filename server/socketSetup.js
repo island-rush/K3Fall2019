@@ -24,7 +24,8 @@ import {
     SERVER_COMM_INTERRUPT_CONFIRM,
     SERVER_GOLDEN_EYE_CONFIRM,
     SERVER_OUTER_PIECE_CLICK,
-    SERVER_INNER_PIECE_CLICK
+    SERVER_INNER_PIECE_CLICK,
+    SERVER_INNER_TRANSPORT_PIECE_CLICK
 } from "../client/src/redux/actions/actionTypes";
 import { ACTIVATED, DEACTIVATED } from "../client/src/constants/gameConstants";
 const {
@@ -46,7 +47,8 @@ const {
     commInterruptConfirm,
     goldenEyeConfirm,
     enterContainer,
-    exitContainer
+    exitContainer,
+    exitTransportContainer
 } = require("./actions");
 
 const socketSetup = async socket => {
@@ -155,6 +157,9 @@ const socketSetup = async socket => {
                     break;
                 case SERVER_INNER_PIECE_CLICK:
                     exitContainer(socket, payload);
+                    break;
+                case SERVER_INNER_TRANSPORT_PIECE_CLICK:
+                    exitTransportContainer(socket, payload);
                     break;
                 default:
                     sendUserFeedback(socket, "Did not recognize client socket request type");

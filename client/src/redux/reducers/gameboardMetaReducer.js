@@ -50,7 +50,8 @@ import {
     PIECE_OPEN_ACTION,
     PIECE_CLOSE_ACTION,
     OUTER_PIECE_CLICK_ACTION,
-    INNER_PIECE_CLICK_ACTION
+    INNER_PIECE_CLICK_ACTION,
+    INNER_TRANSPORT_PIECE_CLICK_ACTION
 } from "../actions/actionTypes";
 import { distanceMatrix } from "../../constants/distanceMatrix";
 import { initialGameboardEmpty } from "./initialGameboardEmpty";
@@ -89,6 +90,8 @@ const initialGameboardMeta = {
     },
     container: {
         active: false,
+        isSelectingHex: false,
+        innerPieceToDrop: null,
         containerPiece: null,
         outerPieces: []
     },
@@ -180,6 +183,12 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
             stateDeepCopy.container.active = false;
             stateDeepCopy.container.containerPiece = null;
             stateDeepCopy.container.outerPieces = [];
+            stateDeepCopy.container.isSelectingHex = false;
+            stateDeepCopy.container.innerPieceToDrop = null;
+            break;
+        case INNER_TRANSPORT_PIECE_CLICK_ACTION:
+            stateDeepCopy.container.isSelectingHex = true;
+            stateDeepCopy.container.innerPieceToDrop = payload.selectedPiece;
             break;
         case OUTER_PIECE_CLICK_ACTION:
             //need the piece to go inside the container
@@ -194,6 +203,8 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
             //need the piece to go outside the container
             //remove from the container piece
             //add to the outer pieces
+            stateDeepCopy.container.isSelectingHex = false;
+            stateDeepCopy.container.innerPieceToDrop = null;
             stateDeepCopy.container.containerPiece.pieceContents.pieces = stateDeepCopy.container.containerPiece.pieceContents.pieces.filter((piece, index) => {
                 return piece.pieceId !== payload.selectedPiece.pieceId;
             });

@@ -5,7 +5,7 @@ import { SOCKET_SERVER_SENDING_ACTION, SOCKET_SERVER_REDIRECT } from "../../../c
 import { GAME_INACTIVE_TAG, BAD_REQUEST_TAG } from "../../pages/errorTypes";
 import { TYPE_COSTS, PURCHASE_PHASE_ID, TYPE_MAIN, BLUE_TEAM_ID } from "../../../client/src/constants/gameConstants";
 
-const exitContainer = async (socket, payload) => {
+const exitTransportContainer = async (socket, payload) => {
     //put the piece from the payload, into the container
 
     //TODO: verify
@@ -13,7 +13,7 @@ const exitContainer = async (socket, payload) => {
     // const thisGame = await new Game({ gameId }).init();
 
     //TODO: verify
-    const { selectedPiece, containerPiece } = payload;
+    const { selectedPiece, containerPiece, selectedPositionId } = payload;
 
     //need to update these container id's
 
@@ -22,7 +22,7 @@ const exitContainer = async (socket, payload) => {
     const selectedPieceId = selectedPiece.pieceId;
 
     //TODO: this currently only considers same position containers (not transports)
-    await Piece.putOutsideContainer(selectedPieceId, selectedPiece.piecePositionId);
+    await Piece.putOutsideContainer(selectedPieceId, selectedPositionId);
 
     const serverAction = {
         type: INNER_PIECE_CLICK_ACTION,
@@ -36,4 +36,4 @@ const exitContainer = async (socket, payload) => {
     socket.emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
 };
 
-module.exports = exitContainer;
+module.exports = exitTransportContainer;
