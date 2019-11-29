@@ -89,7 +89,8 @@ const ZOOMBOX_BACKGROUNDS = {
     flag: { backgroundColor: "green" },
     missile: { backgroundColor: "green" },
     red: { backgroundColor: "green" },
-    blue: { backgroundColor: "green" }
+    blue: { backgroundColor: "green" },
+    remoteSensing: { backgroundColor: "LightGray" }
 };
 
 let TYPE_TEAM_BORDERS = {};
