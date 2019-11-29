@@ -43,23 +43,23 @@ npm run devBackend
 
 Running the backend allows access to non-game pages, and admin controls
 
-- /index.html
-- /teacher.html
-- /courseDirector.html
-- /credits.html
-- /troubleshoot.html
+-   /index.html
+-   /teacher.html
+-   /courseDirector.html
+-   /credits.html
+-   /troubleshoot.html
 
 Note there are several env variables used by the backend.
 
-- CD_LASTNAME = Course Director Last Name -> default is "Smith"
-- CD_PASSWORD = Course Director MD5 Password Hash -> default is MD5('asdf')
-- DB_NAME = name of database -> default is 'k3'
-- DB_HOSTNAME = database host -> default is 'localhost'
-- DB_USERNAME = database user -> default is 'root'
-- DB_PASSWORD = database password -> default is ''
-- SESSION_SECRET = optional secret used by session cookies for security
-- NODE_ENV = 'production' or 'development'
-- PORT = server port (typically pre-set in production environments) -> default is 80
+-   CD_LASTNAME = Course Director Last Name -> default is "Smith"
+-   CD_PASSWORD = Course Director MD5 Password Hash -> default is MD5('asdf')
+-   DB_NAME = name of database -> default is 'k3'
+-   DB_HOSTNAME = database host -> default is 'localhost'
+-   DB_USERNAME = database user -> default is 'root'
+-   DB_PASSWORD = database password -> default is ''
+-   SESSION_SECRET = optional secret used by session cookies for security
+-   NODE_ENV = 'production' or 'development'
+-   PORT = server port (typically pre-set in production environments) -> default is 80
 
 Inserting the database tables and creating/deleting games can be accomplished from the /courseDirector page. Login from the homepage with the creditionals used in the env variables. The password used when creating a game is the password used by teachers to login to their /teacher page. Teachers are able activate/deactivate their games, as well as reset the game to have initial pieces on the board.
 
@@ -97,9 +97,9 @@ Please note that the web.config is currently being used to configure the environ
 
 ## Built With
 
-- [node](https://nodejs.org/en/docs/) - Backend Server
-- [mysql](https://dev.mysql.com/doc/) - Database
-- [react](https://reactjs.org/docs/getting-started.html) - Frontend Framework
+-   [node](https://nodejs.org/en/docs/) - Backend Server
+-   [mysql](https://dev.mysql.com/doc/) - Database
+-   [react](https://reactjs.org/docs/getting-started.html) - Frontend Framework
 
 ## License
 
@@ -112,3 +112,5 @@ Version 3.1.0
 ---
 
 Please [report](https://gitreports.com/issue/island-rush/K3) any issues.
+
+//change
