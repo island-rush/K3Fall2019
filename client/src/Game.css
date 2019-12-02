@@ -60,8 +60,8 @@ svg g polygon {
     stroke-width: 1;
 }
 .remoteSensePos polygon {
-    stroke: rgb(255, 136, 0);
-    stroke-width: 0.3;
+    stroke: rgb(255, 255, 204);
+    stroke-width: 0.9;
 }
 .bioWeaponPos polygon {
     stroke: rgb(88, 0, 81);
