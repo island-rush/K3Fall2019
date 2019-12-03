@@ -75,7 +75,9 @@ const selectPosition = selectedPositionId => {
                 let clickedPosition = selectedPositionId !== -1 ? selectedPositionId : gameboardMeta.selectedPosition;
                 let highlightedPositions = [];
                 for (let x = 0; x < distanceMatrix[clickedPosition].length; x++) {
-                    if (distanceMatrix[clickedPosition][x] <= REMOTE_SENSING_RANGE) highlightedPositions.push(x);
+                    if (distanceMatrix[clickedPosition][x] <= REMOTE_SENSING_RANGE){ 
+                        highlightedPositions.push(x);
+                    }
                 }
 
                 dispatch({

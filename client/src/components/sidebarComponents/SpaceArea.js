@@ -109,6 +109,8 @@ class SpaceArea extends Component {
 
 		return (
 			<div style={selected ? spaceAreaStyle : invisibleStyle}>
+				
+                <div>Space Area Capabilities</div>
 				{/* TODO: capabilities is first as a div, but last as a style, make these consistent with style? / rearange these to be in correct order */}
 				<div style={remoteSensingContainerStyle}>
 					<div>Remote Sensing</div>
