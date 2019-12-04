@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Container from "./Container";
 import { TYPE_IMAGES, TYPE_TEAM_BORDERS } from "../styleConstants";
 import { TYPE_NAMES } from "../../constants/gameConstants";
 
@@ -35,7 +34,7 @@ const zIndexLevels = [{ zIndex: 5 }, { zIndex: 10 }];
 
 class Piece extends Component {
     render() {
-        const { piece, topLevel, selected, pieceClick } = this.props;
+        const { piece, topLevel, selected, pieceClick, pieceOpen } = this.props;
 
         const pieceCombinedStyle = {
             ...pieceStyle,
@@ -57,13 +56,13 @@ class Piece extends Component {
             event.stopPropagation();
         };
 
-        const contents = piece.pieceContents.pieces.length === 0 ? null : <Container selected={selected} pieces={piece.pieceContents.pieces} pieceClick={pieceClick} />;
+        const onDoubleClick = event => {
+            event.preventDefault();
+            pieceOpen(piece);
+            event.stopPropagation();
+        };
 
-        return (
-            <div style={pieceCombinedStyle} title={title} onClick={onClick}>
-                {contents}
-            </div>
-        );
+        return <div style={pieceCombinedStyle} title={title} onClick={onClick} onDoubleClick={onDoubleClick}></div>;
     }
 }
 
@@ -71,7 +70,9 @@ Piece.propTypes = {
     piece: PropTypes.object.isRequired,
     topLevel: PropTypes.bool.isRequired,
     selected: PropTypes.bool.isRequired,
-    pieceClick: PropTypes.func.isRequired
+    pieceClick: PropTypes.func.isRequired,
+    pieceOpen: PropTypes.func.isRequired,
+    pieceClose: PropTypes.func.isRequired
 };
 
 export default Piece;

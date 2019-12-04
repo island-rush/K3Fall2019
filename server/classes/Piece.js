@@ -225,7 +225,7 @@ class Piece {
                 let indexOfParent = allPieces[currentPiece.piecePositionId].findIndex(piece => {
                     return piece.pieceId == currentPiece.pieceContainerId;
                 });
-                allPieces[currentPiece.piecePositionId][indexOfParent].pieceContents.push(currentPiece);
+                allPieces[currentPiece.piecePositionId][indexOfParent].pieceContents.pieces.push(currentPiece);
             }
         }
 
@@ -240,6 +240,19 @@ class Piece {
 
         //TODO: should deal with results here and return with other things, or do entire function in this method... calling the other bulk inserts and stuff available?
         return results;
+    }
+
+    static async putInsideContainer(selectedPiece, containerPiece) {
+        let queryString = "UPDATE pieces SET pieceContainerId = ?, piecePositionId = ? WHERE pieceId = ?";
+        let inserts = [containerPiece.pieceId, containerPiece.piecePositionId, selectedPiece.pieceId];
+        await pool.query(queryString, inserts);
+    }
+
+    static async putOutsideContainer(selectedPieceId, newPositionId) {
+        //TODO: deal with inner transport pieces (need to also set the piecePositionId)
+        let queryString = "UPDATE pieces SET pieceContainerId = -1, piecePositionId = ? WHERE pieceId = ?";
+        let inserts = [newPositionId, selectedPieceId];
+        await pool.query(queryString, inserts);
     }
 
     static async insert(pieceGameId, pieceTeamId, pieceTypeId, piecePositionId, pieceContainerId, pieceVisible, pieceMoves, pieceFuel) {

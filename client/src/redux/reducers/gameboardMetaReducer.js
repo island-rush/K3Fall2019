@@ -46,10 +46,18 @@ import {
     COMM_INTERRUP_SELECTED,
     COMM_INTERRUPT_SELECTING,
     GOLDEN_EYE_SELECTING,
-    GOLDEN_EYE_SELECTED
+    GOLDEN_EYE_SELECTED,
+    PIECE_OPEN_ACTION,
+    PIECE_CLOSE_ACTION,
+    OUTER_PIECE_CLICK_ACTION,
+    INNER_PIECE_CLICK_ACTION,
+    INNER_TRANSPORT_PIECE_CLICK_ACTION
 } from "../actions/actionTypes";
+import { distanceMatrix } from "../../constants/distanceMatrix";
+import { initialGameboardEmpty } from "./initialGameboardEmpty";
 
-import { TYPE_FUEL } from "../../constants/gameConstants";
+import { TYPE_FUEL, TRANSPORT_TYPE_ID } from "../../constants/gameConstants";
+import { LAND_TYPE } from "../../constants/gameboardConstants";
 
 const initialGameboardMeta = {
     //TODO: change to selectedPositionId and selectedPieceId to better represent the values (ints) (and also selectedBattlePiece -> selectedBattlePieceId)
@@ -81,8 +89,11 @@ const initialGameboardMeta = {
         aircraft: []
     },
     container: {
-        isMinimized: false,
-        active: false
+        active: false,
+        isSelectingHex: false,
+        innerPieceToDrop: null,
+        containerPiece: null,
+        outerPieces: []
     },
     planning: {
         active: false,
@@ -137,6 +148,67 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
             let lastSelectedTankerId = stateDeepCopy.refuel.selectedTankerPieceId;
             stateDeepCopy.refuel.selectedTankerPieceId = payload.tankerPiece.pieceId === lastSelectedTankerId ? -1 : payload.tankerPiece.pieceId;
             stateDeepCopy.refuel.selectedTankerPieceIndex = payload.tankerPiece.pieceId === lastSelectedTankerId ? -1 : payload.tankerPieceIndex;
+            break;
+        case PIECE_OPEN_ACTION:
+            stateDeepCopy.container.active = true;
+            stateDeepCopy.container.containerPiece = payload.selectedPiece;
+            let selectedPiecePosition = payload.selectedPiece.piecePositionId;
+            let selectedPieceTypeId = payload.selectedPiece.pieceTypeId;
+
+            //outerPieces is dependent on selectedPieceTypeId (surrounding land if transport...)
+            //TODO: this can be cleaned up with modern for.each syntact -> for (let x of y)? something like that (it was used somewhere else so search for it)
+            if (selectedPieceTypeId === TRANSPORT_TYPE_ID) {
+                for (let x = 0; x < distanceMatrix[selectedPiecePosition].length; x++) {
+                    //TODO: do we need a constant for '1'? transports can only pick up pieces from 1 hex away seems obvious
+                    if (distanceMatrix[selectedPiecePosition][x] <= 1 && initialGameboardEmpty[x].type === LAND_TYPE) {
+                        //TODO: better way of combining arrays (no internet while i'm coding this mid-flight)
+                        for (let y = 0; y < payload.gameboard[x].pieces.length; y++) {
+                            //TODO: only put pieces here if they are able to get onto transport pieces
+                            if (payload.gameboard[x].pieces[y].pieceId === payload.selectedPiece.pieceId) continue;
+                            stateDeepCopy.container.outerPieces.push(payload.gameboard[x].pieces[y]);
+                        }
+                    }
+                }
+
+                //now for each of those positions...
+            } else {
+                //other container types only look in their own position (probably...//TODO: write down the rules for this later )
+
+                stateDeepCopy.container.outerPieces = payload.gameboard[selectedPiecePosition].pieces.filter((piece, index) => {
+                    return piece.pieceId !== payload.selectedPiece.pieceId;
+                });
+            }
+            break;
+        case PIECE_CLOSE_ACTION:
+            stateDeepCopy.container.active = false;
+            stateDeepCopy.container.containerPiece = null;
+            stateDeepCopy.container.outerPieces = [];
+            stateDeepCopy.container.isSelectingHex = false;
+            stateDeepCopy.container.innerPieceToDrop = null;
+            break;
+        case INNER_TRANSPORT_PIECE_CLICK_ACTION:
+            stateDeepCopy.container.isSelectingHex = true;
+            stateDeepCopy.container.innerPieceToDrop = payload.selectedPiece;
+            break;
+        case OUTER_PIECE_CLICK_ACTION:
+            //need the piece to go inside the container
+            //remove from outerpieces
+            //add to innerpieces
+            stateDeepCopy.container.outerPieces = stateDeepCopy.container.outerPieces.filter((piece, index) => {
+                return piece.pieceId !== payload.selectedPiece.pieceId;
+            });
+            stateDeepCopy.container.containerPiece.pieceContents.pieces.push(payload.selectedPiece);
+            break;
+        case INNER_PIECE_CLICK_ACTION:
+            //need the piece to go outside the container
+            //remove from the container piece
+            //add to the outer pieces
+            stateDeepCopy.container.isSelectingHex = false;
+            stateDeepCopy.container.innerPieceToDrop = null;
+            stateDeepCopy.container.containerPiece.pieceContents.pieces = stateDeepCopy.container.containerPiece.pieceContents.pieces.filter((piece, index) => {
+                return piece.pieceId !== payload.selectedPiece.pieceId;
+            });
+            stateDeepCopy.container.outerPieces.push(payload.selectedPiece);
             break;
         case AIRCRAFT_CLICK:
             //show which tanker is giving the aircraft...

@@ -20,7 +20,8 @@ import {
     SERVER_RODS_FROM_GOD_CONFIRM,
     SERVER_BIOLOGICAL_WEAPONS_CONFIRM,
     SERVER_COMM_INTERRUPT_CONFIRM,
-    SERVER_GOLDEN_EYE_CONFIRM
+    SERVER_GOLDEN_EYE_CONFIRM,
+    SERVER_INNER_TRANSPORT_PIECE_CLICK
 } from "./actionTypes";
 import { SOCKET_CLIENT_SENDING_ACTION } from "../../constants/otherConstants";
 import setUserFeedbackAction from "./setUserfeedbackAction";
@@ -29,6 +30,26 @@ import { initialGameboardEmpty } from "../reducers/initialGameboardEmpty";
 const selectPosition = selectedPositionId => {
     return (dispatch, getState, emit) => {
         const { gameboardMeta } = getState();
+
+        //selecting the hex to put piece that is inside container
+        if (gameboardMeta.container.isSelectingHex) {
+            //TODO: check that the position selected was valid
+            //TODO: check that the position was vaild (on the server side)
+
+            //other checks
+            const thisAction = {
+                type: SERVER_INNER_TRANSPORT_PIECE_CLICK,
+                payload: {
+                    selectedPiece: gameboardMeta.container.innerPieceToDrop,
+                    containerPiece: gameboardMeta.container.containerPiece,
+                    selectedPositionId
+                }
+            };
+
+            emit(SOCKET_CLIENT_SENDING_ACTION, thisAction);
+
+            return;
+        }
 
         if (!gameboardMeta.planning.active) {
             //select anything and highlight, looking at the position
