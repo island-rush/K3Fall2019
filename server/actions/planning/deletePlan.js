@@ -18,7 +18,7 @@ const deletePlan = async (socket, payload) => {
     }
 
     //Can only change/delete plans in combat phase (2) and slice 0
-    if (gamePhase != COMBAT_PHASE_ID && gameSlice != SLICE_PLANNING_ID) {
+    if (gamePhase != COMBAT_PHASE_ID || gameSlice != SLICE_PLANNING_ID) {
         sendUserFeedback(socket, "Not the right phase/slice...looking for phase 2 slice 0");
         return;
     }

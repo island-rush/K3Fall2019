@@ -249,6 +249,8 @@ const TYPE_GROUND_PIECES = [
 ];
 
 const CONTAINER_TYPES = [TACTICAL_AIRLIFT_SQUADRON_TYPE_ID, A_C_CARRIER_TYPE_ID, TRANSPORT_TYPE_ID, C_130_TYPE_ID];
+//TODO: how to make what they can hold into a constant? (change what they can hold later...)
+
 const CAPTURE_TYPES = [
     ARMY_INFANTRY_COMPANY_TYPE_ID,
     ARTILLERY_BATTERY_TYPE_ID,
