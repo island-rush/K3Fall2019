@@ -77,6 +77,13 @@ class Piece {
         await pool.query(queryString, inserts);
     }
 
+    async getPiecesInside() {
+        const queryString = "SELECT * FROM pieces WHERE pieceContainerId = ?";
+        const inserts = [this.pieceId];
+        const [allPieces] = await pool.query(queryString, inserts);
+        return allPieces;
+    }
+
     // prettier-ignore
     static async updateVisibilities(gameId) {
 		const conn = await pool.getConnection();
@@ -248,6 +255,7 @@ class Piece {
         await pool.query(queryString, inserts);
     }
 
+    //TODO: could make this a non-static method? (since we already have the pieceId....)
     static async putOutsideContainer(selectedPieceId, newPositionId) {
         //TODO: deal with inner transport pieces (need to also set the piecePositionId)
         let queryString = "UPDATE pieces SET pieceContainerId = -1, piecePositionId = ? WHERE pieceId = ?";

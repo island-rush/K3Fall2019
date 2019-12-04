@@ -1,16 +1,14 @@
 const { Game, Piece } = require("../../classes");
 const sendUserFeedback = require("../sendUserFeedback");
-import { SHOP_REFUND, OUTER_PIECE_CLICK_ACTION, INNER_PIECE_CLICK_ACTION } from "../../../client/src/redux/actions/actionTypes";
+import { INNER_PIECE_CLICK_ACTION } from "../../../client/src/redux/actions/actionTypes";
 import { SOCKET_SERVER_SENDING_ACTION, SOCKET_SERVER_REDIRECT } from "../../../client/src/constants/otherConstants";
-import { GAME_INACTIVE_TAG, BAD_REQUEST_TAG } from "../../pages/errorTypes";
-import { TYPE_COSTS, PURCHASE_PHASE_ID, TYPE_MAIN, BLUE_TEAM_ID, COMBAT_PHASE_ID, SLICE_PLANNING_ID, CONTAINER_TYPES } from "../../../client/src/constants/gameConstants";
+import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
+import { TYPE_MAIN, COMBAT_PHASE_ID, SLICE_PLANNING_ID, CONTAINER_TYPES } from "../../../client/src/constants/gameConstants";
 
 const exitContainer = async (socket, payload) => {
-    //Get info from client
     const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
     const { selectedPiece, containerPiece } = payload;
 
-    //Get info for this game
     const thisGame = await new Game({ gameId }).init();
     const { gameActive, gamePhase, gameSlice } = thisGame;
 
@@ -29,7 +27,6 @@ const exitContainer = async (socket, payload) => {
         return;
     }
 
-    //Get info for pieces involved in this action
     const thisSelectedPiece = await new Piece(selectedPiece.pieceId).init();
     const thisContainerPiece = await new Piece(containerPiece.pieceId).init();
 
