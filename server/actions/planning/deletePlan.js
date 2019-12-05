@@ -46,6 +46,7 @@ const deletePlan = async (socket, payload) => {
         }
     };
     socket.emit(SOCKET_SERVER_SENDING_ACTION, serverAction); //TODO: should the other sockets for this team get the update? (in the background?)
+    socket.to("game" + gameId + "team" + gameTeam).emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
 };
 
 module.exports = deletePlan;
