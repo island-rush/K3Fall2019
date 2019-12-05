@@ -10,7 +10,7 @@ const confirmFuelSelection = async (socket, payload) => {
     const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
 
     const thisGame = await new Game({ gameId }).init();
-    const { gameActive, gamePhase, game0Status, game1Status } = thisGame;
+    const { gameActive, gamePhase } = thisGame;
 
     if (!gameActive) {
         socket.emit(SOCKET_SERVER_REDIRECT, GAME_INACTIVE_TAG);

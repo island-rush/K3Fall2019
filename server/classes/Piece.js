@@ -172,6 +172,11 @@ class Piece {
             "UPDATE pieces, plans SET pieces.pieceFuel = pieces.pieceFuel - 1 WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
         await conn.query(removeFuel, inserts);
 
+        let updateContents =
+            "UPDATE pieces AS insidePieces JOIN pieces AS containerPieces ON insidePieces.pieceContainerId = containerPieces.pieceId SET insidePieces.piecePositionId = containerPieces.piecePositionId WHERE insidePieces.pieceGameId = ?";
+        let newinserts = [gameId];
+        await conn.query(updateContents, newinserts);
+
         //TODO: referencing another table here...(could change to put into the plans class)
         const deletePlansQuery = "DELETE FROM plans WHERE planGameId = ? AND planMovementOrder = ? AND planSpecialFlag = 0";
         await conn.query(deletePlansQuery, inserts);
