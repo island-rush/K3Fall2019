@@ -244,11 +244,7 @@ class Gameboard extends Component {
                 //TODO: change this to always selectPositon(positionindex), instead of sending -1 (more info for the action, let it take care of it)
                 onClick={event => {
                     event.preventDefault();
-                    if (parseInt(positionIndex) === parseInt(selectedPosition)) {
-                        selectPosition(-1);
-                    } else {
-                        selectPosition(positionIndex);
-                    }
+                    selectPosition(positionIndex);
                     event.stopPropagation();
                 }}
                 //These are found in the Game.css

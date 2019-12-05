@@ -27,7 +27,9 @@ import {
     MC_12_TYPE_ID,
     C_130_TYPE_ID,
     RADAR_TYPE_ID,
-    MISSILE_TYPE_ID
+    MISSILE_TYPE_ID,
+    TYPE_AIR_PIECES,
+    TYPE_FUEL
 } from "../../client/src/constants/gameConstants";
 import { distanceMatrix } from "../../client/src/constants/distanceMatrix";
 
@@ -231,6 +233,7 @@ class Piece {
             if (!allPieces[currentPiece.piecePositionId]) {
                 allPieces[currentPiece.piecePositionId] = [];
             }
+            //TODO: constant instead of -1
             if (currentPiece.pieceContainerId == -1) {
                 allPieces[currentPiece.piecePositionId].push(currentPiece);
             } else {
@@ -245,6 +248,7 @@ class Piece {
     }
 
     static async getPositionRefuels(gameId, gameTeam) {
+        //TODO: constant for 'outside container' instead of -1?
         const queryString =
             "SELECT tnkr.pieceId as tnkrPieceId, tnkr.pieceTypeId as tnkrPieceTypeId, tnkr.piecePositionId as tnkrPiecePositionId, tnkr.pieceMoves as tnkrPieceMoves, tnkr.pieceFuel as tnkrPieceFuel, arcft.pieceId as arcftPieceId, arcft.pieceTypeId as arcftPieceTypeId, arcft.piecePositionId as arcftPiecePositionId, arcft.pieceMoves as arcftPieceMoves, arcft.pieceFuel as arcftPieceFuel FROM (SELECT * FROM pieces WHERE pieceTypeId = 3 AND pieceGameId = ? AND pieceTeamId = ?) as tnkr JOIN (SELECT * FROM pieces WHERE pieceTypeId in (0, 1, 2, 4, 5, 17, 18) AND pieceGameId = ? AND pieceTeamId = ?) as arcft ON tnkr.piecePositionId = arcft.piecePositionId WHERE arcft.pieceContainerId = -1";
         const inserts = [gameId, gameTeam, gameId, gameTeam];
@@ -255,9 +259,18 @@ class Piece {
     }
 
     static async putInsideContainer(selectedPiece, containerPiece) {
+        //TODO: could combine into 1 query, or could have a selection for variable query, 1 request instead of 2 would be better
+
         let queryString = "UPDATE pieces SET pieceContainerId = ?, piecePositionId = ? WHERE pieceId = ?";
         let inserts = [containerPiece.pieceId, containerPiece.piecePositionId, selectedPiece.pieceId];
         await pool.query(queryString, inserts);
+
+        //refuel the piece
+        if (TYPE_AIR_PIECES.includes(selectedPiece.pieceTypeId)) {
+            queryString = "UPDATE pieces SET pieceFuel = ? WHERE pieceId = ?";
+            inserts = [TYPE_FUEL[selectedPiece.pieceTypeId], selectedPiece.pieceId];
+            await pool.query(queryString, inserts);
+        }
     }
 
     //TODO: could make this a non-static method? (since we already have the pieceId....)
