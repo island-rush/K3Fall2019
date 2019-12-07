@@ -84,9 +84,9 @@ Note there are several env variables used by the backend.
 
 Inserting the database tables and creating/deleting games can be accomplished from the /courseDirector page. Login from the homepage teacher login with the creditionals used in the env variables (or defaults). 
 
-Section: "CourseDirector" -> This is always the section for Course Director.
-Instructor: "Smith" -> Env or Default
-Password: "asdf" -> Env or Default
+- Section: "CourseDirector" -> This is always the section for Course Director.
+- Instructor: "Smith" -> Env or Default
+- Password: "asdf" -> Env or Default
 
 Here you can click a button to insert the database tables ("INITIALIZE DATABASE"). This action must be done before all others. 
 
@@ -96,9 +96,9 @@ The password used when creating a game is the password used by teachers to login
 
 Similar to Course Director, teachers login with:
 
-Section: "m1a1" -> Whatever value was set from CourseDirector.
-Instructor: "adolph" -> Whatever value was set from CourseDirector.
-Password: "asdf" -> Whatever value was set from CourseDirector.
+- Section: "m1a1" -> Whatever value was set from CourseDirector.
+- Instructor: "adolph" -> Whatever value was set from CourseDirector.
+- Password: "asdf" -> Whatever value was set from CourseDirector.
 
 Note: Course Director default credentials are set within ./server/adminFunctions/adminLoginVerfy.js
 
