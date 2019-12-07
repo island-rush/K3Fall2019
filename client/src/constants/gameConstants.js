@@ -270,6 +270,7 @@ const TYPE_HIGH_LOW = {
     lowPieces: [ARMY_INFANTRY_COMPANY_TYPE_ID, ARTILLERY_BATTERY_TYPE_ID, TANK_COMPANY_TYPE_ID, MARINE_INFANTRY_COMPANY_TYPE_ID, LIGHT_INFANTRY_VEHICLE_CONVOY_TYPE_ID, SAM_SITE_TYPE_ID, DESTROYER_TYPE_ID, TRANSPORT_TYPE_ID, A_C_CARRIER_TYPE_ID, SUBMARINE_TYPE_ID, SOF_TEAM_TYPE_ID, RADAR_TYPE_ID, MISSILE_TYPE_ID]
 };
 
+//TODO: put these constants in another file, separate the constants in more distinct places for easier access and readability. This file is getting pretty long...
 const REMOTE_SENSING_RANGE = 3;
 const COMM_INTERRUPT_RANGE = 2;
 const GOLDEN_EYE_RANGE = 2;
