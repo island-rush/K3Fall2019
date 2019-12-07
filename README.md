@@ -41,11 +41,10 @@ npm install
 cd ..
 ```
 
-Give node extra memory. (This command is for 'git bash' terminal, your terminal may have a different syntax)
+Give node extra memory with NODE_OPTIONS env variable. (This command may change based on OS / Terminal) (Works with 'Git Bash')
 ```
 export NODE_OPTIONS=--max_old_space_size=4096
 ```
-The 'NODE_OPTIONS' should also be used in production.
 
 All dependencies should now be installed and you should be able to run the server for local development and testing.
 
@@ -55,8 +54,9 @@ There are many methods of running / hosting a MySQL server. Once the database ex
 
 ### Development
 
-This command will run only the backend server.
+The following are a list of commands used to control the frontend and backend. Please reference the ./package.json file for all commands, dependencies, dev dependencies, and repository configurations.
 
+This command will run only the backend server.
 ```
 npm run devBackend
 ```
@@ -79,21 +79,26 @@ Note there are several env variables used by the backend.
 - DB_PASSWORD = database password -> default is ''
 - SESSION_SECRET = optional secret used by session cookies for security
 - NODE_ENV = 'production' or 'development'...this determines how the backend serves out the frontend.
-- NODE_OPTIONS = options for running node.
+- NODE_OPTIONS = options for running node. (--max_old_space_size=4096)
 - PORT = server port (typically pre-set in production environments) -> default is 80
 
-Inserting the database tables and creating/deleting games can be accomplished from the /courseDirector page. Login from the homepage with the creditionals used in the env variables. The password used when creating a game is the password used by teachers to login to their /teacher page. Teachers are able activate/deactivate their games, as well as reset the game to have initial pieces on the board. Note: Course Director default credentials are set within ./server/adminFunctions/adminLoginVerfy.js
+Inserting the database tables and creating/deleting games can be accomplished from the /courseDirector page. Login from the homepage teacher login with the creditionals used in the env variables (or defaults). Here you can click a button to insert the database tables ("INITIALIZE DATABASE"). This action must be done before all others. 
+
+The /courseDirector page is used for creating games, deleting games, and resetting teacher passwords. You must create a game here in order to play the game. It is recommended to create a game with the default values that are always loaded in the homepage. This will prevent typing in credentials everytime the client needs to login. ('m1a1', 'adolph'). 
+
+The password used when creating a game is the password used by teachers to login to their /teacher page. Teachers are able activate/deactivate their games, as well as reset the game to have initial pieces on the board. They can also reset team passwords, but simply leaving these as the defaults are fine when developing.
+
+Note: Course Director default credentials are set within ./server/adminFunctions/adminLoginVerfy.js
 
 This command will run the frontend react server by itself.
-
 ```
 npm run devFrontend
 ```
 
-Running the frontend allows access to the main /game.html page. If the backend server is running, it will redirect the frontend to the homepage to enforce an authenticated session.
+Running the frontend allows access to the main /game.html page. This is running a react development server. If the backend server is running, it will redirect the frontend to the homepage to enforce an authenticated session. Without the backend running, the frontend won't redirect (great for developing react components) but won't receive any game info, and will appear as if it is loading.
 
-This command will use concurrently to run the frontend and backend simultaneously. This is typically used instead of the previous two when developing.
-
+This command will run the frontend and backend simultaneously. 
+THIS COMMAND IS TYPICALLY USED FOR ALL DEVELOPMENT.
 ```
 npm run dev
 ```
@@ -106,18 +111,9 @@ npm run buildClient
 
 ## Deployment
 
-These commands can be configured inside an automated CICD pipeline, or manually executed on whatever production machine is in use. Please set env variables before executing, and ensure the database is accessable. The '-r esm' allows a mix of syntax within the server files, so be sure this isn't left out.
+A combination of the commands listed above can be configured inside an automated CICD pipeline, or manually executed on whatever production machine is in use. Please set env variables before executing, and ensure the database is accessable.
 
-```
-npm install
-cd client
-npm install
-cd ..
-npm run buildClient
-node -r esm server.js
-```
-
-Please note that the ./web.config is currently being used to configure the environment to run on the Azure Cloud. This application should run as any typical node server, for which there are plenty of guides and configurations available online to help with deploying.
+Note: the ./web.config is currently being used to configure the environment to run on the Azure Cloud. This application should run as any typical node server, for which there are plenty of guides and configurations available online to help with deploying.
 
 ## Built With
 
