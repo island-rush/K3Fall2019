@@ -166,18 +166,20 @@ class Piece {
 
         let inserts = [gameId, movementOrder];
         let movePiecesQuery =
-            "UPDATE pieces, plans SET pieces.piecePositionId = plans.planPositionId, pieces.pieceMoves = pieces.pieceMoves - 1 WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
+            "UPDATE pieces, plans SET pieces.piecePositionId = plans.planPositionId, pieces.pieceMoves = pieces.pieceMoves - 1,  WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
         await conn.query(movePiecesQuery, inserts);
 
-        inserts = [gameId, movementOrder];
+        //update fuel (only for pieces that are restricted by fuel (air pieces))
+        inserts = [gameId, movementOrder, TYPE_AIR_PIECES];
         let removeFuel =
-            "UPDATE pieces, plans SET pieces.pieceFuel = pieces.pieceFuel - 1 WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
+            "UPDATE pieces, plans SET pieces.pieceFuel = pieces.pieceFuel - 1 WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0 AND pieces.pieceTypeId in (?)";
         await conn.query(removeFuel, inserts);
 
         let updateContents =
             "UPDATE pieces AS insidePieces JOIN pieces AS containerPieces ON insidePieces.pieceContainerId = containerPieces.pieceId SET insidePieces.piecePositionId = containerPieces.piecePositionId WHERE insidePieces.pieceGameId = ?";
         let newinserts = [gameId];
         await conn.query(updateContents, newinserts);
+        await conn.query(updateContents, newinserts); //do it twice for containers within containers contained pieces to get updated (GENIUS LEVEL CODING RIGHT HERE)
 
         //TODO: referencing another table here...(could change to put into the plans class)
         const deletePlansQuery = "DELETE FROM plans WHERE planGameId = ? AND planMovementOrder = ? AND planSpecialFlag = 0";
