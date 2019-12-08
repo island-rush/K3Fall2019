@@ -166,7 +166,7 @@ class Piece {
 
         let inserts = [gameId, movementOrder];
         let movePiecesQuery =
-            "UPDATE pieces, plans SET pieces.piecePositionId = plans.planPositionId, pieces.pieceMoves = pieces.pieceMoves - 1,  WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
+            "UPDATE pieces, plans SET pieces.piecePositionId = plans.planPositionId, pieces.pieceMoves = pieces.pieceMoves - 1 WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
         await conn.query(movePiecesQuery, inserts);
 
         //update fuel (only for pieces that are restricted by fuel (air pieces))
@@ -242,7 +242,25 @@ class Piece {
                 let indexOfParent = allPieces[currentPiece.piecePositionId].findIndex(piece => {
                     return piece.pieceId == currentPiece.pieceContainerId;
                 });
-                allPieces[currentPiece.piecePositionId][indexOfParent].pieceContents.pieces.push(currentPiece);
+                if (indexOfParent == -1) {
+                    //need to find grandparent, and find parent within pieceContents
+                    //loop through all grandparent children to find actual parent?
+                    //TODO: probably cleaner way of doing this logic, should also break from outer loop to be more efficient, since we are done
+                    let parentId = currentPiece.pieceContainerId;
+                    let grandParentId;
+                    for (let x = 0; x < allPieces[currentPiece.piecePositionId].length; x++) {
+                        let potentialGrandparent = allPieces[currentPiece.piecePositionId][x];
+                        for (let y = 0; y < potentialGrandparent.pieceContents.pieces.length; y++) {
+                            let potentialParent = potentialGrandparent.pieceContents.pieces[y];
+                            if (potentialParent.pieceId == currentPiece.pieceContainerId) {
+                                allPieces[currentPiece.piecePositionId][x].pieceContents.pieces[y].pieceContents.pieces.push(currentPiece);
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    allPieces[currentPiece.piecePositionId][indexOfParent].pieceContents.pieces.push(currentPiece);
+                }
             }
         }
 

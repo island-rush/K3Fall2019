@@ -1,9 +1,14 @@
+/**
+ * This function for letting pieces leave containers within the same position
+ */
+
 const { Game, Piece } = require("../../classes");
 const sendUserFeedback = require("../sendUserFeedback");
 import { INNER_PIECE_CLICK_ACTION } from "../../../client/src/redux/actions/actionTypes";
 import { SOCKET_SERVER_SENDING_ACTION, SOCKET_SERVER_REDIRECT } from "../../../client/src/constants/otherConstants";
 import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
-import { TYPE_MAIN, COMBAT_PHASE_ID, SLICE_PLANNING_ID, CONTAINER_TYPES } from "../../../client/src/constants/gameConstants";
+import { TYPE_MAIN, COMBAT_PHASE_ID, SLICE_PLANNING_ID, CONTAINER_TYPES, TYPE_TERRAIN } from "../../../client/src/constants/gameConstants";
+import { initialGameboardEmpty } from "../../../client/src/redux/reducers/initialGameboardEmpty";
 
 const exitContainer = async (socket, payload) => {
     const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
@@ -28,13 +33,12 @@ const exitContainer = async (socket, payload) => {
     }
 
     const thisSelectedPiece = await new Piece(selectedPiece.pieceId).init();
-    const thisContainerPiece = await new Piece(containerPiece.pieceId).init();
-
     if (!thisSelectedPiece) {
         sendUserFeedback(socket, "Selected Piece did not exists...refresh page probably");
         return;
     }
 
+    const thisContainerPiece = await new Piece(containerPiece.pieceId).init();
     if (!thisContainerPiece) {
         sendUserFeedback(socket, "Selected Container piece did not exist...");
         return;
@@ -42,6 +46,13 @@ const exitContainer = async (socket, payload) => {
 
     if (!CONTAINER_TYPES.includes(thisContainerPiece.pieceTypeId)) {
         sendUserFeedback(socket, "Selected Container piece was not a container type");
+        return;
+    }
+
+    //TODO: can't 'air drop', other edge cases and stuff
+
+    if (!TYPE_TERRAIN[thisSelectedPiece.pieceTypeId].includes(initialGameboardEmpty[thisSelectedPiece.piecePositionId].type)) {
+        sendUserFeedback(socket, "that piece can't be on that terrain.");
         return;
     }
 

@@ -1,3 +1,7 @@
+/**
+ * This function for after selecting position for piece to go to for exiting transport container.
+ */
+
 const { Game, Piece } = require("../../classes");
 const sendUserFeedback = require("../sendUserFeedback");
 import { INNER_PIECE_CLICK_ACTION } from "../../../client/src/redux/actions/actionTypes";
