@@ -31,7 +31,7 @@ import {
 const inventoryStyle = {
     backgroundColor: "Yellow",
     position: "absolute",
-    height: "225%",
+    height: "215%",
     width: "1800%",
     marginLeft: "150%",
     marginTop: "20%",
@@ -146,8 +146,6 @@ class InvMenu extends Component {
         const specialItemMoveBoost = itemCount(confirmedRaiseMorale, TYPE_SPECIAL);
 
         return (
-            
-           
             <div style={selected ? inventoryStyle : invisibleStyle}>
                 <div>Inventory Section for Purchased Items</div>
                 <div style={airpieceItemsContainerStyle}>

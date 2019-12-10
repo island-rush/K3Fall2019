@@ -20,7 +20,7 @@ const confirmPlan = async (socket, payload) => {
     }
 
     //Must be in combat phase (2), slice 0 to make plans
-    if (gamePhase != COMBAT_PHASE_ID && gameSlice != SLICE_PLANNING_ID) {
+    if (gamePhase != COMBAT_PHASE_ID || gameSlice != SLICE_PLANNING_ID) {
         sendUserFeedback(socket, "Not the right phase/slice...looking for phase 2 slice 0");
         return;
     }
@@ -132,6 +132,7 @@ const confirmPlan = async (socket, payload) => {
         }
     };
     socket.emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
+    socket.to("game" + gameId + "team" + gameTeam).emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
 };
 
 module.exports = confirmPlan;

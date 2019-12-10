@@ -1,28 +1,73 @@
+/**
+ * This function for after selecting position for piece to go to for exiting transport container.
+ */
+
 const { Game, Piece } = require("../../classes");
 const sendUserFeedback = require("../sendUserFeedback");
-import { SHOP_REFUND, OUTER_PIECE_CLICK_ACTION, INNER_PIECE_CLICK_ACTION } from "../../../client/src/redux/actions/actionTypes";
+import { INNER_PIECE_CLICK_ACTION } from "../../../client/src/redux/actions/actionTypes";
 import { SOCKET_SERVER_SENDING_ACTION, SOCKET_SERVER_REDIRECT } from "../../../client/src/constants/otherConstants";
-import { GAME_INACTIVE_TAG, BAD_REQUEST_TAG } from "../../pages/errorTypes";
-import { TYPE_COSTS, PURCHASE_PHASE_ID, TYPE_MAIN, BLUE_TEAM_ID } from "../../../client/src/constants/gameConstants";
+import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
+import { TYPE_MAIN, COMBAT_PHASE_ID, SLICE_PLANNING_ID, CONTAINER_TYPES } from "../../../client/src/constants/gameConstants";
+import { initialGameboardEmpty } from "../../../client/src/redux/reducers/initialGameboardEmpty";
+import { ALL_GROUND_TYPES } from "../../../client/src/constants/gameboardConstants";
+import { distanceMatrix } from "../../../client/src/constants/distanceMatrix";
 
 const exitTransportContainer = async (socket, payload) => {
-    //put the piece from the payload, into the container
-
-    //TODO: verify
     const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
-    // const thisGame = await new Game({ gameId }).init();
-
-    //TODO: verify
     const { selectedPiece, containerPiece, selectedPositionId } = payload;
 
-    //need to update these container id's
+    const thisGame = await new Game({ gameId }).init();
+    const { gameActive, gamePhase, gameSlice } = thisGame;
 
-    //need to let client(s) know about the container change (send them full pieces update if lazy)
+    if (!gameActive) {
+        socket.emit(SOCKET_SERVER_REDIRECT, GAME_INACTIVE_TAG);
+        return;
+    }
 
-    const selectedPieceId = selectedPiece.pieceId;
+    if (!gameControllers.includes(TYPE_MAIN)) {
+        sendUserFeedback(socket, "Not the right controller type for this action...");
+        return;
+    }
 
-    //TODO: this currently only considers same position containers (not transports)
-    await Piece.putOutsideContainer(selectedPieceId, selectedPositionId);
+    if (gamePhase != COMBAT_PHASE_ID || gameSlice != SLICE_PLANNING_ID) {
+        sendUserFeedback(socket, "Not the right phase/slice for container entering.");
+        return;
+    }
+
+    const thisSelectedPiece = await new Piece(selectedPiece.pieceId).init();
+    const thisContainerPiece = await new Piece(containerPiece.pieceId).init();
+
+    if (!thisSelectedPiece) {
+        sendUserFeedback(socket, "Selected Piece did not exists...refresh page probably");
+        return;
+    }
+
+    if (!thisContainerPiece) {
+        sendUserFeedback(socket, "Selected Container piece did not exist...");
+        return;
+    }
+
+    if (!CONTAINER_TYPES.includes(thisContainerPiece.pieceTypeId)) {
+        sendUserFeedback(socket, "Selected Container piece was not a container type");
+        return;
+    }
+
+    if (thisSelectedPiece.pieceContainerId !== thisContainerPiece.pieceId) {
+        sendUserFeedback(socket, "Tried to move piece outside container, it wasn't in the container to begin with...");
+        return;
+    }
+
+    if (!ALL_GROUND_TYPES.includes(initialGameboardEmpty[selectedPositionId].type)) {
+        sendUserFeedback(socket, "Tried to move piece to non-land position.");
+        return;
+    }
+
+    if (distanceMatrix[thisContainerPiece.piecePositionId][selectedPositionId] !== 1) {
+        sendUserFeedback(socket, "Tried to move piece to position that was not exactly 1 hex away.");
+        return;
+    }
+
+    await Piece.putOutsideContainer(thisSelectedPiece.pieceId, selectedPositionId);
 
     const serverAction = {
         type: INNER_PIECE_CLICK_ACTION,
@@ -32,6 +77,8 @@ const exitTransportContainer = async (socket, payload) => {
             containerPiece
         }
     };
+
+    //TODO: could make some sort of helper to send to teams and stuff, this is a little weird...
     socket.to("game" + gameId + "team" + gameTeam).emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
     socket.emit(SOCKET_SERVER_SENDING_ACTION, serverAction);
 };

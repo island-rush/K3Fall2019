@@ -9,7 +9,7 @@ import { TYPE_OWNERS, TYPE_AIR, TYPE_LAND, TYPE_SEA, TYPE_SPECIAL, LIST_ALL_CAPA
 const shopStyle = {
     backgroundColor: "Yellow",
     position: "absolute",
-    height: "225%",
+    height: "215%",
     width: "1800%",
     marginLeft: "150%",
     marginTop: "20%"
@@ -51,7 +51,7 @@ class ShopMenu extends Component {
         const shopItemComponents = shopItems.map((shopItem, index) => <ShopItem key={index} shopItem={shopItem} refund={shopItemId => refund(shopItemId)} />);
 
         return (
-            <div style={selected ? shopStyle : invisibleStyle}>                
+            <div style={selected ? shopStyle : invisibleStyle}>
                 <div>Shop Menu</div>
                 <div>Points: {points}</div>
                 <div style={purchaseableItemsContainerStyle}>

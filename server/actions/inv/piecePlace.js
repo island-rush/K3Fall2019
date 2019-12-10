@@ -3,8 +3,9 @@ const sendUserFeedback = require("../sendUserFeedback");
 import { PIECE_PLACE } from "../../../client/src/redux/actions/actionTypes";
 import { SOCKET_SERVER_REDIRECT, SOCKET_SERVER_SENDING_ACTION } from "../../../client/src/constants/otherConstants";
 import { BAD_REQUEST_TAG, GAME_INACTIVE_TAG } from "../../pages/errorTypes";
-import { PLACE_PHASE_ID, TYPE_OWNERS, TYPE_TERRAIN } from "../../../client/src/constants/gameConstants";
+import { PLACE_PHASE_ID, TYPE_OWNERS, TYPE_TERRAIN, RADAR_TYPE_ID, MISSILE_TYPE_ID, TYPE_AIR_PIECES } from "../../../client/src/constants/gameConstants";
 import { initialGameboardEmpty } from "../../../client/src/redux/reducers/initialGameboardEmpty";
+import { TEAM_MAIN_ISLAND_STARTING_POSITIONS, ALL_AIRFIELD_LOCATIONS } from "../../../client/src/constants/gameboardConstants";
 
 const piecePlace = async (socket, payload) => {
     const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
@@ -63,6 +64,21 @@ const piecePlace = async (socket, payload) => {
     if (!TYPE_TERRAIN[invItemTypeId].includes(type)) {
         sendUserFeedback(socket, "can't go on that terrain with this piece type");
         return;
+    }
+
+    if (!TEAM_MAIN_ISLAND_STARTING_POSITIONS[gameTeam].includes(selectedPosition) && ![RADAR_TYPE_ID, MISSILE_TYPE_ID].includes(invItemTypeId)) {
+        //radar and missile only need to be placed in either silo or next to friendly piece
+        sendUserFeedback(socket, "Must place piece on/around main island.");
+        return;
+    }
+
+    //TODO: could also check that they own the airfield? already check that this is on the main island...
+    //TODO: does placing them in the airfield start them as 'landed' or 'airborn'? -> probably should make them landed to start....
+    //TODO: does this include helicopters? they can be on land, so probably not...
+    if (TYPE_AIR_PIECES.includes(invItemTypeId)) {
+        if (!ALL_AIRFIELD_LOCATIONS.includes(selectedPosition)) {
+            sendUserFeedback(socket, "Must place air unit on airfield.");
+        }
     }
 
     //TODO: need to make sure pieces are put onto main island (or surrounding waters)

@@ -1,28 +1,63 @@
+/**
+ * This function for letting pieces leave containers within the same position
+ */
+
 const { Game, Piece } = require("../../classes");
 const sendUserFeedback = require("../sendUserFeedback");
-import { SHOP_REFUND, OUTER_PIECE_CLICK_ACTION, INNER_PIECE_CLICK_ACTION } from "../../../client/src/redux/actions/actionTypes";
+import { INNER_PIECE_CLICK_ACTION } from "../../../client/src/redux/actions/actionTypes";
 import { SOCKET_SERVER_SENDING_ACTION, SOCKET_SERVER_REDIRECT } from "../../../client/src/constants/otherConstants";
-import { GAME_INACTIVE_TAG, BAD_REQUEST_TAG } from "../../pages/errorTypes";
-import { TYPE_COSTS, PURCHASE_PHASE_ID, TYPE_MAIN, BLUE_TEAM_ID } from "../../../client/src/constants/gameConstants";
+import { GAME_INACTIVE_TAG } from "../../pages/errorTypes";
+import { TYPE_MAIN, COMBAT_PHASE_ID, SLICE_PLANNING_ID, CONTAINER_TYPES, TYPE_TERRAIN } from "../../../client/src/constants/gameConstants";
+import { initialGameboardEmpty } from "../../../client/src/redux/reducers/initialGameboardEmpty";
 
 const exitContainer = async (socket, payload) => {
-    //put the piece from the payload, into the container
-
-    //TODO: verify
     const { gameId, gameTeam, gameControllers } = socket.handshake.session.ir3;
-    // const thisGame = await new Game({ gameId }).init();
-
-    //TODO: verify
     const { selectedPiece, containerPiece } = payload;
 
-    //need to update these container id's
+    const thisGame = await new Game({ gameId }).init();
+    const { gameActive, gamePhase, gameSlice } = thisGame;
 
-    //need to let client(s) know about the container change (send them full pieces update if lazy)
+    if (!gameActive) {
+        socket.emit(SOCKET_SERVER_REDIRECT, GAME_INACTIVE_TAG);
+        return;
+    }
 
-    const selectedPieceId = selectedPiece.pieceId;
+    if (!gameControllers.includes(TYPE_MAIN)) {
+        sendUserFeedback(socket, "Not the right controller type for this action...");
+        return;
+    }
 
-    //TODO: this currently only considers same position containers (not transports)
-    await Piece.putOutsideContainer(selectedPieceId, selectedPiece.piecePositionId);
+    if (gamePhase != COMBAT_PHASE_ID || gameSlice != SLICE_PLANNING_ID) {
+        sendUserFeedback(socket, "Not the right phase/slice for container entering.");
+        return;
+    }
+
+    const thisSelectedPiece = await new Piece(selectedPiece.pieceId).init();
+    if (!thisSelectedPiece) {
+        sendUserFeedback(socket, "Selected Piece did not exists...refresh page probably");
+        return;
+    }
+
+    const thisContainerPiece = await new Piece(containerPiece.pieceId).init();
+    if (!thisContainerPiece) {
+        sendUserFeedback(socket, "Selected Container piece did not exist...");
+        return;
+    }
+
+    if (!CONTAINER_TYPES.includes(thisContainerPiece.pieceTypeId)) {
+        sendUserFeedback(socket, "Selected Container piece was not a container type");
+        return;
+    }
+
+    //TODO: can't 'air drop', other edge cases and stuff
+    //TODO: could combine with exitTransport container and do more switch case for edge cases / terrain checking?
+
+    if (!TYPE_TERRAIN[thisSelectedPiece.pieceTypeId].includes(initialGameboardEmpty[thisSelectedPiece.piecePositionId].type)) {
+        sendUserFeedback(socket, "that piece can't be on that terrain.");
+        return;
+    }
+
+    await Piece.putOutsideContainer(thisSelectedPiece.pieceId, thisSelectedPiece.piecePositionId);
 
     const serverAction = {
         type: INNER_PIECE_CLICK_ACTION,

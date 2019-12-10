@@ -27,7 +27,9 @@ import {
     MC_12_TYPE_ID,
     C_130_TYPE_ID,
     RADAR_TYPE_ID,
-    MISSILE_TYPE_ID
+    MISSILE_TYPE_ID,
+    TYPE_AIR_PIECES,
+    TYPE_FUEL
 } from "../../client/src/constants/gameConstants";
 import { distanceMatrix } from "../../client/src/constants/distanceMatrix";
 
@@ -75,6 +77,13 @@ class Piece {
         const queryString = "DELETE FROM plans WHERE planPieceId = ?";
         const inserts = [this.pieceId];
         await pool.query(queryString, inserts);
+    }
+
+    async getPiecesInside() {
+        const queryString = "SELECT * FROM pieces WHERE pieceContainerId = ?";
+        const inserts = [this.pieceId];
+        const [allPieces] = await pool.query(queryString, inserts);
+        return allPieces;
     }
 
     // prettier-ignore
@@ -160,10 +169,17 @@ class Piece {
             "UPDATE pieces, plans SET pieces.piecePositionId = plans.planPositionId, pieces.pieceMoves = pieces.pieceMoves - 1 WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
         await conn.query(movePiecesQuery, inserts);
 
-        inserts = [gameId, movementOrder];
+        //update fuel (only for pieces that are restricted by fuel (air pieces))
+        inserts = [gameId, movementOrder, TYPE_AIR_PIECES];
         let removeFuel =
-            "UPDATE pieces, plans SET pieces.pieceFuel = pieces.pieceFuel - 1 WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0";
+            "UPDATE pieces, plans SET pieces.pieceFuel = pieces.pieceFuel - 1 WHERE pieces.pieceId = plans.planPieceId AND planGameId = ? AND plans.planMovementOrder = ? AND plans.planSpecialFlag = 0 AND pieces.pieceTypeId in (?)";
         await conn.query(removeFuel, inserts);
+
+        let updateContents =
+            "UPDATE pieces AS insidePieces JOIN pieces AS containerPieces ON insidePieces.pieceContainerId = containerPieces.pieceId SET insidePieces.piecePositionId = containerPieces.piecePositionId WHERE insidePieces.pieceGameId = ?";
+        let newinserts = [gameId];
+        await conn.query(updateContents, newinserts);
+        await conn.query(updateContents, newinserts); //do it twice for containers within containers contained pieces to get updated (GENIUS LEVEL CODING RIGHT HERE)
 
         //TODO: referencing another table here...(could change to put into the plans class)
         const deletePlansQuery = "DELETE FROM plans WHERE planGameId = ? AND planMovementOrder = ? AND planSpecialFlag = 0";
@@ -219,13 +235,32 @@ class Piece {
             if (!allPieces[currentPiece.piecePositionId]) {
                 allPieces[currentPiece.piecePositionId] = [];
             }
+            //TODO: constant instead of -1
             if (currentPiece.pieceContainerId == -1) {
                 allPieces[currentPiece.piecePositionId].push(currentPiece);
             } else {
                 let indexOfParent = allPieces[currentPiece.piecePositionId].findIndex(piece => {
                     return piece.pieceId == currentPiece.pieceContainerId;
                 });
-                allPieces[currentPiece.piecePositionId][indexOfParent].pieceContents.pieces.push(currentPiece);
+                if (indexOfParent == -1) {
+                    //need to find grandparent, and find parent within pieceContents
+                    //loop through all grandparent children to find actual parent?
+                    //TODO: probably cleaner way of doing this logic, should also break from outer loop to be more efficient, since we are done
+                    let parentId = currentPiece.pieceContainerId;
+                    let grandParentId;
+                    for (let x = 0; x < allPieces[currentPiece.piecePositionId].length; x++) {
+                        let potentialGrandparent = allPieces[currentPiece.piecePositionId][x];
+                        for (let y = 0; y < potentialGrandparent.pieceContents.pieces.length; y++) {
+                            let potentialParent = potentialGrandparent.pieceContents.pieces[y];
+                            if (potentialParent.pieceId == currentPiece.pieceContainerId) {
+                                allPieces[currentPiece.piecePositionId][x].pieceContents.pieces[y].pieceContents.pieces.push(currentPiece);
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    allPieces[currentPiece.piecePositionId][indexOfParent].pieceContents.pieces.push(currentPiece);
+                }
             }
         }
 
@@ -233,6 +268,7 @@ class Piece {
     }
 
     static async getPositionRefuels(gameId, gameTeam) {
+        //TODO: constant for 'outside container' instead of -1?
         const queryString =
             "SELECT tnkr.pieceId as tnkrPieceId, tnkr.pieceTypeId as tnkrPieceTypeId, tnkr.piecePositionId as tnkrPiecePositionId, tnkr.pieceMoves as tnkrPieceMoves, tnkr.pieceFuel as tnkrPieceFuel, arcft.pieceId as arcftPieceId, arcft.pieceTypeId as arcftPieceTypeId, arcft.piecePositionId as arcftPiecePositionId, arcft.pieceMoves as arcftPieceMoves, arcft.pieceFuel as arcftPieceFuel FROM (SELECT * FROM pieces WHERE pieceTypeId = 3 AND pieceGameId = ? AND pieceTeamId = ?) as tnkr JOIN (SELECT * FROM pieces WHERE pieceTypeId in (0, 1, 2, 4, 5, 17, 18) AND pieceGameId = ? AND pieceTeamId = ?) as arcft ON tnkr.piecePositionId = arcft.piecePositionId WHERE arcft.pieceContainerId = -1";
         const inserts = [gameId, gameTeam, gameId, gameTeam];
@@ -243,11 +279,21 @@ class Piece {
     }
 
     static async putInsideContainer(selectedPiece, containerPiece) {
+        //TODO: could combine into 1 query, or could have a selection for variable query, 1 request instead of 2 would be better
+
         let queryString = "UPDATE pieces SET pieceContainerId = ?, piecePositionId = ? WHERE pieceId = ?";
         let inserts = [containerPiece.pieceId, containerPiece.piecePositionId, selectedPiece.pieceId];
         await pool.query(queryString, inserts);
+
+        //refuel the piece
+        if (TYPE_AIR_PIECES.includes(selectedPiece.pieceTypeId)) {
+            queryString = "UPDATE pieces SET pieceFuel = ? WHERE pieceId = ?";
+            inserts = [TYPE_FUEL[selectedPiece.pieceTypeId], selectedPiece.pieceId];
+            await pool.query(queryString, inserts);
+        }
     }
 
+    //TODO: could make this a non-static method? (since we already have the pieceId....)
     static async putOutsideContainer(selectedPieceId, newPositionId) {
         //TODO: deal with inner transport pieces (need to also set the piecePositionId)
         let queryString = "UPDATE pieces SET pieceContainerId = -1, piecePositionId = ? WHERE pieceId = ?";

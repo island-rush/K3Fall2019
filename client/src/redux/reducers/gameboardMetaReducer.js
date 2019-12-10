@@ -57,7 +57,7 @@ import { distanceMatrix } from "../../constants/distanceMatrix";
 import { initialGameboardEmpty } from "./initialGameboardEmpty";
 
 import { TYPE_FUEL, TRANSPORT_TYPE_ID } from "../../constants/gameConstants";
-import { LAND_TYPE } from "../../constants/gameboardConstants";
+import { LAND_TYPE, ALL_GROUND_TYPES } from "../../constants/gameboardConstants";
 
 const initialGameboardMeta = {
     //TODO: change to selectedPositionId and selectedPieceId to better represent the values (ints) (and also selectedBattlePiece -> selectedBattlePieceId)
@@ -160,7 +160,7 @@ function gameboardMetaReducer(state = initialGameboardMeta, { type, payload }) {
             if (selectedPieceTypeId === TRANSPORT_TYPE_ID) {
                 for (let x = 0; x < distanceMatrix[selectedPiecePosition].length; x++) {
                     //TODO: do we need a constant for '1'? transports can only pick up pieces from 1 hex away seems obvious
-                    if (distanceMatrix[selectedPiecePosition][x] <= 1 && initialGameboardEmpty[x].type === LAND_TYPE) {
+                    if (distanceMatrix[selectedPiecePosition][x] <= 1 && ALL_GROUND_TYPES.includes(initialGameboardEmpty[x].type)) {
                         //TODO: better way of combining arrays (no internet while i'm coding this mid-flight)
                         for (let y = 0; y < payload.gameboard[x].pieces.length; y++) {
                             //TODO: only put pieces here if they are able to get onto transport pieces
