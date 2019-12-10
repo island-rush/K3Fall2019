@@ -8,8 +8,8 @@ const containerPieceStyle = {
     backgroundSize: "90% 90%",
     backgroundPosition: "center",
     border: "2px solid black",
-    height: "20%",
-    width: "23%",
+    height: "15%",
+    width: "15%",
     float: "left",
     margin: ".5%",
     position: "relative"

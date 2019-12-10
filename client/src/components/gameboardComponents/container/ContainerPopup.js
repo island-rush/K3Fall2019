@@ -7,7 +7,7 @@ const containerPopupStyle = {
     position: "absolute",
     display: "block",
     width: "80%",
-    height: "80%",
+    height: "70%",
     top: "10%",
     right: "10%",
     backgroundColor: "white",

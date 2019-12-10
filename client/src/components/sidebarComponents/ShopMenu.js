@@ -9,7 +9,7 @@ import { TYPE_OWNERS, TYPE_AIR, TYPE_LAND, TYPE_SEA, TYPE_SPECIAL, LIST_ALL_CAPA
 const shopStyle = {
     backgroundColor: "Yellow",
     position: "absolute",
-    height: "215%",
+    height: "170%",
     width: "1800%",
     marginLeft: "150%",
     marginTop: "20%"

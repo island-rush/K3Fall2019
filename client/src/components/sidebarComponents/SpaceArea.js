@@ -8,7 +8,7 @@ import { REMOTE_SENSING_TYPE_ID, RODS_FROM_GOD_TYPE_ID, ANTI_SATELLITE_MISSILES_
 const spaceAreaStyle = {
     backgroundColor: "Yellow",
     position: "absolute",
-    height: "215%",
+    height: "170%",
     width: "1800%",
     marginLeft: "150%",
     marginTop: "20%",
