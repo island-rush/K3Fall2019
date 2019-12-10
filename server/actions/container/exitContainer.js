@@ -50,6 +50,7 @@ const exitContainer = async (socket, payload) => {
     }
 
     //TODO: can't 'air drop', other edge cases and stuff
+    //TODO: could combine with exitTransport container and do more switch case for edge cases / terrain checking?
 
     if (!TYPE_TERRAIN[thisSelectedPiece.pieceTypeId].includes(initialGameboardEmpty[thisSelectedPiece.piecePositionId].type)) {
         sendUserFeedback(socket, "that piece can't be on that terrain.");
