@@ -1,3 +1,6 @@
+THIS VERSION IS NO LONGER SUPPORTED.
+
+This repository represents the final product given by the Fall 2019 A&M Team.
 # Island Rush V3
 
 [![Build status](https://dev.azure.com/spenceradolph/IslandRushK3/_apis/build/status/IslandRushK3-CI)](https://dev.azure.com/spenceradolph/IslandRushK3/_build/latest?definitionId=7)
